@@ -1,0 +1,18 @@
+version: 1
+agent:
+  name: subagent-reviewer
+  extend: default
+
+  loop_control:
+    max_steps_per_turn: 10000
+
+  system_prompt_path: ../../prompts/subagents/reviewer.md
+
+  tools:
+    - "kimi_cli.tools.file:ReadFile"
+    - "kimi_cli.tools.file:WriteFile"
+    - "kimi_cli.tools.file:Grep"
+    - "kimi_cli.tools.file:Glob"
+    - "kimi_cli.tools.shell:Shell"
+    - "kimi_cli.tools.web:FetchURL"
+    - "kimi_cli.tools.todo:SetTodoList"

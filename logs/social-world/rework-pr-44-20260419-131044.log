@@ -1,0 +1,2828 @@
+[2026-04-19 13:10:44] PR #44 Rework 启动
+分支: design/issue-43
+【任务上下文】
+- PR 编号: #44
+- 项目路径: /var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/rework-pr-44-316927
+4568
+- 项目地图: /var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/rework-pr-44-316927
+4568/AGENTS.md
+- 关联 PRD: /var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/rework-pr-44-316927
+4568/prd/v1-profile.md,/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/rework-p
+r-44-3169274568/prd/v1-mvp.md,/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/r
+ework-pr-44-3169274568/prd/v1-matching.md
+- 文档目录: /var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/rework-pr-44-316927
+4568/docs
+
+Issue #44: design: assets for issue #43
+
+这是 PR #44 的返工任务。
+分支: design/issue-43
+
+请严格按照以下步骤执行修复：
+1. 先执行：git checkout design/issue-43
+2. 根据审查报告中的问题进行代码修改
+3. 修改完成后按项目技术栈运行自测（不要只跑 go test）：
+   - 若修改了 Flutter 代码（apps/mobile/ 或 packages/design-system/）：
+     cd apps/mobile && flutter pub get
+     cd apps/mobile && flutter analyze
+     cd apps/mobile && flutter test
+   - 若修改了 Node/NestJS 后端代码：
+     cd apps/api && npm test
+     cd apps/api && npm run build
+   - 通用检查：
+     make check-docs（文档检查）
+4. 提交并推送：git add -A && git commit -m "fix: 修复 PR #44 review 问题" && git
+push origin design/issue-43
+   注意：如果 git commit 触发 pre-commit hook 失败，必须阅读错误输出并修复后重新
+commit。
+
+审查报告：
+## 审查结论
+
+审查结论: **NEEDS_MAJOR_FIX**
+
+> 本 PR 为 issue-43 的 Design-Only PR，产出 Matching 模块的 UI 设计规范、高保真
+原型（mockup.html）与线框图（wireframe.svg）。设计资产质量整体合格，但存在**文档
+引用不一致**和**Accessibility 规范缺口**两个严重问题，会导致后续开发 Agent 产出
+的代码无法通过 Maestro E2E 验收。
+
+---
+
+## 阻塞问题（Blocking）
+
+无。
+
+---
+
+## 严重问题（Major）
+
+### 1. 项目文档中的设计资产引用仍指向旧版 issue-4，未同步更新为 issue-43
+- **位置**: `prd/v1-matching.md:8` / `docs/api/matching.md:4`
+- **问题**: 
+  - `prd/v1-matching.md` 第 8 行写 `"设计资产参见 designs/issue-4/"`
+  - `docs/api/matching.md` 第 4 行写 `"关联设计规范: ../../designs/issue-4/desig
+n-spec.md"`
+  - 本 PR 的 `designs/issue-43/docs-to-update.txt` 明确列出要在 `prd/v1-matching
+.md` 顶部添加 `"设计资产参见 designs/issue-43/"`，但 **PR diff 中未包含对该文件
+的任何修改**。
+  - 仓库现已同时存在 `designs/issue-4/design-spec.md` 与 `designs/issue-43/desig
+n-spec.md` 两个 Matching 设计规范，若引用不更新，后续开发 Agent 无法判断以哪个为
+准。
+- **影响**: 下游开发 Agent 可能基于过时的 issue-4 设计资产实现，导致与 issue-43 
+新增内容（如 `EmptyMatchListView`、响应式适配、模式切换动画）不一致。
+- **修复**:
+  1. 在 `prd/v1-matching.md` 第 8 行将 `designs/issue-4/` 改为 `designs/issue-43
+/`
+  2. 在 `docs/api/matching.md` 第 4 行将 `../../designs/issue-4/design-spec.md` 
+改为 `../../designs/issue-43/design-spec.md`
+- **依据**: 
+  - `designs/issue-43/docs-to-update.txt` 第 25-26 行自身要求更新 PRD
+  - `docs/design-docs/issue-workflow.md` 第 95 行："文档已同步（AGENTS.md、docs/
+modules/INDEX.md、API 文档等）"
+
+### 2. Accessibility 规范缺少 Maestro E2E 必需的 `Semantics(identifier)` 定义
+- **位置**: `designs/issue-43/design-spec.md` 第 258-279 行（第 8 节 Accessibili
+ty 规范）
+- **问题**: 
+  - 8.2 节「屏幕阅读器」表格仅定义了 `label`、`tooltip`、`selected`、`onTapHint`
+，**完全未定义 `identifier`**。
+  - 根据 `docs/design-docs/flutter.md` 第 251-258 行，`identifier` 是 Maestro E2
+E 定位 Widget 的核心属性：
+    > "`identifier: 'xxx'` — 生成稳定的 `resource-id` — 对应 Maestro `tapOn: { i
+d: "xxx" }`"
+  - Matching 是核心用户旅程，`docs/design-docs/issue-workflow.md` 第 75-79 行明
+确规定：
+    > "用户可见的核心 UI（登录、注册、资料、匹配、新页面交互）→ **Maestro E2E** 
+或 **ADB fallback**，必须覆盖完整用户流程"
+  - 由于设计规范未指定 `identifier`，下游实现 Agent 极可能遗漏，导致 `.maestro/f
+lows/` 无法稳定定位「Pass 按钮」「Like 按钮」「模式切换 Tab」「匹配列表项」等关
+键元素。
+- **影响**: 后续 feat PR 若按此设计规范实现，Maestro E2E 将因缺少 `resource-id` 
+而无法编写或运行匹配流程的自动化测试。
+- **修复**: 在 `designs/issue-43/design-spec.md` 第 8.2 节表格中，为每个交互元素
+补充 `identifier` 列：
+
+| 元素 | Semantics identifier | Semantics label |
+|------|---------------------|-----------------|
+| 推荐卡片 | `recommendation_card_{user_id}` 或 `recommendation_card_top` | `"{
+昵称}, {年龄}岁, 距离{距离}"` |
+| Pass 按钮 | `swipe_pass_button` | `"跳过"` |
+| Like 按钮 | `swipe_like_button` | `"喜欢"` |
+| 模式切换 Tab | `mode_tab_nearby` / `mode_tab_city` / `mode_tab_nationwide` | `
+"{模式名}"` |
+| 匹配列表项 | `match_list_item_{index}` | `"{昵称}, {匹配时间}"` |
+| 继续滑动按钮（弹窗） | `match_continue_button` | `"继续滑动"` |
+| 去聊天按钮（弹窗） | `match_chat_button` | `"去聊天"` |
+
+- **依据**: 
+  - `docs/design-docs/flutter.md` 第 251-272 行（Semantics 三要素与最小示例）
+  - `docs/design-docs/issue-workflow.md` 第 83-86 行（Feature / UI 变更的 E2E 要
+求）
+
+### 3. 交互说明未提及 Maestro 兼容的 `onTapDown` 手势要求
+- **位置**: `designs/issue-43/design-spec.md` 第 5.1 节（手势与动画）
+- **问题**: 
+  - 设计规范描述了「点击 ✕ → Pass」「点击 ♥ → Like」等交互，但未注明这些可点击元
+素在 Flutter 实现时必须使用 `GestureDetector(onTapDown: ...)` 而非 `onTap`，以满
+足 Maestro 兼容性。
+  - `docs/design-docs/flutter.md` 第 295-314 行明确指出：
+    > "Maestro 使用 Android Accessibility API 的 `performAction(ACTION_CLICK)`，
+其事件序列（仅 `ACTION_DOWN` → `ACTION_UP`，无完整手势轨迹）**无法触发 Flutter 
+的 `GestureDetector.onTap`**"
+    > "**必须**将需要 Maestro 点击的交互回调改为 `onTapDown`"
+- **影响**: 若下游 Agent 只阅读设计规范而未重读 `flutter.md`，可能使用 `onTap` 
+实现操作按钮，导致 Maestro E2E 点击失败。
+- **修复**: 在 `designs/issue-43/design-spec.md` 第 5.1 节或新增「开发备注」小节
+中追加：
+  > "所有需 Maestro E2E 点击的按钮（Pass、Like、模式 Tab、弹窗 CTA）在 Flutter 
+实现时，必须使用 `GestureDetector(onTapDown: (_) => ...)`，禁止使用 `onTap`。参
+见 `docs/design-docs/flutter.md` Maestro 点击兼容性章节。"
+- **依据**: `docs/design-docs/flutter.md` 第 295-314 行
+
+---
+
+## 轻微问题（Minor）
+
+### 4. 设计规范文档存放位置与项目模板不完全一致
+- **位置**: `designs/issue-43/design-spec.md` / `designs/issue-43/wireframe.svg`
+- **问题**: 
+  - `docs/exec-plans/templates/TEMPLATE-design.md` 第 16 行规定设计规范文档应存
+放于 `docs/design-docs/ui-specs/<feature>/`，线框图存放于 `docs/design-docs/ui-s
+pecs/<feature>/wireframes/`。
+  - 项目现有实践：`docs/design-docs/ui-specs/auth/login-page-wireframe.md`、`doc
+s/design-docs/ui-specs/profile/profile-edit-wireframe.md`。
+  - 本 PR 将 `design-spec.md` 与 `wireframe.svg` 直接放在 `designs/issue-43/` 下
+，与既有目录结构不一致。
+- **影响**: 后续 Agent 查找 Matching 设计规范时，可能优先检索 `docs/design-docs/
+ui-specs/matching/` 而找不到。
+- **修复**: 建议将 `design-spec.md` 复制或移动到 `docs/design-docs/ui-specs/matc
+hing/spec.md`，`wireframe.svg` 移动到 `docs/design-docs/ui-specs/matching/wirefr
+ames/`（或在 `docs/design-docs/ui-specs/` 下创建 `matching/` 目录的索引链接）。
+- **依据**: `docs/exec-plans/templates/TEMPLATE-design.md` 第 16 行及现有 `docs/
+design-docs/ui-specs/` 目录结构。
+
+### 5. 缺少 Maestro E2E Flow 的设计考虑
+- **位置**: `designs/issue-43/design-spec.md` 全局
+- **问题**: 
+  - 作为核心用户旅程（首页推荐 → 滑动 → 配对成功 → 匹配列表），设计文档未提及应
+配套产出哪些 Maestro E2E flow。
+  - `docs/design-docs/issue-workflow.md` 第 83 行要求："涉及新的用户流程 → **必
+须**新建 `.maestro/flows/<flow>.yaml`"。
+- **影响**: 后续实现 Agent 可能遗漏 E2E 测试资产，导致 feat PR 因缺少 E2E 被退回
+。
+- **修复**: 在 `designs/issue-43/design-spec.md` 第 9 节（或新增第 10 节）中增加
+E2E Flow 建议：
+  - `.maestro/flows/matching_swipe.yaml`：覆盖首页加载推荐 → 右滑 Like → 断言卡
+片消失
+  - `.maestro/flows/matching_match_success.yaml`：覆盖双向 Like → 断言 MatchSucc
+essDialog 弹出
+  - `.maestro/flows/match_list.yaml`：覆盖进入消息 Tab → 断言匹配列表加载
+- **依据**: `docs/design-docs/issue-workflow.md` 第 83-86 行
+
+### 6. `docs/modules/matching.md` 与 design-spec 的 Widget 清单不一致
+- **位置**: `docs/modules/matching.md` 第 120-137 行 / `designs/issue-43/design-
+spec.md` 第 98-105 行
+- **问题**: 
+  - `designs/issue-43/design-spec.md` 新增了 `EmptyMatchListView`，但 `docs/modu
+les/matching.md` 的页面级 Widget 清单中未列出它。
+  - 本 PR 的 `docs-to-update.txt` 要求更新 `docs/modules/matching.md`，但 PR dif
+f 未包含该修改。
+- **影响**: 模块文档与最新设计规范不一致。
+- **修复**: 在 `docs/modules/matching.md` 页面级 Widget 表格中追加 `EmptyMatchLi
+stView` 一行。
+- **依据**: `designs/issue-43/docs-to-update.txt` 第 13-15 行
+
+---
+
+## 验证结果
+
+| 维度 | 状态 | 说明 |
+|------|------|------|
+| 全链路完整性 | N/A | 本 PR 为 Design-Only，无代码实现 |
+| 规范符合性 | ❌ | design-spec 缺少 Maestro `identifier` 与 `onTapDown` 要求，
+与 `flutter.md` 冲突 |
+| 测试覆盖 | ❌ | 未提供 E2E flow 设计建议，与 `issue-workflow.md` 对核心 UI 的 
+E2E 要求有差距 |
+| 文档同步 | ❌ | PRD、API 文档、模块文档中的旧引用（issue-4）未更新为 issue-43 
+|
+| 设计 Token 合规 | ✅ | 颜色、字号、间距、圆角均复用现有 `DesignTokens`，未引入
+硬编码色值 |
+| 组件层级合规 | ✅ | atom / molecule / organism 分层正确，Widgetbook 用例要求已
+声明 |
+| 状态完整性 | ✅ | Loading、Empty、Error、Match Success 四种状态均已定义 |
+| 响应式适配 | ✅ | 小屏/大屏/安全区适配方案已记录 |
+
+---
+
+## 风险与建议
+
+1. **issue-4 与 issue-43 设计资产并存的风险**：仓库内同时存在两个 Matching 设计
+规范（`designs/issue-4/` 与 `designs/issue-43/`）。建议在本 PR 合并前或合并后的
+清理 PR 中，明确废弃或删除 `designs/issue-4/`（若其已被 issue-43 完全替代），避
+免后续 Agent 误用旧规范。
+
+2. **Accessibility 规范前移建议**：当前项目对 Maestro E2E 的要求非常严格（`flutt
+er.md` 专门用 150+ 行描述）。建议在 `docs/design-docs/ui-style-guide/verificatio
+n.md` 或 `mobile-patterns.md` 中增加「设计规范必须包含 Maestro `identifier`」的
+强制检查项，让设计 Agent 在产出阶段就内建该要求，而不是依赖 Code Review 发现。
+
+3. **设计规范与模块文档去重建议**：`designs/issue-43/design-spec.md` 的 BLoC/Eve
+nt/State 设计与 `docs/modules/matching.md` 高度重复。建议后续在模块文档中仅保留
+架构流程图和关键文件索引，将详细的组件/状态定义仅保留在设计规范中，降低维护成本
+。
+TurnBegin(
+    user_input='【任务上下文】\n- PR 编号: #44\n- 项目路径: /var/folders/lt/w3sl
+6z8j5v50vt2s6knvf5n00000gn/T/rework-pr-44-3169274568\n- 项目地图: /var/folders/l
+t/w3sl6z8j5v50vt2s6knvf5n00000gn/T/rework-pr-44-3169274568/AGENTS.md\n- 关联 PRD
+: /var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/rework-pr-44-3169274568/prd/v
+1-profile.md,/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/rework-pr-44-31692
+74568/prd/v1-mvp.md,/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/rework-pr-4
+4-3169274568/prd/v1-matching.md\n- 文档目录: /var/folders/lt/w3sl6z8j5v50vt2s6kn
+vf5n00000gn/T/rework-pr-44-3169274568/docs\n\nIssue #44: design: assets for issu
+e #43\n\n这是 PR #44 的返工任务。\n分支: design/issue-43\n\n请严格按照以下步骤执
+行修复：\n1. 先执行：git checkout design/issue-43\n2. 根据审查报告中的问题进行代
+码修改\n3. 修改完成后按项目技术栈运行自测（不要只跑 go test）：\n   - 若修改了 F
+lutter 代码（apps/mobile/ 或 packages/design-system/）：\n     cd apps/mobile &&
+flutter pub get\n     cd apps/mobile && flutter analyze\n     cd apps/mobile && 
+flutter test\n   - 若修改了 Node/NestJS 后端代码：\n     cd apps/api && npm test
+\n     cd apps/api && npm run build\n   - 通用检查：\n     make check-docs（文档
+检查）\n4. 提交并推送：git add -A && git commit -m "fix: 修复 PR #44 review 问题
+" && git push origin design/issue-43\n   注意：如果 git commit 触发 pre-commit h
+ook 失败，必须阅读错误输出并修复后重新 commit。\n\n审查报告：\n## 审查结论\n\n审
+查结论: **NEEDS_MAJOR_FIX**\n\n> 本 PR 为 issue-43 的 Design-Only PR，产出 Match
+ing 模块的 UI 设计规范、高保真原型（mockup.html）与线框图（wireframe.svg）。设计
+资产质量整体合格，但存在**文档引用不一致**和**Accessibility 规范缺口**两个严重问
+题，会导致后续开发 Agent 产出的代码无法通过 Maestro E2E 验收。\n\n---\n\n## 阻塞
+问题（Blocking）\n\n无。\n\n---\n\n## 严重问题（Major）\n\n### 1. 项目文档中的设
+计资产引用仍指向旧版 issue-4，未同步更新为 issue-43\n- **位置**: `prd/v1-matchin
+g.md:8` / `docs/api/matching.md:4`\n- **问题**: \n  - `prd/v1-matching.md` 第 8 
+行写 `"设计资产参见 designs/issue-4/"`\n  - `docs/api/matching.md` 第 4 行写 `"
+关联设计规范: ../../designs/issue-4/design-spec.md"`\n  - 本 PR 的 `designs/issu
+e-43/docs-to-update.txt` 明确列出要在 `prd/v1-matching.md` 顶部添加 `"设计资产参
+见 designs/issue-43/"`，但 **PR diff 中未包含对该文件的任何修改**。\n  - 仓库现
+已同时存在 `designs/issue-4/design-spec.md` 与 `designs/issue-43/design-spec.md`
+两个 Matching 设计规范，若引用不更新，后续开发 Agent 无法判断以哪个为准。\n- **
+影响**: 下游开发 Agent 可能基于过时的 issue-4 设计资产实现，导致与 issue-43 新增
+内容（如 `EmptyMatchListView`、响应式适配、模式切换动画）不一致。\n- **修复**:\n
+ 1. 在 `prd/v1-matching.md` 第 8 行将 `designs/issue-4/` 改为 `designs/issue-43/
+`\n  2. 在 `docs/api/matching.md` 第 4 行将 `../../designs/issue-4/design-spec.m
+d` 改为 `../../designs/issue-43/design-spec.md`\n- **依据**: \n  - `designs/issu
+e-43/docs-to-update.txt` 第 25-26 行自身要求更新 PRD\n  - `docs/design-docs/issu
+e-workflow.md` 第 95 行："文档已同步（AGENTS.md、docs/modules/INDEX.md、API 文档
+等）"\n\n### 2. Accessibility 规范缺少 Maestro E2E 必需的 `Semantics(identifier)
+` 定义\n- **位置**: `designs/issue-43/design-spec.md` 第 258-279 行（第 8 节 Acc
+essibility 规范）\n- **问题**: \n  - 8.2 节「屏幕阅读器」表格仅定义了 `label`、`
+tooltip`、`selected`、`onTapHint`，**完全未定义 `identifier`**。\n  - 根据 `docs
+/design-docs/flutter.md` 第 251-258 行，`identifier` 是 Maestro E2E 定位 Widget 
+的核心属性：\n    > "`identifier: \'xxx\'` — 生成稳定的 `resource-id` — 对应 Mae
+stro `tapOn: { id: "xxx" }`"\n  - Matching 是核心用户旅程，`docs/design-docs/iss
+ue-workflow.md` 第 75-79 行明确规定：\n    > "用户可见的核心 UI（登录、注册、资
+料、匹配、新页面交互）→ **Maestro E2E** 或 **ADB fallback**，必须覆盖完整用户流
+程"\n  - 由于设计规范未指定 `identifier`，下游实现 Agent 极可能遗漏，导致 `.maes
+tro/flows/` 无法稳定定位「Pass 按钮」「Like 按钮」「模式切换 Tab」「匹配列表项」
+等关键元素。\n- **影响**: 后续 feat PR 若按此设计规范实现，Maestro E2E 将因缺少 
+`resource-id` 而无法编写或运行匹配流程的自动化测试。\n- **修复**: 在 `designs/is
+sue-43/design-spec.md` 第 8.2 节表格中，为每个交互元素补充 `identifier` 列：\n\n
+| 元素 | Semantics identifier | Semantics label |\n|------|---------------------
+|-----------------|\n| 推荐卡片 | `recommendation_card_{user_id}` 或 `recommenda
+tion_card_top` | `"{昵称}, {年龄}岁, 距离{距离}"` |\n| Pass 按钮 | `swipe_pass_b
+utton` | `"跳过"` |\n| Like 按钮 | `swipe_like_button` | `"喜欢"` |\n| 模式切换 
+Tab | `mode_tab_nearby` / `mode_tab_city` / `mode_tab_nationwide` | `"{模式名}"`
+|\n| 匹配列表项 | `match_list_item_{index}` | `"{昵称}, {匹配时间}"` |\n| 继续滑
+动按钮（弹窗） | `match_continue_button` | `"继续滑动"` |\n| 去聊天按钮（弹窗） 
+| `match_chat_button` | `"去聊天"` |\n\n- **依据**: \n  - `docs/design-docs/flut
+ter.md` 第 251-272 行（Semantics 三要素与最小示例）\n  - `docs/design-docs/issue
+-workflow.md` 第 83-86 行（Feature / UI 变更的 E2E 要求）\n\n### 3. 交互说明未提
+及 Maestro 兼容的 `onTapDown` 手势要求\n- **位置**: `designs/issue-43/design-spe
+c.md` 第 5.1 节（手势与动画）\n- **问题**: \n  - 设计规范描述了「点击 ✕ → Pass」
+「点击 ♥ → Like」等交互，但未注明这些可点击元素在 Flutter 实现时必须使用 `Gestur
+eDetector(onTapDown: ...)` 而非 `onTap`，以满足 Maestro 兼容性。\n  - `docs/desi
+gn-docs/flutter.md` 第 295-314 行明确指出：\n    > "Maestro 使用 Android Accessi
+bility API 的 `performAction(ACTION_CLICK)`，其事件序列（仅 `ACTION_DOWN` → `ACT
+ION_UP`，无完整手势轨迹）**无法触发 Flutter 的 `GestureDetector.onTap`**"\n    >
+"**必须**将需要 Maestro 点击的交互回调改为 `onTapDown`"\n- **影响**: 若下游 Agen
+t 只阅读设计规范而未重读 `flutter.md`，可能使用 `onTap` 实现操作按钮，导致 Maest
+ro E2E 点击失败。\n- **修复**: 在 `designs/issue-43/design-spec.md` 第 5.1 节或
+新增「开发备注」小节中追加：\n  > "所有需 Maestro E2E 点击的按钮（Pass、Like、模
+式 Tab、弹窗 CTA）在 Flutter 实现时，必须使用 `GestureDetector(onTapDown: (_) =>
+...)`，禁止使用 `onTap`。参见 `docs/design-docs/flutter.md` Maestro 点击兼容性章
+节。"\n- **依据**: `docs/design-docs/flutter.md` 第 295-314 行\n\n---\n\n## 轻微
+问题（Minor）\n\n### 4. 设计规范文档存放位置与项目模板不完全一致\n- **位置**: `d
+esigns/issue-43/design-spec.md` / `designs/issue-43/wireframe.svg`\n- **问题**: 
+\n  - `docs/exec-plans/templates/TEMPLATE-design.md` 第 16 行规定设计规范文档应
+存放于 `docs/design-docs/ui-specs/<feature>/`，线框图存放于 `docs/design-docs/ui
+-specs/<feature>/wireframes/`。\n  - 项目现有实践：`docs/design-docs/ui-specs/au
+th/login-page-wireframe.md`、`docs/design-docs/ui-specs/profile/profile-edit-wir
+eframe.md`。\n  - 本 PR 将 `design-spec.md` 与 `wireframe.svg` 直接放在 `designs
+/issue-43/` 下，与既有目录结构不一致。\n- **影响**: 后续 Agent 查找 Matching 设
+计规范时，可能优先检索 `docs/design-docs/ui-specs/matching/` 而找不到。\n- **修
+复**: 建议将 `design-spec.md` 复制或移动到 `docs/design-docs/ui-specs/matching/s
+pec.md`，`wireframe.svg` 移动到 `docs/design-docs/ui-specs/matching/wireframes/`
+（或在 `docs/design-docs/ui-specs/` 下创建 `matching/` 目录的索引链接）。\n- **
+依据**: `docs/exec-plans/templates/TEMPLATE-design.md` 第 16 行及现有 `docs/desi
+gn-docs/ui-specs/` 目录结构。\n\n### 5. 缺少 Maestro E2E Flow 的设计考虑\n- **位
+置**: `designs/issue-43/design-spec.md` 全局\n- **问题**: \n  - 作为核心用户旅程
+（首页推荐 → 滑动 → 配对成功 → 匹配列表），设计文档未提及应配套产出哪些 Maestro 
+E2E flow。\n  - `docs/design-docs/issue-workflow.md` 第 83 行要求："涉及新的用户
+流程 → **必须**新建 `.maestro/flows/<flow>.yaml`"。\n- **影响**: 后续实现 Agent 
+可能遗漏 E2E 测试资产，导致 feat PR 因缺少 E2E 被退回。\n- **修复**: 在 `designs
+/issue-43/design-spec.md` 第 9 节（或新增第 10 节）中增加 E2E Flow 建议：\n  - `
+.maestro/flows/matching_swipe.yaml`：覆盖首页加载推荐 → 右滑 Like → 断言卡片消失
+\n  - `.maestro/flows/matching_match_success.yaml`：覆盖双向 Like → 断言 MatchSu
+ccessDialog 弹出\n  - `.maestro/flows/match_list.yaml`：覆盖进入消息 Tab → 断言
+匹配列表加载\n- **依据**: `docs/design-docs/issue-workflow.md` 第 83-86 行\n\n##
+# 6. `docs/modules/matching.md` 与 design-spec 的 Widget 清单不一致\n- **位置**:
+`docs/modules/matching.md` 第 120-137 行 / `designs/issue-43/design-spec.md` 第 
+98-105 行\n- **问题**: \n  - `designs/issue-43/design-spec.md` 新增了 `EmptyMatc
+hListView`，但 `docs/modules/matching.md` 的页面级 Widget 清单中未列出它。\n  - 
+本 PR 的 `docs-to-update.txt` 要求更新 `docs/modules/matching.md`，但 PR diff 未
+包含该修改。\n- **影响**: 模块文档与最新设计规范不一致。\n- **修复**: 在 `docs/m
+odules/matching.md` 页面级 Widget 表格中追加 `EmptyMatchListView` 一行。\n- **依
+据**: `designs/issue-43/docs-to-update.txt` 第 13-15 行\n\n---\n\n## 验证结果\n\
+n| 维度 | 状态 | 说明 |\n|------|------|------|\n| 全链路完整性 | N/A | 本 PR 为
+Design-Only，无代码实现 |\n| 规范符合性 | ❌ | design-spec 缺少 Maestro `identif
+ier` 与 `onTapDown` 要求，与 `flutter.md` 冲突 |\n| 测试覆盖 | ❌ | 未提供 E2E f
+low 设计建议，与 `issue-workflow.md` 对核心 UI 的 E2E 要求有差距 |\n| 文档同步 |
+❌ | PRD、API 文档、模块文档中的旧引用（issue-4）未更新为 issue-43 |\n| 设计 Tok
+en 合规 | ✅ | 颜色、字号、间距、圆角均复用现有 `DesignTokens`，未引入硬编码色值
+|\n| 组件层级合规 | ✅ | atom / molecule / organism 分层正确，Widgetbook 用例要
+求已声明 |\n| 状态完整性 | ✅ | Loading、Empty、Error、Match Success 四种状态均
+已定义 |\n| 响应式适配 | ✅ | 小屏/大屏/安全区适配方案已记录 |\n\n---\n\n## 风险
+与建议\n\n1. **issue-4 与 issue-43 设计资产并存的风险**：仓库内同时存在两个 Matc
+hing 设计规范（`designs/issue-4/` 与 `designs/issue-43/`）。建议在本 PR 合并前或
+合并后的清理 PR 中，明确废弃或删除 `designs/issue-4/`（若其已被 issue-43 完全替
+代），避免后续 Agent 误用旧规范。\n\n2. **Accessibility 规范前移建议**：当前项目
+对 Maestro E2E 的要求非常严格（`flutter.md` 专门用 150+ 行描述）。建议在 `docs/d
+esign-docs/ui-style-guide/verification.md` 或 `mobile-patterns.md` 中增加「设计
+规范必须包含 Maestro `identifier`」的强制检查项，让设计 Agent 在产出阶段就内建该
+要求，而不是依赖 Code Review 发现。\n\n3. **设计规范与模块文档去重建议**：`desig
+ns/issue-43/design-spec.md` 的 BLoC/Event/State 设计与 `docs/modules/matching.md
+` 高度重复。建议后续在模块文档中仅保留架构流程图和关键文件索引，将详细的组件/状
+态定义仅保留在设计规范中，降低维护成本。'
+)
+StepBegin(n=1)
+ThinkPart(
+    type='think',
+    think="Let me analyze the task:\n\n1. This is a rework task for PR #44 (desi
+gn: assets for issue #43)\n2. Branch: design/issue-43\n3. I need to fix review i
+ssues in the code\n\nThe review report identifies several issues:\n1. **Major Is
+sue 1**: Document references still point to old `issue-4` instead of `issue-43` 
+in `prd/v1-matching.md` and `docs/api/matching.md`\n2. **Major Issue 2**: Access
+ibility section in `designs/issue-43/design-spec.md` missing Maestro E2E require
+d `Semantics(identifier)` definitions\n3. **Major Issue 3**: Interaction section
+missing Maestro compatible `onTapDown` gesture requirements\n4. **Minor Issue 4*
+*: Design spec file locations don't match project template\n5. **Minor Issue 5**
+: Missing Maestro E2E Flow design considerations\n6. **Minor Issue 6**: `docs/mo
+dules/matching.md` widget list missing `EmptyMatchListView`\n\nThe task says to:
+\n1. git checkout design/issue-43\n2. Fix code according to review report\n3. Ru
+n self-tests (this is a design-only PR, so mainly check-docs)\n4. Commit and pus
+h\n\nLet me start by checking out the branch, reading the relevant files, and ma
+king the fixes. Since this is primarily documentation fixes, I should read the f
+iles first.\n\nLet me first read the AGENTS.md to understand the project, then c
+heck out the branch, then read the files that need to be modified.",
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_OiT54U0lJ7GeCobNeg1XgRIr',
+    function=FunctionBody(
+        name='Shell',
+        arguments='{"command": "cd /var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000g
+n/T/rework-pr-44-3169274568 && git checkout design/issue-43 && git status"}'
+    ),
+    extras=None
+)
+ToolCall(
+    type='function',
+    id='tool_aJiAq6ZCFrNAHHcPWSThNBe9',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/re
+work-pr-44-3169274568/AGENTS.md'
+    ),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_OiT54U0lJ7GeCobNeg1XgRIr',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='Already on \'design/issue-43\'\nM\tapps/mobile/pubspec.lock\nYou
+r branch is up to date with \'origin/design/issue-43\'.\nOn branch design/issue-
+43\nYour branch is up to date with \'origin/design/issue-43\'.\n\nChanges not st
+aged for commit:\n  (use "git add <file>..." to update what will be committed)\n
+ (use "git restore <file>..." to discard changes in working directory)\n\tmodifi
+ed:   apps/mobile/pubspec.lock\n\nno changes added to commit (use "git add" and/
+or "git commit -a")\n',
+        message='Command executed successfully.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(arguments_part='"}')
+StatusUpdate(
+    context_usage=0.041278839111328125,
+    context_tokens=10821,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=3653,
+        output=443,
+        input_cache_read=7168,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-qDzfnVJC1aWyIxrt2HMJEXDu',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_aJiAq6ZCFrNAHHcPWSThNBe9',
+    return_value=ToolOk(
+        is_error=False,
+        output='     1\t# Social World 智能体导航地图\n     2\t\n     3\t> 仓库
+即唯一真实来源。不在仓库里的知识等于不存在。\n     4\t\n     5\t## 文档地图\n   
+ 6\t\n     7\t| 你要找什么         | 去哪里                                     
+                                         |\n     8\t| ------------------ | -----
+------------------------------------------------------------------------------- 
+|\n     9\t| 项目背景           | [README.md](README.md)                        
+                                      |\n    10\t| 编码与架构规范     | [docs/de
+sign-docs/INDEX.md](docs/design-docs/INDEX.md)                               |\n
+   11\t| Issue 处理工作流   | [docs/design-docs/issue-workflow.md](docs/design-d
+ocs/issue-workflow.md)             |\n    12\t| UI 风格规范        | [docs/desig
+n-docs/ui-style-guide/INDEX.md](docs/design-docs/ui-style-guide/INDEX.md) |\n   
+13\t| 业务术语           | [docs/product-specs/glossary.md](docs/product-specs/g
+lossary.md)                     |\n    14\t| 当前需求           | [prd/v1-mvp.md
+](prd/v1-mvp.md)                                                       |\n    15
+\t| 模块实现           | [docs/modules/INDEX.md](docs/modules/INDEX.md)（含 prof
+ile）                         |\n    16\t| **执行计划与模板** | **[docs/exec-pla
+ns/INDEX.md](docs/exec-plans/INDEX.md)** ⬅️ **开发前必读**           |\n    17\t|
+技术债务           | [docs/exec-plans/tech-debt-tracker.md](docs/exec-plans/tech
+-debt-tracker.md)         |\n    18\t| Maestro E2E 规范   | [.maestro/README.md]
+(.maestro/README.md)                                             |\n    19\t\n  
+ 20\t## 目录结构\n    21\t\n    22\t```\n    23\tdocs/design-docs/    # 架构规范
+、编码约定、数据库/API 规范\n    24\tdocs/product-specs/  # 业务术语、领域规则\n
+   25\tdocs/modules/        # 模块实现文档（跨代码层级）\n    26\tdocs/exec-plan
+s/     # 执行计划 + 按任务类型拆分的专用模板 + 技术债务\n    27\tprd/           
+     # 产品需求文档\n    28\tapps/                # mobile (Flutter), api (NestJ
+S), admin (Next.js)\n    29\tpackages/            # shared-types, design-system\
+n    30\t```\n    31\t\n    32\t## 黄金原则\n    33\t\n    34\t1. **计划先行**：
+复杂任务（多模块协调、架构变更、新用户旅程）必须先写 `docs/exec-plans/PLAN-XXX.m
+d`，按模板执行\n    35\t2. **全链路交付**：一个需求必须同时包含 DB + API + Mobil
+e 的实现\n    36\t3. **契约同步**：`packages/shared-types/` 是前后端的唯一真实来
+源\n    37\t4. **约束即代码**：linter、hooks、CI 会强制执行规则，不在规则里的约
+束等于不存在\n    38\t5. **效果优先**：先跑通端到端，再考虑优雅性\n    39\t\n   
+40\t## 常见任务\n    41\t\n    42\t| 任务                  | 命令               
+                                 |\n    43\t| --------------------- | ----------
+------------------------------------------ |\n    44\t| 查看执行计划模板      | 
+[docs/exec-plans/INDEX.md](docs/exec-plans/INDEX.md) |\n    45\t| 启动开发环境  
+       | `make dev`                                           |\n    46\t| 检查
+文档健康          | `make check-docs`                                    |\n    
+47\t| 运行测试              | `make test`                                       
+  |\n    48\t| Mobile E2E (login)    | `make test-mobile-e2e-login`             
+           |\n    49\t| Mobile E2E (devtools) | `make test-mobile-e2e-devtools` 
+                    |\n    50\t| Mobile E2E (完整)     | `make test-mobile-e2e` 
+                             |\n    51\t| 启动 E2E 后端环境     | `make e2e-env-
+up`                                    |\n    52\t| 安装 hooks            | `mak
+e hooks`                                         |\n    53\t| 架构约束检查      
+   | `make arch-check`                                    |\n    54\t| Agent 配
+置检查        | `make agent-check`                                   |\n',
+        message='54 lines read from file starting from line 1. Total lines in fi
+le: 54. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+StepBegin(n=2)
+ThinkPart(
+    type='think',
+    think='Let me read the files that need to be modified according to the revie
+w report. I need to read:\n1. `prd/v1-matching.md` - to fix issue-4 reference\n2
+. `docs/api/matching.md` - to fix issue-4 reference\n3. `designs/issue-43/design
+-spec.md` - to add accessibility identifiers, onTapDown requirement, and E2E flo
+w suggestions\n4. `docs/modules/matching.md` - to add EmptyMatchListView\n5. `de
+signs/issue-43/docs-to-update.txt` - to understand the requirements\n\nLet me re
+ad these files in parallel.',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_XYNEezWiPDkL8tldhpNbzojT',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/re
+work-pr-44-3169274568/prd/v1-matching.md"}'
+    ),
+    extras=None
+)
+ToolCall(
+    type='function',
+    id='tool_EZr9GLgnnOPXwbemBn26tgGo',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/re
+work-pr-44-3169274568/docs/api/matching.md'
+    ),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_XYNEezWiPDkL8tldhpNbzojT',
+    return_value=ToolOk(
+        is_error=False,
+        output='     1\t# V1 Matching 产品需求文档\n     2\t\n     3\t> 状态：待
+评审  \n     4\t> 版本：1.0  \n     5\t> 日期：2026-04-10  \n     6\t> 关联 PRD
+：[prd/v1-mvp.md](./v1-mvp.md)\n     7\t>\n     8\t> 设计资产参见 [designs/issue
+-43/](../designs/issue-43/)\n     9\t\n    10\t## 1. 背景与目标\n    11\t\n    1
+2\t### 背景\n    13\t\n    14\tSocial World 的核心体验是「滑动匹配」。用户在首页
+看到基于地理位置和偏好筛选推荐的卡片，通过左滑（Pass）或右滑（Like）表达喜好。当
+两个用户互相喜欢时，系统创建一次 `Match` 并自动开启 `Conversation`，促成后续的即
+时通讯。\n    15\t\n    16\t### 目标\n    17\t\n    18\t1. 为用户推荐附近符合偏
+好条件的异性/同性用户卡片。\n    19\t2. 支持左滑 Pass 和右滑 Like，操作幂等。\n 
+  20\t3. 双向喜欢时自动创建 `Match` 和 `Conversation`，并实时推送通知。\n    21\
+t4. 排除已交互、已匹配、已拉黑和资料不完整的用户。\n    22\t5. 推荐结果缓存于 Re
+dis，减少数据库查询压力。\n    23\t6. 支持「同城」「全国」两种距离范围切换。\n  
+ 24\t\n    25\t---\n    26\t\n    27\t## 2. 用户故事与验收标准\n    28\t\n    29
+\t### US-MATCH-1：获取推荐卡片\n    30\t\n    31\t**作为** 已完善资料的用户，  \
+n    32\t**我希望** 看到附近符合条件的用户卡片，  \n    33\t**以便** 发现感兴趣
+的社交对象。\n    34\t\n    35\t#### 验收标准\n    36\t\n    37\t> 以上验收标准
+的完整 Gherkin 用例详见 `tests/bdd/matching.feature`。\n    38\t\n    39\t```ghe
+rkin\n    40\tFeature: Card Recommendations\n    41\t  Scenario: User sees recom
+mendation cards\n    42\t    Given the user is on the home screen with a complet
+e profile\n    43\t    And there are 20 eligible candidates nearby\n    44\t    
+When the app requests GET /matching/recommendations\n    45\t    Then the user s
+hould receive a stack of up to 20 profile cards\n    46\t    And each card shoul
+d contain: user_id, nickname, age, distance, bio, avatar_url\n    47\t    And th
+e cards should be sorted by composite score\n    48\t\n    49\t  Scenario: Cache
+hit returns quickly\n    50\t    Given the user has requested recommendations wi
+thin the last 5 minutes\n    51\t    When the app requests GET /matching/recomme
+ndations again\n    52\t    Then the API should return cached results from Redis
+within 100ms\n    53\t\n    54\t  Scenario: No eligible candidates\n    55\t    
+Given the user is in a remote area with no other users\n    56\t    When the app
+requests recommendations\n    57\t    Then the API should return an empty list\n
+   58\t    And the app should show an empty state "附近暂无可推荐用户"\n    59\t
+```\n    60\t\n    61\t#### 技术要求\n    62\t\n    63\t- 接口：`GET /matching/r
+ecommendations?mode=nearby&limit=20`。\n    64\t- `mode` 参数：`nearby`（默认 50
+km）、`city`（同城市，根据用户当前位置行政边界）、`nationwide`（全国）。\n    65
+\t- 过滤条件：\n    66\t  1. 目标用户资料完整。\n    67\t  2. 目标用户性别符合当
+前用户的 `preferred_gender`（若 `both` 则不限制）。\n    68\t  3. 当前用户性别符
+合目标用户的 `preferred_gender`（双向匹配偏好）。\n    69\t  4. 目标用户在设定距
+离范围内（Haversine 公式计算）。\n    70\t  5. 排除已存在 `match_actions`（Like 
+或 Pass）的记录。\n    71\t  6. 排除已存在 `matches`（无论状态）的记录。\n    72
+\t  7. 排除 `blocks` 表中的双向屏蔽记录（blocker_id 或 blocked_id 为当前用户）。
+\n    73\t- 排序规则（综合得分）：\n    74\t  - 距离越近越优先（权重 50%）：`sco
+re += (1 - distance / max_distance) * 0.5`\n    75\t  - 近期活跃用户优先（权重 3
+0%）：根据 `last_active_at` 分档（24h 内 1.0，7 天内 0.7，30 天内 0.4，其余 0.1
+）。\n    76\t  - 新用户曝光加成（权重 20%）：注册 7 天内加 0.2。\n    77\t- Red
+is 缓存：`recommendations:{user_id}`，String（JSON）存储候选 `user_id` 列表和得
+分，TTL 5 分钟。\n    78\t- 缓存击穿防护：使用互斥锁（Redis `SET recommendations
+:lock:{user_id} NX EX 10`）。\n    79\t\n    80\t---\n    81\t\n    82\t### US-M
+ATCH-2：滑动操作\n    83\t\n    84\t**作为** 用户，  \n    85\t**我希望** 通过左
+滑或右滑表达喜好，  \n    86\t**以便** 快速筛选感兴趣的人。\n    87\t\n    88\t#
+### 验收标准\n    89\t\n    90\t> 以上验收标准的完整 Gherkin 用例详见 `tests/bdd
+/matching.feature`。\n    91\t\n    92\t```gherkin\n    93\tFeature: Swipe Actio
+ns\n    94\t  Scenario: User likes a profile\n    95\t    Given the user sees a 
+card for target user "Bob"\n    96\t    When the user swipes right or taps the l
+ike button\n    97\t    Then a like action should be recorded in match_actions\n
+   98\t    And the target user should be removed from the user\'s recommendation
+cache\n    99\t\n   100\t  Scenario: User passes a profile\n   101\t    Given th
+e user sees a card for target user "Charlie"\n   102\t    When the user swipes l
+eft or taps the pass button\n   103\t    Then a pass action should be recorded i
+n match_actions\n   104\t    And the target user should be removed from the user
+\'s recommendation cache\n   105\t\n   106\t  Scenario: Duplicate swipe is idemp
+otent\n   107\t    Given the user has already liked target user "Bob"\n   108\t 
+  When the user likes "Bob" again within 1 second\n   109\t    Then the API shou
+ld return success without creating a duplicate match_actions record\n   110\t   
+And no duplicate match should be created\n   111\t\n   112\t  Scenario: User can
+not swipe themselves\n   113\t    Given the user sees their own profile in the c
+andidate list by accident\n   114\t    When the user tries to like themselves\n 
+ 115\t    Then the API should reject with code 1000\n   116\t```\n   117\t\n   1
+18\t#### 技术要求\n   119\t\n   120\t- 接口：`POST /matching/actions`（`target_i
+d`, `action: \'like\' | \'pass\'`）。\n   121\t- 幂等性：`match_actions` 表对 `(
+actor_id, target_id)` 建立唯一索引，重复插入被数据库拦截，后端捕获异常返回成功。
+\n   122\t- 自身滑动校验：若 `target_id == actor_id`，返回 `code=1000`。\n   123
+\t- 滑动后清除 Redis 缓存 `recommendations:{user_id}`，确保下次请求不再包含该用
+户。\n   124\t- `match_actions` 表字段：`id`, `actor_id`, `target_id`, `action`
+（`like`/`pass`/`super_like`）, `created_at`。\n   125\t\n   126\t---\n   127\t\
+n   128\t### US-MATCH-3：双向匹配成功\n   129\t\n   130\t**作为** 用户，  \n   1
+31\t**我希望** 当我和对方互相喜欢时自动配对成功，  \n   132\t**以便** 立即开始聊
+天。\n   133\t\n   134\t#### 验收标准\n   135\t\n   136\t> 以上验收标准的完整 Gh
+erkin 用例详见 `tests/bdd/matching.feature`。\n   137\t\n   138\t```gherkin\n   
+139\tFeature: Mutual Like Creates Match\n   140\t  Scenario: Mutual like trigger
+s match and conversation\n   141\t    Given Alice liked Bob\n   142\t    And Bob
+has not yet liked Alice\n   143\t    When Bob likes Alice\n   144\t    Then a ma
+tch record should be created with status "matched"\n   145\t    And a conversati
+on should be auto-created for Alice and Bob\n   146\t    And both users should r
+eceive a match notification via Socket.io\n   147\t    And both users should see
+the new match in their match list\n   148\t\n   149\t  Scenario: One-way like re
+mains pending\n   150\t    Given Alice liked Bob\n   151\t    And Bob has not li
+ked Alice\n   152\t    When the system checks for mutual like\n   153\t    Then 
+no match record should exist\n   154\t    And no conversation should be created\
+n   155\t```\n   156\t\n   157\t#### 技术要求\n   158\t\n   159\t- 匹配判定：在 
+`POST /matching/actions` 处理 `like` 时，查询 `match_actions` 是否存在 `actor_id
+= target_id AND target_id = actor_id AND action = \'like\'`。\n   160\t- 若存在
+双向喜欢：\n   161\t  1. 创建 `matches` 记录：`user_a_id`（较小的 UUID）、`user_
+b_id`（较大的 UUID），`status = \'matched\'`。\n   162\t  2. 创建 `conversations
+` 记录，关联 `match_id`。\n   163\t  3. 创建两条 `conversation_participants` 记
+录，`last_read_message_id = NULL`。\n   164\t  4. 通过 Socket.io 向双方 emit `ma
+tch:created` 事件，Payload 包含 `match_id`、`conversation_id`、`matched_user` 资
+料摘要。\n   165\t  5. 若接收方离线，触发推送通知（极光/Firebase）。\n   166\t- 
+`matches` 表字段：`id`, `user_a_id`, `user_b_id`, `status`（`pending`/`matched`/
+`unmatched`），`created_at`, `updated_at`。\n   167\t- 事务：匹配创建必须使用数
+据库事务，确保 `matches` + `conversations` + `conversation_participants` 原子性
+。\n   168\t\n   169\t---\n   170\t\n   171\t### US-MATCH-4：匹配列表查看\n   17
+2\t\n   173\t**作为** 已匹配成功的用户，  \n   174\t**我希望** 查看所有匹配成功
+的人列表，  \n   175\t**以便** 快速找到想聊天的人。\n   176\t\n   177\t#### 验收
+标准\n   178\t\n   179\t> 以上验收标准的完整 Gherkin 用例详见 `tests/bdd/matchin
+g.feature`。\n   180\t\n   181\t```gherkin\n   182\tFeature: Match List\n   183\
+t  Scenario: User sees their matches\n   184\t    Given Alice has matched with B
+ob and Charlie\n   185\t    When Alice opens the match list\n   186\t    Then sh
+e should see Bob and Charlie ordered by match creation time descending\n   187\t
+   And each item should show the matched user\'s nickname, avatar, and match tim
+e\n   188\t```\n   189\t\n   190\t#### 技术要求\n   191\t\n   192\t- 接口：`GET 
+/matches?limit=20&cursor=`（游标分页）。\n   193\t- 查询当前用户参与的 `matches`
+中 `status = \'matched\'` 的记录，按 `created_at DESC` 排序。\n   194\t- 返回体
+包含对方用户的 `user_id`, `nickname`, `avatar_url`, `match_id`, `conversation_id
+`, `matched_at`。\n   195\t- 列表中的用户若被拉黑，则自动过滤（`unmatched` 状态
+）。\n   196\t\n   197\t---\n   198\t\n   199\t## 3. 非功能需求\n   200\t\n   20
+1\t### 性能\n   202\t\n   203\t- 首页推荐卡片加载时间 < 800ms（P95）。\n   204\t
+- 滑动操作响应时间 < 200ms。\n   205\t- 双向匹配判定和创建 < 300ms（含事务）。\n
+  206\t- Redis 缓存命中时响应时间 < 100ms。\n   207\t\n   208\t### 安全\n   209\
+t\n   210\t- 推荐池必须排除资料不完整用户（后端通过 JOIN `user_profiles` 的 `is_
+complete` 字段过滤）。\n   211\t- 用户不能看到自己（`target_id != actor_id`）。\
+n   212\t- 已拉黑用户双向不可见、不可匹配。\n   213\t- 匹配成功后若一方拉黑另一
+方，`match.status` 应更新为 `unmatched`（拉黑模块实现，Matching 侧读取时过滤）。
+\n   214\t\n   215\t### 兼容性\n   216\t\n   217\t- 距离计算在 MySQL 中使用 Have
+rsine 公式，不依赖 Spatial 扩展，保证跨环境兼容。\n   218\t- 推荐列表为空时 Mobi
+le 需展示空状态引导页。\n   219\t\n   220\t---\n   221\t\n   222\t## 4. 里程碑\n
+  223\t\n   224\t| 阶段      | 目标                                             
+             | 预计工期 |\n   225\t| --------- | -------------------------------
+------------------------------- | -------- |\n   226\t| M-MATCH-1 | 推荐 API + R
+edis 缓存 + Haversine 排序 + Mobile 首页卡片       | 3 天     |\n   227\t| M-MAT
+CH-2 | 滑动 API + 幂等性 + 双向匹配判定 + Match/Conversation 自动创建 | 2 天    
+|\n   228\t| M-MATCH-3 | Socket.io 匹配通知 + 推送 + 匹配列表 + BDD 测试闭环    
+       | 2 天     |\n   229\t\n   230\t**总预计工期：7 天。**\n   231\t\n   232\
+t---\n   233\t\n   234\t## 5. 风险与回滚策略\n   235\t\n   236\t| 风险          
+                                      | 影响 | 缓解措施                         
+                        |\n   237\t| -------------------------------------------
+--------- | ---- | --------------------------------------------------------- |\n
+  238\t| 推荐算法性能不足，首页加载超过 800ms                 | 高   | 加 Redis 
+缓存、建立复合索引、MVP 阶段限制候选池为 1000 人 |\n   239\t| 并发滑动导致重复创
+建 Match                           | 中   | 数据库唯一索引 `(user_a_id, user_b_i
+d)` + 事务处理        |\n   240\t| 缓存与数据库状态不一致（用户被拉黑后仍出现在
+推荐中） | 中   | 拉黑操作时主动清除双方 Redis 推荐缓存                     |\n 
+ 241\t| 地理位置隐私合规风险                                 | 中   | 用户协议中
+明确告知位置用途，提供「全国」模式淡化精确位置  |\n   242\t\n   243\t### 回滚策
+略\n   244\t\n   245\t- **推荐算法故障**：关闭 Redis 缓存，直接查询数据库（响应
+变慢但可用）。\n   246\t- **匹配创建事务死锁**：重试 3 次，失败后返回临时错误并
+记录日志，不丢失滑动记录。\n   247\t- **Socket.io 通知失败**：降级为仅推送通知（
+若用户离线）或记录待补发事件。\n',
+        message='247 lines read from file starting from line 1. Total lines in f
+ile: 247. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(arguments_part='"}')
+ToolCall(
+    type='function',
+    id='tool_0JEGfvjLpdYtG8HnNPmiCSa5',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/re
+work-pr-44-3169274568/designs/issue-43/design'
+    ),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_EZr9GLgnnOPXwbemBn26tgGo',
+    return_value=ToolOk(
+        is_error=False,
+        output='     1\t# Matching API\n     2\t\n     3\t> 本文档描述 Matching 
+模块的接口契约，包含推荐、滑动和匹配列表接口定义。\n     4\t> 关联设计规范: [des
+ign-spec.md](../../designs/issue-43/design-spec.md)\n     5\t> 关联 PRD: [prd/v1
+-matching.md](../../prd/v1-matching.md)\n     6\t\n     7\t---\n     8\t\n     9
+\t## 1. 获取推荐卡片\n    10\t\n    11\t### `GET /matching/recommendations`\n   
+12\t\n    13\t获取当前用户的推荐卡片列表。\n    14\t\n    15\t#### Query Paramet
+ers\n    16\t\n    17\t| 参数    | 类型      | 必填 | 说明                      
+                                                                |\n    18\t| ---
+---- | --------- | ---- | ------------------------------------------------------
+------------------------------------ |\n    19\t| `mode`  | `string`  | 否   | 
+推荐模式：`nearby`（附近，默认 50km）、`city`（同城）、`nationwide`（全国），默
+认 `nearby` |\n    20\t| `limit` | `integer` | 否   | 返回数量上限，默认 `20`   
+                                                                |\n    21\t\n   
+22\t#### Response 200 OK\n    23\t\n    24\t```json\n    25\t{\n    26\t  "data"
+: [\n    27\t    {\n    28\t      "user_id": "uuid",\n    29\t      "nickname": 
+"Alice",\n    30\t      "age": 24,\n    31\t      "distance": 1.2,\n    32\t    
+ "bio": "喜欢旅行和摄影",\n    33\t      "avatar_url": "https://cdn.example.com/
+avatars/uuid.jpg"\n    34\t    }\n    35\t  ]\n    36\t}\n    37\t```\n    38\t\
+n    39\t#### 过滤规则\n    40\t\n    41\t1. 目标用户资料完整（`user_profiles.is
+_complete = true`）。\n    42\t2. 目标用户性别符合当前用户的 `preferred_gender`
+（若 `both` 则不限制）。\n    43\t3. 当前用户性别符合目标用户的 `preferred_gende
+r`（双向匹配偏好）。\n    44\t4. 目标用户在设定距离范围内（Haversine 公式计算）
+。\n    45\t5. 排除已存在 `match_actions`（Like 或 Pass）的记录。\n    46\t6. 排
+除已存在 `matches`（无论状态）的记录。\n    47\t7. 排除 `blocks` 表中的双向屏蔽
+记录。\n    48\t\n    49\t#### 排序规则（综合得分）\n    50\t\n    51\t- 距离越
+近越优先（权重 50%）\n    52\t- 近期活跃用户优先（权重 30%）\n    53\t- 新用户曝
+光加成（权重 20%）：注册 7 天内加 0.2\n    54\t\n    55\t#### 缓存策略\n    56\t
+\n    57\t- Redis 键：`recommendations:{user_id}`\n    58\t- 存储内容：候选 `use
+r_id` 列表和得分的 JSON 字符串\n    59\t- TTL：5 分钟\n    60\t- 缓存击穿防护：
+使用互斥锁 `SET recommendations:lock:{user_id} NX EX 10`\n    61\t\n    62\t---\
+n    63\t\n    64\t## 2. 滑动操作\n    65\t\n    66\t### `POST /matching/actions
+`\n    67\t\n    68\t记录用户对目标卡片的滑动操作（Like 或 Pass）。\n    69\t\n 
+  70\t#### Request Body\n    71\t\n    72\t```json\n    73\t{\n    74\t  "target
+_id": "uuid",\n    75\t  "action": "like"\n    76\t}\n    77\t```\n    78\t\n   
+79\t#### 字段说明\n    80\t\n    81\t| 字段        | 类型     | 必填 | 说明     
+                               |\n    82\t| ----------- | -------- | ---- | ----
+------------------------------------ |\n    83\t| `target_id` | `string` | 是   
+| 目标用户 ID                              |\n    84\t| `action`    | `string` |
+是   | 操作类型：`like` / `pass` / `super_like` |\n    85\t\n    86\t#### Respon
+se 200 OK\n    87\t\n    88\t```json\n    89\t{\n    90\t  "data": {\n    91\t  
+ "matched": true,\n    92\t    "match_id": "uuid",\n    93\t    "conversation_id
+": "uuid",\n    94\t    "matched_user": {\n    95\t      "user_id": "uuid",\n   
+96\t      "nickname": "Alice",\n    97\t      "avatar_url": "https://cdn.example
+.com/avatars/uuid.jpg"\n    98\t    }\n    99\t  }\n   100\t}\n   101\t```\n   1
+02\t\n   103\t- 若 `matched` 为 `false`，则 `match_id`、`conversation_id`、`matc
+hed_user` 为 `null`。\n   104\t- 若双向匹配成功，服务端会同时通过 Socket.io 向双
+方 emit `match:created` 事件。\n   105\t\n   106\t#### 幂等性\n   107\t\n   108\
+t`match_actions` 表对 `(actor_id, target_id)` 建立唯一索引，重复插入被数据库拦截
+，后端捕获异常后返回成功，不创建重复记录。\n   109\t\n   110\t#### 边界情况\n   
+111\t\n   112\t- 若 `target_id == actor_id`，返回错误码 `1000`（参数错误）。\n  
+113\t- 滑动成功后清除该用户的 Redis 推荐缓存 `recommendations:{user_id}`。\n   1
+14\t\n   115\t---\n   116\t\n   117\t## 3. 获取匹配列表\n   118\t\n   119\t### `
+GET /matches`\n   120\t\n   121\t获取当前用户已成功匹配的用户列表，支持游标分页
+。\n   122\t\n   123\t#### Query Parameters\n   124\t\n   125\t| 参数     | 类型
+     | 必填 | 说明                |\n   126\t| -------- | --------- | ---- | ---
+---------------- |\n   127\t| `limit`  | `integer` | 否   | 每页数量，默认 `20` 
+|\n   128\t| `cursor` | `string`  | 否   | 游标，用于翻页      |\n   129\t\n   1
+30\t#### Response 200 OK\n   131\t\n   132\t```json\n   133\t{\n   134\t  "data"
+: {\n   135\t    "items": [\n   136\t      {\n   137\t        "match_id": "uuid"
+,\n   138\t        "conversation_id": "uuid",\n   139\t        "user_id": "uuid"
+,\n   140\t        "nickname": "Alice",\n   141\t        "avatar_url": "https://
+cdn.example.com/avatars/uuid.jpg",\n   142\t        "matched_at": "2026-04-15T08
+:30:00Z"\n   143\t      }\n   144\t    ],\n   145\t    "has_more": true,\n   146
+\t    "next_cursor": "base64_cursor_string"\n   147\t  }\n   148\t}\n   149\t```
+\n   150\t\n   151\t#### 查询规则\n   152\t\n   153\t- 查询当前用户参与的 `match
+es` 中 `status = \'matched\'` 的记录，按 `created_at DESC` 排序。\n   154\t- 列
+表中的用户若被拉黑（状态变为 `unmatched`），自动过滤不展示。\n   155\t\n   156\t
+---\n   157\t\n   158\t## 4. 错误码表\n   159\t\n   160\t| 错误码 | 场景        
+                          | HTTP 状态码           |\n   161\t| ------ | --------
+------------------------------ | --------------------- |\n   162\t| `1000` | 参
+数错误（如滑动自己、非法 action 值） | 400                   |\n   163\t| `1001`
+| 用户资料不完整，无法获取推荐           | 403                   |\n   164\t| `1
+002` | 目标用户不存在                         | 404                   |\n   165\
+t| `1003` | 推荐列表为空                           | 200（正常返回空数组） |\n  
+166\t| `2000` | 系统内部错误                           | 500                   |
+\n',
+        message='166 lines read from file starting from line 1. Total lines in f
+ile: 166. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(arguments_part='-spec.md"}')
+ToolCall(
+    type='function',
+    id='tool_VhtlU4rRDXzRTHyG0muHM1mB',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/re
+work-pr-44-3169274568/docs/modules/matching'
+    ),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_0JEGfvjLpdYtG8HnNPmiCSa5',
+    return_value=ToolOk(
+        is_error=False,
+        output='     1\t# Issue #43 Matching 设计规范\n     2\t\n     3\t> 关联 
+PRD：[prd/v1-matching.md](../../prd/v1-matching.md)  \n     4\t> 关联 Issue：#43
+ \n     5\t> 技术栈：Flutter (Mobile) + BLoC/Cubit  \n     6\t> 设计资产参见 [de
+signs/issue-43/](../issue-43/)\n     7\t\n     8\t---\n     9\t\n    10\t## 1. 
+页面/场景清单\n    11\t\n    12\t| 序号 | 页面/场景         | 说明              
+                                | 关键状态                              |\n    1
+3\t| ---- | ----------------- | ------------------------------------------------
+-- | ------------------------------------- |\n    14\t| 1    | **首页-推荐卡片**
+| 用户进入 App 后默认页面，展示可滑动的推荐卡片堆叠  | Loading、正常态（卡片堆叠
+）、空数据态 |\n    15\t| 2    | **滑动操作反馈**  | 用户左滑 Pass / 右滑 Like 
+时的实时视觉反馈         | 拖动中、释放动画、操作成功            |\n    16\t| 3 
+  | **配对成功弹窗**  | 双向喜欢时触发的全屏 Modal，引导用户聊天或继续滑动 | 动
+画进入、可关闭                      |\n    17\t| 4    | **匹配列表页**    | 底部
+导航「消息」入口内的配对成功用户列表           | Loading、列表态、空态          
+      |\n    18\t\n    19\t### 场景流程图\n    20\t\n    21\t```\n    22\tHomePa
+ge\n    23\t  ├── 加载中 → CircularProgressIndicator\n    24\t  ├── 有数据 → Swi
+peCardStack + 操作按钮\n    25\t  │       ├── 左滑/点击 ✕ → Pass\n    26\t  │   
+   ├── 右滑/点击 ♥ → Like\n    27\t  │       └── 双向 Like → MatchSuccessDialog\
+n    28\t  └── 无数据 → EmptyRecommendationView\n    29\t\n    30\tMatchListPage
+(Tab: 消息)\n    31\t  ├── 加载中 → CircularProgressIndicator\n    32\t  ├── 有
+数据 → MatchListItem 列表\n    33\t  └── 空态 → EmptyMatchListView\n    34\t```\
+n    35\t\n    36\t---\n    37\t\n    38\t## 2. 视觉系统\n    39\t\n    40\t视觉
+系统严格复用项目已有 Design Token，**禁止新增硬编码色值**。\n    41\t\n    42\t#
+## 2.1 色板\n    43\t\n    44\t| Token                      | 色值      | 使用场
+景                                               |\n    45\t| ------------------
+-------- | --------- | ------------------------------------------------------ |\
+n    46\t| `DesignTokens.primary`     | `#6750A4` | 主按钮、激活 Tab、底部导航选
+中态、Like 按钮 hover 强调 |\n    47\t| `DesignTokens.background`  | `#FFFBFE` |
+页面背景、Card 背景                                    |\n    48\t| `DesignToken
+s.textPrimary` | `#1C1B1F` | 标题、正文、图标主色                               
+   |\n    49\t| `DesignTokens.error`       | `#B3261E` | Pass 操作色、错误提示  
+                               |\n    50\t| `ColorScheme.surface`      | `#F3EDF
+7` | Tab 背景、头像 fallback 背景                           |\n    51\t| `ColorS
+cheme.outline`      | `#79747E` | 辅助文字、分割线、次要按钮边框                
+        |\n    52\t\n    53\t额外语义色（需在 `tokens.dart` / `app_theme.dart` 
+中注册）：\n    54\t\n    55\t- `--success` / `likeActionColor`: `#2E7D32` — Lik
+e 按钮、配对成功状态\n    56\t\n    57\t### 2.2 字体\n    58\t\n    59\t| Token 
+                         | 值     | 使用场景                     |\n    60\t| --
+----------------------------- | ------ | ---------------------------- |\n    61\
+t| `DesignTokens.fontSizeHeadline` | `28.0` | 空状态大标题                 |\n  
+ 62\t| `DesignTokens.fontSizeTitle`    | `22.0` | 卡片姓名、弹窗标题、页面标题 |
+\n    63\t| `DesignTokens.fontSizeBody`     | `16.0` | 按钮文字、列表主文字     
+   |\n    64\t| `DesignTokens.fontSizeCaption`  | `12.0` | 距离/时间、Bio、底部
+导航标签 |\n    65\t\n    66\t### 2.3 间距与圆角\n    67\t\n    68\t| Token     
+              | 值     | 使用场景                          |\n    69\t| --------
+---------------- | ------ | --------------------------------- |\n    70\t| `Desi
+gnTokens.spacingMd` | `16.0` | 页面边距、Card 内边距、列表项间距 |\n    71\t| `D
+esignTokens.spacingSm` | `12.0` | Tab 内间距、操作按钮与卡片间距    |\n    72\t|
+`DesignTokens.spacingXs` | `8.0`  | 行内小间距、文字与图标间距        |\n    73\
+t| `DesignTokens.radiusLg`  | `16.0` | 推荐卡片圆角、弹窗圆角            |\n    
+74\t| `DesignTokens.radiusMd`  | `12.0` | 按钮、列表项、小卡片圆角          |\n 
+  75\t| `DesignTokens.radiusSm`  | `8.0`  | Tag、Badge 圆角                   |\
+n    76\t\n    77\t### 2.4 布局尺寸\n    78\t\n    79\t- **手机画布**：按 375×81
+2pt（iPhone X 基准）设计\n    80\t- **推荐卡片**：水平边距 16pt，圆角 16pt，图片
+区高度 340pt，信息区高度自适应\n    81\t- **卡片堆叠视觉差**：下层卡片 scale(0.9
+5) + translateY(12pt)\n    82\t- **操作按钮**：直径 64pt，与卡片底部间距 16pt\n 
+  83\t- **底部导航栏**：高度 80pt（含 Home Indicator 安全区）\n    84\t\n    85\
+t---\n    86\t\n    87\t## 3. 组件清单\n    88\t\n    89\t### 3.1 需新增 design-
+system 组件\n    90\t\n    91\t| 层级     | 组件名               | 文件路径     
+                                                       | 说明                   
+                   | Widgetbook 用例要求                                      |\
+n    92\t| -------- | -------------------- | -----------------------------------
+--------------------------------- | ------------------------------------------ |
+-------------------------------------------------------- |\n    93\t| atom     |
+`SwActionButton`     | `packages/design-system/lib/src/atoms/sw_action_button.da
+rt`         | 圆形操作按钮（Pass/Like 两种变体）         | 默认态、禁用态、按下
+态                                   |\n    94\t| molecule | `SwipeCard`        
+ | `packages/design-system/lib/src/molecules/swipe_card.dart`           | 可拖动
+/可点击的推荐用户卡片                | 默认态、拖动中(show like badge)、拖动中(s
+how pass badge) |\n    95\t| organism | `SwipeCardStack`     | `packages/design-
+system/lib/src/organisms/swipe_card_stack.dart`     | 卡片堆叠容器，管理多层卡片
+渲染与手势冲突   | 3张卡片堆叠、1张卡片、空态                               |\n 
+  96\t| organism | `MatchSuccessDialog` | `packages/design-system/lib/src/organi
+sms/match_success_dialog.dart` | 配对成功全屏弹窗，含头像组合、CTA 按钮     | 默
+认态                                                   |\n    97\t| molecule | `
+MatchListItem`      | `packages/design-system/lib/src/molecules/match_list_item.
+dart`      | 匹配列表单项，含头像、昵称、时间、聊天入口 | 默认态                
+                                  |\n    98\t\n    99\t### 3.2 页面级 Widget\n  
+100\t\n   101\t| Widget 名                 | 路径                               
+                                  | 说明                                        
+    |\n   102\t| ------------------------- | -----------------------------------
+---------------------------------- | -------------------------------------------
+----- |\n   103\t| `HomePage`                | `apps/mobile/lib/presentation/pag
+es/home_page.dart`                   | 首页，承载模式切换、卡片堆叠、操作按钮、
+底部导航 |\n   104\t| `MatchListPage`           | `apps/mobile/lib/presentation/
+pages/match_list_page.dart`             | 匹配列表页，底部导航「消息」Tab 内容  
+          |\n   105\t| `EmptyRecommendationView` | `apps/mobile/lib/presentation
+/widgets/empty_recommendation_view.dart` | 推荐为空时的占位视图（可复用）       
+           |\n   106\t| `EmptyMatchListView`      | `apps/mobile/lib/presentatio
+n/widgets/empty_match_list_view.dart`     | 匹配列表为空时的占位视图            
+            |\n   107\t\n   108\t### 3.3 禁止直接使用原生组件替代\n   109\t\n   
+110\t- 禁止用 `ElevatedButton` / `IconButton` 直接替代 `SwActionButton`\n   111\
+t- 禁止在 `pages/` 中写死 `Color(0xFF...)` 或 `BoxDecoration` 颜色值\n   112\t- 
+卡片阴影、圆角、间距必须来自 `DesignTokens`\n   113\t\n   114\t---\n   115\t\n  
+116\t## 4. 图片/图标资源\n   117\t\n   118\t本设计全部使用 Emoji / 矢量图标 / CS
+S 渐变占位，**无需额外图片资源**。实际开发时：\n   119\t\n   120\t| 资源位置    
+| 说明                                                                          
+            |\n   121\t| ------------ | ----------------------------------------
+-------------------------------------------------- |\n   122\t| 用户头像     | 
+网络图 `Image.network(card.avatarUrl)`，fallback 到 `SwAvatar`                  
+          |\n   123\t| 空状态插图   | 使用 `Icons.search_off` 或 Lottie 动画（待
+产品确认），MVP 阶段可用 `Icons.person_off` 替代 |\n   124\t| 操作按钮图标 | Mat
+erial `Icons.close` (Pass) / `Icons.favorite` (Like)，颜色语义化                
+       |\n   125\t| 底部导航图标 | Material `Icons.home` / `Icons.chat_bubble` /
+`Icons.person`                               |\n   126\t\n   127\t> **待产品确认
+**：配对成功弹窗是否使用 Lottie 庆祝动画？当前原型使用 CSS confetti 演示，Flutte
+r 侧可用 `AnimatedContainer` + `Particle` 简易实现，或引入 `lottie` 包。\n   128
+\t\n   129\t---\n   130\t\n   131\t## 5. 交互说明\n   132\t\n   133\t### 5.1 手
+势与动画\n   134\t\n   135\t| 交互      | 触发                           | 动画
+表现                                                          | 时长  | 曲线    
+                 |\n   136\t| --------- | ------------------------------ | -----
+------------------------------------------------------------ | ----- | ---------
+---------------- |\n   137\t| 卡片拖动  | 手指按住并水平移动             | 卡片
+跟随手指，旋转 angle = dx × 0.05°，Like/Pass badge 透明度渐变 | 实时  | —       
+                 |\n   138\t| 释放-Pass | 左滑超过阈值（≈120pt）或点击 ✕ | 卡片
+向左飞出屏幕，下层卡片 scale 恢复 1.0                         | 300ms | `easeOut
+Cubic`            |\n   139\t| 释放-Like | 右滑超过阈值或点击 ♥           | 卡片
+向右飞出屏幕，触发 API；若双向匹配则弹 MatchSuccessDialog     | 300ms | `easeOut
+Cubic`            |\n   140\t| 弹窗进入  | 双向匹配成功                   | 背景
+遮罩 fadeIn + 内容 scale(0.9→1.0)                             | 300ms | `easeOut
+Back`（轻微回弹） |\n   141\t| 弹窗关闭  | 点击「继续滑动」或遮罩         | 背景
+fadeOut + 内容 scale(0.95) + opacity(0)                      | 200ms | `easeInCu
+bic`             |\n   142\t| 列表加载  | 进入 MatchListPage             | 顶部 
+CircularProgressIndicator，数据返回后列表淡入                | 200ms | `easeIn` 
+                |\n   143\t| 模式切换  | 顶部 Tab 切换                  | 当前卡
+片堆叠淡出（150ms）→ 新卡片堆叠淡入（200ms）                | 350ms | `easeInOut
+`               |\n   144\t\n   145\t> **开发备注（Maestro 兼容性）**：所有需 Ma
+estro E2E 点击的按钮（Pass、Like、模式 Tab、弹窗 CTA）在 Flutter 实现时，必须使
+用 `GestureDetector(onTapDown: (_) => ...)`，禁止使用 `onTap`。Maestro 使用 Andr
+oid Accessibility API 的 `performAction(ACTION_CLICK)`，其事件序列（仅 `ACTION_D
+OWN` → `ACTION_UP`，无完整手势轨迹）无法触发 Flutter 的 `GestureDetector.onTap`
+。参见 `docs/design-docs/flutter.md` Maestro 点击兼容性章节。\n   146\t\n   147\
+t### 5.2 状态与边界\n   148\t\n   149\t| 状态                 | 视觉处理        
+                                                          |\n   150\t| ---------
+----------- | ------------------------------------------------------------------
+-------- |\n   151\t| 推荐加载中           | 页面居中 `CircularProgressIndicator
+(color: DesignTokens.primary)`          |\n   152\t| 推荐空数据           | `Emp
+tyRecommendationView`：图标 + 文案「附近暂无可推荐用户」+ 切换全国按钮 |\n   153
+\t| 滑动后缓存刷新       | 卡片飞出后，若剩余卡片 < 3 张，自动触发下一页加载（底
+部小 loading）        |\n   154\t| 网络错误             | `SnackBar` 提示 + 重试
+按钮（`SwButton.outlined`）                          |\n   155\t| 滑动自己（极端
+边界） | 后端返回 code=1000，前端展示 `SnackBar`「操作异常，请稍后再试」        
+   |\n   156\t| 匹配列表空态         | `EmptyMatchListView`：图标 + 文案「还没有
+匹配成功的人」+ 引导回首页滑动    |\n   157\t\n   158\t### 5.3 模式切换\n   159\
+t\n   160\t- 顶部 Tab 切换「附近 / 同城 / 全国」时：\n   161\t  1. 当前卡片堆叠
+淡出（150ms）\n   162\t  2. 触发 `GET /matching/recommendations?mode=xxx`\n   16
+3\t  3. 新卡片堆叠淡入（200ms）\n   164\t\n   165\t---\n   166\t\n   167\t## 6. 
+BLoC / Event / State 设计\n   168\t\n   169\t### 6.1 MatchingBloc（首页推荐 + 滑
+动）\n   170\t\n   171\t```dart\n   172\t// matching_bloc.dart\n   173\tclass Ma
+tchingBloc extends Bloc<MatchingEvent, MatchingState> { ... }\n   174\t\n   175\
+t// matching_event.dart\n   176\tabstract class MatchingEvent {}\n   177\tclass 
+RecommendationsRequested extends MatchingEvent {\n   178\t  final String mode; /
+/ \'nearby\' | \'city\' | \'nationwide\'\n   179\t}\n   180\tclass SwipeActionSu
+bmitted extends MatchingEvent {\n   181\t  final String targetId;\n   182\t  fin
+al SwipeAction action; // like | pass\n   183\t}\n   184\tclass MatchModalDismis
+sed extends MatchingEvent {}\n   185\tclass ExternalMatchReceived extends Matchi
+ngEvent {\n   186\t  final MatchSummary match;\n   187\t}\n   188\t\n   189\t// 
+matching_state.dart\n   190\tabstract class MatchingState {}\n   191\tclass Matc
+hingInitial extends MatchingState {}\n   192\tclass MatchingLoadInProgress exten
+ds MatchingState {}\n   193\tclass MatchingLoadSuccess extends MatchingState {\n
+  194\t  final List<RecommendationCard> cards;\n   195\t  final String mode;\n  
+196\t}\n   197\tclass MatchingLoadEmpty extends MatchingState {\n   198\t  final
+String mode;\n   199\t}\n   200\tclass MatchingSwipeInProgress extends MatchingS
+tate {\n   201\t  final List<RecommendationCard> cards;\n   202\t  final String 
+targetId;\n   203\t  final SwipeAction action;\n   204\t}\n   205\tclass Matchin
+gMatchCreated extends MatchingState {\n   206\t  final MatchSummary match; // 用
+于弹窗展示\n   207\t}\n   208\tclass MatchingFailure extends MatchingState {\n  
+209\t  final String message;\n   210\t}\n   211\t```\n   212\t\n   213\t### 6.2 
+MatchListCubit（匹配列表）\n   214\t\n   215\t```dart\n   216\t// match_list_cub
+it.dart\n   217\tclass MatchListCubit extends Cubit<MatchListState> {\n   218\t 
+Future<void> fetchMatches({String? cursor}) async { ... }\n   219\t}\n   220\t\n
+  221\t// match_list_state.dart\n   222\tabstract class MatchListState {}\n   22
+3\tclass MatchListInitial extends MatchListState {}\n   224\tclass MatchListLoad
+InProgress extends MatchListState {}\n   225\tclass MatchListLoadSuccess extends
+MatchListState {\n   226\t  final List<MatchItem> matches;\n   227\t  final bool
+hasMore;\n   228\t  final String? nextCursor;\n   229\t}\n   230\tclass MatchLis
+tLoadFailure extends MatchListState {\n   231\t  final String message;\n   232\t
+}\n   233\t```\n   234\t\n   235\t### 6.3 Socket.io 事件监听\n   236\t\n   237\t
+- 在 `HomePage` 的 `initState` 中建立 Socket 连接（或通过全局 BLoC）\n   238\t- 
+监听 `match:created` 事件，接收到后向 `MatchingBloc` dispatch `ExternalMatchRece
+ived(matchSummary)`\n   239\t- `MatchingBloc` 状态流转至 `MatchingMatchCreated`
+，触发 `MatchSuccessDialog`\n   240\t\n   241\t---\n   242\t\n   243\t## 7. 响应
+式与适配\n   244\t\n   245\t### 7.1 屏幕尺寸适配\n   246\t\n   247\t| 场景      
+                           | 处理方案                                           
+                      |\n   248\t| ------------------------------------- | -----
+-------------------------------------------------------------------- |\n   249\t
+| 小屏（< 375pt 宽，如 iPhone SE）      | 卡片水平边距缩减至 12pt；操作按钮直径
+缩减至 56pt                          |\n   250\t| 大屏（> 414pt 宽，如 iPhone Pr
+o Max） | 卡片最大宽度限制 400pt，居中显示；操作按钮间距适当增大                
+   |\n   251\t| 横屏                                  | 暂不优化，保持竖屏锁定（
+由 `SystemChrome.setPreferredOrientations` 控制） |\n   252\t\n   253\t### 7.2 
+安全区\n   254\t\n   255\t- 底部导航栏必须包裹 `SafeArea(bottom: true)`\n   256\
+t- 卡片堆叠顶部预留 `MediaQuery.of(context).padding.top` 空间\n   257\t- 操作按
+钮区域避开 Home Indicator\n   258\t\n   259\t---\n   260\t\n   261\t## 8. Access
+ibility 规范\n   262\t\n   263\t### 8.1 颜色对比度\n   264\t\n   265\t- 卡片文字
+叠加在图片上时，必须使用文字阴影或渐变遮罩保证对比度 ≥ 4.5:1\n   266\t- 操作按钮
+图标与背景对比度 ≥ 3:1\n   267\t\n   268\t### 8.2 屏幕阅读器\n   269\t\n   270\t
+| 元素                 | Semantics identifier                                   
+     | Semantics label                                        |\n   271\t| -----
+--------------- | ------------------------------------------------------------ |
+------------------------------------------------------ |\n   272\t| 推荐卡片    
+        | `recommendation_card_{user_id}` 或 `recommendation_card_top` | `label:
+"{昵称}, {年龄}岁, 距离{距离}"`                |\n   273\t| Pass 按钮           
+| `swipe_pass_button`                                          | `tooltip: "跳过
+"`                                      |\n   274\t| Like 按钮            | `swi
+pe_like_button`                                          | `tooltip: "喜欢"`    
+                                 |\n   275\t| 模式切换 Tab         | `mode_tab_n
+earby` / `mode_tab_city` / `mode_tab_nationwide`  | `selected: true/false`，`lab
+el: "{模式名}"`            |\n   276\t| 匹配列表项           | `match_list_item_
+{index}`                                    | `label: "{昵称}, {匹配时间}"`，`on
+TapHint: "打开聊天"` |\n   277\t| 继续滑动按钮（弹窗） | `match_continue_button`
+                                     | `label: "继续滑动"`                      
+             |\n   278\t| 去聊天按钮（弹窗）   | `match_chat_button`            
+                             | `label: "去聊天"`                                
+     |\n   279\t\n   280\t### 8.3 触摸目标\n   281\t\n   282\t- 操作按钮最小触摸
+区域 64×64pt（符合 Material 规范）\n   283\t- 底部导航项最小触摸区域 48×48pt\n  
+284\t- 匹配列表项整行可点击，高度 ≥ 56pt\n   285\t\n   286\t---\n   287\t\n   28
+8\t## 9. 需更新文档\n   289\t\n   290\t本设计产物完成后，以下文档必须同步新增或
+更新，以保证后续开发 Agent 有唯一真实来源。\n   291\t\n   292\t### 9.1 API 文档\
+n   293\t\n   294\t| 文档路径                    | 更新说明                     
+                                                                                
+         |\n   295\t| --------------------------- | ----------------------------
+--------------------------------------------------------------------------------
+----------- |\n   296\t| `docs/api/matching.md`      | 新增 Matching 模块 API 文
+档，包含 `GET /matching/recommendations` 与 `POST /matching/actions` 的请求/响应
+示例、错误码表 |\n   297\t| `docs/api/socket-events.md` | 新增 Socket.io 事件文
+档，记录 `match:created` 的 Payload 结构                                        
+                  |\n   298\t\n   299\t### 9.2 架构/流程文档\n   300\t\n   301\t
+| 文档路径                      | 更新说明                                      
+                                                                        |\n   30
+2\t| ----------------------------- | -------------------------------------------
+--------------------------------------------------------------------------- |\n 
+ 303\t| `docs/modules/matching.md`    | 更新 Matching 模块实现文档，补全 Flutter
+侧的 BLoC、Widget、路由映射关系                                               |\
+n   304\t| `docs/design-docs/flutter.md` | 在「Design-Only PR 验收 Checklist」中
+补充 Matching 相关组件的 Widgetbook 用例要求（已存在通用规范，本 Issue 执行即可
+） |\n   305\t\n   306\t### 9.3 模块索引\n   307\t\n   308\t| 文档路径          
+     | 更新说明                                                  |\n   309\t| --
+--------------------- | --------------------------------------------------------
+- |\n   310\t| `docs/modules/INDEX.md` | 确认 `matching.md` 已在模块清单中注册（
+已注册，无需修改） |\n   311\t\n   312\t### 9.4 PRD 注释\n   313\t\n   314\t- 在
+`prd/v1-matching.md` 顶部添加链接注释：`设计资产参见 designs/issue-43/`\n   315\
+t\n   316\t---\n   317\t\n   318\t## 10. Maestro E2E Flow 建议\n   319\t\n   320
+\t作为核心用户旅程，Matching 模块应配套以下 Maestro E2E flow，确保后续 feat PR 
+的自动化测试覆盖：\n   321\t\n   322\t| Flow 文件                               
+    | 覆盖场景                                 | 关键步骤                       
+                                                                                
+  |\n   323\t| -------------------------------------------- | ------------------
+---------------------- | -------------------------------------------------------
+----------------------------------------------------------- |\n   324\t| `.maest
+ro/flows/matching_swipe.yaml`         | 首页加载推荐 → 右滑 Like → 断言卡片消失 
+| ① 断言 `recommendation_card_top` 可见 ② 点击 `swipe_like_button` ③ 断言原卡片
+消失 / 新卡片出现                     |\n   325\t| `.maestro/flows/matching_matc
+h_success.yaml` | 双向 Like → 断言 MatchSuccessDialog 弹出 | ① 触发双向 Like ② 
+断言 `match_continue_button` 与 `match_chat_button` 可见 ③ 点击 `match_continue_
+button` 关闭弹窗 |\n   326\t| `.maestro/flows/match_list.yaml`             | 进
+入消息 Tab → 断言匹配列表加载          | ① 切换到底部导航「消息」Tab ② 断言 `mat
+ch_list_item_0` 可见 ③ 断言列表项包含昵称与头像                             |\n 
+ 327\t\n   328\t> 上述 flow 依赖第 8.2 节定义的 `Semantics identifier`，Flutter 
+实现时必须严格对应，否则 E2E 将无法稳定定位元素。\n   329\t\n   330\t## 11. 验收
+Checklist（供 Design-Only PR 使用）\n   331\t\n   332\t- [ ] 低保真/高保真原型图
+已产出（本文件 + wireframe.svg + mockup.html）\n   333\t- [ ] 所有新增组件已在 `
+widgetbook/main.dart` 中注册 use-case\n   334\t- [ ] PR 中附带 Golden File 截图
+或 Widgetbook 运行截图\n   335\t- [ ] `pages/` 中未使用 `Color(0xFF...)`、`TextF
+ield`、`ElevatedButton` 等硬编码或原生 Material 组件替代 design-system\n   336\t
+- [ ] 页面中的状态（加载、空态、错误、配对成功弹窗）在原型图中有明确定义\n   337
+\t- [ ] Accessibility 语义标签已覆盖所有交互元素\n   338\t- [ ] 响应式适配方案已
+记录\n',
+        message='338 lines read from file starting from line 1. Total lines in f
+ile: 338. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(arguments_part='.md"}')
+ToolCall(
+    type='function',
+    id='tool_b3j8CEovFGUxZWITEIQwMdSl',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/re
+work-pr-44-3169274568/designs/issue-43'
+    ),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_VhtlU4rRDXzRTHyG0muHM1mB',
+    return_value=ToolOk(
+        is_error=False,
+        output="     1\t# Matching 模块实现\n     2\t\n     3\t## 职责\n     4\t
+\n     5\t负责推荐卡片生成、滑动操作处理、双向匹配判定与通知。\n     6\t\n     7
+\t## 流程图\n     8\t\n     9\t### 推荐卡片\n    10\t\n    11\t```mermaid\n    1
+2\tsequenceDiagram\n    13\t    participant C as Flutter App\n    14\t    partic
+ipant API as MatchingController\n    15\t    participant S as MatchingService\n 
+  16\t    participant DB as MySQL\n    17\t    participant R as Redis\n    18\t\
+n    19\t    C->>API: GET /matching/recommendations\n    20\t    API->>S: getRec
+ommendations(userId, location, filters)\n    21\t    S->>R: get candidate pool\n
+   22\t    alt cache miss\n    23\t        S->>DB: query candidates (Haversine +
+filters)\n    24\t        DB-->>S: user list\n    25\t        S->>R: cache candi
+date pool (TTL 5min)\n    26\t    end\n    27\t    S-->>API: sorted cards\n    2
+8\t    API-->>C: 200 OK\n    29\t```\n    30\t\n    31\t### 滑动与匹配\n    32\t
+\n    33\t```mermaid\n    34\tsequenceDiagram\n    35\t    participant C as Flut
+ter App\n    36\t    participant API as MatchingController\n    37\t    particip
+ant S as MatchingService\n    38\t    participant DB as MySQL\n    39\t    parti
+cipant WS as Socket.io\n    40\t\n    41\t    C->>API: POST /matching/actions (t
+arget_id, action=like)\n    42\t    API->>S: recordAction(userId, targetId, acti
+on)\n    43\t    S->>DB: insert match_actions\n    44\t    S->>DB: checkMutualLi
+ke(targetId, userId)\n    45\t    alt mutual like\n    46\t        S->>DB: creat
+e match + conversation\n    47\t        S->>WS: emit match:created to both users
+\n    48\t    end\n    49\t    S-->>API: result\n    50\t    API-->>C: 200 OK\n 
+  51\t```\n    52\t\n    53\t## Flutter 架构\n    54\t\n    55\t### BLoC / Event
+/ State\n    56\t\n    57\t#### MatchingBloc（首页推荐 + 滑动）\n    58\t\n    5
+9\t```dart\n    60\t// matching_bloc.dart\n    61\tclass MatchingBloc extends Bl
+oc<MatchingEvent, MatchingState> { ... }\n    62\t\n    63\t// matching_event.da
+rt\n    64\tabstract class MatchingEvent {}\n    65\tclass RecommendationsReques
+ted extends MatchingEvent {\n    66\t  final String mode; // 'nearby' | 'city' |
+'nationwide'\n    67\t}\n    68\tclass SwipeActionSubmitted extends MatchingEven
+t {\n    69\t  final String targetId;\n    70\t  final SwipeAction action; // li
+ke | pass\n    71\t}\n    72\tclass MatchModalDismissed extends MatchingEvent {}
+\n    73\t\n    74\t// matching_state.dart\n    75\tabstract class MatchingState
+{}\n    76\tclass MatchingInitial extends MatchingState {}\n    77\tclass Matchi
+ngLoadInProgress extends MatchingState {}\n    78\tclass MatchingLoadSuccess ext
+ends MatchingState {\n    79\t  final List<RecommendationCard> cards;\n    80\t 
+final String mode;\n    81\t}\n    82\tclass MatchingLoadEmpty extends MatchingS
+tate {\n    83\t  final String mode;\n    84\t}\n    85\tclass MatchingSwipeInPr
+ogress extends MatchingState {\n    86\t  final List<RecommendationCard> cards;\
+n    87\t  final String targetId;\n    88\t  final SwipeAction action;\n    89\t
+}\n    90\tclass MatchingMatchCreated extends MatchingState {\n    91\t  final M
+atchSummary match; // 用于弹窗展示\n    92\t}\n    93\tclass MatchingFailure ext
+ends MatchingState {\n    94\t  final String message;\n    95\t}\n    96\t```\n 
+  97\t\n    98\t#### MatchListCubit（匹配列表）\n    99\t\n   100\t```dart\n   1
+01\t// match_list_cubit.dart\n   102\tclass MatchListCubit extends Cubit<MatchLi
+stState> {\n   103\t  Future<void> fetchMatches({String? cursor}) async { ... }\
+n   104\t}\n   105\t\n   106\t// match_list_state.dart\n   107\tabstract class M
+atchListState {}\n   108\tclass MatchListInitial extends MatchListState {}\n   1
+09\tclass MatchListLoadInProgress extends MatchListState {}\n   110\tclass Match
+ListLoadSuccess extends MatchListState {\n   111\t  final List<MatchItem> matche
+s;\n   112\t  final bool hasMore;\n   113\t  final String? nextCursor;\n   114\t
+}\n   115\tclass MatchListLoadFailure extends MatchListState {\n   116\t  final 
+String message;\n   117\t}\n   118\t```\n   119\t\n   120\t### 组件清单\n   121\
+t\n   122\t| 层级     | 组件名               | 文件路径                         
+                                   | 说明                                       
+|\n   123\t| -------- | -------------------- | ---------------------------------
+----------------------------------- | ------------------------------------------
+|\n   124\t| atom     | `SwActionButton`     | `packages/design-system/lib/src/a
+toms/sw_action_button.dart`         | 圆形操作按钮（Pass/Like 两种变体）        
+|\n   125\t| molecule | `SwipeCard`          | `packages/design-system/lib/src/m
+olecules/swipe_card.dart`           | 可拖动/可点击的推荐用户卡片               
+|\n   126\t| organism | `SwipeCardStack`     | `packages/design-system/lib/src/o
+rganisms/swipe_card_stack.dart`     | 卡片堆叠容器，管理多层卡片渲染与手势冲突  
+|\n   127\t| organism | `MatchSuccessDialog` | `packages/design-system/lib/src/o
+rganisms/match_success_dialog.dart` | 配对成功全屏弹窗，含头像组合、CTA 按钮    
+|\n   128\t| molecule | `MatchListItem`      | `packages/design-system/lib/src/m
+olecules/match_list_item.dart`      | 匹配列表单项，含头像、昵称、时间、聊天入口
+|\n   129\t\n   130\t### 页面级 Widget\n   131\t\n   132\t| Widget 名           
+     | 路径                                                                  | 
+说明                                             |\n   133\t| ------------------
+------- | --------------------------------------------------------------------- 
+| ------------------------------------------------ |\n   134\t| `HomePage`      
+         | `apps/mobile/lib/presentation/pages/home_page.dart`                  
+| 首页，承载模式切换、卡片堆叠、操作按钮、底部导航 |\n   135\t| `MatchListPage` 
+         | `apps/mobile/lib/presentation/pages/match_list_page.dart`            
+| 匹配列表页，底部导航「消息」Tab 内容             |\n   136\t| `EmptyRecommenda
+tionView` | `apps/mobile/lib/presentation/widgets/empty_recommendation_view.dart
+` | 推荐为空时的占位视图                             |\n   137\t| `EmptyMatchLis
+tView`      | `apps/mobile/lib/presentation/widgets/empty_match_list_view.dart` 
+   | 匹配列表为空时的占位视图                         |\n   138\t\n   139\t### 
+路由映射\n   140\t\n   141\t| 路由名      | 页面            | 参数              
+|\n   142\t| ----------- | --------------- | ------------------ |\n   143\t| `/h
+ome`     | `HomePage`      | 无                 |\n   144\t| `/messages` | `Matc
+hListPage` | 无（底部导航 Tab） |\n   145\t\n   146\t### Socket.io 事件监听\n   
+147\t\n   148\t- 在 `HomePage` 的 `initState` 中建立 Socket 连接（或通过全局 BLo
+C）\n   149\t- 监听 `match:created` 事件，接收到后向 `MatchingBloc` dispatch `Ex
+ternalMatchReceived(matchSummary)`\n   150\t- `MatchingBloc` 状态流转至 `Matchin
+gMatchCreated`，触发 `MatchSuccessDialog`\n   151\t\n   152\t## 关键文件\n   153
+\t\n   154\t| 文件         | 路径                                               
+   |\n   155\t| ------------ | -------------------------------------------------
+----- |\n   156\t| Controller   | `apps/api/src/modules/matching/matching.contro
+ller.ts` |\n   157\t| Service      | `apps/api/src/modules/matching/matching.ser
+vice.ts`    |\n   158\t| DTO          | `apps/api/src/modules/matching/dto/`    
+              |\n   159\t| Flutter BLoC | `apps/mobile/lib/presentation/blocs/ma
+tching/`         |\n   160\t| Card Widget  | `apps/mobile/lib/presentation/widge
+ts/swipe_card.dart` |\n   161\t\n   162\t## 边界情况\n   163\t\n   164\t1. **重
+复滑动**：同一用户短时间内重复滑动同一人，后端幂等处理（MySQL `INSERT IGNORE` 或
+唯一索引拦截）\n   165\t2. **滑动自己**：返回 `code=1000` 参数错误\n   166\t3. *
+*缓存击穿**：推荐池使用 Redis + 本地缓存双层防护，DB 查询加互斥锁\n   167\t4. **
+新用户冷启动**：注册完成后自动生成首批推荐池\n",
+        message='167 lines read from file starting from line 1. Total lines in f
+ile: 167. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(arguments_part='/docs-to-update.txt"}')
+StatusUpdate(
+    context_usage=0.047397613525390625,
+    context_tokens=12425,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=1673,
+        output=423,
+        input_cache_read=10752,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-Ykchh3WdPcNpAJYj5R9uWYVP',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_b3j8CEovFGUxZWITEIQwMdSl',
+    return_value=ToolOk(
+        is_error=False,
+        output='     1\t# Issue #43 设计资产完成后需同步更新的文档清单\n     2\t
+\n     3\t## API 文档\n     4\t- docs/api/matching.md\n     5\t  - 新增 Matching
+模块 API 文档\n     6\t  - 包含 GET /matching/recommendations 与 POST /matching/
+actions 的请求/响应示例、错误码表\n     7\t\n     8\t- docs/api/socket-events.md
+\n     9\t  - 新增 Socket.io 事件文档\n    10\t  - 记录 match:created 的 Payload
+结构\n    11\t\n    12\t## 架构/流程文档\n    13\t- docs/modules/matching.md\n  
+ 14\t  - 更新 Matching 模块实现文档\n    15\t  - 补全 Flutter 侧的 BLoC、Widget
+、路由映射关系\n    16\t\n    17\t- docs/design-docs/flutter.md\n    18\t  - 在
+「Design-Only PR 验收 Checklist」中补充 Matching 相关组件的 Widgetbook 用例要求\
+n    19\t\n    20\t## 模块索引\n    21\t- docs/modules/INDEX.md\n    22\t  - 确
+认 matching.md 已在模块清单中注册（已注册，无需修改）\n    23\t\n    24\t## PRD 
+注释\n    25\t- prd/v1-matching.md\n    26\t  - 在顶部添加链接注释：设计资产参见
+designs/issue-43/\n',
+        message='26 lines read from file starting from line 1. Total lines in fi
+le: 26. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+StepBegin(n=3)
+ThinkPart(
+    type='think',
+    think='Let me analyze the review issues and what needs to be fixed:\n\n1. **
+Major Issue 1**: Document references still point to old `issue-4` instead of `is
+sue-43`\n   - `prd/v1-matching.md:8` - Actually looking at the file, line 8 alre
+ady says `designs/issue-43/`. Wait, let me re-read... Actually the review says i
+t points to `designs/issue-4/`, but when I read the file, line 8 says `designs/i
+ssue-43/`. Hmm, maybe the file was already partially fixed or the review is base
+d on an older state. Let me check if there are any `issue-4` references in `prd/
+v1-matching.md` and `docs/api/matching.md`.\n   - Looking at `docs/api/matching.
+md` line 4: `关联设计规范: [design-spec.md](../../designs/issue-43/design-spec.m
+d)` - this already says issue-43.\n\nWait, the review report says:\n- `prd/v1-ma
+tching.md` 第 8 行写 `"设计资产参见 designs/issue-4/"`\n- `docs/api/matching.md`
+第 4 行写 `"关联设计规范: ../../designs/issue-4/design-spec.md"`\n\nBut when I r
+ead the files, both already reference `issue-43`. This is strange. Maybe the bra
+nch has already been partially modified, or maybe the files are different from w
+hat the review was based on.\n\nLet me check if there are any other references t
+o `issue-4` in these files, or if there\'s a mismatch.\n\nActually, looking more
+carefully at the review, it says "本 PR 的 `designs/issue-43/docs-to-update.txt`
+明确列出要在 `prd/v1-matching.md` 顶部添加 `"设计资产参见 designs/issue-43/"`，
+但 **PR diff 中未包含对该文件的任何修改**。"\n\nBut the file currently shows `is
+sue-43`. Maybe the branch was already modified but not committed/pushed? Let me 
+check git status and diff.\n\nWait, actually I need to be more careful. Let me c
+heck the actual content again and see if there are other files or if the review 
+issues have already been fixed.\n\n2. **Major Issue 2**: Accessibility section m
+issing `Semantics(identifier)` definitions\n   - Looking at `designs/issue-43/de
+sign-spec.md` lines 270-279, there IS already a table with `Semantics identifier
+` and `Semantics label` columns. The table seems complete with all the items men
+tioned in the review.\n\n3. **Major Issue 3**: Interaction section missing Maest
+ro compatible `onTapDown` gesture requirement\n   - Looking at `designs/issue-43
+/design-spec.md` line 145: "> **开发备注（Maestro 兼容性）**：所有需 Maestro E2E
+点击的按钮（Pass、Like、模式 Tab、弹窗 CTA）在 Flutter 实现时，必须使用 `Gesture
+Detector(onTapDown: (_) => ...)`，禁止使用 `onTap`。"\n\n4. **Minor Issue 4**: D
+esign spec file locations don\'t match project template\n   - The files are in `
+designs/issue-43/` but template says `docs/design-docs/ui-specs/<feature>/`\n\n5
+. **Minor Issue 5**: Missing Maestro E2E Flow design considerations\n   - Lookin
+g at `designs/issue-43/design-spec.md` lines 318-329, there IS a section "10. Ma
+estro E2E Flow 建议" with the exact flows mentioned in the review.\n\n6. **Minor
+Issue 6**: `docs/modules/matching.md` widget list missing `EmptyMatchListView`\n
+  - Looking at `docs/modules/matching.md` lines 130-137, `EmptyMatchListView` IS
+already there.\n\nWait, it seems like most of the issues have already been fixed
+in the current branch! Let me check git diff to see what was changed.\n\nActuall
+y, looking at the git status, it says:\n```\nOn branch design/issue-43\nYour bra
+nch is up to date with \'origin/design/issue-43\'.\n\nChanges not staged for com
+mit:\n\tmodified:   apps/mobile/pubspec.lock\n```\n\nSo there are no staged chan
+ges for the document fixes. Let me check the git log to see if these fixes were 
+already committed.\n\nLet me check the actual state more carefully. Maybe the re
+view was done on an older commit and someone already fixed some issues. Let me l
+ook at git log and compare with origin.\n\nActually, I should look at what the r
+eview says more carefully. The review says PR diff doesn\'t contain modification
+s to certain files. But the files in the working tree might already have been fi
+xed. The task says "根据审查报告中的问题进行代码修改" - so I need to make sure a
+ll the issues in the review report are actually fixed.\n\nLet me search for `iss
+ue-4` references across the repo to see if any still exist.',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_rW6LYTrs7GiWJ4fubeoJyJ4N',
+    function=FunctionBody(
+        name='Shell',
+        arguments='{"command": "cd /var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000g
+n/T/rework-pr-44-3169274568 && git log --oneline -5"}'
+    ),
+    extras=None
+)
+ToolCall(
+    type='function',
+    id='tool_FtTYl7OmFv6i2L8iAZxnJJk5',
+    function=FunctionBody(name='Grep', arguments='{"pattern":'),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_rW6LYTrs7GiWJ4fubeoJyJ4N',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='f13e537 fix: 修复 PR #44 review 问题\naf0a239 design: add assets
+for issue #43\n6685f4e refactor(e2e): 环境准备与测试执行职责分离\n7119c46 feat(m
+aestro): run-e2e.sh 支持自动启动模拟器\n4968370 chore(maestro): 配置 maestro 为
+全局命令，移除 run-e2e.sh 硬编码路径\n',
+        message='Command executed successfully.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(
+    arguments_part=' "issue-4", "path": "/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n
+00000gn/T/rework-pr-44-3169274568", "output_mode": "content", "-n": true}'
+)
+ToolCall(
+    type='function',
+    id='tool_SJqElUMFIUGbhCIeyagkwyxN',
+    function=FunctionBody(
+        name='Shell',
+        arguments='{"command": "cd /var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000g
+n/T/rework-pr-44-3169274568 &&'
+    ),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_FtTYl7OmFv6i2L8iAZxnJJk5',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='designs/issue-43/design-spec.md:6:> 设计资产参见 [designs/issue-
+43/](../issue-43/)\ndesigns/issue-43/design-spec.md:314:- 在 `prd/v1-matching.md
+` 顶部添加链接注释：`设计资产参见 designs/issue-43/`\ndesigns/issue-43/docs-to-u
+pdate.txt:26:  - 在顶部添加链接注释：设计资产参见 designs/issue-43/\ndesigns/iss
+ue-4/design-spec.md:258:- 在 `prd/v1-matching.md` 顶部添加链接注释：`设计资产参
+见 designs/issue-4/`\ndesigns/issue-4/docs-to-update.txt:5: prd/v1-matching.md|
+顶部添加设计资产链接注释 designs/issue-4/\ndocs/api/matching.md:4:> 关联设计规范
+: [design-spec.md](../../designs/issue-43/design-spec.md)\ndocs/design-docs/ui-s
+pecs/matching/spec.md:6:> 设计资产参见 [designs/issue-43/](../../../../designs/i
+ssue-43/)\ndocs/design-docs/ui-specs/matching/spec.md:314:- 在 `prd/v1-matching.
+md` 顶部添加链接注释：`设计资产参见 designs/issue-43/`\nprd/v1-matching.md:8:> 
+设计资产参见 [designs/issue-43/](../designs/issue-43/)',
+        message='',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(arguments_part=' git diff HEAD~1 --name-only"}')
+StatusUpdate(
+    context_usage=0.10255050659179688,
+    context_tokens=26883,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=14595,
+        output=1218,
+        input_cache_read=12288,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-WvEkN9XxcIrytJ63vzZ1BXOi',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_SJqElUMFIUGbhCIeyagkwyxN',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='apps/mobile/assets/images/.gitkeep\napps/mobile/pubspec.lock\nde
+signs/issue-43/design-spec.md\ndocs/api/matching.md\ndocs/design-docs/ui-specs/m
+atching/spec.md\ndocs/design-docs/ui-specs/matching/wireframes/wireframe.svg\ndo
+cs/modules/matching.md\nprd/v1-matching.md\n',
+        message='Command executed successfully.',
+        display=[],
+        extras=None
+    )
+)
+StepBegin(n=4)
+ThinkPart(
+    type='think',
+    think="Interesting! There's already a commit `f13e537 fix: 修复 PR #44 revie
+w 问题` on the branch. Let me check what that commit contains - maybe someone al
+ready fixed the issues. But the task says this is a rework task, so perhaps that
+commit was incomplete or the fixes weren't pushed properly.\n\nLet me check the 
+diff of that commit to see what was already fixed.",
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_w0FjllAO2i73jkjfeQO3JU9p',
+    function=FunctionBody(
+        name='Shell',
+        arguments='{"command": "cd /var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000g
+n/T/rework-pr-44-3169274568 && git show f13e537 --stat && echo \\"---\\" && git 
+show f13e537"}'
+    ),
+    extras=None
+)
+StatusUpdate(
+    context_usage=0.10914230346679688,
+    context_tokens=28611,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=1731,
+        output=157,
+        input_cache_read=26880,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-QUTMsfCijXL0pJXUrf8W5ncG',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_w0FjllAO2i73jkjfeQO3JU9p',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='commit f13e5375a14c8eaa3dcf477a49e3606707e5a922\nAuthor: insulat
+e <liuting_502@126.com>\nDate:   Sun Apr 19 12:17:00 2026 +0800\n\n    fix: 修复
+PR #44 review 问题\n\n apps/mobile/assets/images/.gitkeep                 |   0\
+n designs/issue-43/design-spec.md                    | 187 ++++++------\n docs/a
+pi/matching.md                               |  40 +--\n docs/design-docs/ui-spe
+cs/matching/spec.md         | 338 +++++++++++++++++++++\n .../ui-specs/matching/
+wireframes/wireframe.svg     | 243 +++++++++++++++\n docs/modules/matching.md   
+                       |  45 +--\n prd/v1-matching.md                           
+     |  38 ++-\n 7 files changed, 752 insertions(+), 139 deletions(-)\n---\ncomm
+it f13e5375a14c8eaa3dcf477a49e3606707e5a922\nAuthor: insulate <liuting_502@126.c
+om>\nDate:   Sun Apr 19 12:17:00 2026 +0800\n\n    fix: 修复 PR #44 review 问题\
+n\ndiff --git a/apps/mobile/assets/images/.gitkeep b/apps/mobile/assets/images/.
+gitkeep\nnew file mode 100644\nindex 0000000..e69de29\ndiff --git a/designs/issu
+e-43/design-spec.md b/designs/issue-43/design-spec.md\nindex 4cf5367..7782adb 10
+0644\n--- a/designs/issue-43/design-spec.md\n+++ b/designs/issue-43/design-spec.
+md\n@@ -9,12 +9,12 @@\n \n ## 1. 页面/场景清单\n \n-| 序号 | 页面/场景 | 说明 | 
+关键状态 |\n-|------|-----------|------|----------|\n-| 1 | **首页-推荐卡片** | 
+用户进入 App 后默认页面，展示可滑动的推荐卡片堆叠 | Loading、正常态（卡片堆叠）
+、空数据态 |\n-| 2 | **滑动操作反馈** | 用户左滑 Pass / 右滑 Like 时的实时视觉反
+馈 | 拖动中、释放动画、操作成功 |\n-| 3 | **配对成功弹窗** | 双向喜欢时触发的全
+屏 Modal，引导用户聊天或继续滑动 | 动画进入、可关闭 |\n-| 4 | **匹配列表页** | 
+底部导航「消息」入口内的配对成功用户列表 | Loading、列表态、空态 |\n+| 序号 | 页
+面/场景         | 说明                                               | 关键状态 
+                            |\n+| ---- | ----------------- | -------------------
+------------------------------- | ------------------------------------- |\n+| 1 
+  | **首页-推荐卡片** | 用户进入 App 后默认页面，展示可滑动的推荐卡片堆叠  | Loa
+ding、正常态（卡片堆叠）、空数据态 |\n+| 2    | **滑动操作反馈**  | 用户左滑 Pas
+s / 右滑 Like 时的实时视觉反馈         | 拖动中、释放动画、操作成功            |
+\n+| 3    | **配对成功弹窗**  | 双向喜欢时触发的全屏 Modal，引导用户聊天或继续滑
+动 | 动画进入、可关闭                      |\n+| 4    | **匹配列表页**    | 底部
+导航「消息」入口内的配对成功用户列表           | Loading、列表态、空态          
+      |\n \n ### 场景流程图\n \n@@ -41,37 +41,38 @@ MatchListPage (Tab: 消息)\n 
+\n ### 2.1 色板\n \n-| Token | 色值 | 使用场景 |\n-|-------|------|----------|\n
+-| `DesignTokens.primary` | `#6750A4` | 主按钮、激活 Tab、底部导航选中态、Like 
+按钮 hover 强调 |\n-| `DesignTokens.background` | `#FFFBFE` | 页面背景、Card 背
+景 |\n-| `DesignTokens.textPrimary` | `#1C1B1F` | 标题、正文、图标主色 |\n-| `De
+signTokens.error` | `#B3261E` | Pass 操作色、错误提示 |\n-| `ColorScheme.surface
+` | `#F3EDF7` | Tab 背景、头像 fallback 背景 |\n-| `ColorScheme.outline` | `#797
+47E` | 辅助文字、分割线、次要按钮边框 |\n+| Token                      | 色值   
+  | 使用场景                                               |\n+| ---------------
+----------- | --------- | ------------------------------------------------------
+|\n+| `DesignTokens.primary`     | `#6750A4` | 主按钮、激活 Tab、底部导航选中态
+、Like 按钮 hover 强调 |\n+| `DesignTokens.background`  | `#FFFBFE` | 页面背景、
+Card 背景                                    |\n+| `DesignTokens.textPrimary` | 
+`#1C1B1F` | 标题、正文、图标主色                                   |\n+| `Design
+Tokens.error`       | `#B3261E` | Pass 操作色、错误提示                         
+        |\n+| `ColorScheme.surface`      | `#F3EDF7` | Tab 背景、头像 fallback 
+背景                           |\n+| `ColorScheme.outline`      | `#79747E` | 辅
+助文字、分割线、次要按钮边框                         |\n \n 额外语义色（需在 `to
+kens.dart` / `app_theme.dart` 中注册）：\n+\n - `--success` / `likeActionColor`:
+`#2E7D32` — Like 按钮、配对成功状态\n \n ### 2.2 字体\n \n-| Token | 值 | 使用场
+景 |\n-|-------|-----|----------|\n-| `DesignTokens.fontSizeHeadline` | `28.0` |
+空状态大标题 |\n-| `DesignTokens.fontSizeTitle` | `22.0` | 卡片姓名、弹窗标题、
+页面标题 |\n-| `DesignTokens.fontSizeBody` | `16.0` | 按钮文字、列表主文字 |\n-|
+`DesignTokens.fontSizeCaption` | `12.0` | 距离/时间、Bio、底部导航标签 |\n+| Tok
+en                           | 值     | 使用场景                     |\n+| -----
+-------------------------- | ------ | ---------------------------- |\n+| `Design
+Tokens.fontSizeHeadline` | `28.0` | 空状态大标题                 |\n+| `DesignTo
+kens.fontSizeTitle`    | `22.0` | 卡片姓名、弹窗标题、页面标题 |\n+| `DesignToke
+ns.fontSizeBody`     | `16.0` | 按钮文字、列表主文字         |\n+| `DesignTokens
+.fontSizeCaption`  | `12.0` | 距离/时间、Bio、底部导航标签 |\n \n ### 2.3 间距与
+圆角\n \n-| Token | 值 | 使用场景 |\n-|-------|-----|----------|\n+| Token      
+             | 值     | 使用场景                          |\n+| ----------------
+-------- | ------ | --------------------------------- |\n | `DesignTokens.spacin
+gMd` | `16.0` | 页面边距、Card 内边距、列表项间距 |\n-| `DesignTokens.spacingSm`
+| `12.0` | Tab 内间距、操作按钮与卡片间距 |\n-| `DesignTokens.spacingXs` | `8.0`
+| 行内小间距、文字与图标间距 |\n-| `DesignTokens.radiusLg` | `16.0` | 推荐卡片圆
+角、弹窗圆角 |\n-| `DesignTokens.radiusMd` | `12.0` | 按钮、列表项、小卡片圆角 |
+\n-| `DesignTokens.radiusSm` | `8.0` | Tag、Badge 圆角 |\n+| `DesignTokens.spaci
+ngSm` | `12.0` | Tab 内间距、操作按钮与卡片间距    |\n+| `DesignTokens.spacingXs
+` | `8.0`  | 行内小间距、文字与图标间距        |\n+| `DesignTokens.radiusLg`  | 
+`16.0` | 推荐卡片圆角、弹窗圆角            |\n+| `DesignTokens.radiusMd`  | `12.
+0` | 按钮、列表项、小卡片圆角          |\n+| `DesignTokens.radiusSm`  | `8.0`  |
+Tag、Badge 圆角                   |\n \n ### 2.4 布局尺寸\n \n@@ -87,22 +88,22 @
+@ MatchListPage (Tab: 消息)\n \n ### 3.1 需新增 design-system 组件\n \n-| 层级 |
+组件名 | 文件路径 | 说明 | Widgetbook 用例要求 |\n-|------|--------|----------|-
+-----|---------------------|\n-| atom | `SwActionButton` | `packages/design-syst
+em/lib/src/atoms/sw_action_button.dart` | 圆形操作按钮（Pass/Like 两种变体） | 
+默认态、禁用态、按下态 |\n-| molecule | `SwipeCard` | `packages/design-system/li
+b/src/molecules/swipe_card.dart` | 可拖动/可点击的推荐用户卡片 | 默认态、拖动中(
+show like badge)、拖动中(show pass badge) |\n-| organism | `SwipeCardStack` | `p
+ackages/design-system/lib/src/organisms/swipe_card_stack.dart` | 卡片堆叠容器，
+管理多层卡片渲染与手势冲突 | 3张卡片堆叠、1张卡片、空态 |\n-| organism | `MatchS
+uccessDialog` | `packages/design-system/lib/src/organisms/match_success_dialog.d
+art` | 配对成功全屏弹窗，含头像组合、CTA 按钮 | 默认态 |\n-| molecule | `MatchLi
+stItem` | `packages/design-system/lib/src/molecules/match_list_item.dart` | 匹配
+列表单项，含头像、昵称、时间、聊天入口 | 默认态 |\n+| 层级     | 组件名         
+     | 文件路径                                                             | 说
+明                                       | Widgetbook 用例要求                  
+                   |\n+| -------- | -------------------- | ---------------------
+----------------------------------------------- | ------------------------------
+------------ | -------------------------------------------------------- |\n+| at
+om     | `SwActionButton`     | `packages/design-system/lib/src/atoms/sw_action_
+button.dart`         | 圆形操作按钮（Pass/Like 两种变体）         | 默认态、禁用
+态、按下态                                   |\n+| molecule | `SwipeCard`       
+  | `packages/design-system/lib/src/molecules/swipe_card.dart`           | 可拖
+动/可点击的推荐用户卡片                | 默认态、拖动中(show like badge)、拖动中
+(show pass badge) |\n+| organism | `SwipeCardStack`     | `packages/design-syste
+m/lib/src/organisms/swipe_card_stack.dart`     | 卡片堆叠容器，管理多层卡片渲染
+与手势冲突   | 3张卡片堆叠、1张卡片、空态                               |\n+| or
+ganism | `MatchSuccessDialog` | `packages/design-system/lib/src/organisms/match_
+success_dialog.dart` | 配对成功全屏弹窗，含头像组合、CTA 按钮     | 默认态      
+                                            |\n+| molecule | `MatchListItem`    
+ | `packages/design-system/lib/src/molecules/match_list_item.dart`      | 匹配列
+表单项，含头像、昵称、时间、聊天入口 | 默认态                                   
+               |\n \n ### 3.2 页面级 Widget\n \n-| Widget 名 | 路径 | 说明 |\n-|
+-----------|------|------|\n-| `HomePage` | `apps/mobile/lib/presentation/pages/
+home_page.dart` | 首页，承载模式切换、卡片堆叠、操作按钮、底部导航 |\n-| `MatchL
+istPage` | `apps/mobile/lib/presentation/pages/match_list_page.dart` | 匹配列表
+页，底部导航「消息」Tab 内容 |\n-| `EmptyRecommendationView` | `apps/mobile/lib/
+presentation/widgets/empty_recommendation_view.dart` | 推荐为空时的占位视图（可
+复用） |\n-| `EmptyMatchListView` | `apps/mobile/lib/presentation/widgets/empty_
+match_list_view.dart` | 匹配列表为空时的占位视图 |\n+| Widget 名                
+| 路径                                                                  | 说明  
+                                          |\n+| ------------------------- | ----
+----------------------------------------------------------------- | ------------
+------------------------------------ |\n+| `HomePage`                | `apps/mob
+ile/lib/presentation/pages/home_page.dart`                   | 首页，承载模式切
+换、卡片堆叠、操作按钮、底部导航 |\n+| `MatchListPage`           | `apps/mobile/
+lib/presentation/pages/match_list_page.dart`             | 匹配列表页，底部导航
+「消息」Tab 内容             |\n+| `EmptyRecommendationView` | `apps/mobile/lib/
+presentation/widgets/empty_recommendation_view.dart` | 推荐为空时的占位视图（可
+复用）                   |\n+| `EmptyMatchListView`      | `apps/mobile/lib/pres
+entation/widgets/empty_match_list_view.dart`     | 匹配列表为空时的占位视图     
+                   |\n \n ### 3.3 禁止直接使用原生组件替代\n \n@@ -116,12 +117,1
+2 @@ MatchListPage (Tab: 消息)\n \n 本设计全部使用 Emoji / 矢量图标 / CSS 渐变占
+位，**无需额外图片资源**。实际开发时：\n \n-| 资源位置 | 说明 |\n-|----------|--
+----|\n-| 用户头像 | 网络图 `Image.network(card.avatarUrl)`，fallback 到 `SwAvat
+ar` |\n-| 空状态插图 | 使用 `Icons.search_off` 或 Lottie 动画（待产品确认），MVP
+阶段可用 `Icons.person_off` 替代 |\n-| 操作按钮图标 | Material `Icons.close` (Pa
+ss) / `Icons.favorite` (Like)，颜色语义化 |\n-| 底部导航图标 | Material `Icons.h
+ome` / `Icons.chat_bubble` / `Icons.person` |\n+| 资源位置     | 说明           
+                                                                           |\n+|
+------------ | -----------------------------------------------------------------
+------------------------- |\n+| 用户头像     | 网络图 `Image.network(card.avatar
+Url)`，fallback 到 `SwAvatar`                             |\n+| 空状态插图   | 
+使用 `Icons.search_off` 或 Lottie 动画（待产品确认），MVP 阶段可用 `Icons.person
+_off` 替代 |\n+| 操作按钮图标 | Material `Icons.close` (Pass) / `Icons.favorite`
+(Like)，颜色语义化                        |\n+| 底部导航图标 | Material `Icons.h
+ome` / `Icons.chat_bubble` / `Icons.person`                               |\n \n
+> **待产品确认**：配对成功弹窗是否使用 Lottie 庆祝动画？当前原型使用 CSS confett
+i 演示，Flutter 侧可用 `AnimatedContainer` + `Particle` 简易实现，或引入 `lottie
+` 包。\n \n@@ -131,26 +132,28 @@ MatchListPage (Tab: 消息)\n \n ### 5.1 手势与动
+画\n \n-| 交互 | 触发 | 动画表现 | 时长 | 曲线 |\n-|------|------|----------|---
+---|------|\n-| 卡片拖动 | 手指按住并水平移动 | 卡片跟随手指，旋转 angle = dx × 
+0.05°，Like/Pass badge 透明度渐变 | 实时 | — |\n-| 释放-Pass | 左滑超过阈值（≈12
+0pt）或点击 ✕ | 卡片向左飞出屏幕，下层卡片 scale 恢复 1.0 | 300ms | `easeOutCubi
+c` |\n-| 释放-Like | 右滑超过阈值或点击 ♥ | 卡片向右飞出屏幕，触发 API；若双向匹
+配则弹 MatchSuccessDialog | 300ms | `easeOutCubic` |\n-| 弹窗进入 | 双向匹配成功
+| 背景遮罩 fadeIn + 内容 scale(0.9→1.0) | 300ms | `easeOutBack`（轻微回弹） |\n-
+| 弹窗关闭 | 点击「继续滑动」或遮罩 | 背景 fadeOut + 内容 scale(0.95) + opacity(
+0) | 200ms | `easeInCubic` |\n-| 列表加载 | 进入 MatchListPage | 顶部 CircularPr
+ogressIndicator，数据返回后列表淡入 | 200ms | `easeIn` |\n-| 模式切换 | 顶部 Tab
+切换 | 当前卡片堆叠淡出（150ms）→ 新卡片堆叠淡入（200ms） | 350ms | `easeInOut` 
+|\n+| 交互      | 触发                           | 动画表现                     
+                                    | 时长  | 曲线                      |\n+| --
+------- | ------------------------------ | -------------------------------------
+---------------------------- | ----- | ------------------------- |\n+| 卡片拖动 
+| 手指按住并水平移动             | 卡片跟随手指，旋转 angle = dx × 0.05°，Like/P
+ass badge 透明度渐变 | 实时  | —                         |\n+| 释放-Pass | 左滑
+超过阈值（≈120pt）或点击 ✕ | 卡片向左飞出屏幕，下层卡片 scale 恢复 1.0          
+              | 300ms | `easeOutCubic`            |\n+| 释放-Like | 右滑超过阈值
+或点击 ♥           | 卡片向右飞出屏幕，触发 API；若双向匹配则弹 MatchSuccessDial
+og     | 300ms | `easeOutCubic`            |\n+| 弹窗进入  | 双向匹配成功       
+           | 背景遮罩 fadeIn + 内容 scale(0.9→1.0)                             |
+300ms | `easeOutBack`（轻微回弹） |\n+| 弹窗关闭  | 点击「继续滑动」或遮罩      
+  | 背景 fadeOut + 内容 scale(0.95) + opacity(0)                      | 200ms | 
+`easeInCubic`             |\n+| 列表加载  | 进入 MatchListPage             | 顶
+部 CircularProgressIndicator，数据返回后列表淡入                | 200ms | `easeI
+n`                  |\n+| 模式切换  | 顶部 Tab 切换                  | 当前卡片
+堆叠淡出（150ms）→ 新卡片堆叠淡入（200ms）                | 350ms | `easeInOut` 
+             |\n+\n+> **开发备注（Maestro 兼容性）**：所有需 Maestro E2E 点击的
+按钮（Pass、Like、模式 Tab、弹窗 CTA）在 Flutter 实现时，必须使用 `GestureDetect
+or(onTapDown: (_) => ...)`，禁止使用 `onTap`。Maestro 使用 Android Accessibility
+API 的 `performAction(ACTION_CLICK)`，其事件序列（仅 `ACTION_DOWN` → `ACTION_UP`
+，无完整手势轨迹）无法触发 Flutter 的 `GestureDetector.onTap`。参见 `docs/design
+-docs/flutter.md` Maestro 点击兼容性章节。\n \n ### 5.2 状态与边界\n \n-| 状态 |
+视觉处理 |\n-|------|----------|\n-| 推荐加载中 | 页面居中 `CircularProgressIndi
+cator(color: DesignTokens.primary)` |\n-| 推荐空数据 | `EmptyRecommendationView`
+：图标 + 文案「附近暂无可推荐用户」+ 切换全国按钮 |\n-| 滑动后缓存刷新 | 卡片飞
+出后，若剩余卡片 < 3 张，自动触发下一页加载（底部小 loading） |\n-| 网络错误 | `
+SnackBar` 提示 + 重试按钮（`SwButton.outlined`） |\n-| 滑动自己（极端边界） | 后
+端返回 code=1000，前端展示 `SnackBar`「操作异常，请稍后再试」 |\n-| 匹配列表空态
+| `EmptyMatchListView`：图标 + 文案「还没有匹配成功的人」+ 引导回首页滑动 |\n+| 
+状态                 | 视觉处理                                                 
+                 |\n+| -------------------- | ----------------------------------
+---------------------------------------- |\n+| 推荐加载中           | 页面居中 `
+CircularProgressIndicator(color: DesignTokens.primary)`          |\n+| 推荐空数
+据           | `EmptyRecommendationView`：图标 + 文案「附近暂无可推荐用户」+ 切
+换全国按钮 |\n+| 滑动后缓存刷新       | 卡片飞出后，若剩余卡片 < 3 张，自动触发
+下一页加载（底部小 loading）        |\n+| 网络错误             | `SnackBar` 提示
++ 重试按钮（`SwButton.outlined`）                          |\n+| 滑动自己（极端
+边界） | 后端返回 code=1000，前端展示 `SnackBar`「操作异常，请稍后再试」        
+   |\n+| 匹配列表空态         | `EmptyMatchListView`：图标 + 文案「还没有匹配成
+功的人」+ 引导回首页滑动    |\n \n ### 5.3 模式切换\n \n@@ -241,11 +244,11 @@ cl
+ass MatchListLoadFailure extends MatchListState {\n \n ### 7.1 屏幕尺寸适配\n \n
+-| 场景 | 处理方案 |\n-|------|----------|\n-| 小屏（< 375pt 宽，如 iPhone SE） 
+| 卡片水平边距缩减至 12pt；操作按钮直径缩减至 56pt |\n-| 大屏（> 414pt 宽，如 iP
+hone Pro Max） | 卡片最大宽度限制 400pt，居中显示；操作按钮间距适当增大 |\n-| 横
+屏 | 暂不优化，保持竖屏锁定（由 `SystemChrome.setPreferredOrientations` 控制） |
+\n+| 场景                                  | 处理方案                           
+                                      |\n+| ------------------------------------
+- | ------------------------------------------------------------------------- |\
+n+| 小屏（< 375pt 宽，如 iPhone SE）      | 卡片水平边距缩减至 12pt；操作按钮直
+径缩减至 56pt                          |\n+| 大屏（> 414pt 宽，如 iPhone Pro Max
+） | 卡片最大宽度限制 400pt，居中显示；操作按钮间距适当增大                    |
+\n+| 横屏                                  | 暂不优化，保持竖屏锁定（由 `SystemC
+hrome.setPreferredOrientations` 控制） |\n \n ### 7.2 安全区\n \n@@ -264,13 +267
+,15 @@ class MatchListLoadFailure extends MatchListState {\n \n ### 8.2 屏幕阅读
+器\n \n-| 元素 | Semantics 标签 |\n-|------|----------------|\n-| 推荐卡片 | `la
+bel: "{昵称}, {年龄}岁, 距离{距离}"` |\n-| Pass 按钮 | `tooltip: "跳过"` |\n-| L
+ike 按钮 | `tooltip: "喜欢"` |\n-| 模式切换 Tab | `selected: true/false`，`label
+: "{模式名}"` |\n-| 匹配列表项 | `label: "{昵称}, {匹配时间}"`，`onTapHint: "打
+开聊天"` |\n+| 元素                 | Semantics identifier                      
+                  | Semantics label                                        |\n+|
+-------------------- | ---------------------------------------------------------
+--- | ------------------------------------------------------ |\n+| 推荐卡片     
+       | `recommendation_card_{user_id}` 或 `recommendation_card_top` | `label: 
+"{昵称}, {年龄}岁, 距离{距离}"`                |\n+| Pass 按钮            | `swi
+pe_pass_button`                                          | `tooltip: "跳过"`    
+                                 |\n+| Like 按钮            | `swipe_like_button
+`                                          | `tooltip: "喜欢"`                  
+                   |\n+| 模式切换 Tab         | `mode_tab_nearby` / `mode_tab_ci
+ty` / `mode_tab_nationwide`  | `selected: true/false`，`label: "{模式名}"`      
+     |\n+| 匹配列表项           | `match_list_item_{index}`                     
+              | `label: "{昵称}, {匹配时间}"`，`onTapHint: "打开聊天"` |\n+| 继
+续滑动按钮（弹窗） | `match_continue_button`                                    
+ | `label: "继续滑动"`                                    |\n+| 去聊天按钮（弹窗
+）   | `match_chat_button`                                          | `label: "
+去聊天"`                                      |\n \n ### 8.3 触摸目标\n \n@@ -28
+6,22 +291,22 @@ class MatchListLoadFailure extends MatchListState {\n \n ### 9.1
+API 文档\n \n-| 文档路径 | 更新说明 |\n-|----------|----------|\n-| `docs/api/ma
+tching.md` | 新增 Matching 模块 API 文档，包含 `GET /matching/recommendations` 
+与 `POST /matching/actions` 的请求/响应示例、错误码表 |\n-| `docs/api/socket-eve
+nts.md` | 新增 Socket.io 事件文档，记录 `match:created` 的 Payload 结构 |\n+| 文
+档路径                    | 更新说明                                            
+                                                                   |\n+| -------
+-------------------- | ---------------------------------------------------------
+-------------------------------------------------------------- |\n+| `docs/api/m
+atching.md`      | 新增 Matching 模块 API 文档，包含 `GET /matching/recommendati
+ons` 与 `POST /matching/actions` 的请求/响应示例、错误码表 |\n+| `docs/api/socke
+t-events.md` | 新增 Socket.io 事件文档，记录 `match:created` 的 Payload 结构    
+                                                      |\n \n ### 9.2 架构/流程文
+档\n \n-| 文档路径 | 更新说明 |\n-|----------|----------|\n-| `docs/modules/matc
+hing.md` | 更新 Matching 模块实现文档，补全 Flutter 侧的 BLoC、Widget、路由映射
+关系 |\n+| 文档路径                      | 更新说明                             
+                                                                                
+|\n+| ----------------------------- | ------------------------------------------
+---------------------------------------------------------------------------- |\n
++| `docs/modules/matching.md`    | 更新 Matching 模块实现文档，补全 Flutter 侧的
+BLoC、Widget、路由映射关系                                               |\n | `
+docs/design-docs/flutter.md` | 在「Design-Only PR 验收 Checklist」中补充 Matchin
+g 相关组件的 Widgetbook 用例要求（已存在通用规范，本 Issue 执行即可） |\n \n ###
+9.3 模块索引\n \n-| 文档路径 | 更新说明 |\n-|----------|----------|\n+| 文档路径
+               | 更新说明                                                  |\n+|
+----------------------- | ------------------------------------------------------
+--- |\n | `docs/modules/INDEX.md` | 确认 `matching.md` 已在模块清单中注册（已注
+册，无需修改） |\n \n ### 9.4 PRD 注释\n@@ -310,7 +315,19 @@ class MatchListLoad
+Failure extends MatchListState {\n \n ---\n \n-## 10. 验收 Checklist（供 Design-
+Only PR 使用）\n+## 10. Maestro E2E Flow 建议\n+\n+作为核心用户旅程，Matching 模
+块应配套以下 Maestro E2E flow，确保后续 feat PR 的自动化测试覆盖：\n+\n+| Flow 
+文件                                    | 覆盖场景                              
+  | 关键步骤                                                                    
+                                      |\n+| ------------------------------------
+-------- | ---------------------------------------- | --------------------------
+--------------------------------------------------------------------------------
+-------- |\n+| `.maestro/flows/matching_swipe.yaml`         | 首页加载推荐 → 右
+滑 Like → 断言卡片消失  | ① 断言 `recommendation_card_top` 可见 ② 点击 `swipe_li
+ke_button` ③ 断言原卡片消失 / 新卡片出现                     |\n+| `.maestro/flo
+ws/matching_match_success.yaml` | 双向 Like → 断言 MatchSuccessDialog 弹出 | ① 
+触发双向 Like ② 断言 `match_continue_button` 与 `match_chat_button` 可见 ③ 点击 
+`match_continue_button` 关闭弹窗 |\n+| `.maestro/flows/match_list.yaml`         
+   | 进入消息 Tab → 断言匹配列表加载          | ① 切换到底部导航「消息」Tab ② 断
+言 `match_list_item_0` 可见 ③ 断言列表项包含昵称与头像                          
+  |\n+\n+> 上述 flow 依赖第 8.2 节定义的 `Semantics identifier`，Flutter 实现时
+必须严格对应，否则 E2E 将无法稳定定位元素。\n+\n+## 11. 验收 Checklist（供 Desig
+n-Only PR 使用）\n \n - [ ] 低保真/高保真原型图已产出（本文件 + wireframe.svg + 
+mockup.html）\n - [ ] 所有新增组件已在 `widgetbook/main.dart` 中注册 use-case\nd
+iff --git a/docs/api/matching.md b/docs/api/matching.md\nindex 466322a..6636343 
+100644\n--- a/docs/api/matching.md\n+++ b/docs/api/matching.md\n@@ -1,7 +1,7 @@\
+n # Matching API\n \n > 本文档描述 Matching 模块的接口契约，包含推荐、滑动和匹配
+列表接口定义。\n-> 关联设计规范: [design-spec.md](../../designs/issue-4/design-s
+pec.md)\n+> 关联设计规范: [design-spec.md](../../designs/issue-43/design-spec.md
+)\n > 关联 PRD: [prd/v1-matching.md](../../prd/v1-matching.md)\n \n ---\n@@ -14,
+10 +14,10 @@\n \n #### Query Parameters\n \n-| 参数 | 类型 | 必填 | 说明 |\n-|--
+----|------|------|------|\n-| `mode` | `string` | 否 | 推荐模式：`nearby`（附近
+，默认 50km）、`city`（同城）、`nationwide`（全国），默认 `nearby` |\n-| `limit`
+| `integer` | 否 | 返回数量上限，默认 `20` |\n+| 参数    | 类型      | 必填 | 说
+明                                                                              
+        |\n+| ------- | --------- | ---- | -------------------------------------
+----------------------------------------------------- |\n+| `mode`  | `string`  
+| 否   | 推荐模式：`nearby`（附近，默认 50km）、`city`（同城）、`nationwide`（全
+国），默认 `nearby` |\n+| `limit` | `integer` | 否   | 返回数量上限，默认 `20`  
+                                                                 |\n \n #### Res
+ponse 200 OK\n \n@@ -78,10 +78,10 @@\n \n #### 字段说明\n \n-| 字段 | 类型 | 必
+填 | 说明 |\n-|------|------|------|------|\n-| `target_id` | `string` | 是 | 目
+标用户 ID |\n-| `action` | `string` | 是 | 操作类型：`like` / `pass` / `super_li
+ke` |\n+| 字段        | 类型     | 必填 | 说明                                  
+  |\n+| ----------- | -------- | ---- | ----------------------------------------
+|\n+| `target_id` | `string` | 是   | 目标用户 ID                              |
+\n+| `action`    | `string` | 是   | 操作类型：`like` / `pass` / `super_like` |\
+n \n #### Response 200 OK\n \n@@ -122,10 +122,10 @@\n \n #### Query Parameters\n
+\n-| 参数 | 类型 | 必填 | 说明 |\n-|------|------|------|------|\n-| `limit` | `
+integer` | 否 | 每页数量，默认 `20` |\n-| `cursor` | `string` | 否 | 游标，用于
+翻页 |\n+| 参数     | 类型      | 必填 | 说明                |\n+| -------- | --
+------- | ---- | ------------------- |\n+| `limit`  | `integer` | 否   | 每页数
+量，默认 `20` |\n+| `cursor` | `string`  | 否   | 游标，用于翻页      |\n \n ###
+# Response 200 OK\n \n@@ -157,10 +157,10 @@\n \n ## 4. 错误码表\n \n-| 错误码 | 
+场景 | HTTP 状态码 |\n-|--------|------|-------------|\n-| `1000` | 参数错误（如
+滑动自己、非法 action 值） | 400 |\n-| `1001` | 用户资料不完整，无法获取推荐 | 4
+03 |\n-| `1002` | 目标用户不存在 | 404 |\n-| `1003` | 推荐列表为空 | 200（正常返
+回空数组） |\n-| `2000` | 系统内部错误 | 500 |\n+| 错误码 | 场景                
+                  | HTTP 状态码           |\n+| ------ | -----------------------
+--------------- | --------------------- |\n+| `1000` | 参数错误（如滑动自己、非
+法 action 值） | 400                   |\n+| `1001` | 用户资料不完整，无法获取推
+荐           | 403                   |\n+| `1002` | 目标用户不存在              
+          | 404                   |\n+| `1003` | 推荐列表为空                   
+       | 200（正常返回空数组） |\n+| `2000` | 系统内部错误                      
+    | 500                   |\ndiff --git a/docs/design-docs/ui-specs/matching/s
+pec.md b/docs/design-docs/ui-specs/matching/spec.md\nnew file mode 100644\nindex
+0000000..bfbb98c\n--- /dev/null\n+++ b/docs/design-docs/ui-specs/matching/spec.m
+d\n@@ -0,0 +1,338 @@\n+# Issue #43 Matching 设计规范\n+\n+> 关联 PRD：[prd/v1-ma
+tching.md](../../../../prd/v1-matching.md)  \n+> 关联 Issue：#43  \n+> 技术栈：F
+lutter (Mobile) + BLoC/Cubit  \n+> 设计资产参见 [designs/issue-43/](../../../../
+designs/issue-43/)\n+\n+---\n+\n+## 1. 页面/场景清单\n+\n+| 序号 | 页面/场景    
+    | 说明                                               | 关键状态             
+                |\n+| ---- | ----------------- | -------------------------------
+------------------- | ------------------------------------- |\n+| 1    | **首页-
+推荐卡片** | 用户进入 App 后默认页面，展示可滑动的推荐卡片堆叠  | Loading、正常
+态（卡片堆叠）、空数据态 |\n+| 2    | **滑动操作反馈**  | 用户左滑 Pass / 右滑 L
+ike 时的实时视觉反馈         | 拖动中、释放动画、操作成功            |\n+| 3    
+| **配对成功弹窗**  | 双向喜欢时触发的全屏 Modal，引导用户聊天或继续滑动 | 动画
+进入、可关闭                      |\n+| 4    | **匹配列表页**    | 底部导航「消
+息」入口内的配对成功用户列表           | Loading、列表态、空态                 |
+\n+\n+### 场景流程图\n+\n+```\n+HomePage\n+  ├── 加载中 → CircularProgressIndica
+tor\n+  ├── 有数据 → SwipeCardStack + 操作按钮\n+  │       ├── 左滑/点击 ✕ → Pas
+s\n+  │       ├── 右滑/点击 ♥ → Like\n+  │       └── 双向 Like → MatchSuccessDia
+log\n+  └── 无数据 → EmptyRecommendationView\n+\n+MatchListPage (Tab: 消息)\n+  
+├── 加载中 → CircularProgressIndicator\n+  ├── 有数据 → MatchListItem 列表\n+  └
+── 空态 → EmptyMatchListView\n+```\n+\n+---\n+\n+## 2. 视觉系统\n+\n+视觉系统严
+格复用项目已有 Design Token，**禁止新增硬编码色值**。\n+\n+### 2.1 色板\n+\n+| T
+oken                      | 色值      | 使用场景                                
+              |\n+| -------------------------- | --------- | -------------------
+----------------------------------- |\n+| `DesignTokens.primary`     | `#6750A4`
+| 主按钮、激活 Tab、底部导航选中态、Like 按钮 hover 强调 |\n+| `DesignTokens.bac
+kground`  | `#FFFBFE` | 页面背景、Card 背景                                    |
+\n+| `DesignTokens.textPrimary` | `#1C1B1F` | 标题、正文、图标主色              
+                    |\n+| `DesignTokens.error`       | `#B3261E` | Pass 操作色、
+错误提示                                  |\n+| `ColorScheme.surface`      | `#F
+3EDF7` | Tab 背景、头像 fallback 背景                           |\n+| `ColorSche
+me.outline`      | `#79747E` | 辅助文字、分割线、次要按钮边框                   
+     |\n+\n+额外语义色（需在 `tokens.dart` / `app_theme.dart` 中注册）：\n+\n+- 
+`--success` / `likeActionColor`: `#2E7D32` — Like 按钮、配对成功状态\n+\n+### 2.
+2 字体\n+\n+| Token                           | 值     | 使用场景               
+     |\n+| ------------------------------- | ------ | --------------------------
+-- |\n+| `DesignTokens.fontSizeHeadline` | `28.0` | 空状态大标题                
+|\n+| `DesignTokens.fontSizeTitle`    | `22.0` | 卡片姓名、弹窗标题、页面标题 |\
+n+| `DesignTokens.fontSizeBody`     | `16.0` | 按钮文字、列表主文字         |\n+
+| `DesignTokens.fontSizeCaption`  | `12.0` | 距离/时间、Bio、底部导航标签 |\n+\n
++### 2.3 间距与圆角\n+\n+| Token                    | 值     | 使用场景         
+                |\n+| ------------------------ | ------ | ----------------------
+----------- |\n+| `DesignTokens.spacingMd` | `16.0` | 页面边距、Card 内边距、列
+表项间距 |\n+| `DesignTokens.spacingSm` | `12.0` | Tab 内间距、操作按钮与卡片间
+距    |\n+| `DesignTokens.spacingXs` | `8.0`  | 行内小间距、文字与图标间距      
+ |\n+| `DesignTokens.radiusLg`  | `16.0` | 推荐卡片圆角、弹窗圆角            |\n
++| `DesignTokens.radiusMd`  | `12.0` | 按钮、列表项、小卡片圆角          |\n+| `
+DesignTokens.radiusSm`  | `8.0`  | Tag、Badge 圆角                   |\n+\n+### 
+2.4 布局尺寸\n+\n+- **手机画布**：按 375×812pt（iPhone X 基准）设计\n+- **推荐卡
+片**：水平边距 16pt，圆角 16pt，图片区高度 340pt，信息区高度自适应\n+- **卡片堆
+叠视觉差**：下层卡片 scale(0.95) + translateY(12pt)\n+- **操作按钮**：直径 64pt
+，与卡片底部间距 16pt\n+- **底部导航栏**：高度 80pt（含 Home Indicator 安全区）\
+n+\n+---\n+\n+## 3. 组件清单\n+\n+### 3.1 需新增 design-system 组件\n+\n+| 层级 
+   | 组件名               | 文件路径                                            
+                | 说明                                       | Widgetbook 用例要
+求                                      |\n+| -------- | -------------------- | 
+-------------------------------------------------------------------- | ---------
+--------------------------------- | --------------------------------------------
+------------ |\n+| atom     | `SwActionButton`     | `packages/design-system/lib
+/src/atoms/sw_action_button.dart`         | 圆形操作按钮（Pass/Like 两种变体）  
+      | 默认态、禁用态、按下态                                   |\n+| molecule 
+| `SwipeCard`          | `packages/design-system/lib/src/molecules/swipe_card.da
+rt`           | 可拖动/可点击的推荐用户卡片                | 默认态、拖动中(show
+like badge)、拖动中(show pass badge) |\n+| organism | `SwipeCardStack`     | `pa
+ckages/design-system/lib/src/organisms/swipe_card_stack.dart`     | 卡片堆叠容器
+，管理多层卡片渲染与手势冲突   | 3张卡片堆叠、1张卡片、空态                     
+         |\n+| organism | `MatchSuccessDialog` | `packages/design-system/lib/src
+/organisms/match_success_dialog.dart` | 配对成功全屏弹窗，含头像组合、CTA 按钮  
+  | 默认态                                                   |\n+| molecule | `M
+atchListItem`      | `packages/design-system/lib/src/molecules/match_list_item.d
+art`      | 匹配列表单项，含头像、昵称、时间、聊天入口 | 默认态                 
+                                 |\n+\n+### 3.2 页面级 Widget\n+\n+| Widget 名  
+              | 路径                                                            
+     | 说明                                             |\n+| ------------------
+------- | --------------------------------------------------------------------- 
+| ------------------------------------------------ |\n+| `HomePage`             
+  | `apps/mobile/lib/presentation/pages/home_page.dart`                   | 首页
+，承载模式切换、卡片堆叠、操作按钮、底部导航 |\n+| `MatchListPage`           | `
+apps/mobile/lib/presentation/pages/match_list_page.dart`             | 匹配列表
+页，底部导航「消息」Tab 内容             |\n+| `EmptyRecommendationView` | `apps
+/mobile/lib/presentation/widgets/empty_recommendation_view.dart` | 推荐为空时的
+占位视图（可复用）                   |\n+| `EmptyMatchListView`      | `apps/mob
+ile/lib/presentation/widgets/empty_match_list_view.dart`     | 匹配列表为空时的
+占位视图                         |\n+\n+### 3.3 禁止直接使用原生组件替代\n+\n+- 
+禁止用 `ElevatedButton` / `IconButton` 直接替代 `SwActionButton`\n+- 禁止在 `pag
+es/` 中写死 `Color(0xFF...)` 或 `BoxDecoration` 颜色值\n+- 卡片阴影、圆角、间距
+必须来自 `DesignTokens`\n+\n+---\n+\n+## 4. 图片/图标资源\n+\n+本设计全部使用 Em
+oji / 矢量图标 / CSS 渐变占位，**无需额外图片资源**。实际开发时：\n+\n+| 资源位
+置     | 说明                                                                   
+                   |\n+| ------------ | ----------------------------------------
+-------------------------------------------------- |\n+| 用户头像     | 网络图 `
+Image.network(card.avatarUrl)`，fallback 到 `SwAvatar`                          
+  |\n+| 空状态插图   | 使用 `Icons.search_off` 或 Lottie 动画（待产品确认），MVP
+阶段可用 `Icons.person_off` 替代 |\n+| 操作按钮图标 | Material `Icons.close` (Pa
+ss) / `Icons.favorite` (Like)，颜色语义化                        |\n+| 底部导航
+图标 | Material `Icons.home` / `Icons.chat_bubble` / `Icons.person`             
+                 |\n+\n+> **待产品确认**：配对成功弹窗是否使用 Lottie 庆祝动画？
+当前原型使用 CSS confetti 演示，Flutter 侧可用 `AnimatedContainer` + `Particle` 
+简易实现，或引入 `lottie` 包。\n+\n+---\n+\n+## 5. 交互说明\n+\n+### 5.1 手势与
+动画\n+\n+| 交互      | 触发                           | 动画表现               
+                                          | 时长  | 曲线                      |\
+n+| --------- | ------------------------------ | -------------------------------
+---------------------------------- | ----- | ------------------------- |\n+| 卡
+片拖动  | 手指按住并水平移动             | 卡片跟随手指，旋转 angle = dx × 0.05°
+，Like/Pass badge 透明度渐变 | 实时  | —                         |\n+| 释放-Pass
+| 左滑超过阈值（≈120pt）或点击 ✕ | 卡片向左飞出屏幕，下层卡片 scale 恢复 1.0    
+                    | 300ms | `easeOutCubic`            |\n+| 释放-Like | 右滑超
+过阈值或点击 ♥           | 卡片向右飞出屏幕，触发 API；若双向匹配则弹 MatchSucce
+ssDialog     | 300ms | `easeOutCubic`            |\n+| 弹窗进入  | 双向匹配成功 
+                 | 背景遮罩 fadeIn + 内容 scale(0.9→1.0)                        
+    | 300ms | `easeOutBack`（轻微回弹） |\n+| 弹窗关闭  | 点击「继续滑动」或遮罩
+        | 背景 fadeOut + 内容 scale(0.95) + opacity(0)                      | 20
+0ms | `easeInCubic`             |\n+| 列表加载  | 进入 MatchListPage            
+| 顶部 CircularProgressIndicator，数据返回后列表淡入                | 200ms | `e
+aseIn`                  |\n+| 模式切换  | 顶部 Tab 切换                  | 当前
+卡片堆叠淡出（150ms）→ 新卡片堆叠淡入（200ms）                | 350ms | `easeInO
+ut`               |\n+\n+> **开发备注（Maestro 兼容性）**：所有需 Maestro E2E 点
+击的按钮（Pass、Like、模式 Tab、弹窗 CTA）在 Flutter 实现时，必须使用 `GestureDe
+tector(onTapDown: (_) => ...)`，禁止使用 `onTap`。Maestro 使用 Android Accessibi
+lity API 的 `performAction(ACTION_CLICK)`，其事件序列（仅 `ACTION_DOWN` → `ACTIO
+N_UP`，无完整手势轨迹）无法触发 Flutter 的 `GestureDetector.onTap`。参见 `docs/d
+esign-docs/flutter.md` Maestro 点击兼容性章节。\n+\n+### 5.2 状态与边界\n+\n+| 
+状态                 | 视觉处理                                                 
+                 |\n+| -------------------- | ----------------------------------
+---------------------------------------- |\n+| 推荐加载中           | 页面居中 `
+CircularProgressIndicator(color: DesignTokens.primary)`          |\n+| 推荐空数
+据           | `EmptyRecommendationView`：图标 + 文案「附近暂无可推荐用户」+ 切
+换全国按钮 |\n+| 滑动后缓存刷新       | 卡片飞出后，若剩余卡片 < 3 张，自动触发
+下一页加载（底部小 loading）        |\n+| 网络错误             | `SnackBar` 提示
++ 重试按钮（`SwButton.outlined`）                          |\n+| 滑动自己（极端
+边界） | 后端返回 code=1000，前端展示 `SnackBar`「操作异常，请稍后再试」        
+   |\n+| 匹配列表空态         | `EmptyMatchListView`：图标 + 文案「还没有匹配成
+功的人」+ 引导回首页滑动    |\n+\n+### 5.3 模式切换\n+\n+- 顶部 Tab 切换「附近 /
+同城 / 全国」时：\n+  1. 当前卡片堆叠淡出（150ms）\n+  2. 触发 `GET /matching/re
+commendations?mode=xxx`\n+  3. 新卡片堆叠淡入（200ms）\n+\n+---\n+\n+## 6. BLoC 
+/ Event / State 设计\n+\n+### 6.1 MatchingBloc（首页推荐 + 滑动）\n+\n+```dart\n
++// matching_bloc.dart\n+class MatchingBloc extends Bloc<MatchingEvent, Matching
+State> { ... }\n+\n+// matching_event.dart\n+abstract class MatchingEvent {}\n+c
+lass RecommendationsRequested extends MatchingEvent {\n+  final String mode; // 
+\'nearby\' | \'city\' | \'nationwide\'\n+}\n+class SwipeActionSubmitted extends 
+MatchingEvent {\n+  final String targetId;\n+  final SwipeAction action; // like
+| pass\n+}\n+class MatchModalDismissed extends MatchingEvent {}\n+class External
+MatchReceived extends MatchingEvent {\n+  final MatchSummary match;\n+}\n+\n+// 
+matching_state.dart\n+abstract class MatchingState {}\n+class MatchingInitial ex
+tends MatchingState {}\n+class MatchingLoadInProgress extends MatchingState {}\n
++class MatchingLoadSuccess extends MatchingState {\n+  final List<Recommendation
+Card> cards;\n+  final String mode;\n+}\n+class MatchingLoadEmpty extends Matchi
+ngState {\n+  final String mode;\n+}\n+class MatchingSwipeInProgress extends Mat
+chingState {\n+  final List<RecommendationCard> cards;\n+  final String targetId
+;\n+  final SwipeAction action;\n+}\n+class MatchingMatchCreated extends Matchin
+gState {\n+  final MatchSummary match; // 用于弹窗展示\n+}\n+class MatchingFailu
+re extends MatchingState {\n+  final String message;\n+}\n+```\n+\n+### 6.2 Matc
+hListCubit（匹配列表）\n+\n+```dart\n+// match_list_cubit.dart\n+class MatchList
+Cubit extends Cubit<MatchListState> {\n+  Future<void> fetchMatches({String? cur
+sor}) async { ... }\n+}\n+\n+// match_list_state.dart\n+abstract class MatchList
+State {}\n+class MatchListInitial extends MatchListState {}\n+class MatchListLoa
+dInProgress extends MatchListState {}\n+class MatchListLoadSuccess extends Match
+ListState {\n+  final List<MatchItem> matches;\n+  final bool hasMore;\n+  final
+String? nextCursor;\n+}\n+class MatchListLoadFailure extends MatchListState {\n+
+ final String message;\n+}\n+```\n+\n+### 6.3 Socket.io 事件监听\n+\n+- 在 `Home
+Page` 的 `initState` 中建立 Socket 连接（或通过全局 BLoC）\n+- 监听 `match:creat
+ed` 事件，接收到后向 `MatchingBloc` dispatch `ExternalMatchReceived(matchSummary
+)`\n+- `MatchingBloc` 状态流转至 `MatchingMatchCreated`，触发 `MatchSuccessDialo
+g`\n+\n+---\n+\n+## 7. 响应式与适配\n+\n+### 7.1 屏幕尺寸适配\n+\n+| 场景       
+                          | 处理方案                                            
+                     |\n+| ------------------------------------- | -------------
+------------------------------------------------------------ |\n+| 小屏（< 375pt
+宽，如 iPhone SE）      | 卡片水平边距缩减至 12pt；操作按钮直径缩减至 56pt      
+                   |\n+| 大屏（> 414pt 宽，如 iPhone Pro Max） | 卡片最大宽度限
+制 400pt，居中显示；操作按钮间距适当增大                    |\n+| 横屏          
+                       | 暂不优化，保持竖屏锁定（由 `SystemChrome.setPreferredOr
+ientations` 控制） |\n+\n+### 7.2 安全区\n+\n+- 底部导航栏必须包裹 `SafeArea(bot
+tom: true)`\n+- 卡片堆叠顶部预留 `MediaQuery.of(context).padding.top` 空间\n+- 
+操作按钮区域避开 Home Indicator\n+\n+---\n+\n+## 8. Accessibility 规范\n+\n+### 
+8.1 颜色对比度\n+\n+- 卡片文字叠加在图片上时，必须使用文字阴影或渐变遮罩保证对比
+度 ≥ 4.5:1\n+- 操作按钮图标与背景对比度 ≥ 3:1\n+\n+### 8.2 屏幕阅读器\n+\n+| 元
+素                 | Semantics identifier                                       
+ | Semantics label                                        |\n+| ----------------
+---- | ------------------------------------------------------------ | ----------
+-------------------------------------------- |\n+| 推荐卡片             | `recom
+mendation_card_{user_id}` 或 `recommendation_card_top` | `label: "{昵称}, {年龄}
+岁, 距离{距离}"`                |\n+| Pass 按钮            | `swipe_pass_button`
+                                         | `tooltip: "跳过"`                    
+                 |\n+| Like 按钮            | `swipe_like_button`               
+                          | `tooltip: "喜欢"`                                   
+  |\n+| 模式切换 Tab         | `mode_tab_nearby` / `mode_tab_city` / `mode_tab_n
+ationwide`  | `selected: true/false`，`label: "{模式名}"`            |\n+| 匹配
+列表项           | `match_list_item_{index}`                                    
+| `label: "{昵称}, {匹配时间}"`，`onTapHint: "打开聊天"` |\n+| 继续滑动按钮（弹
+窗） | `match_continue_button`                                      | `label: "
+继续滑动"`                                    |\n+| 去聊天按钮（弹窗）   | `matc
+h_chat_button`                                          | `label: "去聊天"`     
+                                |\n+\n+### 8.3 触摸目标\n+\n+- 操作按钮最小触摸
+区域 64×64pt（符合 Material 规范）\n+- 底部导航项最小触摸区域 48×48pt\n+- 匹配列
+表项整行可点击，高度 ≥ 56pt\n+\n+---\n+\n+## 9. 需更新文档\n+\n+本设计产物完成后
+，以下文档必须同步新增或更新，以保证后续开发 Agent 有唯一真实来源。\n+\n+### 9.1
+API 文档\n+\n+| 文档路径                    | 更新说明                          
+                                                                                
+    |\n+| --------------------------- | ----------------------------------------
+------------------------------------------------------------------------------- 
+|\n+| `docs/api/matching.md`      | 新增 Matching 模块 API 文档，包含 `GET /matc
+hing/recommendations` 与 `POST /matching/actions` 的请求/响应示例、错误码表 |\n+
+| `docs/api/socket-events.md` | 新增 Socket.io 事件文档，记录 `match:created` 的
+Payload 结构                                                           |\n+\n+##
+# 9.2 架构/流程文档\n+\n+| 文档路径                      | 更新说明             
+                                                                                
+                |\n+| ----------------------------- | --------------------------
+--------------------------------------------------------------------------------
+------------ |\n+| `docs/modules/matching.md`    | 更新 Matching 模块实现文档，
+补全 Flutter 侧的 BLoC、Widget、路由映射关系                                    
+          |\n+| `docs/design-docs/flutter.md` | 在「Design-Only PR 验收 Checklis
+t」中补充 Matching 相关组件的 Widgetbook 用例要求（已存在通用规范，本 Issue 执行
+即可） |\n+\n+### 9.3 模块索引\n+\n+| 文档路径                | 更新说明        
+                                         |\n+| ----------------------- | -------
+-------------------------------------------------- |\n+| `docs/modules/INDEX.md`
+| 确认 `matching.md` 已在模块清单中注册（已注册，无需修改） |\n+\n+### 9.4 PRD 
+注释\n+\n+- 在 `prd/v1-matching.md` 顶部添加链接注释：`设计资产参见 designs/issu
+e-43/`\n+\n+---\n+\n+## 10. Maestro E2E Flow 建议\n+\n+作为核心用户旅程，Matchin
+g 模块应配套以下 Maestro E2E flow，确保后续 feat PR 的自动化测试覆盖：\n+\n+| Fl
+ow 文件                                    | 覆盖场景                           
+     | 关键步骤                                                                 
+                                         |\n+| ---------------------------------
+----------- | ---------------------------------------- | -----------------------
+--------------------------------------------------------------------------------
+----------- |\n+| `.maestro/flows/matching_swipe.yaml`         | 首页加载推荐 → 
+右滑 Like → 断言卡片消失  | ① 断言 `recommendation_card_top` 可见 ② 点击 `swipe_
+like_button` ③ 断言原卡片消失 / 新卡片出现                     |\n+| `.maestro/f
+lows/matching_match_success.yaml` | 双向 Like → 断言 MatchSuccessDialog 弹出 | ①
+触发双向 Like ② 断言 `match_continue_button` 与 `match_chat_button` 可见 ③ 点击 
+`match_continue_button` 关闭弹窗 |\n+| `.maestro/flows/match_list.yaml`         
+   | 进入消息 Tab → 断言匹配列表加载          | ① 切换到底部导航「消息」Tab ② 断
+言 `match_list_item_0` 可见 ③ 断言列表项包含昵称与头像                          
+  |\n+\n+> 上述 flow 依赖第 8.2 节定义的 `Semantics identifier`，Flutter 实现时
+必须严格对应，否则 E2E 将无法稳定定位元素。\n+\n+## 11. 验收 Checklist（供 Desig
+n-Only PR 使用）\n+\n+- [ ] 低保真/高保真原型图已产出（本文件 + wireframe.svg + 
+mockup.html）\n+- [ ] 所有新增组件已在 `widgetbook/main.dart` 中注册 use-case\n+
+- [ ] PR 中附带 Golden File 截图或 Widgetbook 运行截图\n+- [ ] `pages/` 中未使用
+`Color(0xFF...)`、`TextField`、`ElevatedButton` 等硬编码或原生 Material 组件替代
+design-system\n+- [ ] 页面中的状态（加载、空态、错误、配对成功弹窗）在原型图中有
+明确定义\n+- [ ] Accessibility 语义标签已覆盖所有交互元素\n+- [ ] 响应式适配方案
+已记录\ndiff --git a/docs/design-docs/ui-specs/matching/wireframes/wireframe.svg
+b/docs/design-docs/ui-specs/matching/wireframes/wireframe.svg\nnew file mode 100
+644\nindex 0000000..9d0275c\n--- /dev/null\n+++ b/docs/design-docs/ui-specs/matc
+hing/wireframes/wireframe.svg\n@@ -0,0 +1,243 @@\n+<svg xmlns="http://www.w3.org
+/2000/svg" viewBox="0 0 1600 900" width="1600" height="900">\n+  <defs>\n+    <s
+tyle>\n+      .phone{fill:none;stroke:#999;stroke-width:2;rx:24;ry:24}\n+      .
+screen{fill:#fff;stroke:#ddd;stroke-width:1}\n+      .label{font-family:-apple-s
+ystem,BlinkMacSystemFont,sans-serif;font-size:12px;fill:#666;text-anchor:middle}
+\n+      .title{font-family:-apple-system,BlinkMacSystemFont,sans-serif;font-siz
+e:14px;font-weight:600;fill:#333;text-anchor:middle}\n+      .wire{fill:none;str
+oke:#bbb;stroke-width:1.5}\n+      .fill-wire{fill:#f5f5f5;stroke:#bbb;stroke-wi
+dth:1.5}\n+      .text-wire{font-family:-apple-system,BlinkMacSystemFont,sans-se
+rif;font-size:11px;fill:#999;text-anchor:middle}\n+      .badge-wire{fill:none;s
+troke:#999;stroke-width:1.5;stroke-dasharray:4 2}\n+      .nav-item{fill:none;st
+roke:#ddd;stroke-width:1}\n+      .tab-active{fill:#e8e0eb;stroke:none}\n+      
+.tab-inactive{fill:#f5f5f5;stroke:none}\n+    </style>\n+  </defs>\n+\n+  <!-- B
+ackground -->\n+  <rect width="1600" height="900" fill="#fafafa"/>\n+\n+  <!-- H
+eader -->\n+  <text x="800" y="36" class="title" font-size="18" font-weight="700
+">Issue #43 Matching - Wireframes</text>\n+\n+  <!-- ========== PHONE 1: HOME / 
+CARD STACK ========== -->\n+  <g transform="translate(60,60)">\n+    <rect x="0"
+y="0" width="340" height="700" class="phone" rx="24"/>\n+    <rect x="2" y="2" w
+idth="336" height="696" class="screen" rx="22"/>\n+    \n+    <!-- Status bar --
+>\n+    <rect x="2" y="2" width="336" height="36" fill="#fff" rx="22"/>\n+    <t
+ext x="170" y="24" class="label" font-size="12">9:41</text>\n+\n+    <!-- Mode t
+abs -->\n+    <rect x="18" y="48" width="304" height="32" rx="16" class="fill-wi
+re"/>\n+    <rect x="20" y="50" width="96" height="28" rx="14" class="tab-active
+"/>\n+    <text x="68" y="68" class="text-wire" font-size="11">附近</text>\n+   
+<text x="170" y="68" class="text-wire" font-size="11">同城</text>\n+    <text x=
+"272" y="68" class="text-wire" font-size="11">全国</text>\n+\n+    <!-- Card sta
+ck container -->\n+    <rect x="18" y="92" width="304" height="420" rx="12" clas
+s="wire"/>\n+    \n+    <!-- Back card -->\n+    <rect x="26" y="104" width="288
+" height="396" rx="12" class="fill-wire" fill="#f9f9f9"/>\n+    <rect x="26" y="
+104" width="288" height="300" rx="12" class="wire"/>\n+    <text x="170" y="260"
+class="text-wire" font-size="14">[Photo]</text>\n+    <text x="170" y="430" clas
+s="text-wire" font-size="13">Name, Age</text>\n+    <text x="170" y="450" class=
+"text-wire" font-size="10">Distance · Last active</text>\n+    <text x="170" y="
+470" class="text-wire" font-size="10">Bio text...</text>\n+\n+    <!-- Front car
+d -->\n+    <rect x="18" y="92" width="304" height="420" rx="12" class="fill-wir
+e" fill="#fff"/>\n+    <rect x="18" y="92" width="304" height="320" rx="12" clas
+s="wire"/>\n+    <text x="170" y="260" class="text-wire" font-size="14">[Photo]<
+/text>\n+    <text x="170" y="440" class="text-wire" font-size="14" font-weight=
+"600">小雨, 24</text>\n+    <text x="170" y="460" class="text-wire" font-size="1
+1">📍 2.5km · 刚刚活跃</text>\n+    <text x="170" y="480" class="text-wire" font
+-size="11">喜欢旅行、摄影、咖啡 ☕️</text>\n+\n+    <!-- Action buttons -->\n+   
+<circle cx="120" cy="560" r="28" class="wire"/>\n+    <text x="120" y="566" clas
+s="text-wire" font-size="14">✕</text>\n+    <circle cx="220" cy="560" r="28" cla
+ss="wire"/>\n+    <text x="220" y="566" class="text-wire" font-size="14">♥</text
+>\n+\n+    <!-- Bottom nav -->\n+    <rect x="2" y="636" width="336" height="62"
+fill="#fff" stroke="#eee" stroke-width="1"/>\n+    <circle cx="90" cy="658" r="1
+2" class="wire"/>\n+    <text x="90" y="680" class="text-wire" font-size="9">首
+页</text>\n+    <circle cx="170" cy="658" r="12" class="wire"/>\n+    <text x="1
+70" y="680" class="text-wire" font-size="9">消息</text>\n+    <circle cx="250" c
+y="658" r="12" class="wire"/>\n+    <text x="250" y="680" class="text-wire" font
+-size="9">我的</text>\n+\n+    <!-- Label -->\n+    <text x="170" y="730" class=
+"label" font-weight="600">HomePage - Card Stack</text>\n+    <text x="170" y="74
+8" class="label" font-size="11">SwipeCardStack + SwActionButton</text>\n+  </g>\
+n+\n+  <!-- ========== PHONE 2: EMPTY STATE ========== -->\n+  <g transform="tra
+nslate(440,60)">\n+    <rect x="0" y="0" width="340" height="700" class="phone" 
+rx="24"/>\n+    <rect x="2" y="2" width="336" height="696" class="screen" rx="22
+"/>\n+    \n+    <!-- Status bar -->\n+    <rect x="2" y="2" width="336" height=
+"36" fill="#fff" rx="22"/>\n+    <text x="170" y="24" class="label" font-size="1
+2">9:41</text>\n+\n+    <!-- Mode tabs -->\n+    <rect x="18" y="48" width="304"
+height="32" rx="16" class="fill-wire"/>\n+    <rect x="20" y="50" width="96" hei
+ght="28" rx="14" class="tab-active"/>\n+    <text x="68" y="68" class="text-wire
+" font-size="11">附近</text>\n+    <text x="170" y="68" class="text-wire" font-s
+ize="11">同城</text>\n+    <text x="272" y="68" class="text-wire" font-size="11"
+>全国</text>\n+\n+    <!-- Empty state -->\n+    <circle cx="170" cy="280" r="50
+" class="wire"/>\n+    <text x="170" y="286" class="text-wire" font-size="20">🔍
+</text>\n+    <text x="170" y="370" class="text-wire" font-size="13" font-weight
+="600">附近暂无可推荐用户</text>\n+    <text x="170" y="390" class="text-wire" f
+ont-size="11">扩大范围或稍后再来看看吧</text>\n+    <rect x="90" y="414" width="
+160" height="36" rx="18" class="wire"/>\n+    <text x="170" y="436" class="text-
+wire" font-size="11">切换至全国模式</text>\n+\n+    <!-- Bottom nav -->\n+    <r
+ect x="2" y="636" width="336" height="62" fill="#fff" stroke="#eee" stroke-width
+="1"/>\n+    <circle cx="90" cy="658" r="12" class="wire"/>\n+    <text x="90" y
+="680" class="text-wire" font-size="9">首页</text>\n+    <circle cx="170" cy="65
+8" r="12" class="wire"/>\n+    <text x="170" y="680" class="text-wire" font-size
+="9">消息</text>\n+    <circle cx="250" cy="658" r="12" class="wire"/>\n+    <te
+xt x="250" y="680" class="text-wire" font-size="9">我的</text>\n+\n+    <!-- Lab
+el -->\n+    <text x="170" y="730" class="label" font-weight="600">Empty State</
+text>\n+    <text x="170" y="748" class="label" font-size="11">EmptyRecommendati
+onView</text>\n+  </g>\n+\n+  <!-- ========== PHONE 3: MATCH SUCCESS MODAL =====
+===== -->\n+  <g transform="translate(820,60)">\n+    <rect x="0" y="0" width="3
+40" height="700" class="phone" rx="24"/>\n+    <rect x="2" y="2" width="336" hei
+ght="696" class="screen" rx="22"/>\n+    \n+    <!-- Status bar -->\n+    <rect 
+x="2" y="2" width="336" height="36" fill="#fff" rx="22"/>\n+    <text x="170" y=
+"24" class="label" font-size="12">9:41</text>\n+\n+    <!-- Mode tabs -->\n+    
+<rect x="18" y="48" width="304" height="32" rx="16" class="fill-wire"/>\n+    <r
+ect x="20" y="50" width="96" height="28" rx="14" class="tab-active"/>\n+    <tex
+t x="68" y="68" class="text-wire" font-size="11">附近</text>\n+    <text x="170"
+y="68" class="text-wire" font-size="11">同城</text>\n+    <text x="272" y="68" c
+lass="text-wire" font-size="11">全国</text>\n+\n+    <!-- Dimmed card stack back
+ground -->\n+    <rect x="18" y="92" width="304" height="420" rx="12" class="fil
+l-wire" fill="#f0f0f0" opacity="0.5"/>\n+    <rect x="18" y="92" width="304" hei
+ght="320" rx="12" class="wire" opacity="0.4"/>\n+    <text x="170" y="260" class
+="text-wire" font-size="14" opacity="0.4">[Photo]</text>\n+\n+    <!-- Action bu
+ttons (dimmed) -->\n+    <circle cx="120" cy="560" r="28" class="wire" opacity="
+0.4"/>\n+    <circle cx="220" cy="560" r="28" class="wire" opacity="0.4"/>\n+\n+
+   <!-- Modal overlay -->\n+    <rect x="2" y="2" width="336" height="696" fill=
+"#000" opacity="0.5" rx="22"/>\n+    \n+    <!-- Modal content -->\n+    <rect x
+="38" y="200" width="264" height="300" rx="16" fill="#fff" stroke="#ddd" stroke-
+width="1"/>\n+    <text x="170" y="240" class="text-wire" font-size="16" font-we
+ight="600">🎉 配对成功！</text>\n+    \n+    <!-- Avatars -->\n+    <circle cx="
+130" cy="290" r="32" class="wire"/>\n+    <text x="130" y="296" class="text-wire
+" font-size="16">😊</text>\n+    <circle cx="210" cy="290" r="32" class="wire"/>
+\n+    <text x="210" y="296" class="text-wire" font-size="16">👩🏻</text>\n+    <c
+ircle cx="170" cy="290" r="14" class="fill-wire" fill="#fff"/>\n+    <text x="17
+0" y="296" class="text-wire" font-size="10">💕</text>\n+    \n+    <text x="170"
+y="360" class="text-wire" font-size="12">你们互相喜欢了对方</text>\n+    <text x
+="170" y="380" class="text-wire" font-size="11">现在可以开始聊天啦</text>\n+    
+\n+    <rect x="70" y="410" width="200" height="40" rx="20" class="tab-active"/>
+\n+    <text x="170" y="436" class="text-wire" font-size="12">立即聊天</text>\n+
+   <rect x="70" y="460" width="200" height="40" rx="20" class="wire"/>\n+    <te
+xt x="170" y="486" class="text-wire" font-size="12">继续滑动</text>\n+\n+    <!-
+- Bottom nav -->\n+    <rect x="2" y="636" width="336" height="62" fill="#fff" s
+troke="#eee" stroke-width="1"/>\n+    <circle cx="90" cy="658" r="12" class="wir
+e"/>\n+    <text x="90" y="680" class="text-wire" font-size="9">首页</text>\n+  
+ <circle cx="170" cy="658" r="12" class="wire"/>\n+    <text x="170" y="680" cla
+ss="text-wire" font-size="9">消息</text>\n+    <circle cx="250" cy="658" r="12" 
+class="wire"/>\n+    <text x="250" y="680" class="text-wire" font-size="9">我的<
+/text>\n+\n+    <!-- Label -->\n+    <text x="170" y="730" class="label" font-we
+ight="600">Match Success</text>\n+    <text x="170" y="748" class="label" font-s
+ize="11">MatchSuccessDialog</text>\n+  </g>\n+\n+  <!-- ========== PHONE 4: MATC
+H LIST ========== -->\n+  <g transform="translate(1200,60)">\n+    <rect x="0" y
+="0" width="340" height="700" class="phone" rx="24"/>\n+    <rect x="2" y="2" wi
+dth="336" height="696" class="screen" rx="22"/>\n+    \n+    <!-- Status bar -->
+\n+    <rect x="2" y="2" width="336" height="36" fill="#fff" rx="22"/>\n+    <te
+xt x="170" y="24" class="label" font-size="12">9:41</text>\n+\n+    <!-- Header 
+-->\n+    <text x="170" y="72" class="text-wire" font-size="14" font-weight="600
+">我的配对</text>\n+\n+    <!-- Match list -->\n+    <g transform="translate(18,
+96)">\n+      <!-- Item 1 -->\n+      <rect x="0" y="0" width="304" height="64" 
+rx="12" class="fill-wire" fill="#fff"/>\n+      <circle cx="32" cy="32" r="20" c
+lass="wire"/>\n+      <text x="32" y="38" class="text-wire" font-size="12">👩🏻</t
+ext>\n+      <text x="68" y="28" class="text-wire" font-size="12" font-weight="6
+00" text-anchor="start">小雨</text>\n+      <text x="68" y="46" class="text-wire
+" font-size="10" text-anchor="start">2小时前配对</text>\n+      <circle cx="268"
+cy="32" r="16" class="wire"/>\n+      <text x="268" y="38" class="text-wire" fon
+t-size="10">💬</text>\n+\n+      <!-- Item 2 -->\n+      <rect x="0" y="76" widt
+h="304" height="64" rx="12" class="fill-wire" fill="#fff"/>\n+      <circle cx="
+32" cy="108" r="20" class="wire"/>\n+      <text x="32" y="114" class="text-wire
+" font-size="12">👨🏻</text>\n+      <text x="68" y="104" class="text-wire" font-s
+ize="12" font-weight="600" text-anchor="start">阿杰</text>\n+      <text x="68" 
+y="122" class="text-wire" font-size="10" text-anchor="start">昨天配对</text>\n+ 
+    <circle cx="268" cy="108" r="16" class="wire"/>\n+      <text x="268" y="114
+" class="text-wire" font-size="10">💬</text>\n+\n+      <!-- Item 3 -->\n+      
+<rect x="0" y="152" width="304" height="64" rx="12" class="fill-wire" fill="#fff
+"/>\n+      <circle cx="32" cy="184" r="20" class="wire"/>\n+      <text x="32" 
+y="1[...truncated]\n',
+        message='Command executed successfully. Output is truncated to fit in th
+e message.',
+        display=[],
+        extras=None
+    )
+)
+StepBegin(n=5)
+ThinkPart(
+    type='think',
+    think="So the commit `f13e537` already contains fixes for the review issues!
+Let me check if this commit is already pushed to origin or if it's just local.\n
+\nLet me check the git status and see if the branch is ahead of origin.",
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_X9PvKqvd3SmrtVFa6YePI2Kd',
+    function=FunctionBody(
+        name='Shell',
+        arguments='{"command": "cd /var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000g
+n/T/rework-pr-44-3169274568 && git status && echo \\"---\\" && git log --oneline
+--decorate --graph -5 && echo \\"---\\" && git diff origin/design/issue-43 --sta
+t"}'
+    ),
+    extras=None
+)
+StatusUpdate(
+    context_usage=0.17004776000976562,
+    context_tokens=44577,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=16161,
+        output=142,
+        input_cache_read=28416,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-RBY9YeqzgA7Zc8IdciEiWMLN',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_X9PvKqvd3SmrtVFa6YePI2Kd',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='On branch design/issue-43\nYour branch is up to date with \'orig
+in/design/issue-43\'.\n\nChanges not staged for commit:\n  (use "git add <file>.
+.." to update what will be committed)\n  (use "git restore <file>..." to discard
+changes in working directory)\n\tmodified:   apps/mobile/pubspec.lock\n\nno chan
+ges added to commit (use "git add" and/or "git commit -a")\n---\n* f13e537 (HEAD
+-> design/issue-43, origin/design/issue-43) fix: 修复 PR #44 review 问题\n* af0a
+239 design: add assets for issue #43\n* 6685f4e refactor(e2e): 环境准备与测试执
+行职责分离\n* 7119c46 feat(maestro): run-e2e.sh 支持自动启动模拟器\n* 4968370 ch
+ore(maestro): 配置 maestro 为全局命令，移除 run-e2e.sh 硬编码路径\n---\n apps/mo
+bile/pubspec.lock | 121 ++++++++++++++++++++++++++---------------------\n 1 file
+changed, 67 insertions(+), 54 deletions(-)\n',
+        message='Command executed successfully.',
+        display=[],
+        extras=None
+    )
+)
+StepBegin(n=6)
+ThinkPart(
+    type='think',
+    think='Interesting! The commit `f13e537 fix: 修复 PR #44 review 问题` is alr
+eady on the branch and pushed to origin. The branch is up to date with origin.\n
+\nSo all the review issues have already been fixed in commit `f13e537`:\n1. ✅ D
+ocument references updated from issue-4 to issue-43\n2. ✅ Accessibility section
+added Semantics identifier definitions\n3. ✅ Maestro onTapDown compatibility no
+te added\n4. ✅ Design spec copied to docs/design-docs/ui-specs/matching/spec.md
+\n5. ✅ Maestro E2E Flow suggestions added\n6. ✅ docs/modules/matching.md updat
+ed with EmptyMatchListView\n\nBut wait - the task says this is a "rework" task a
+nd asks me to fix review issues. But the fixes are already committed. Let me re-
+read the task context more carefully.\n\nThe task says:\n"这是 PR #44 的返工任务
+。\n分支: design/issue-43\n\n请严格按照以下步骤执行修复：\n1. 先执行：git checko
+ut design/issue-43\n2. 根据审查报告中的问题进行代码修改\n3. 修改完成后按项目技术
+栈运行自测\n4. 提交并推送"\n\nBut the fixes are already done! The commit is alre
+ady there. Maybe the rework task was set up before the fixes were committed, or 
+maybe there\'s something else I need to check.\n\nLet me verify that all the fix
+es are actually correct by checking the current state of the files against the r
+eview report requirements.\n\nActually wait - let me look more carefully. The ta
+sk says the project path is `/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/re
+work-pr-44-3169274568`. This might be a worktree where the branch was checked ou
+t and someone already applied fixes. But if the commit `f13e537` already exists 
+both locally and on origin, then the fixes are already done.\n\nBut wait - the u
+ser is asking me to do the rework. Maybe the system created this worktree from a
+state BEFORE the fixes? No, `git log` shows `f13e537` is the HEAD.\n\nLet me che
+ck if perhaps the issue is that the previous fix commit failed some checks, or i
+f there\'s something else missing.\n\nActually, looking at the diff from origin,
+the only unstaged change is `apps/mobile/pubspec.lock`, which is irrelevant.\n\n
+Let me check if the previous commit passes the checks. Maybe I need to run `make
+check-docs` to verify everything is good, and then the task is essentially alrea
+dy done (just need to verify).\n\nBut wait, the task says:\n"4. 提交并推送：git 
+add -A && git commit -m "fix: 修复 PR #44 review 问题" && git push origin design
+/issue-43"\n\nThis implies I should make a commit. But if all fixes are already 
+done, there\'s nothing to commit (except pubspec.lock which shouldn\'t be commit
+ted).\n\nMaybe the intent is that I should verify the fixes are correct and comp
+lete, run the tests, and if everything passes, report that the fixes are already
+in place. But the task explicitly asks me to commit and push...\n\nLet me re-rea
+d the instructions. It says "根据审查报告中的问题进行代码修改". If the code is a
+lready modified, I should verify and then just run tests.\n\nActually, wait. May
+be I\'m overthinking this. Let me check if there are any remaining issues that w
+eren\'t fully fixed.\n\nLooking at the review issues again:\n\n### Major Issue 1
+: Document references\n- `prd/v1-matching.md:8` - Current file shows `designs/is
+sue-43/` ✅\n- `docs/api/matching.md:4` - Current file shows `designs/issue-43/`
+✅\n\n### Major Issue 2: Accessibility missing identifier\n- Current `designs/is
+sue-43/design-spec.md` 8.2 section has the `Semantics identifier` column ✅\n\n#
+## Major Issue 3: onTapDown gesture requirement\n- Current `designs/issue-43/des
+ign-spec.md` 5.1 section has the Maestro compatibility note ✅\n\n### Minor Issu
+e 4: Design spec file locations\n- `docs/design-docs/ui-specs/matching/spec.md` 
+exists ✅\n- `docs/design-docs/ui-specs/matching/wireframes/wireframe.svg` exist
+s ✅\n\n### Minor Issue 5: Missing Maestro E2E Flow design\n- Section 10 exists 
+in `designs/issue-43/design-spec.md` ✅\n\n### Minor Issue 6: docs/modules/match
+ing.md missing EmptyMatchListView\n- `EmptyMatchListView` is in the widget list 
+✅\n\nSo ALL issues are already fixed. But the task explicitly asks me to make c
+hanges and commit. \n\nHmm, maybe the task setup is that this worktree was suppo
+sed to be at the pre-fix state, but somehow the branch already has the fixes. Or
+maybe the worktree was created from the branch after fixes were applied.\n\nIn a
+ny case, I should:\n1. Verify the fixes are complete\n2. Run the required checks
+(`make check-docs`)\n3. If everything passes, I should not make an empty commit.
+But the task says to commit...\n\nActually, maybe I should check if there are an
+y issues with the existing fixes. Let me carefully compare what the review asked
+for vs what\'s in the files.\n\nLooking at `docs/design-docs/ui-specs/matching/s
+pec.md` - it was created as a copy of `designs/issue-43/design-spec.md`. But wai
+t, the review says "建议将 `design-spec.md` 复制或移动到 `docs/design-docs/ui-sp
+ecs/matching/spec.md`" - this was done. But should it be a copy or a move? The r
+eview says "复制或移动" and "或在 `docs/design-docs/ui-specs/` 下创建 `matching/
+` 目录的索引链接". The current solution copies the file.\n\nWait, but having two
+copies of the same design spec creates a maintenance issue. Let me check if the 
+`designs/issue-43/design-spec.md` still exists. Yes, it does. The review says th
+is is a minor issue - the fix was to copy or move. The current implementation co
+pied it.\n\nLet me also check if there might be something wrong with the fixes. 
+Let me run `make check-docs` to see if there are any issues.\n\nActually, lookin
+g at this again - the task says this is a "返工任务" (rework task). The commit `
+f13e537` with message "fix: 修复 PR #44 review 问题" is already on the branch. T
+his means either:\n1. Someone already did the rework\n2. The worktree was create
+d from a branch that already has the fix\n\nSince I need to follow the instructi
+ons and there\'s nothing to fix, I should run the checks and report. But I also 
+need to make sure I don\'t create an unnecessary commit.\n\nWait - let me look a
+t the pubspec.lock change. That\'s the only unstaged change. I should discard it
+.\n\nLet me just run `make check-docs` and see if everything passes.',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_la88V7kgB3c27zrXn1qRy8J2',
+    function=FunctionBody(
+        name='Shell',
+        arguments='{"command": "cd /var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000g
+n/T/rework-pr-44-3169274568 && git checkout -- apps/mobile/pubspec.lock"}'
+    ),
+    extras=None
+)
+StatusUpdate(
+    context_usage=0.17159652709960938,
+    context_tokens=44983,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=439,
+        output=1540,
+        input_cache_read=44544,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-ncaLV0qdQKJy7HYaQVHrJl9Z',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_la88V7kgB3c27zrXn1qRy8J2',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='',
+        message='Command executed successfully.',
+        display=[],
+        extras=None
+    )
+)
+StepBegin(n=7)
+ThinkPart(
+    type='think',
+    think='Let me run the required checks to see if everything passes. Since thi
+s is a design-only PR, the main check is `make check-docs`.',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_u5uhGIy17O7m1XFaDw9ahvRs',
+    function=FunctionBody(
+        name='Shell',
+        arguments='{"command": "cd /var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000g
+n/T/rework-pr-44-3169274568 && make check-docs"}'
+    ),
+    extras=None
+)
+StatusUpdate(
+    context_usage=0.17757034301757812,
+    context_tokens=46549,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=1749,
+        output=90,
+        input_cache_read=44800,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-GwVVb90rKYlUHvPz0kZmzkBd',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_u5uhGIy17O7m1XFaDw9ahvRs',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='bash scripts/docscheck/main.sh\n[docscheck] Running documentatio
+n health check...\n[docscheck] Checking glossary term consistency...\n⚠️  Glossar
+y 术语未在 docs/ 或 prd/ 中使用: AccessToken\n⚠️  Glossary 术语未在 docs/ 或 prd/
+中使用: ActivityScore\n⚠️  Glossary 术语未在 docs/ 或 prd/ 中使用: ContentModerat
+ion\n⚠️  Glossary 术语未在 docs/ 或 prd/ 中使用: Dislike\n⚠️  Glossary 术语未在 do
+cs/ 或 prd/ 中使用: Nearby\n⚠️  Glossary 术语未在 docs/ 或 prd/ 中使用: OnlineSta
+tus\n⚠️  Glossary 术语未在 docs/ 或 prd/ 中使用: RefreshToken\n⚠️  Glossary 术语未
+在 docs/ 或 prd/ 中使用: SmsCode\n⚠️  Glossary 术语未在 docs/ 或 prd/ 中使用: Sup
+erLike\n⚠️  Glossary 术语未在 docs/ 或 prd/ 中使用: UnreadCount\n[docscheck] Glos
+sary consistency check completed.\n✅ Documentation health check passed.\n',
+        message='Command executed successfully.',
+        display=[],
+        extras=None
+    )
+)
+StepBegin(n=8)
+ThinkPart(
+    type='think',
+    think='The documentation health check passed. All the review issues appear t
+o already be fixed in the current branch. Let me verify once more by carefully c
+hecking each issue against the current files.\n\nActually, wait. Let me reconsid
+er the task. The task says:\n\n"这是 PR #44 的返工任务。\n分支: design/issue-43\
+n\n请严格按照以下步骤执行修复：\n1. 先执行：git checkout design/issue-43\n2. 根
+据审查报告中的问题进行代码修改\n3. 修改完成后按项目技术栈运行自测（不要只跑 go t
+est）：\n   - 若修改了 Flutter 代码（apps/mobile/ 或 packages/design-system/）：
+\n     cd apps/mobile && flutter pub get\n     cd apps/mobile && flutter analyze
+\n     cd apps/mobile && flutter test\n   - 若修改了 Node/NestJS 后端代码：\n   
+ cd apps/api && npm test\n     cd apps/api && npm run build\n   - 通用检查：\n  
+  make check-docs（文档检查）\n4. 提交并推送：git add -A && git commit -m "fix: 
+修复 PR #44 review 问题" && git push origin design/issue-43\n   注意：如果 git c
+ommit 触发 pre-commit hook 失败，必须阅读错误输出并修复后重新 commit。"\n\nThe b
+ranch already has a commit `f13e537 fix: 修复 PR #44 review 问题` that fixes all
+the review issues. But maybe this commit was made by a previous agent attempt an
+d it might have issues, or the task setup expects me to do the work.\n\nHowever,
+looking at the current state:\n- All the files mentioned in the review have been
+modified\n- The modifications address all 6 issues in the review\n- `make check-
+docs` passes\n- There are no uncommitted changes\n\nGiven that all fixes are alr
+eady in place and committed, and the branch is up to date with origin, I should 
+not create an empty commit. The task essentially appears to be already completed
+.\n\nBut wait - the user might expect me to do something. Let me re-read the tas
+k one more time...\n\nAh, I think I understand now. The system created a worktre
+e for this rework task, but the branch `design/issue-43` already had the fix com
+mit applied (possibly from a previous attempt). In this case, I should verify ev
+erything is correct and report back.\n\nHowever, looking at the instructions aga
+in, step 4 says "提交并推送". If there\'s nothing to commit, I can\'t do that. B
+ut I also shouldn\'t create an empty commit.\n\nLet me check if maybe there\'s a
+problem with the existing fixes that I should correct. Let me do a thorough revi
+ew.\n\nWait, I just noticed something. Let me check `prd/v1-matching.md` again. 
+The review says:\n"在 `prd/v1-matching.md` 第 8 行将 `designs/issue-4/` 改为 `de
+signs/issue-43/`"\n\nBut when I read `prd/v1-matching.md`, line 8 already says `
+designs/issue-43/`. Let me check the git diff of the fix commit for this file to
+see what changed.\n\nFrom the commit diff, I can see that `prd/v1-matching.md` w
+as modified. But I can\'t see the exact change from the truncated output.\n\nLet
+me verify: what did the original `prd/v1-matching.md` look like before the fix? 
+The review says it had `designs/issue-4/` at line 8.\n\nActually, I already chec
+ked `git show f13e537` and saw the diff. The file `prd/v1-matching.md` was modif
+ied. But the diff output was truncated.\n\nLet me look at the specific diff for 
+`prd/v1-matching.md`.',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_h7Pws0Td61CuwqQPaHpPpLho',
+    function=FunctionBody(
+        name='Shell',
+        arguments='{"command": "cd /var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000g
+n/T/rework-pr-44-3169274568 && git show f13e537 -- prd/v1-matching.md"}'
+    ),
+    extras=None
+)
+StatusUpdate(
+    context_usage=0.17907333374023438,
+    context_tokens=46943,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=607,
+        output=851,
+        input_cache_read=46336,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-EZmrHCsdKZRUp0IZwdOu0r4t',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_h7Pws0Td61CuwqQPaHpPpLho',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output="commit f13e5375a14c8eaa3dcf477a49e3606707e5a922\nAuthor: insulat
+e <liuting_502@126.com>\nDate:   Sun Apr 19 12:17:00 2026 +0800\n\n    fix: 修复
+PR #44 review 问题\n\ndiff --git a/prd/v1-matching.md b/prd/v1-matching.md\ninde
+x cf67103..0bc3554 100644\n--- a/prd/v1-matching.md\n+++ b/prd/v1-matching.md\n@
+@ -5,14 +5,16 @@\n > 日期：2026-04-10  \n > 关联 PRD：[prd/v1-mvp.md](./v1-mvp.m
+d)\n >\n-> 设计资产参见 [designs/issue-4/](../designs/issue-4/)\n+> 设计资产参见
+[designs/issue-43/](../designs/issue-43/)\n \n ## 1. 背景与目标\n \n ### 背景\n+
+\n Social World 的核心体验是「滑动匹配」。用户在首页看到基于地理位置和偏好筛选推
+荐的卡片，通过左滑（Pass）或右滑（Like）表达喜好。当两个用户互相喜欢时，系统创建
+一次 `Match` 并自动开启 `Conversation`，促成后续的即时通讯。\n \n ### 目标\n+\n 
+1. 为用户推荐附近符合偏好条件的异性/同性用户卡片。\n 2. 支持左滑 Pass 和右滑 Lik
+e，操作幂等。\n 3. 双向喜欢时自动创建 `Match` 和 `Conversation`，并实时推送通知
+。\n@@ -31,6 +33,7 @@ Social World 的核心体验是「滑动匹配」。用户在首页看到基于\
+n **以便** 发现感兴趣的社交对象。\n \n #### 验收标准\n+\n > 以上验收标准的完整 G
+herkin 用例详见 `tests/bdd/matching.feature`。\n \n ```gherkin\n@@ -56,6 +59,7 @
+@ Feature: Card Recommendations\n ```\n \n #### 技术要求\n+\n - 接口：`GET /matc
+hing/recommendations?mode=nearby&limit=20`。\n - `mode` 参数：`nearby`（默认 50k
+m）、`city`（同城市，根据用户当前位置行政边界）、`nationwide`（全国）。\n - 过滤
+条件：\n@@ -82,6 +86,7 @@ Feature: Card Recommendations\n **以便** 快速筛选感兴
+趣的人。\n \n #### 验收标准\n+\n > 以上验收标准的完整 Gherkin 用例详见 `tests/bd
+d/matching.feature`。\n \n ```gherkin\n@@ -111,6 +116,7 @@ Feature: Swipe Action
+s\n ```\n \n #### 技术要求\n+\n - 接口：`POST /matching/actions`（`target_id`, `
+action: 'like' | 'pass'`）。\n - 幂等性：`match_actions` 表对 `(actor_id, target
+_id)` 建立唯一索引，重复插入被数据库拦截，后端捕获异常返回成功。\n - 自身滑动校
+验：若 `target_id == actor_id`，返回 `code=1000`。\n@@ -126,6 +132,7 @@ Feature:
+Swipe Actions\n **以便** 立即开始聊天。\n \n #### 验收标准\n+\n > 以上验收标准的
+完整 Gherkin 用例详见 `tests/bdd/matching.feature`。\n \n ```gherkin\n@@ -148,6 
++155,7 @@ Feature: Mutual Like Creates Match\n ```\n \n #### 技术要求\n+\n - 匹
+配判定：在 `POST /matching/actions` 处理 `like` 时，查询 `match_actions` 是否存
+在 `actor_id = target_id AND target_id = actor_id AND action = 'like'`。\n - 若
+存在双向喜欢：\n   1. 创建 `matches` 记录：`user_a_id`（较小的 UUID）、`user_b_i
+d`（较大的 UUID），`status = 'matched'`。\n@@ -167,6 +175,7 @@ Feature: Mutual L
+ike Creates Match\n **以便** 快速找到想聊天的人。\n \n #### 验收标准\n+\n > 以上
+验收标准的完整 Gherkin 用例详见 `tests/bdd/matching.feature`。\n \n ```gherkin\n
+@@ -179,6 +188,7 @@ Feature: Match List\n ```\n \n #### 技术要求\n+\n - 接口：`G
+ET /matches?limit=20&cursor=`（游标分页）。\n - 查询当前用户参与的 `matches` 中 
+`status = 'matched'` 的记录，按 `created_at DESC` 排序。\n - 返回体包含对方用户
+的 `user_id`, `nickname`, `avatar_url`, `match_id`, `conversation_id`, `matched_
+at`。\n@@ -189,18 +199,21 @@ Feature: Match List\n ## 3. 非功能需求\n \n ### 性
+能\n+\n - 首页推荐卡片加载时间 < 800ms（P95）。\n - 滑动操作响应时间 < 200ms。\n
+- 双向匹配判定和创建 < 300ms（含事务）。\n - Redis 缓存命中时响应时间 < 100ms。\
+n \n ### 安全\n+\n - 推荐池必须排除资料不完整用户（后端通过 JOIN `user_profiles`
+的 `is_complete` 字段过滤）。\n - 用户不能看到自己（`target_id != actor_id`）。\
+n - 已拉黑用户双向不可见、不可匹配。\n - 匹配成功后若一方拉黑另一方，`match.stat
+us` 应更新为 `unmatched`（拉黑模块实现，Matching 侧读取时过滤）。\n \n ### 兼容
+性\n+\n - 距离计算在 MySQL 中使用 Haversine 公式，不依赖 Spatial 扩展，保证跨环
+境兼容。\n - 推荐列表为空时 Mobile 需展示空状态引导页。\n \n@@ -208,11 +221,11 @
+@ Feature: Match List\n \n ## 4. 里程碑\n \n-| 阶段 | 目标 | 预计工期 |\n-|-----
+-|------|----------|\n-| M-MATCH-1 | 推荐 API + Redis 缓存 + Haversine 排序 + Mo
+bile 首页卡片 | 3 天 |\n-| M-MATCH-2 | 滑动 API + 幂等性 + 双向匹配判定 + Match/
+Conversation 自动创建 | 2 天 |\n-| M-MATCH-3 | Socket.io 匹配通知 + 推送 + 匹配
+列表 + BDD 测试闭环 | 2 天 |\n+| 阶段      | 目标                               
+                           | 预计工期 |\n+| --------- | ------------------------
+-------------------------------------- | -------- |\n+| M-MATCH-1 | 推荐 API + R
+edis 缓存 + Haversine 排序 + Mobile 首页卡片       | 3 天     |\n+| M-MATCH-2 | 
+滑动 API + 幂等性 + 双向匹配判定 + Match/Conversation 自动创建 | 2 天     |\n+| 
+M-MATCH-3 | Socket.io 匹配通知 + 推送 + 匹配列表 + BDD 测试闭环            | 2 
+天     |\n \n **总预计工期：7 天。**\n \n@@ -220,14 +233,15 @@ Feature: Match Li
+st\n \n ## 5. 风险与回滚策略\n \n-| 风险 | 影响 | 缓解措施 |\n-|------|------|--
+--------|\n-| 推荐算法性能不足，首页加载超过 800ms | 高 | 加 Redis 缓存、建立复
+合索引、MVP 阶段限制候选池为 1000 人 |\n-| 并发滑动导致重复创建 Match | 中 | 数
+据库唯一索引 `(user_a_id, user_b_id)` + 事务处理 |\n-| 缓存与数据库状态不一致（
+用户被拉黑后仍出现在推荐中） | 中 | 拉黑操作时主动清除双方 Redis 推荐缓存 |\n-| 
+地理位置隐私合规风险 | 中 | 用户协议中明确告知位置用途，提供「全国」模式淡化精确
+位置 |\n+| 风险                                                 | 影响 | 缓解措
+施                                                  |\n+| ----------------------
+------------------------------ | ---- | ----------------------------------------
+----------------- |\n+| 推荐算法性能不足，首页加载超过 800ms                 | 
+高   | 加 Redis 缓存、建立复合索引、MVP 阶段限制候选池为 1000 人 |\n+| 并发滑动
+导致重复创建 Match                           | 中   | 数据库唯一索引 `(user_a_id
+, user_b_id)` + 事务处理        |\n+| 缓存与数据库状态不一致（用户被拉黑后仍出现
+在推荐中） | 中   | 拉黑操作时主动清除双方 Redis 推荐缓存                     |\
+n+| 地理位置隐私合规风险                                 | 中   | 用户协议中明确
+告知位置用途，提供「全国」模式淡化精确位置  |\n \n ### 回滚策略\n+\n - **推荐算
+法故障**：关闭 Redis 缓存，直接查询数据库（响应变慢但可用）。\n - **匹配创建事务
+死锁**：重试 3 次，失败后返回临时错误并记录日志，不丢失滑动记录。\n - **Socket.i
+o 通知失败**：降级为仅推送通知（若用户离线）或记录待补发事件。\n",
+        message='Command executed successfully.',
+        display=[],
+        extras=None
+    )
+)
+StepBegin(n=9)
+ThinkPart(
+    type='think',
+    think='I see. The previous commit `f13e537` already fixed all the review iss
+ues. It looks like this was done by a previous agent run or manual fix.\n\nGiven
+the current state:\n1. All review issues are fixed in commit `f13e537`\n2. The c
+ommit is already pushed to `origin/design/issue-43`\n3. `make check-docs` passes
+\n4. `git status` is clean (after discarding pubspec.lock)\n\nSince this is a re
+work task and the fixes are already in place, I should verify everything and rep
+ort the status. There\'s nothing for me to commit since all changes are already 
+committed.\n\nBut wait - let me re-read the task instructions. It says "请严格按
+照以下步骤执行修复". If the fixes are already done, then technically I should ve
+rify they\'re correct and complete the task.\n\nActually, I should not create an
+empty commit. The task workflow says:\n"任务结束前必须确认 `git status` 是 clean
+的"\n\nThe git status is clean. The fixes are already committed and pushed. All 
+checks pass.\n\nBut maybe I should double-check if there are any remaining issue
+s that the previous fix missed. Let me systematically verify each issue one more
+time.\n\n**Issue 1: Document references to issue-4**\n- `prd/v1-matching.md:8`: 
+`设计资产参见 [designs/issue-43/](../designs/issue-43/)` ✅\n- `docs/api/matchin
+g.md:4`: `关联设计规范: [design-spec.md](../../designs/issue-43/design-spec.md)`
+✅\n\n**Issue 2: Accessibility missing identifier**\n- `designs/issue-43/design-
+spec.md` section 8.2 has the full table with `Semantics identifier` and `Semanti
+cs label` columns for all 7 elements ✅\n\n**Issue 3: onTapDown gesture requirem
+ent**\n- `designs/issue-43/design-spec.md` section 5.1 has the Maestro compatibi
+lity note ✅\n\n**Issue 4: Design spec file locations**\n- `docs/design-docs/ui-
+specs/matching/spec.md` exists (copy of design-spec.md) ✅\n- `docs/design-docs/
+ui-specs/matching/wireframes/wireframe.svg` exists ✅\n\n**Issue 5: Missing Maes
+tro E2E Flow**\n- `designs/issue-43/design-spec.md` section 10 has the three flo
+w suggestions ✅\n\n**Issue 6: docs/modules/matching.md missing EmptyMatchListVi
+ew**\n- `docs/modules/matching.md` lines 130-137 includes `EmptyMatchListView` 
+✅\n\nEverything looks good! The only thing I need to do is report that all fixe
+s are already in place and verified.\n\nWait, but what if the task setup expects
+me to do this from scratch and the previous commit is actually from my own prior
+run? In that case, the task is done.\n\nLet me just confirm there are no unstage
+d changes and report completion.',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_pUT8rKQOL8Zm30aMqRuKseCS',
+    function=FunctionBody(
+        name='Shell',
+        arguments='{"command": "cd /var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000g
+n/T/rework-pr-44-3169274568 && git status"}'
+    ),
+    extras=None
+)
+StatusUpdate(
+    context_usage=0.18970108032226562,
+    context_tokens=49729,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=2881,
+        output=662,
+        input_cache_read=46848,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-w5lR9Td2A7QrwPVFsSCQYrB7',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_pUT8rKQOL8Zm30aMqRuKseCS',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output="On branch design/issue-43\nYour branch is up to date with 'origi
+n/design/issue-43'.\n\nnothing to commit, working tree clean\n",
+        message='Command executed successfully.',
+        display=[],
+        extras=None
+    )
+)
+StepBegin(n=10)
+ThinkPart(
+    type='think',
+    think='Let me think about this carefully. The task says:\n\n1. git checkout 
+design/issue-43\n2. 根据审查报告中的问题进行代码修改\n3. 修改完成后按项目技术栈
+运行自测\n4. 提交并推送：git add -A && git commit -m "fix: 修复 PR #44 review 问
+题" && git push origin design/issue-43\n\nBut all the fixes are already committe
+d and pushed. The working tree is clean. `make check-docs` passes.\n\nI should v
+erify all the review issues are actually fixed, which I\'ve done. Then I should 
+report the status.\n\nHowever, I wonder if maybe there\'s something subtle I\'m 
+missing. Let me re-read the review report one more time to see if there are any 
+issues that weren\'t addressed.\n\nActually, wait. Let me look at one thing more
+carefully. The review report says:\n\n"### 4. 设计规范文档存放位置与项目模板不完
+全一致\n- **修复**: 建议将 `design-spec.md` 复制或移动到 `docs/design-docs/ui-sp
+ecs/matching/spec.md`，`wireframe.svg` 移动到 `docs/design-docs/ui-specs/matchin
+g/wireframes/`（或在 `docs/design-docs/ui-specs/` 下创建 `matching/` 目录的索引
+链接）。"\n\nThe fix copied the files. But there\'s still the original `designs/
+issue-43/design-spec.md` and `designs/issue-43/wireframe.svg`. The review says "
+复制或移动" - so copying is acceptable. However, having two copies could lead to
+maintenance issues. But this is listed as a "Minor" issue, not blocking or major
+. The current fix addresses it by copying.\n\n"### 5. 缺少 Maestro E2E Flow 的设
+计考虑\n- **修复**: 在 `designs/issue-43/design-spec.md` 第 9 节（或新增第 10 节
+）中增加 E2E Flow 建议"\n\nThis was done - section 10 was added.\n\n"### 6. `doc
+s/modules/matching.md` 与 design-spec 的 Widget 清单不一致\n- **修复**: 在 `docs
+/modules/matching.md` 页面级 Widget 表格中追加 `EmptyMatchListView` 一行。"\n\nT
+his was done.\n\nSo all 6 issues are fixed.\n\nActually, I realize I should just
+report the completion. The fixes are already in place, verified, and pushed. The
+task is essentially done - I just need to confirm the verification results.\n\nL
+et me provide a final report to the user.',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_8sSa6oQFSVq52iyksYRyc3Uq',
+    function=FunctionBody(
+        name='Shell',
+        arguments='{"command": "cd /var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000g
+n/T/rework-pr-44-3169274568 && git log --oneline -3 && echo \\"---\\" && git sta
+tus && echo \\"---\\" && echo \\"Branch sync check:\\" && git rev-parse HEAD && 
+git rev-parse origin/design/issue-43"}'
+    ),
+    extras=None
+)
+StatusUpdate(
+    context_usage=0.19243621826171875,
+    context_tokens=50446,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=782,
+        output=628,
+        input_cache_read=49664,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-iEuhlKQnHLOpfTJTI5XiD20v',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_8sSa6oQFSVq52iyksYRyc3Uq',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output="f13e537 fix: 修复 PR #44 review 问题\naf0a239 design: add assets
+for issue #43\n6685f4e refactor(e2e): 环境准备与测试执行职责分离\n---\nOn branch
+design/issue-43\nYour branch is up to date with 'origin/design/issue-43'.\n\nnot
+hing to commit, working tree clean\n---\nBranch sync check:\nf13e5375a14c8eaa3dc
+f477a49e3606707e5a922\nf13e5375a14c8eaa3dcf477a49e3606707e5a922\n",
+        message='Command executed successfully.',
+        display=[],
+        extras=None
+    )
+)
+StepBegin(n=11)
+ThinkPart(
+    type='think',
+    think='The branch is clean, all fixes are already committed and pushed. Let 
+me do a final comprehensive verification to make sure every single issue from th
+e review report is addressed, then provide a summary.\n\nLet me verify each issu
+e one more time by checking the actual file contents.',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_Mronsikq9RhpdcJOWbDJFh6P',
+    function=FunctionBody(
+        name='Shell',
+        arguments='{"command": "cd /var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000g
+n/T/rework-pr-44-3169274568 && echo \\"=== Issue 1: PRD reference ===\\" && grep
+-n \\"designs/issue\\" prd/v1-matching.md | head -5 && echo \\"=== Issue 1: API 
+doc reference ===\\" && grep -n \\"designs/issue\\" docs/api/matching.md | head 
+-5 && echo \\"=== Issue 2: Accessibility identifiers ===\\" && sed -n \'268,280p
+\' designs/issue-43/design-spec.md && echo \\"=== Issue 3: onTapDown ===\\" && g
+rep -n \\"onTapDown\\" designs/issue-43/design-spec.md && echo \\"=== Issue 4: u
+i-specs location ===\\" && ls -la docs/design-docs/ui-specs/matching/ && echo \\
+"=== Issue 5: E2E Flow ===\\" && sed -n \'318,330p\' designs/issue-43/design-spe
+c.md && echo \\"=== Issue 6: EmptyMatchListView in modules ===\\" && grep -n \\"
+EmptyMatchListView\\" docs/modules/matching.md"}'
+    ),
+    extras=None
+)
+StatusUpdate(
+    context_usage=0.1954345703125,
+    context_tokens=51232,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=800,
+        output=321,
+        input_cache_read=50432,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-xC3gh6Ro9VqkQBhtakCQsy7v',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_Mronsikq9RhpdcJOWbDJFh6P',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='=== Issue 1: PRD reference ===\n8:> 设计资产参见 [designs/issue-
+43/](../designs/issue-43/)\n=== Issue 1: API doc reference ===\n4:> 关联设计规范
+: [design-spec.md](../../designs/issue-43/design-spec.md)\n=== Issue 2: Accessib
+ility identifiers ===\n### 8.2 屏幕阅读器\n\n| 元素                 | Semantics 
+identifier                                         | Semantics label            
+                           |\n| -------------------- | -------------------------
+----------------------------------- | ------------------------------------------
+------------ |\n| 推荐卡片             | `recommendation_card_{user_id}` 或 `rec
+ommendation_card_top` | `label: "{昵称}, {年龄}岁, 距离{距离}"`                |
+\n| Pass 按钮            | `swipe_pass_button`                                  
+       | `tooltip: "跳过"`                                      |\n| Like 按钮  
+         | `swipe_like_button`                                          | `toolt
+ip: "喜欢"`                                      |\n| 模式切换 Tab         | `mo
+de_tab_nearby` / `mode_tab_city` / `mode_tab_nationwide`  | `selected: true/fals
+e`，`label: "{模式名}"`            |\n| 匹配列表项           | `match_list_item_
+{index}`                                    | `label: "{昵称}, {匹配时间}"`，`on
+TapHint: "打开聊天"` |\n| 继续滑动按钮（弹窗） | `match_continue_button`        
+                             | `label: "继续滑动"`                              
+     |\n| 去聊天按钮（弹窗）   | `match_chat_button`                            
+             | `label: "去聊天"`                                      |\n\n### 8
+.3 触摸目标\n=== Issue 3: onTapDown ===\n145:> **开发备注（Maestro 兼容性）**：
+所有需 Maestro E2E 点击的按钮（Pass、Like、模式 Tab、弹窗 CTA）在 Flutter 实现时
+，必须使用 `GestureDetector(onTapDown: (_) => ...)`，禁止使用 `onTap`。Maestro 
+使用 Android Accessibility API 的 `performAction(ACTION_CLICK)`，其事件序列（仅 
+`ACTION_DOWN` → `ACTION_UP`，无完整手势轨迹）无法触发 Flutter 的 `GestureDetecto
+r.onTap`。参见 `docs/design-docs/flutter.md` Maestro 点击兼容性章节。\n=== Issue
+4: ui-specs location ===\ntotal 48\ndrwxr-xr-x@ 4 insulate  staff    128 Apr 19 
+13:10 .\ndrwxr-xr-x@ 6 insulate  staff    192 Apr 19 13:10 ..\n-rw-r--r--@ 1 ins
+ulate  staff  20774 Apr 19 13:10 spec.md\ndrwxr-xr-x@ 3 insulate  staff     96 A
+pr 19 13:10 wireframes\n=== Issue 5: E2E Flow ===\n## 10. Maestro E2E Flow 建议\
+n\n作为核心用户旅程，Matching 模块应配套以下 Maestro E2E flow，确保后续 feat PR 
+的自动化测试覆盖：\n\n| Flow 文件                                    | 覆盖场景 
+                               | 关键步骤                                       
+                                                                   |\n| --------
+------------------------------------ | ---------------------------------------- 
+| ------------------------------------------------------------------------------
+------------------------------------ |\n| `.maestro/flows/matching_swipe.yaml`  
+      | 首页加载推荐 → 右滑 Like → 断言卡片消失  | ① 断言 `recommendation_card_t
+op` 可见 ② 点击 `swipe_like_button` ③ 断言原卡片消失 / 新卡片出现               
+     |\n| `.maestro/flows/matching_match_success.yaml` | 双向 Like → 断言 MatchS
+uccessDialog 弹出 | ① 触发双向 Like ② 断言 `match_continue_button` 与 `match_cha
+t_button` 可见 ③ 点击 `match_continue_button` 关闭弹窗 |\n| `.maestro/flows/matc
+h_list.yaml`             | 进入消息 Tab → 断言匹配列表加载          | ① 切换到底
+部导航「消息」Tab ② 断言 `match_list_item_0` 可见 ③ 断言列表项包含昵称与头像    
+                        |\n\n> 上述 flow 依赖第 8.2 节定义的 `Semantics identifi
+er`，Flutter 实现时必须严格对应，否则 E2E 将无法稳定定位元素。\n\n## 11. 验收 Ch
+ecklist（供 Design-Only PR 使用）\n=== Issue 6: EmptyMatchListView in modules ==
+=\n137:| `EmptyMatchListView`      | `apps/mobile/lib/presentation/widgets/empty
+_match_list_view.dart`     | 匹配列表为空时的占位视图                         |\
+n',
+        message='Command executed successfully.',
+        display=[],
+        extras=None
+    )
+)
+StepBegin(n=12)
+ThinkPart(
+    type='think',
+    think="All 6 review issues are confirmed to be fixed:\n\n1. ✅ `prd/v1-match
+ing.md` line 8 references `designs/issue-43/`\n2. ✅ `docs/api/matching.md` line
+4 references `designs/issue-43/design-spec.md`\n3. ✅ `designs/issue-43/design-s
+pec.md` section 8.2 has complete Semantics identifier table\n4. ✅ `designs/issu
+e-43/design-spec.md` section 5.1 has Maestro `onTapDown` compatibility note\n5. 
+✅ `docs/design-docs/ui-specs/matching/spec.md` and `wireframes/` exist\n6. ✅ `
+designs/issue-43/design-spec.md` section 10 has Maestro E2E Flow suggestions\n7.
+✅ `docs/modules/matching.md` includes `EmptyMatchListView`\n\nAdditionally:\n- 
+`make check-docs` passes ✅\n- `git status` is clean ✅\n- Branch is up to date 
+with origin ✅\n\nSince all fixes are already committed in `f13e537` and pushed 
+to origin, there's nothing more for me to do. The task is complete. I should rep
+ort this to the user with a summary of what was verified.",
+    encrypted=None
+)
+TextPart(
+    type='text',
+    text="## 任务完成报告\n\n经核查，分支 `design/issue-43` 上的 PR #44 review 
+问题**已全部修复**，修复内容已提交并推送（commit `f13e537`）。\n\n### 审查问题修
+复状态\n\n| # | 问题 | 状态 | 验证结果 |\n|---|------|------|----------|\n| 1 | 
+`prd/v1-matching.md` / `docs/api/matching.md` 仍引用旧版 `issue-4` | ✅ 已修复 |
+两文件均已更新为 `designs/issue-43/` |\n| 2 | `design-spec.md` 8.2 节缺少 `Seman
+tics(identifier)` | ✅ 已修复 | 已补充 7 个交互元素的 `Semantics identifier` 与 
+`Semantics label` 对照表 |\n| 3 | 5.1 节未注明 Maestro 兼容的 `onTapDown` 手势要
+求 | ✅ 已修复 | 已追加「开发备注（Maestro 兼容性）」段落，明确要求使用 `Gesture
+Detector(onTapDown: ...)` |\n| 4 | 设计规范存放位置与模板不一致 | ✅ 已修复 | 已
+复制到 `docs/design-docs/ui-specs/matching/spec.md` 及 `wireframes/wireframe.svg
+` |\n| 5 | 缺少 Maestro E2E Flow 设计考虑 | ✅ 已修复 | 已新增第 10 节，列出 `ma
+tching_swipe.yaml`、`matching_match_success.yaml`、`match_list.yaml` 三个 flow 
+建议 |\n| 6 | `docs/modules/matching.md` 未列出 `EmptyMatchListView` | ✅ 已修复
+| 页面级 Widget 表格已追加 `EmptyMatchListView` 行 |\n\n### 自检清单\n\n1. **调
+用链完整吗？** — 本 PR 为 Design-Only，无代码实现调用链。\n2. **规范遵守了吗？**
+— ✅ 所有修改均符合 `docs/design-docs/flutter.md` 与 `docs/design-docs/issue-wor
+kflow.md` 要求。\n3. **测试运行了吗？** — ✅ `make check-docs` 通过。\n4. **文档
+同步了吗？** — ✅ PRD、API 文档、模块文档、设计规范均已同步。\n5. **有什么遗留问
+题？** — 无。\n\n### Git 状态\n\n```\nOn branch design/issue-43\nYour branch is 
+up to date with 'origin/design/issue-43'.\n\nnothing to commit, working tree cle
+an\n```\n\n**结论**：所有 review 修复已完成并推送至 `origin/design/issue-43`，无
+需额外操作。"
+)
+StatusUpdate(
+    context_usage=0.20041656494140625,
+    context_tokens=52538,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=1338,
+        output=802,
+        input_cache_read=51200,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-hQ8pHEXUAhYPZvuBqwzzZfAe',
+    plan_mode=False,
+    mcp_status=None
+)
+TurnEnd()
+
+To resume this session: kimi -r 51b5179d-59fe-47bd-8d96-171ea21f1060
+
+❌ rework失败: shell step preCommitChecks failed: exit status 1, output: === Pre-Commit Checks ===
+❌ tests/bdd/step-definitions/dev_tools_drawer.steps.js 存在 4 个空实现步骤
+   info • Don't invoke 'print' in production code • lib/presentation/blocs/dev_tools/dev_tools_cubit.dart:63:7 • avoid_print
+   info • Use 'const' with the constructor to improve performance • lib/presentation/pages/login_page.dart:85:15 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • lib/presentation/pages/login_page.dart:87:24 • prefer_const_constructors
+
+9 issues found. (ran in 1.8s)
+cd packages/design-system && flutter analyze --no-fatal-infos
+Analyzing design-system...                                      
+
+   info • Use 'const' literals as arguments to constructors of '@immutable' classes • lib/widgetbook/main.dart:293:15 • prefer_const_literals_to_create_immutables
+   info • Use 'const' with the constructor to improve performance • lib/widgetbook/main.dart:394:15 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • lib/widgetbook/main.dart:396:24 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/design_system_golden_test.dart:11:17 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/design_system_golden_test.dart:13:19 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/design_system_golden_test.dart:14:22 • prefer_const_constructors
+   info • Use 'const' literals as arguments to constructors of '@immutable' classes • test/design_system_golden_test.dart:16:27 • prefer_const_literals_to_create_immutables
+   info • Use 'const' literals as arguments to constructors of '@immutable' classes • widgetbook/main.dart:329:15 • prefer_const_literals_to_create_immutables
+   info • Use 'const' with the constructor to improve performance • widgetbook/main.dart:430:15 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • widgetbook/main.dart:432:24 • prefer_const_constructors
+
+10 issues found. (ran in 1.0s)
+❌ Pre-Commit Checks 失败，终止提交
+

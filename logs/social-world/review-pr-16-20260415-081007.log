@@ -1,0 +1,8 @@
+[2026-04-15 08:10:07] PR #16 Review 启动
+分支: feat/issue-3
+项目路径: ../../social-world
+日志文件: logs/social-world/review-pr-16-20260415-081007.log
+
+❌ Review 失败: shell step createWorktree failed: exit status 2, output: bash: -c: line 0: syntax error near unexpected token `newline'
+bash: -c: line 0: `<no value>'
+

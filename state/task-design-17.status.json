@@ -1,0 +1,18 @@
+{
+  "taskID": "design-17",
+  "type": "design",
+  "status": "stopped",
+  "projectName": "new-world-monorepo",
+  "startedAt": "2026-05-09T11:11:55.137925+08:00",
+  "lastHeartbeat": "2026-05-09T11:30:28.696688+08:00",
+  "stepResults": {
+    "fetchOrigin": {
+      "status": "success",
+      "exitCode": 0
+    },
+    "makeDesignsDir": {
+      "status": "success",
+      "exitCode": 0
+    }
+  }
+}

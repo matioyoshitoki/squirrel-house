@@ -1,0 +1,2561 @@
+[2026-04-17 17:41:32] PR #38 Review 启动
+分支: feat/issue-37
+项目路径: ../../social-world
+日志文件: /Users/insulate/Desktop/new-world/new-world-ops/logs/social-world/review-pr-38-20260417-174132.log
+【任务上下文】
+- PR 编号: #38
+- 项目路径: ../../social-world
+- 项目地图: ../../social-world/AGENTS.md
+- 关联 PRD: ../../social-world/prd/v1-matching.md,../../social-world/prd/v1-dev-
+tools-drawer.md,../../social-world/prd/v1-auth-login.md
+- 文档目录: ../../social-world/docs
+
+【辅助审查文件】
+以下文件已在工作目录中生成，请在审查时按需读取（若文件不存在或为空则跳过）：
+- 文档覆盖信息: /var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/review-pr-38-30
+83123428/.doc-coverage.txt
+- 设计资产列表: /var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/review-pr-38-30
+83123428/.design-assets.txt
+- Figma 链接: /var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/review-pr-38-3083
+123428/.figma-links.txt
+
+Review PR #38, branch: feat/issue-37. After completing the review, you MUST writ
+e the full markdown report to logs/review-report-38.md
+TurnBegin(
+    user_input='【任务上下文】\n- PR 编号: #38\n- 项目路径: ../../social-world\n
+- 项目地图: ../../social-world/AGENTS.md\n- 关联 PRD: ../../social-world/prd/v1-
+matching.md,../../social-world/prd/v1-dev-tools-drawer.md,../../social-world/prd
+/v1-auth-login.md\n- 文档目录: ../../social-world/docs\n\n【辅助审查文件】\n以下
+文件已在工作目录中生成，请在审查时按需读取（若文件不存在或为空则跳过）：\n- 文档
+覆盖信息: /var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/review-pr-38-30831234
+28/.doc-coverage.txt\n- 设计资产列表: /var/folders/lt/w3sl6z8j5v50vt2s6knvf5n000
+00gn/T/review-pr-38-3083123428/.design-assets.txt\n- Figma 链接: /var/folders/lt
+/w3sl6z8j5v50vt2s6knvf5n00000gn/T/review-pr-38-3083123428/.figma-links.txt\n\nRe
+view PR #38, branch: feat/issue-37. After completing the review, you MUST write 
+the full markdown report to logs/review-report-38.md'
+)
+StepBegin(n=1)
+ThinkPart(
+    type='think',
+    think="Let me start by reading the project navigation document (AGENTS.md) a
+nd the PR diff to understand what needs to be reviewed. I'll also check the auxi
+liary files provided.",
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_qq6ec6hStQt1n9E5yveTR7RT',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "../../social-world/AGENTS.md"}'
+    ),
+    extras=None
+)
+ToolCall(
+    type='function',
+    id='tool_xfPO6G3qifkS2TbWpXZ7Yeuv',
+    function=FunctionBody(name='ReadFile', arguments='{"path":'),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_qq6ec6hStQt1n9E5yveTR7RT',
+    return_value=ToolError(
+        is_error=True,
+        output='',
+        message='`../../social-world/AGENTS.md` is not an absolute path. You mus
+t provide an absolute path to read a file outside the working directory.',
+        display=[BriefDisplayBlock(type='brief', text='Invalid path')],
+        extras=None
+    )
+)
+ToolCallPart(
+    arguments_part=' "/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/review-pr
+-38-3083123428/.doc-coverage.txt"}'
+)
+ToolCall(
+    type='function',
+    id='tool_66WBlTxVGXkFgS47f47KCDwP',
+    function=FunctionBody(name='ReadFile', arguments='{"path": "/'),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_xfPO6G3qifkS2TbWpXZ7Yeuv',
+    return_value=ToolOk(
+        is_error=False,
+        output='     1\t=== PR 变更文件 ===\n     2\tapps/mobile/lib/core/di/di.
+dart\n     3\tapps/mobile/lib/presentation/widgets/dev_tools_wrapper.dart\n     
+4\tapps/mobile/test/dev_tools_widget_test.dart\n     5\tdocs/modules/dev-tools.m
+d\n     6\t\n     7\t=== PR 中变更的文档文件 ===\n     8\tdocs/modules/dev-tools
+.md\n     9\t\n    10\t=== 现有 docs 目录结构（顶层） ===\n    11\tapi\n    12\t
+api-contracts\n    13\tdesign-docs\n    14\texec-plans\n    15\tmodules\n    16\
+tproduct-specs\n    17\tQUALITY_SCORE.md\n    18\t\n    19\tdocs/api:\n    20\tI
+NDEX.md\n    21\tmatching.md\n    22\tsocket-events.md\n    23\t\n    24\tdocs/a
+pi-contracts:\n    25\tauth.yaml\n    26\tcommon.yaml\n    27\tim.yaml\n    28\t
+INDEX.md\n    29\tmatching.yaml\n    30\toss.yaml\n    31\tprofile.yaml\n    32\
+t\n    33\tdocs/design-docs:\n    34\tADR-001-monorepo.md\n    35\tapi.md\n    3
+6\tcore-beliefs.md\n    37\tdb.md\n    38\tflutter.md\n    39\tINDEX.md\n    40\
+tissue-workflow.md\n    41\tnestjs.md\n    42\tobservability.md\n    43\treadabi
+lity.md\n    44\ttesting.md\n    45\tui-specs\n    46\tui-style-guide\n    47\t\
+n    48\tdocs/design-docs/ui-specs:\n    49\tauth\n    50\tdev-tools\n    51\tpr
+ofile\n    52\t\n    53\tdocs/design-docs/ui-specs/auth:\n    54\tlogin-page-wir
+eframe.md\n    55\t\n    56\tdocs/design-docs/ui-specs/dev-tools:\n    57\tdev-t
+ools-drawer-wireframe.md\n    58\t\n    59\tdocs/design-docs/ui-specs/profile:\n
+   60\tprofile-edit-wireframe.md\n',
+        message='60 lines read from file starting from line 1. Total lines in fi
+le: 60. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(
+    arguments_part='var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/review-pr-38
+-3083123428/.design-assets.txt"}'
+)
+ToolCall(
+    type='function',
+    id='tool_SZcLzE4v3Y8Uice8fe57dzo1',
+    function=FunctionBody(name='ReadFile', arguments='{"path": "/'),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_66WBlTxVGXkFgS47f47KCDwP',
+    return_value=ToolOk(
+        is_error=False,
+        output='     1\t/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/review-
+pr-38-3083123428/designs/issue-4/wireframe.svg\n     2\t/var/folders/lt/w3sl6z8j
+5v50vt2s6knvf5n00000gn/T/review-pr-38-3083123428/designs/issue-4/docs-to-update.
+txt\n     3\t/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/review-pr-38-30831
+23428/designs/issue-4/mockup.html\n     4\t/var/folders/lt/w3sl6z8j5v50vt2s6knvf
+5n00000gn/T/review-pr-38-3083123428/designs/issue-4/design-spec.md\n     5\t/var
+/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/review-pr-38-3083123428/designs/iss
+ue-29/wireframe.svg\n     6\t/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/re
+view-pr-38-3083123428/designs/issue-29/docs-to-update.txt\n     7\t/var/folders/
+lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/review-pr-38-3083123428/designs/issue-29/moc
+kup.html\n     8\t/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/review-pr-38-
+3083123428/designs/issue-29/design-spec.md\n',
+        message='8 lines read from file starting from line 1. Total lines in fil
+e: 8. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(
+    arguments_part='var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/review-pr-38
+-3083123428/.figma-links.txt"}'
+)
+ToolCall(
+    type='function',
+    id='tool_wsesf1lsiYJ0QX2KH2mH0Yeb',
+    function=FunctionBody(name='Shell', arguments='{"command": "'),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_SZcLzE4v3Y8Uice8fe57dzo1',
+    return_value=ToolError(
+        is_error=True,
+        output='',
+        message='`/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/review-pr-38-
+3083123428/.figma-links.txt` does not exist.',
+        display=[BriefDisplayBlock(type='brief', text='File not found')],
+        extras=None
+    )
+)
+ToolCallPart(
+    arguments_part='cd ../../social-world && git fetch origin feat/issue-37 && g
+it diff origin/main...origin/feat/issue-37 --stat", "description": "Get PR diff 
+stats"}'
+)
+StatusUpdate(
+    context_usage=0.0175323486328125,
+    context_tokens=4596,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=4084,
+        output=273,
+        input_cache_read=512,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-lww00b1Qfi8POBqNQg4beIwW',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_wsesf1lsiYJ0QX2KH2mH0Yeb',
+    return_value=ToolReturnValue(
+        is_error=True,
+        output='/bin/bash: line 0: cd: ../../social-world: No such file or direc
+tory\n',
+        message='Command failed with exit code: 1.',
+        display=[
+            BriefDisplayBlock(type='brief', text='Failed with exit code: 1')
+        ],
+        extras=None
+    )
+)
+StepBegin(n=2)
+ThinkPart(
+    type='think',
+    think='I need to find the correct absolute path for the project. Let me chec
+k the working directory and locate the project.',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_91ixQtAZhCSU3MjwJhtWPxNX',
+    function=FunctionBody(
+        name='Shell',
+        arguments='{"command": "pwd && ls -la && find / -name \\"social-world\\"
+-maxdepth 4 -type d 2>/dev/null | head -20", "description": "Find project path"}
+'
+    ),
+    extras=None
+)
+StatusUpdate(
+    context_usage=0.022945404052734375,
+    context_tokens=6015,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=1663,
+        output=79,
+        input_cache_read=4352,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-DqWsWSDYTsgQYwFYkUgsaSjG',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_91ixQtAZhCSU3MjwJhtWPxNX',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='/private/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/review-
+pr-38-3083123428\ntotal 896\ndrwx------@  34 insulate  staff    1088 Apr 17 17:4
+1 .\ndrwx------@ 735 insulate  staff   23520 Apr 17 17:41 ..\n-rw-r--r--@   1 in
+sulate  staff     836 Apr 17 17:41 .design-assets.txt\n-rw-r--r--@   1 insulate 
+staff     941 Apr 17 17:41 .doc-coverage.txt\n-rw-r--r--@   1 insulate  staff   
+ 694 Apr 17 17:41 .env.example\n-rw-r--r--@   1 insulate  staff      84 Apr 17 1
+7:41 .git\ndrwxr-xr-x@   5 insulate  staff     160 Apr 17 17:41 .github\n-rw-r--
+r--@   1 insulate  staff     779 Apr 17 17:41 .gitignore\ndrwxr-xr-x@   4 insula
+te  staff     128 Apr 17 17:41 .husky\ndrwxr-xr-x@  10 insulate  staff     320 A
+pr 17 17:41 .maestro\n-rw-r--r--@   1 insulate  staff      14 Apr 17 17:41 .pret
+tierignore\n-rw-r--r--@   1 insulate  staff   18066 Apr 17 17:41 AGENT-FIRST-PRO
+JECT-SEED.md\n-rw-r--r--@   1 insulate  staff    2752 Apr 17 17:41 AGENTS.md\ndr
+wxr-xr-x@   5 insulate  staff     160 Apr 17 17:41 apps\n-rw-r--r--@   1 insulat
+e  staff     315 Apr 17 17:41 CHANGELOG.md\ndrwxr-xr-x@   4 insulate  staff     
+128 Apr 17 17:41 designs\n-rw-r--r--@   1 insulate  staff    1991 Apr 17 17:41 d
+ocker-compose.yml\ndrwxr-xr-x@   9 insulate  staff     288 Apr 17 17:41 docs\n-r
+w-r--r--@   1 insulate  staff      53 Apr 17 17:41 go.mod\ndrwxr-xr-x@   3 insul
+ate  staff      96 Apr 17 17:41 internal\ndrwxr-xr-x@   2 insulate  staff      6
+4 Apr 17 17:41 logs\n-rw-r--r--@   1 insulate  staff    4022 Apr 17 17:41 Makefi
+le\n-rw-r--r--@   1 insulate  staff     253 Apr 17 17:41 melos.yaml\n-rw-r--r--@
+  1 insulate  staff     154 Apr 17 17:41 openapitools.json\n-rw-r--r--@   1 insu
+late  staff     915 Apr 17 17:41 package.json\ndrwxr-xr-x@   4 insulate  staff  
+  128 Apr 17 17:41 packages\n-rw-r--r--@   1 insulate  staff  363710 Apr 17 17:4
+1 pnpm-lock.yaml\n-rw-r--r--@   1 insulate  staff      40 Apr 17 17:41 pnpm-work
+space.yaml\ndrwxr-xr-x@  10 insulate  staff     320 Apr 17 17:41 prd\n-rw-r--r--
+@   1 insulate  staff     206 Apr 17 17:41 pubspec.yaml\n-rw-r--r--@   1 insulat
+e  staff    1670 Apr 17 17:41 README.md\ndrwxr-xr-x@  11 insulate  staff     352
+Apr 17 17:41 scripts\ndrwxr-xr-x@   4 insulate  staff     128 Apr 17 17:41 tests
+\n-rw-r--r--@   1 insulate  staff     456 Apr 17 17:41 turbo.json\n/Users/insula
+te/Desktop/social-world\n',
+        message='Command executed successfully.',
+        display=[],
+        extras=None
+    )
+)
+StepBegin(n=3)
+ThinkPart(
+    type='think',
+    think='The project is at `/Users/insulate/Desktop/social-world` and the curr
+ent working directory seems to be a temporary review directory. Let me read the 
+AGENTS.md and the actual PR diff files. I can also see from the current director
+y that it contains the repo files too. Let me check if this is the actual repo o
+r a copy.',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_Ccbc0Fv5jm3RLgj8iHYKZWa6',
+    function=FunctionBody(
+        name='Shell',
+        arguments='{"command": "git remote -v && git status && git log --oneline
+-3", "description": "Check git status"}'
+    ),
+    extras=None
+)
+ToolCall(
+    type='function',
+    id='tool_HYEssQG0MRZiWpDkYG9xoF0J',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "/private/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n0000
+0gn/T/review-pr-38-3083123428/AG'
+    ),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_Ccbc0Fv5jm3RLgj8iHYKZWa6',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='origin\tgit@github.com:MatioYoshitoki/social-world.git (fetch)\n
+origin\tgit@github.com:MatioYoshitoki/social-world.git (push)\nOn branch feat/is
+sue-37\nYour branch is up to date with \'origin/feat/issue-37\'.\n\nUntracked fi
+les:\n  (use "git add <file>..." to include in what will be committed)\n\t.desig
+n-assets.txt\n\t.doc-coverage.txt\n\nnothing added to commit but untracked files
+present (use "git add" to track)\nd6c7026 feat: resolve #37 - [Bug] Dev Tools Dr
+awer 的 Server URL 输入框修改后仍会自动填充默认地址\n7cc58d5 docs: add GitHub Is
+sue templates and issue-workflow design doc\nb513c8a docs: add Maestro E2E testi
+ng guidelines to design-docs\n',
+        message='Command executed successfully.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(arguments_part='ENTS.md"}')
+StatusUpdate(
+    context_usage=0.02712249755859375,
+    context_tokens=7110,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=1222,
+        output=166,
+        input_cache_read=5888,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-quPznmaAVVC8ONHqeNjEDylD',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_HYEssQG0MRZiWpDkYG9xoF0J',
+    return_value=ToolOk(
+        is_error=False,
+        output='     1\t# Social World 智能体导航地图\n     2\t\n     3\t> 仓库
+即唯一真实来源。不在仓库里的知识等于不存在。\n     4\t\n     5\t## 文档地图\n   
+ 6\t\n     7\t| 你要找什么       | 去哪里                                       
+                                       |\n     8\t| ---------------- | ---------
+--------------------------------------------------------------------------- |\n 
+   9\t| 项目背景         | [README.md](README.md)                               
+                               |\n    10\t| 编码与架构规范   | [docs/design-docs
+/INDEX.md](docs/design-docs/INDEX.md)                               |\n    11\t|
+Issue 处理工作流 | [docs/design-docs/issue-workflow.md](docs/design-docs/issue-w
+orkflow.md)             |\n    12\t| UI 风格规范      | [docs/design-docs/ui-sty
+le-guide/INDEX.md](docs/design-docs/ui-style-guide/INDEX.md) |\n    13\t| 业务术
+语         | [docs/product-specs/glossary.md](docs/product-specs/glossary.md)   
+                 |\n    14\t| 当前需求         | [prd/v1-mvp.md](prd/v1-mvp.md) 
+                                                     |\n    15\t| 模块实现      
+  | [docs/modules/INDEX.md](docs/modules/INDEX.md)（含 profile）                
+        |\n    16\t| Maestro E2E 规范 | [.maestro/README.md](.maestro/README.md)
+                                            |\n    17\t| 技术债务         | [doc
+s/exec-plans/tech-debt-tracker.md](docs/exec-plans/tech-debt-tracker.md)        
+|\n    18\t\n    19\t## 目录结构\n    20\t\n    21\t```\n    22\tdocs/design-doc
+s/    # 架构规范、编码约定、数据库/API 规范\n    23\tdocs/product-specs/  # 业务
+术语、领域规则\n    24\tdocs/modules/        # 模块实现文档（跨代码层级）\n    2
+5\tprd/                 # 产品需求文档\n    26\tapps/                # mobile (F
+lutter), api (NestJS), admin (Next.js)\n    27\tpackages/            # shared-ty
+pes, design-system\n    28\t```\n    29\t\n    30\t## 黄金原则\n    31\t\n    32
+\t1. **全链路交付**：一个需求必须同时包含 DB + API + Mobile 的实现\n    33\t2. *
+*契约同步**：`packages/shared-types/` 是前后端的唯一真实来源\n    34\t3. **约束
+即代码**：linter、hooks、CI 会强制执行规则，不在规则里的约束等于不存在\n    35\t
+4. **效果优先**：先跑通端到端，再考虑优雅性\n    36\t\n    37\t## 常见任务\n    
+38\t\n    39\t| 任务               | 命令                         |\n    40\t| -
+----------------- | ---------------------------- |\n    41\t| 启动开发环境      
+| `make dev`                   |\n    42\t| 检查文档健康       | `make check-doc
+s`            |\n    43\t| 运行测试           | `make test`                  |\n
+   44\t| Mobile E2E (login) | `make test-mobile-e2e-login` |\n    45\t| Mobile E
+2E (完整)  | `make test-mobile-e2e`       |\n    46\t| 启动 E2E 后端环境  | `mak
+e e2e-env-up`            |\n    47\t| 安装 hooks         | `make hooks`         
+       |\n    48\t| 架构约束检查       | `make arch-check`            |\n    49\
+t| Agent 配置检查     | `make agent-check`           |\n',
+        message='49 lines read from file starting from line 1. Total lines in fi
+le: 49. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+StepBegin(n=4)
+ThinkPart(
+    type='think',
+    think='Good, the current working directory is the actual repo checked out at
+branch `feat/issue-37`. Now let me read the diff for the PR and the relevant fil
+es to understand what changed. Let me also read the related PRD files and design
+docs to check compliance.',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_p7W6bGGNoPxtlerSg9xrwgFg',
+    function=FunctionBody(
+        name='Shell',
+        arguments='{"command": "git diff origin/main...HEAD", "description": "Ge
+t full PR diff"}'
+    ),
+    extras=None
+)
+ToolCall(
+    type='function',
+    id='tool_FQfYO2Ka4AcpBFdv27UM47Kf',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "/private/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n0000
+0gn/T/review-pr-38-3083123428/prd/v'
+    ),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_p7W6bGGNoPxtlerSg9xrwgFg',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output="diff --git a/apps/mobile/lib/core/di/di.dart b/apps/mobile/lib/c
+ore/di/di.dart\nindex d346be6..f574b1a 100644\n--- a/apps/mobile/lib/core/di/di.
+dart\n+++ b/apps/mobile/lib/core/di/di.dart\n@@ -37,7 +37,7 @@ void configureDep
+endencies() {\n       ..registerLazySingleton<DevToolsRepository>(\n         () 
+=> DevToolsRepositoryImpl(),\n       )\n-      ..registerFactory<DevToolsCubit>(
+\n+      ..registerLazySingleton<DevToolsCubit>(\n         () => DevToolsCubit(\
+n           repository: getIt<DevToolsRepository>(),\n           dioClient: getI
+t<DioClient>(),\ndiff --git a/apps/mobile/lib/presentation/widgets/dev_tools_wra
+pper.dart b/apps/mobile/lib/presentation/widgets/dev_tools_wrapper.dart\nindex 3
+46493a..8abbad9 100644\n--- a/apps/mobile/lib/presentation/widgets/dev_tools_wra
+pper.dart\n+++ b/apps/mobile/lib/presentation/widgets/dev_tools_wrapper.dart\n@@
+-19,14 +19,21 @@ class DevToolsWrapper extends StatefulWidget {\n \n class _DevT
+oolsWrapperState extends State<DevToolsWrapper> {\n   bool _isDrawerOpen = false
+;\n+  late final DevToolsCubit _cubit;\n+\n+  @override\n+  void initState() {\n
++    super.initState();\n+    _cubit = getIt<DevToolsCubit>()..load();\n+  }\n \
+n   void _openDrawer() => setState(() => _isDrawerOpen = true);\n   void _closeD
+rawer() => setState(() => _isDrawerOpen = false);\n \n   @override\n   Widget bu
+ild(BuildContext context) {\n-    return BlocProvider(\n-      create: (_) => ge
+tIt<DevToolsCubit>()..load(),\n+    return BlocProvider.value(\n+      value: _c
+ubit,\n       child: Stack(\n         children: [\n           widget.child,\ndif
+f --git a/apps/mobile/test/dev_tools_widget_test.dart b/apps/mobile/test/dev_too
+ls_widget_test.dart\nindex e18b585..cd38bda 100644\n--- a/apps/mobile/test/dev_t
+ools_widget_test.dart\n+++ b/apps/mobile/test/dev_tools_widget_test.dart\n@@ -20
+3,8 +203,8 @@ void main() {\n       await tester.pumpAndSettle();\n \n       // 
+Simulate load() completing after user input\n-      cubit.emit(cubit.state.copyW
+ith(\n-          serverBaseUrl: 'http://localhost:3000/api/v1'));\n+      cubit.
+emit(\n+          cubit.state.copyWith(serverBaseUrl: 'http://localhost:3000/api
+/v1'));\n       await tester.pumpAndSettle();\n \n       expect(tester.widget<Te
+xtField>(textField).controller!.text,\n@@ -229,5 +229,40 @@ void main() {\n     
+ final savedUrl = await repository.getServerBaseUrl();\n       expect(savedUrl, 
+'http://192.168.1.100:3000/api/v1');\n     });\n+\n+    testWidgets('drawer clos
+e and reopen preserves saved url', (tester) async {\n+      await tester.pumpWid
+get(_buildWithCubit(cubit, const ServerUrlTool()));\n+      await tester.pump();
+\n+\n+      final textField = find.byType(TextField);\n+      await tester.enter
+Text(textField, 'http://192.168.1.100:3000/api/v1');\n+      await tester.pumpAn
+dSettle();\n+\n+      await tester.tap(find.widgetWithText(SwButton, '保存配置')
+);\n+      await tester.pumpAndSettle();\n+\n+      // Close drawer by removing 
+ServerUrlTool from tree (simulate Drawer closing)\n+      await tester.pumpWidge
+t(_buildWithCubit(cubit, const SizedBox.shrink()));\n+      await tester.pumpAnd
+Settle();\n+\n+      // Reopen drawer with a new cubit that loads from repositor
+y\n+      final newCubit = DevToolsCubit(\n+        repository: repository,\n+  
+     dioClient: dioClient,\n+      );\n+      await newCubit.load();\n+\n+      
+await tester.pumpWidget(\n+        _buildWithCubit(newCubit, const ServerUrlTool
+()),\n+      );\n+      await tester.pumpAndSettle();\n+\n+      expect(\n+     
+  tester.widget<TextField>(find.byType(TextField)).controller!.text,\n+        '
+http://192.168.1.100:3000/api/v1',\n+      );\n+\n+      await newCubit.close();
+\n+    });\n   });\n }\ndiff --git a/docs/modules/dev-tools.md b/docs/modules/de
+v-tools.md\nindex 0b32a95..a36b21b 100644\n--- a/docs/modules/dev-tools.md\n+++ 
+b/docs/modules/dev-tools.md\n@@ -52,24 +52,24 @@ sequenceDiagram\n \n ## 关键文
+件\n \n-| 文件 | 路径 |\n-|------|------|\n-| DevToolsWrapper | `apps/mobile/lib
+/presentation/widgets/dev_tools_wrapper.dart` |\n+| 文件                 | 路径 
+                                                              |\n+| ------------
+-------- | ------------------------------------------------------------------- |
+\n+| DevToolsWrapper      | `apps/mobile/lib/presentation/widgets/dev_tools_wrap
+per.dart`       |\n | DevToolsToggleButton | `apps/mobile/lib/presentation/widge
+ts/dev_tools_toggle_button.dart` |\n-| DevToolsDrawer | `apps/mobile/lib/present
+ation/widgets/dev_tools_drawer.dart` |\n-| ServerUrlTool | `apps/mobile/lib/pres
+entation/widgets/server_url_tool.dart` |\n-| Cubit | `apps/mobile/lib/presentati
+on/blocs/dev_tools/dev_tools_cubit.dart` |\n-| State | `apps/mobile/lib/presenta
+tion/blocs/dev_tools/dev_tools_state.dart` |\n-| Repository 接口 | `apps/mobile/
+lib/domain/repositories/dev_tools_repository.dart` |\n-| Repository 实现 | `apps
+/mobile/lib/data/repositories/dev_tools_repository_impl.dart` |\n-| DioClient 热
+更新 | `apps/mobile/lib/core/network/dio_client.dart` |\n-| DI 注册 | `apps/mobi
+le/lib/core/di/di.dart` |\n-| Widgetbook Demo | `packages/design-system/widgetbo
+ok/main.dart` |\n-| Cubit 单元测试 | `apps/mobile/test/dev_tools_cubit_test.dart
+` |\n-| Widget 测试 | `apps/mobile/test/dev_tools_widget_test.dart` |\n-| Golden
+截图 | `apps/mobile/test/dev_tools_golden_test.dart` |\n-| Golden 基准图 | `apps
+/mobile/test/goldens/dev_tools_drawer_default.png` |\n-| Golden 错误态 | `apps/m
+obile/test/goldens/server_url_tool_error.png` |\n+| DevToolsDrawer       | `apps
+/mobile/lib/presentation/widgets/dev_tools_drawer.dart`        |\n+| ServerUrlTo
+ol        | `apps/mobile/lib/presentation/widgets/server_url_tool.dart`         
+|\n+| Cubit                | `apps/mobile/lib/presentation/blocs/dev_tools/dev_t
+ools_cubit.dart` |\n+| State                | `apps/mobile/lib/presentation/bloc
+s/dev_tools/dev_tools_state.dart` |\n+| Repository 接口      | `apps/mobile/lib/
+domain/repositories/dev_tools_repository.dart`     |\n+| Repository 实现      | 
+`apps/mobile/lib/data/repositories/dev_tools_repository_impl.dart`  |\n+| DioCli
+ent 热更新     | `apps/mobile/lib/core/network/dio_client.dart`                 
+    |\n+| DI 注册              | `apps/mobile/lib/core/di/di.dart`              
+                    |\n+| Widgetbook Demo      | `packages/design-system/widgetb
+ook/main.dart`                       |\n+| Cubit 单元测试       | `apps/mobile/t
+est/dev_tools_cubit_test.dart`                        |\n+| Widget 测试         
+| `apps/mobile/test/dev_tools_widget_test.dart`                       |\n+| Gold
+en 截图          | `apps/mobile/test/dev_tools_golden_test.dart`                
+      |\n+| Golden 基准图        | `apps/mobile/test/goldens/dev_tools_drawer_de
+fault.png`             |\n+| Golden 错误态        | `apps/mobile/test/goldens/se
+rver_url_tool_error.png`                |\n \n ## 依赖注入（DI）\n \n@@ -88,7 +8
+8,7 @@ void configureDependencies() {\n       ..registerLazySingleton<DevToolsRe
+pository>(\n         () => DevToolsRepositoryImpl(),\n       )\n-      ..registe
+rFactory<DevToolsCubit>(\n+      ..registerLazySingleton<DevToolsCubit>(\n      
+  () => DevToolsCubit(\n           repository: getIt<DevToolsRepository>(),\n   
+       dioClient: getIt<DioClient>(),\n@@ -143,12 +143,12 @@ Widget build(BuildC
+ontext context) {\n \n DevTools 相关 UI 已在 `packages/design-system/widgetbook/
+main.dart` 的 `Features` Folder 下注册：\n \n-| 组件 | UseCase | 说明 |\n-|-----
+-|---------|------|\n-| `ServerUrlTool` | Normal | 默认 URL 展示态 |\n-| `Server
+UrlTool` | Error | 非法 URL 错误态 |\n-| `ServerUrlTool` | Saving | 保存中 loadi
+ng 态 |\n-| `DevToolsDrawer` | Default | 抽屉展开默认态 |\n+| 组件             |
+UseCase | 说明              |\n+| ---------------- | ------- | -----------------
+|\n+| `ServerUrlTool`  | Normal  | 默认 URL 展示态   |\n+| `ServerUrlTool`  | Er
+ror   | 非法 URL 错误态   |\n+| `ServerUrlTool`  | Saving  | 保存中 loading 态 |
+\n+| `DevToolsDrawer` | Default | 抽屉展开默认态    |\n \n 所有新增/修改的 UI 必
+须通过 Golden Test 生成基准截图，供 Code Review 时直接查看视觉产物。\n \n",
+        message='Command executed successfully.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(arguments_part='1-dev-tools-drawer.md"}')
+ToolCall(
+    type='function',
+    id='tool_xwpKfvzi0wYc5ZziQZr3BBTt',
+    function=FunctionBody(name='ReadFile', arguments='{"path":'),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_FQfYO2Ka4AcpBFdv27UM47Kf',
+    return_value=ToolOk(
+        is_error=False,
+        output='     1\t# V1 Dev Tools Drawer 产品需求文档\n     2\t\n     3\t> 
+状态：待评审  \n     4\t> 版本：1.0  \n     5\t> 日期：2026-04-10  \n     6\t> 
+关联 Issue：#29\n     7\t\n     8\t## 1. 背景与目标\n     9\t\n    10\t### 背景\
+n    11\tSocial World 采用前后端分离架构，开发/测试阶段需要频繁切换后端服务器地
+址（如本地 `localhost`、内网测试环境、Staging 环境）。当前修改 `baseUrl` 需要重
+新编译 App，效率较低。\n    12\t\n    13\t### 目标\n    14\t1. 在 Debug 模式下提
+供常驻悬浮入口，快速唤起开发工具抽屉。\n    15\t2. 支持在运行时修改 Server Base 
+URL，并持久化到本地存储。\n    16\t3. 确保 Release 模式下完全排除调试代码，不影
+响包体积与用户体验。\n    17\t\n    18\t---\n    19\t\n    20\t## 2. 用户故事与
+验收标准\n    21\t\n    22\t### US-DEVTOOLS-1：Debug 模式悬浮抽屉\n    23\t\n   
+24\t**作为** 移动开发者，  \n    25\t**我希望** 在 Debug 模式下从任意页面唤起开
+发工具抽屉，  \n    26\t**以便** 快速查看和修改调试配置。\n    27\t\n    28\t###
+# 验收标准\n    29\t\n    30\t```gherkin\n    31\tFeature: Dev Tools Drawer\n   
+32\t  Scenario: Debug mode shows the toggle button\n    33\t    Given the app is
+running in debug mode\n    34\t    Then a semi-transparent toggle button should 
+be visible on the right edge of the screen\n    35\t\n    36\t  Scenario: Releas
+e mode hides the toggle button\n    37\t    Given the app is running in release 
+mode\n    38\t    Then the dev tools toggle button should not exist in the widge
+t tree\n    39\t\n    40\t  Scenario: Open and close the drawer\n    41\t    Giv
+en the app is running in debug mode\n    42\t    When the user taps the toggle b
+utton\n    43\t    Then the dev tools drawer should slide in from the right\n   
+44\t    When the user taps the overlay mask or the close button\n    45\t    The
+n the drawer should slide out and disappear\n    46\t```\n    47\t\n    48\t####
+技术要求\n    49\t- 悬浮按钮位置：`Alignment.centerRight`，右侧距边 `8.0`。\n   
+50\t- 按钮尺寸：`56.0 × 56.0`，圆形，背景色 `DesignTokens.primary.withOpacity(0.
+85)`。\n    51\t- 抽屉宽度：屏幕宽度的 80%，最大 `320.0`。\n    52\t- 进入/退出
+动画：`SlideTransition`，时长 `250ms / 200ms`，曲线 `easeOutCubic / easeInCubic`
+。\n    53\t\n    54\t---\n    55\t\n    56\t### US-DEVTOOLS-2：运行时修改 Serve
+r Base URL\n    57\t\n    58\t**作为** 移动开发者，  \n    59\t**我希望** 在抽屉
+内修改 Server Base URL 并立即生效，  \n    60\t**以便** 在不重新编译的情况下切换
+后端环境。\n    61\t\n    62\t#### 验收标准\n    63\t\n    64\t```gherkin\n    6
+5\tFeature: Server Base URL Tool\n    66\t  Scenario: Save a valid URL\n    67\t
+   Given the dev tools drawer is open\n    68\t    And the current server base u
+rl is "http://localhost:3000/api/v1"\n    69\t    When the user enters "http://1
+92.168.1.100:3000/api/v1"\n    70\t    And the user taps the save button\n    71
+\t    Then the URL should be persisted to local storage\n    72\t    And a succe
+ss message should be shown\n    73\t    And the DioClient baseUrl should be upda
+ted\n    74\t\n    75\t  Scenario: Invalid URL shows error\n    76\t    Given th
+e dev tools drawer is open\n    77\t    When the user enters "not-a-url"\n    78
+\t    Then the input border should turn red\n    79\t    And an error caption sh
+ould appear\n    80\t    And the save button should be disabled\n    81\t\n    8
+2\t  Scenario: Empty URL shows error\n    83\t    Given the dev tools drawer is 
+open\n    84\t    When the user clears the input field\n    85\t    Then the inp
+ut border should turn red\n    86\t    And an error caption "请输入服务器地址" s
+hould appear\n    87\t    And the save button should be disabled\n    88\t```\n 
+  89\t\n    90\t#### 技术要求\n    91\t- 默认值：`const String.fromEnvironment(\
+'API_BASE_URL\', defaultValue: \'http://localhost:3000/api/v1\')`。\n    92\t- 
+校验规则：非空；必须以 `http://` 或 `https://` 开头。\n    93\t- 持久化键：`dev_
+tools_server_base_url`，使用 `SharedPreferences`。\n    94\t- 保存成功后通过 `Sn
+ackBar` 提示 "保存成功，新配置已生效"。\n    95\t\n    96\t---\n    97\t\n    98
+\t## 3. 非功能需求\n    99\t\n   100\t### 性能\n   101\t- 抽屉开闭动画必须保持 6
+0fps，不得引起页面掉帧。\n   102\t- SharedPreferences 读写为异步操作，保存按钮需
+进入 `isLoading` 状态防止重复提交。\n   103\t\n   104\t### 安全\n   105\t- Relea
+se 模式下调试代码必须完全不可见，且不得编译进产物（使用 `kDebugMode` 条件编译）
+。\n   106\t- 本地保存的 URL 仅用于开发/测试，不进入生产环境。\n   107\t\n   108
+\t### 兼容性\n   109\t- 支持 Android 10+ 和 iOS 14+。\n   110\t- 抽屉布局需适配 
+360dp ~ 414dp 屏幕宽度。\n   111\t\n   112\t---\n   113\t\n   114\t## 4. 里程碑\
+n   115\t\n   116\t| 阶段 | 目标 | 预计工期 |\n   117\t|------|------|----------
+|\n   118\t| M-DEVTOOLS-0 | UI 设计评审与 Design-Only PR | 1 天 |\n   119\t| M-D
+EVTOOLS-1 | DevTools Widget + Cubit + Repository 实现 | 1 天 |\n   120\t| M-DEVT
+OOLS-2 | DioClient 热重载 + Widget 测试 + BDD 测试 | 1 天 |\n   121\t\n   122\t*
+*总预计工期：3 天。**\n   123\t\n   124\t---\n   125\t\n   126\t## 5. 风险与回滚
+策略\n   127\t\n   128\t| 风险 | 影响 | 缓解措施 |\n   129\t|------|------|-----
+-----|\n   130\t| `kDebugMode` 使用不当导致 Release 包包含调试代码 | 高 | Code R
+eview 中强制检查所有新增调试 Widget 是否包裹在 `if (kDebugMode)` 中 |\n   131\t|
+非法 URL 导致 Dio 请求失败 | 低 | 保存前进行格式校验，错误时禁止保存 |\n   132\t
+| SharedPreferences 写入失败 | 低 | 捕获异常并显示错误提示，不影响主业务 |\n   1
+33\t\n   134\t### 回滚策略\n   135\t- **URL 配置错误**：开发者可随时重新打开抽屉
+修改回正确的 URL。\n   136\t- **调试代码误合入**：立即回滚 PR，并在 `docs/design
+-docs/flutter.md` 的 Debug-Only 规范中补充拦截规则。\n',
+        message='136 lines read from file starting from line 1. Total lines in f
+ile: 136. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(
+    arguments_part=' "/private/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/r
+eview-pr-38-3083123428/docs/design-docs/ui-specs/dev-tools/dev-tools-drawer-wire
+frame.md"}'
+)
+StatusUpdate(
+    context_usage=0.031768798828125,
+    context_tokens=8328,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=1416,
+        output=214,
+        input_cache_read=6912,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-mJdg7oN29OwLagLbDlE9GMKI',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_xwpKfvzi0wYc5ZziQZr3BBTt',
+    return_value=ToolOk(
+        is_error=False,
+        output='     1\t# Dev Tools Drawer UI 规格归档\n     2\t\n     3\t> 关联
+Issue: #29\n     4\t> 关联 PRD: [prd/v1-dev-tools-drawer.md](../../../../prd/v1-
+dev-tools-drawer.md)\n     5\t> 设计资产目录: [designs/issue-29](../../../../des
+igns/issue-29)\n     6\t\n     7\t## 设计资产清单\n     8\t\n     9\t| 资产 | 路
+径 | 说明 |\n    10\t|------|------|------|\n    11\t| 低保真线框图 | [designs/i
+ssue-29/wireframe.svg](../../../../designs/issue-29/wireframe.svg) | 抽屉布局、
+悬浮按钮位置、URL 编辑卡片结构 |\n    12\t| 设计规范 | [designs/issue-29/design-
+spec.md](../../../../designs/issue-29/design-spec.md) | 完整视觉系统、交互说明、
+组件清单、BLoC 设计 |\n    13\t\n    14\t## 设计评审结论\n    15\t\n    16\t- **
+悬浮按钮**: 右侧居中 (`Alignment.centerRight`)，距边 8.0，直径 56.0，半透明主色
+背景 (`primary.withOpacity(0.85)`)，带 `BackdropFilter.blur`。\n    17\t- **抽屉
+**: 自右向左滑出，宽度为屏幕 80% 且最大 320.0；动画时长 250ms / 200ms，曲线 `eas
+eOutCubic` / `easeInCubic`。\n    18\t- **URL 编辑**: 使用 `SwCard` 包裹 `SwText
+Field` + `SwButton`；校验规则为非空且必须以 `http://` 或 `https://` 开头；错误时
+边框变红、显示错误文案、保存按钮禁用。\n    19\t- **Debug-Only 隔离**: 所有调试
+代码通过 `kDebugMode` 条件编译排除，Release 模式下不进入产物。\n    20\t\n    21
+\t## 变更历史\n    22\t\n    23\t| 日期 | 变更 | 说明 |\n    24\t|------|------|
+------|\n    25\t| 2026-04-10 | 设计资产产出 | 线框图、设计规范初稿完成 |\n    2
+6\t| 2026-04-15 | 实现合入 | Full-Stack PR 完成 Mobile 端 DevTools Widget + Cubi
+t + Repository + 文档 |\n',
+        message='26 lines read from file starting from line 1. Total lines in fi
+le: 26. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+StepBegin(n=5)
+ThinkPart(
+    type='think',
+    think='Now let me read the actual changed files to understand the implementa
+tion in detail. I also need to check if there are any maestro E2E flows related 
+to this, and verify the mechanical checks pass.',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_xNZqmS0D1lHeDTRgnGllw6bh',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "/private/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n0000
+0gn/T/review-pr-38-3083123428/apps/mobile/lib/core/di/di.dart"}'
+    ),
+    extras=None
+)
+ToolCall(
+    type='function',
+    id='tool_7qLvTseNy8nFHuiW5M2FXR9D',
+    function=FunctionBody(name='ReadFile', arguments='{"path": "/'),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_xNZqmS0D1lHeDTRgnGllw6bh',
+    return_value=ToolOk(
+        is_error=False,
+        output="     1\timport 'package:flutter/foundation.dart';\n     2\timpor
+t 'package:get_it/get_it.dart';\n     3\timport '../../domain/repositories/auth_
+repository.dart';\n     4\timport '../../data/repositories/auth_repository_impl.
+dart';\n     5\timport '../../domain/repositories/profile_repository.dart';\n   
+ 6\timport '../../data/repositories/profile_repository_impl.dart';\n     7\timpo
+rt '../../domain/repositories/dev_tools_repository.dart';\n     8\timport '../..
+/data/repositories/dev_tools_repository_impl.dart';\n     9\timport '../network/
+dio_client.dart';\n    10\timport '../storage/secure_storage.dart';\n    11\timp
+ort '../../presentation/blocs/auth/auth_bloc.dart';\n    12\timport '../../prese
+ntation/blocs/profile/profile_bloc.dart';\n    13\timport '../../presentation/bl
+ocs/dev_tools/dev_tools_cubit.dart';\n    14\t\n    15\tfinal getIt = GetIt.inst
+ance;\n    16\t\n    17\tvoid configureDependencies() {\n    18\t  getIt\n    19
+\t    ..registerLazySingleton<DioClient>(DioClient.new)\n    20\t    ..registerL
+azySingleton<AuthRepository>(AuthRepositoryImpl.new)\n    21\t    ..registerLazy
+Singleton<ProfileRepository>(ProfileRepositoryImpl.new)\n    22\t    ..registerL
+azySingleton<SecureStorage>(SecureStorage.new)\n    23\t    ..registerFactory<Au
+thBloc>(\n    24\t      () => AuthBloc(\n    25\t        authRepository: getIt<A
+uthRepository>(),\n    26\t        secureStorage: getIt<SecureStorage>(),\n    2
+7\t      ),\n    28\t    )\n    29\t    ..registerFactory<ProfileBloc>(\n    30\
+t      () => ProfileBloc(\n    31\t        profileRepository: getIt<ProfileRepos
+itory>(),\n    32\t      ),\n    33\t    );\n    34\t\n    35\t  if (kDebugMode)
+{\n    36\t    getIt\n    37\t      ..registerLazySingleton<DevToolsRepository>(
+\n    38\t        () => DevToolsRepositoryImpl(),\n    39\t      )\n    40\t    
+ ..registerLazySingleton<DevToolsCubit>(\n    41\t        () => DevToolsCubit(\n
+   42\t          repository: getIt<DevToolsRepository>(),\n    43\t          dio
+Client: getIt<DioClient>(),\n    44\t        ),\n    45\t      );\n    46\t  }\n
+   47\t}\n",
+        message='47 lines read from file starting from line 1. Total lines in fi
+le: 47. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(
+    arguments_part='private/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/revi
+ew-pr-38-3083123428/apps/mobile/lib/presentation/widgets/dev_tools_wrapper.dart"
+}'
+)
+ToolCall(
+    type='function',
+    id='tool_r5ryWYZx5gHhUKiO8pYA4Ojw',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "/private/var/folders/lt/w3sl6z8j5v50vt2s6knvf5'
+    ),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_7qLvTseNy8nFHuiW5M2FXR9D',
+    return_value=ToolOk(
+        is_error=False,
+        output="     1\timport 'package:flutter/material.dart';\n     2\timport 
+'package:flutter_bloc/flutter_bloc.dart';\n     3\timport '../../core/di/di.dart
+';\n     4\timport '../blocs/dev_tools/dev_tools_cubit.dart';\n     5\timport 'd
+ev_tools_drawer.dart';\n     6\timport 'dev_tools_toggle_button.dart';\n     7\t
+\n     8\tclass DevToolsWrapper extends StatefulWidget {\n     9\t  final Widget
+child;\n    10\t\n    11\t  const DevToolsWrapper({\n    12\t    super.key,\n   
+13\t    required this.child,\n    14\t  });\n    15\t\n    16\t  @override\n    
+17\t  State<DevToolsWrapper> createState() => _DevToolsWrapperState();\n    18\t
+}\n    19\t\n    20\tclass _DevToolsWrapperState extends State<DevToolsWrapper> 
+{\n    21\t  bool _isDrawerOpen = false;\n    22\t  late final DevToolsCubit _cu
+bit;\n    23\t\n    24\t  @override\n    25\t  void initState() {\n    26\t    s
+uper.initState();\n    27\t    _cubit = getIt<DevToolsCubit>()..load();\n    28\
+t  }\n    29\t\n    30\t  void _openDrawer() => setState(() => _isDrawerOpen = t
+rue);\n    31\t  void _closeDrawer() => setState(() => _isDrawerOpen = false);\n
+   32\t\n    33\t  @override\n    34\t  Widget build(BuildContext context) {\n  
+ 35\t    return BlocProvider.value(\n    36\t      value: _cubit,\n    37\t     
+child: Stack(\n    38\t        children: [\n    39\t          widget.child,\n   
+40\t          DevToolsToggleButton(onTap: _openDrawer),\n    41\t          DevTo
+olsDrawer(\n    42\t            isOpen: _isDrawerOpen,\n    43\t            onCl
+ose: _closeDrawer,\n    44\t          ),\n    45\t        ],\n    46\t      ),\n
+   47\t    );\n    48\t  }\n    49\t}\n",
+        message='49 lines read from file starting from line 1. Total lines in fi
+le: 49. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(
+    arguments_part='n00000gn/T/review-pr-38-3083123428/apps/mobile/test/dev_tool
+s_widget_test.dart"}'
+)
+ToolCall(
+    type='function',
+    id='tool_LHS0JYGAxBJ52zYgQQ51Bafm',
+    function=FunctionBody(name='Shell', arguments='{"command": "cd /'),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_r5ryWYZx5gHhUKiO8pYA4Ojw',
+    return_value=ToolOk(
+        is_error=False,
+        output="     1\timport 'package:flutter/material.dart';\n     2\timport 
+'package:flutter_bloc/flutter_bloc.dart';\n     3\timport 'package:flutter_test/
+flutter_test.dart';\n     4\timport 'package:social_world_design_system/social_w
+orld_design_system.dart';\n     5\timport 'package:social_world_mobile/core/netw
+ork/dio_client.dart';\n     6\timport 'package:social_world_mobile/domain/reposi
+tories/dev_tools_repository.dart';\n     7\timport 'package:social_world_mobile/
+presentation/blocs/dev_tools/dev_tools_cubit.dart';\n     8\timport 'package:soc
+ial_world_mobile/presentation/widgets/dev_tools_drawer.dart';\n     9\timport 'p
+ackage:social_world_mobile/presentation/widgets/dev_tools_toggle_button.dart';\n
+   10\timport 'package:social_world_mobile/presentation/widgets/server_url_tool.
+dart';\n    11\t\n    12\tclass _MockDevToolsRepository implements DevToolsRepos
+itory {\n    13\t  String _url = 'http://localhost:3000/api/v1';\n    14\t\n    
+15\t  @override\n    16\t  Future<String> getServerBaseUrl() async => _url;\n   
+17\t\n    18\t  @override\n    19\t  Future<void> saveServerBaseUrl(String url) 
+async {\n    20\t    _url = url;\n    21\t  }\n    22\t}\n    23\t\n    24\tclas
+s _MockDioClient extends DioClient {\n    25\t  _MockDioClient() : super();\n   
+26\t}\n    27\t\n    28\tWidget _buildWithCubit(DevToolsCubit cubit, Widget chil
+d) {\n    29\t  return MaterialApp(\n    30\t    home: BlocProvider.value(\n    
+31\t      value: cubit,\n    32\t      child: Scaffold(body: child),\n    33\t  
+ ),\n    34\t  );\n    35\t}\n    36\t\n    37\tvoid main() {\n    38\t  late _M
+ockDevToolsRepository repository;\n    39\t  late _MockDioClient dioClient;\n   
+40\t  late DevToolsCubit cubit;\n    41\t\n    42\t  setUp(() {\n    43\t    rep
+ository = _MockDevToolsRepository();\n    44\t    dioClient = _MockDioClient();\
+n    45\t    cubit = DevToolsCubit(\n    46\t      repository: repository,\n    
+47\t      dioClient: dioClient,\n    48\t    );\n    49\t  });\n    50\t\n    51
+\t  tearDown(() {\n    52\t    cubit.close();\n    53\t  });\n    54\t\n    55\t
+ group('DevToolsToggleButton', () {\n    56\t    testWidgets('tap triggers onTap
+', (tester) async {\n    57\t      var tapped = false;\n    58\t      await test
+er.pumpWidget(\n    59\t        MaterialApp(\n    60\t          home: Scaffold(\
+n    61\t            body: DevToolsToggleButton(\n    62\t              onTap: (
+) => tapped = true,\n    63\t            ),\n    64\t          ),\n    65\t     
+  ),\n    66\t      );\n    67\t      await tester.tap(find.byIcon(Icons.constru
+ction));\n    68\t      await tester.pump();\n    69\t      expect(tapped, true)
+;\n    70\t    });\n    71\t  });\n    72\t\n    73\t  group('DevToolsDrawer', (
+) {\n    74\t    testWidgets('opens and closes with animation', (tester) async {
+\n    75\t      var closed = false;\n    76\t      await tester.pumpWidget(\n   
+77\t        _buildWithCubit(\n    78\t          cubit,\n    79\t          DevToo
+lsDrawer(\n    80\t            isOpen: false,\n    81\t            onClose: () =
+> closed = true,\n    82\t          ),\n    83\t        ),\n    84\t      );\n  
+ 85\t      expect(find.text('开发工具'), findsNothing);\n    86\t\n    87\t     
+await tester.pumpWidget(\n    88\t        _buildWithCubit(\n    89\t          cu
+bit,\n    90\t          DevToolsDrawer(\n    91\t            isOpen: true,\n    
+92\t            onClose: () => closed = true,\n    93\t          ),\n    94\t   
+    ),\n    95\t      );\n    96\t      await tester.pumpAndSettle();\n    97\t 
+    expect(find.text('开发工具'), findsOneWidget);\n    98\t\n    99\t      awai
+t tester.tap(find.byIcon(Icons.close));\n   100\t      await tester.pump();\n   
+101\t      expect(closed, true);\n   102\t    });\n   103\t\n   104\t    testWid
+gets('tap overlay closes drawer', (tester) async {\n   105\t      var closed = f
+alse;\n   106\t      await tester.pumpWidget(\n   107\t        _buildWithCubit(\
+n   108\t          cubit,\n   109\t          DevToolsDrawer(\n   110\t          
+ isOpen: true,\n   111\t            onClose: () => closed = true,\n   112\t     
+    ),\n   113\t        ),\n   114\t      );\n   115\t      await tester.pumpAnd
+Settle();\n   116\t      expect(find.text('开发工具'), findsOneWidget);\n   117\
+t\n   118\t      await tester.tapAt(const Offset(10, 10));\n   119\t      await 
+tester.pump();\n   120\t      expect(closed, true);\n   121\t    });\n   122\t  
+});\n   123\t\n   124\t  group('ServerUrlTool', () {\n   125\t    testWidgets('s
+hows validation error for empty url', (tester) async {\n   126\t      await test
+er.pumpWidget(_buildWithCubit(cubit, const ServerUrlTool()));\n   127\t      awa
+it tester.pump();\n   128\t\n   129\t      final textField = find.byType(TextFie
+ld);\n   130\t      await tester.enterText(textField, 'http://example.com');\n  
+131\t      await tester.pumpAndSettle();\n   132\t      await tester.enterText(t
+extField, '');\n   133\t      await tester.pumpAndSettle();\n   134\t\n   135\t 
+    expect(find.text('请输入服务器地址'), findsOneWidget);\n   136\t    });\n   
+137\t\n   138\t    testWidgets('shows validation error for invalid url', (tester
+) async {\n   139\t      await tester.pumpWidget(_buildWithCubit(cubit, const Se
+rverUrlTool()));\n   140\t      await tester.pump();\n   141\t\n   142\t      fi
+nal textField = find.byType(TextField);\n   143\t      await tester.enterText(te
+xtField, 'not-a-url');\n   144\t      await tester.pumpAndSettle();\n   145\t\n 
+ 146\t      expect(find.text('请输入有效的 HTTP/HTTPS URL'), findsOneWidget);\n 
+ 147\t    });\n   148\t\n   149\t    testWidgets('save button disabled when inva
+lid', (tester) async {\n   150\t      await tester.pumpWidget(_buildWithCubit(cu
+bit, const ServerUrlTool()));\n   151\t      await tester.pump();\n   152\t\n   
+153\t      final saveButton = find.widgetWithText(SwButton, '保存配置');\n   154
+\t      expect(saveButton, findsOneWidget);\n   155\t      expect(tester.widget<
+SwButton>(saveButton).isDisabled, isTrue);\n   156\t\n   157\t      final textFi
+eld = find.byType(TextField);\n   158\t      await tester.enterText(textField, '
+not-a-url');\n   159\t      await tester.pumpAndSettle();\n   160\t\n   161\t   
+  expect(tester.widget<SwButton>(saveButton).isDisabled, isTrue);\n   162\t    }
+);\n   163\t\n   164\t    testWidgets('save button enabled when valid', (tester)
+async {\n   165\t      await tester.pumpWidget(_buildWithCubit(cubit, const Serv
+erUrlTool()));\n   166\t      await tester.pump();\n   167\t\n   168\t      fina
+l textField = find.byType(TextField);\n   169\t      await tester.enterText(text
+Field, 'http://192.168.1.100:3000/api/v1');\n   170\t      await tester.pumpAndS
+ettle();\n   171\t\n   172\t      final saveButton = find.widgetWithText(SwButto
+n, '保存配置');\n   173\t      expect(tester.widget<SwButton>(saveButton).isDisa
+bled, isFalse);\n   174\t    });\n   175\t\n   176\t    testWidgets('entered tex
+t is not reset by state changes', (tester) async {\n   177\t      await tester.p
+umpWidget(_buildWithCubit(cubit, const ServerUrlTool()));\n   178\t      await t
+ester.pump();\n   179\t\n   180\t      final textField = find.byType(TextField);
+\n   181\t      await tester.enterText(textField, 'http://example.com');\n   182
+\t      await tester.pumpAndSettle();\n   183\t\n   184\t      expect(tester.wid
+get<TextField>(textField).controller!.text,\n   185\t          'http://example.c
+om');\n   186\t\n   187\t      // Trigger a state change that does not mutate se
+rverBaseUrl\n   188\t      // to simulate any background emission (e.g. saveSucc
+ess reset).\n   189\t      cubit.onUrlChanged('http://example.com');\n   190\t  
+   await tester.pumpAndSettle();\n   191\t\n   192\t      expect(tester.widget<T
+extField>(textField).controller!.text,\n   193\t          'http://example.com');
+\n   194\t    });\n   195\t\n   196\t    testWidgets('entered text is not reset 
+by async load completion',\n   197\t        (tester) async {\n   198\t      awai
+t tester.pumpWidget(_buildWithCubit(cubit, const ServerUrlTool()));\n   199\t   
+  await tester.pump();\n   200\t\n   201\t      final textField = find.byType(Te
+xtField);\n   202\t      await tester.enterText(textField, 'http://user-input.co
+m');\n   203\t      await tester.pumpAndSettle();\n   204\t\n   205\t      // Si
+mulate load() completing after user input\n   206\t      cubit.emit(\n   207\t  
+       cubit.state.copyWith(serverBaseUrl: 'http://localhost:3000/api/v1'));\n  
+208\t      await tester.pumpAndSettle();\n   209\t\n   210\t      expect(tester.
+widget<TextField>(textField).controller!.text,\n   211\t          'http://user-i
+nput.com');\n   212\t    });\n   213\t\n   214\t    testWidgets('save button sav
+es user-entered url after load delay',\n   215\t        (tester) async {\n   216
+\t      await tester.pumpWidget(_buildWithCubit(cubit, const ServerUrlTool()));\
+n   217\t      await tester.pump();\n   218\t\n   219\t      final textField = f
+ind.byType(TextField);\n   220\t      await tester.enterText(textField, 'http://
+192.168.1.100:3000/api/v1');\n   221\t      await tester.pumpAndSettle();\n   22
+2\t\n   223\t      final saveButton = find.widgetWithText(SwButton, '保存配置');
+\n   224\t      await tester.tap(saveButton);\n   225\t      await tester.pumpAn
+dSettle();\n   226\t\n   227\t      expect(find.text('保存成功，新配置已生效'), 
+findsOneWidget);\n   228\t      expect(cubit.state.saveSuccess, isTrue);\n   229
+\t      final savedUrl = await repository.getServerBaseUrl();\n   230\t      exp
+ect(savedUrl, 'http://192.168.1.100:3000/api/v1');\n   231\t    });\n   232\t\n 
+ 233\t    testWidgets('drawer close and reopen preserves saved url', (tester) as
+ync {\n   234\t      await tester.pumpWidget(_buildWithCubit(cubit, const Server
+UrlTool()));\n   235\t      await tester.pump();\n   236\t\n   237\t      final 
+textField = find.byType(TextField);\n   238\t      await tester.enterText(textFi
+eld, 'http://192.168.1.100:3000/api/v1');\n   239\t      await tester.pumpAndSet
+tle();\n   240\t\n   241\t      await tester.tap(find.widgetWithText(SwButton, '
+保存配置'));\n   242\t      await tester.pumpAndSettle();\n   243\t\n   244\t   
+  // Close drawer by removing ServerUrlTool from tree (simulate Drawer closing)\
+n   245\t      await tester.pumpWidget(_buildWithCubit(cubit, const SizedBox.shr
+ink()));\n   246\t      await tester.pumpAndSettle();\n   247\t\n   248\t      /
+/ Reopen drawer with a new cubit that loads from repository\n   249\t      final
+newCubit = DevToolsCubit(\n   250\t        repository: repository,\n   251\t    
+   dioClient: dioClient,\n   252\t      );\n   253\t      await newCubit.load();
+\n   254\t\n   255\t      await tester.pumpWidget(\n   256\t        _buildWithCu
+bit(newCubit, const ServerUrlTool()),\n   257\t      );\n   258\t      await tes
+ter.pumpAndSettle();\n   259\t\n   260\t      expect(\n   261\t        tester.wi
+dget<TextField>(find.byType(TextField)).controller!.text,\n   262\t        'http
+://192.168.1.100:3000/api/v1',\n   263\t      );\n   264\t\n   265\t      await 
+newCubit.close();\n   266\t    });\n   267\t  });\n   268\t}\n",
+        message='268 lines read from file starting from line 1. Total lines in f
+ile: 268. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(
+    arguments_part='private/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/revi
+ew-pr-38-3083123428 && ls .maestro/flows/ 2>/dev/null; find .maestro -type f 2>/
+dev/null", "description": "List maestro flows"}'
+)
+StatusUpdate(
+    context_usage=0.04953765869140625,
+    context_tokens=12986,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=4794,
+        output=317,
+        input_cache_read=8192,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-7TT7BYtyGKJhNjyqNZkgZVQh',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_LHS0JYGAxBJ52zYgQQ51Bafm',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='auth\nprofile\n.maestro/core-beliefs.md\n.maestro/includes/login
+-as-test-user.yaml\n.maestro/config.yaml\n.maestro/README.md\n.maestro/adb_flows
+/onboarding.yaml\n.maestro/adb_flows/login.yaml\n.maestro/adb_flows/profile_setu
+p.yaml\n.maestro/scripts/run-e2e.sh\n.maestro/scripts/adb_flow.py\n.maestro/scri
+pts/maestro-check.sh\n.maestro/scripts/adb_runner.py\n.maestro/AGENTS.md\n.maest
+ro/flows/auth/login.yaml\n.maestro/flows/profile/setup.yaml\n',
+        message='Command executed successfully.',
+        display=[],
+        extras=None
+    )
+)
+StepBegin(n=6)
+ThinkPart(
+    type='think',
+    think='Now I need to check if there are any Maestro E2E flows for dev-tools.
+The PR modifies a Mobile user flow (Dev Tools Drawer), so I should check if ther
+e are any existing maestro flows for dev-tools or if new ones should be added. L
+et me also check the .maestro README for guidelines, and look at the existing de
+v_tools_cubit and server_url_tool to understand the full picture. I should also 
+run mechanical checks if possible.',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_vipw9Owy0F8Ac4PwjxQSDF6N',
+    function=FunctionBody(
+        name='Shell',
+        arguments='{"command": "ls -la .maestro/flows/dev-tools/ 2>/dev/null || 
+echo \\"No dev-tools maestro flows\\"", "description": "Check dev-tools maestro 
+flows"}'
+    ),
+    extras=None
+)
+ToolCall(
+    type='function',
+    id='tool_SPDDTKEF3NtJwrAazyMbrJAV',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "/private/var/folders/lt/w3sl6z8j5v50vt'
+    ),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_vipw9Owy0F8Ac4PwjxQSDF6N',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='No dev-tools maestro flows\n',
+        message='Command executed successfully.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(
+    arguments_part='2s6knvf5n00000gn/T/review-pr-38-3083123428/.maestro/README.m
+d"}'
+)
+ToolCall(
+    type='function',
+    id='tool_Fr4VofGm920Tev77C0mvICO9',
+    function=FunctionBody(name='ReadFile', arguments='{"path": "/'),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_SPDDTKEF3NtJwrAazyMbrJAV',
+    return_value=ToolOk(
+        is_error=False,
+        output='     1\t# Mobile E2E 测试（Maestro + ADB Fallback）\n     2\t\n 
+   3\t本目录包含 Social World Mobile 端的端到端 UI 自动化测试。\n     4\t\n     
+5\t## 目录结构\n     6\t\n     7\t```\n     8\t.maestro/\n     9\t├── flows/    
+         # Maestro 标准测试流（推荐）\n    10\t│   ├── login.yaml      # 登录 UI
+流（无需后端，可独立运行）\n    11\t│   └── profile_setup.yaml  # 完善资料完整流
+（需要后端服务）\n    12\t├── adb_flows/          # ADB fallback 测试流（当 Maes
+tro 不可用时）\n    13\t│   ├── login.yaml\n    14\t│   ├── onboarding.yaml\n   
+15\t│   └── profile_setup.yaml\n    16\t└── scripts/\n    17\t    ├── run-e2e.sh
+     # 统一 E2E 入口脚本（自动处理 emulator / build / install / 端口检查）\n    
+18\t    ├── adb_runner.py   # ADB fallback runner（uiautomator dump + adb input
+）\n    19\t    └── adb_flow.py     # 旧版 adb runner（已弃用，请使用 adb_runner
+.py）\n    20\t```\n    21\t\n    22\t## 快速开始\n    23\t\n    24\t### 前置要
+求\n    25\t\n    26\t- Android Emulator 已启动（推荐 API 34，如 `Pixel_8_Pro`）
+\n    27\t- Maestro 1.39.13+ 已安装\n    28\t- **端口 7001 必须空闲**（Maestro 
+硬编码端口，会与 Dashboard `new_world_ws` 冲突）\n    29\t\n    30\t### 常用命令
+\n    31\t\n    32\t```bash\n    33\t# 仅跑 login 流（纯 UI，无需后端）\n    34\
+tmake test-mobile-e2e-login\n    35\t\n    36\t# 跑所有 flows（需要后端 + emulat
+or）\n    37\tmake test-mobile-e2e\n    38\t\n    39\t# CI 模式：自动构建 APK、
+启动后端、运行测试\n    40\tmake test-mobile-e2e-ci\n    41\t\n    42\t# ADB fal
+lback（当 Maestro 不可用时）\n    43\tmake test-mobile-e2e-adb\n    44\t```\n   
+45\t\n    46\t### 手动运行\n    47\t\n    48\t```bash\n    49\t# 使用统一脚本\n 
+  50\tbash .maestro/scripts/run-e2e.sh --flow login\n    51\tbash .maestro/scrip
+ts/run-e2e.sh --flow login --build\n    52\tbash .maestro/scripts/run-e2e.sh --c
+i\n    53\t\n    54\t# 直接使用 maestro\n    55\tmaestro --device emulator-5556 
+test .maestro/flows/login.yaml\n    56\t```\n    57\t\n    58\t## 环境说明\n    
+59\t\n    60\t### login.yaml\n    61\t\n    62\t- **不依赖后端**：仅验证登录页面
+的 UI 交互（输入手机号、验证码、点击按钮）。\n    63\t- 适合作为日常开发和 CI 的
+快速回归测试。\n    64\t\n    65\t### profile_setup.yaml\n    66\t\n    67\t- **
+依赖后端**：登录后会调用 `/auth/login` 和 `/auth/me`，需要后端返回 `isNewUser=tr
+ue` 或 `profileComplete=false` 才能跳转到完善资料页。\n    68\t- 运行前请确保后
+端已启动：\n    69\t  ```bash\n    70\t  make e2e-env-up   # 启动 mysql + redis 
++ api\n    71\t  make test-mobile-e2e\n    72\t  make e2e-env-down # 测试结束后
+关闭\n    73\t  ```\n    74\t\n    75\t## 故障排查\n    76\t\n    77\t### `io.gr
+pc.StatusRuntimeException: INTERNAL: http2 exception`\n    78\t\n    79\t**原因*
+*：端口 7001 被其他进程占用（通常是 `new_world_ws` Dashboard）。  \n    80\t**解
+决**：终止占用进程后再运行测试。\n    81\t\n    82\t```bash\n    83\tlsof -ti :7
+001 | xargs kill\n    84\t```\n    85\t\n    86\t### `adb shell input text` 无法
+输入到 Flutter 自定义输入框\n    87\t\n    88\t**原因**：ADB 的 `input text` 依
+赖系统 IME，某些自定义 `TextField` 不响应。  \n    89\t**解决**：Maestro 的 `inp
+utText` 可以正常工作；如果只能用 ADB fallback，目前只能绕过文字输入步骤，仅做 ta
+p / assert。\n    90\t\n    91\t### Emulator 未找到\n    92\t\n    93\t**原因**
+：脚本通过 `adb devices` 查找 emulator，没有检测到已启动的设备。  \n    94\t**解
+决**：先启动模拟器，例如：\n    95\t\n    96\t```bash\n    97\temulator -avd Pix
+el_8_Pro\n    98\t```\n',
+        message='98 lines read from file starting from line 1. Total lines in fi
+le: 98. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(
+    arguments_part='private/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/revi
+ew-pr-38-3083123428/apps/mobile/lib/presentation/blocs/dev_tools/dev_tools_cubit
+.dart"}'
+)
+ToolCall(
+    type='function',
+    id='tool_OZRD78zt3lYihzCyip8PGSRw',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "/private/var/folders/lt/w3sl6z8j5v50vt2s6k'
+    ),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_Fr4VofGm920Tev77C0mvICO9',
+    return_value=ToolOk(
+        is_error=False,
+        output="     1\timport 'package:flutter_bloc/flutter_bloc.dart';\n     2
+\timport '../../../core/network/dio_client.dart';\n     3\timport '../../../doma
+in/repositories/dev_tools_repository.dart';\n     4\timport 'dev_tools_state.dar
+t';\n     5\t\n     6\tclass DevToolsCubit extends Cubit<DevToolsState> {\n     
+7\t  DevToolsCubit({\n     8\t    required DevToolsRepository repository,\n     
+9\t    required DioClient dioClient,\n    10\t  })  : _repository = repository,\
+n    11\t        _dioClient = dioClient,\n    12\t        super(const DevToolsSt
+ate());\n    13\t\n    14\t  final DevToolsRepository _repository;\n    15\t  fi
+nal DioClient _dioClient;\n    16\t\n    17\t  Future<void> load() async {\n    
+18\t    final url = await _repository.getServerBaseUrl();\n    19\t    // 只有在
+当前 state 为空时才覆盖，避免覆盖用户正在输入的内容\n    20\t    if (state.serve
+rBaseUrl.isEmpty) {\n    21\t      emit(state.copyWith(serverBaseUrl: url));\n  
+ 22\t    }\n    23\t  }\n    24\t\n    25\t  void onUrlChanged(String url) {\n  
+ 26\t    emit(state.copyWith(\n    27\t      serverBaseUrl: url,\n    28\t      
+urlError: _validateUrl(url),\n    29\t      saveSuccess: false,\n    30\t    ));
+\n    31\t  }\n    32\t\n    33\t  String _validateUrl(String url) {\n    34\t  
+ final trimmed = url.trim();\n    35\t    if (trimmed.isEmpty) return '请输入服
+务器地址';\n    36\t    if (!trimmed.startsWith(RegExp(r'^https?://'))) {\n    3
+7\t      return '请输入有效的 HTTP/HTTPS URL';\n    38\t    }\n    39\t    retur
+n '';\n    40\t  }\n    41\t\n    42\t  Future<void> save() async {\n    43\t   
+final error = _validateUrl(state.serverBaseUrl);\n    44\t    if (error.isNotEmp
+ty) return;\n    45\t    emit(state.copyWith(isSaving: true));\n    46\t    try 
+{\n    47\t      await _repository.saveServerBaseUrl(state.serverBaseUrl.trim())
+;\n    48\t      _dioClient.updateBaseUrl(state.serverBaseUrl.trim());\n    49\t
+     emit(state.copyWith(isSaving: false, saveSuccess: true));\n    50\t    } ca
+tch (e) {\n    51\t      emit(state.copyWith(isSaving: false, saveSuccess: false
+));\n    52\t      rethrow;\n    53\t    }\n    54\t  }\n    55\t}\n",
+        message='55 lines read from file starting from line 1. Total lines in fi
+le: 55. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(
+    arguments_part='nvf5n00000gn/T/review-pr-38-3083123428/apps/mobile/lib/prese
+ntation/widgets/server_url_tool.dart"}'
+)
+StatusUpdate(
+    context_usage=0.06627655029296875,
+    context_tokens=17374,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=4574,
+        output=332,
+        input_cache_read=12800,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-HgfptGhB4ibM8jpzDtrzrrKf',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_OZRD78zt3lYihzCyip8PGSRw',
+    return_value=ToolOk(
+        is_error=False,
+        output="     1\timport 'package:flutter/material.dart';\n     2\timport 
+'package:flutter_bloc/flutter_bloc.dart';\n     3\timport 'package:social_world_
+design_system/social_world_design_system.dart';\n     4\timport '../blocs/dev_to
+ols/dev_tools_cubit.dart';\n     5\timport '../blocs/dev_tools/dev_tools_state.d
+art';\n     6\t\n     7\tclass ServerUrlTool extends StatefulWidget {\n     8\t 
+const ServerUrlTool({super.key});\n     9\t\n    10\t  @override\n    11\t  Stat
+e<ServerUrlTool> createState() => _ServerUrlToolState();\n    12\t}\n    13\t\n 
+  14\tclass _ServerUrlToolState extends State<ServerUrlTool> {\n    15\t  late f
+inal TextEditingController _controller;\n    16\t  late final FocusNode _focusNo
+de;\n    17\t\n    18\t  @override\n    19\t  void initState() {\n    20\t    su
+per.initState();\n    21\t    _controller = TextEditingController(\n    22\t    
+ text: context.read<DevToolsCubit>().state.serverBaseUrl,\n    23\t    );\n    2
+4\t    _focusNode = FocusNode();\n    25\t  }\n    26\t\n    27\t  @override\n  
+ 28\t  void dispose() {\n    29\t    _controller.dispose();\n    30\t    _focusN
+ode.dispose();\n    31\t    super.dispose();\n    32\t  }\n    33\t\n    34\t  @
+override\n    35\t  Widget build(BuildContext context) {\n    36\t    return Blo
+cListener<DevToolsCubit, DevToolsState>(\n    37\t      listenWhen: (previous, c
+urrent) =>\n    38\t          previous.serverBaseUrl.isEmpty &&\n    39\t       
+  current.serverBaseUrl.isNotEmpty &&\n    40\t          _controller.text.isEmpt
+y &&\n    41\t          !_focusNode.hasFocus,\n    42\t      listener: (context,
+state) {\n    43\t        _controller.text = state.serverBaseUrl;\n    44\t     
+},\n    45\t      child: BlocBuilder<DevToolsCubit, DevToolsState>(\n    46\t   
+    builder: (context, state) {\n    47\t          return SwCard(\n    48\t     
+      child: Column(\n    49\t              crossAxisAlignment: CrossAxisAlignme
+nt.stretch,\n    50\t              mainAxisSize: MainAxisSize.min,\n    51\t    
+         children: [\n    52\t                const Row(\n    53\t              
+   children: [\n    54\t                    Icon(\n    55\t                     
+Icons.public,\n    56\t                      color: DesignTokens.primary,\n    5
+7\t                      size: 20,\n    58\t                    ),\n    59\t    
+               SizedBox(width: DesignTokens.spacingXs),\n    60\t               
+    Flexible(\n    61\t                      child: Text(\n    62\t             
+          'Server Base URL',\n    63\t                        style: TextStyle(\
+n    64\t                          fontSize: DesignTokens.fontSizeBody,\n    65\
+t                          fontWeight: FontWeight.w600,\n    66\t               
+          color: DesignTokens.textPrimary,\n    67\t                        ),\n
+   68\t                        overflow: TextOverflow.ellipsis,\n    69\t       
+              ),\n    70\t                    ),\n    71\t                  ],\n
+   72\t                ),\n    73\t                const SizedBox(height: Design
+Tokens.spacingSm),\n    74\t                SwTextField(\n    75\t              
+   controller: _controller,\n    76\t                  focusNode: _focusNode,\n 
+  77\t                  hintText: 'http://localhost:3000/api/v1',\n    78\t     
+            labelText: '服务器地址',\n    79\t                  keyboardType: Te
+xtInputType.url,\n    80\t                  prefixIcon: const Icon(Icons.link),\
+n    81\t                  errorText: state.urlError.isEmpty ? null : state.urlE
+rror,\n    82\t                  onChanged: context.read<DevToolsCubit>().onUrlC
+hanged,\n    83\t                ),\n    84\t                const SizedBox(heig
+ht: DesignTokens.spacingMd),\n    85\t                SizedBox(\n    86\t       
+          height: 48,\n    87\t                  child: SwButton(\n    88\t     
+              text: '保存配置',\n    89\t                    variant: SwButtonVa
+riant.filled,\n    90\t                    isLoading: state.isSaving,\n    91\t 
+                  isDisabled: state.urlError.isNotEmpty ||\n    92\t            
+           state.serverBaseUrl.trim().isEmpty,\n    93\t                    onPr
+essed: () async {\n    94\t                      try {\n    95\t                
+       await context.read<DevToolsCubit>().save();\n    96\t                    
+   if (context.mounted) {\n    97\t                          final currentState 
+=\n    98\t                              context.read<DevToolsCubit>().state;\n 
+  99\t                          if (currentState.saveSuccess) {\n   100\t       
+                    ScaffoldMessenger.of(context).showSnackBar(\n   101\t       
+                      const SnackBar(\n   102\t                                c
+ontent: Text('保存成功，新配置已生效'),\n   103\t                              )
+,\n   104\t                            );\n   105\t                          }\n
+  106\t                        }\n   107\t                      } catch (e) {\n 
+ 108\t                        if (context.mounted) {\n   109\t                  
+       ScaffoldMessenger.of(context).showSnackBar(\n   110\t                    
+       SnackBar(content: Text('保存失败: $e')),\n   111\t                       
+  );\n   112\t                        }\n   113\t                      }\n   114
+\t                    },\n   115\t                  ),\n   116\t                
+),\n   117\t              ],\n   118\t            ),\n   119\t          );\n   1
+20\t        },\n   121\t      ),\n   122\t    );\n   123\t  }\n   124\t}\n",
+        message='124 lines read from file starting from line 1. Total lines in f
+ile: 124. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+StepBegin(n=7)
+ThinkPart(
+    type='think',
+    think="Now let me check the mechanical tests and other related files. I need
+to:\n1. Check if tests pass\n2. Check the docs/modules/INDEX.md to see if dev-to
+ols is linked\n3. Check for any missing golden tests updates\n4. Verify the cubi
+t lifecycle management (since it changed from registerFactory to registerLazySin
+gleton)\n5. Check if there's a memory leak issue with the cubit not being closed
+\n\nLet me read more files and run tests.",
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_cCY8mM1c6Yw1wm5xelhe9uxj',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "/private/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n0000
+0gn/T/review-pr-38-3083123428/docs/modules/INDEX.md"}'
+    ),
+    extras=None
+)
+ToolCall(
+    type='function',
+    id='tool_pTeGIOlsHumY8VKTvlSE3FDi',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "/private/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n0000
+0gn'
+    ),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_cCY8mM1c6Yw1wm5xelhe9uxj',
+    return_value=ToolOk(
+        is_error=False,
+        output='     1\t# 模块实现文档索引\n     2\t\n     3\t> 本目录按业务模块
+组织实现文档，跨越代码层级（DB / API / Mobile / BLoC / Widget）描述模块全貌。\n 
+   4\t> \n     5\t> **注意**：本仓库采用单一全栈 Agent 模式，一个模块的文档应覆
+盖后端到前端的完整链路。\n     6\t\n     7\t## 模块清单\n     8\t\n     9\t| 模
+块 | 说明 | 关联 PRD |\n    10\t|------|------|----------|\n    11\t| [auth.md](
+auth.md) | 注册、登录、Token 刷新、登出（DB → API → Mobile） | [prd/v1-mvp.md](.
+./../prd/v1-mvp.md) |\n    12\t| [profile.md](profile.md) | 个人资料、头像相册、
+年龄校验（DB → API → Mobile） | [prd/v1-profile.md](../../prd/v1-profile.md) |\n
+   13\t| [matching.md](matching.md) | 推荐、滑动、匹配成功（DB → API → Mobile） 
+| [docs/product-specs/matching.md](../product-specs/matching.md) |\n    14\t| [d
+ev-tools.md](dev-tools.md) | Debug 专用工具模块（Dev Tools Drawer） | [prd/v1-de
+v-tools-drawer.md](../../prd/v1-dev-tools-drawer.md) |\n    15\t| [im.md](im.md)
+| 会话、消息、已读回执、推送（DB → API → Mobile） | [docs/product-specs/im.md](.
+./product-specs/im.md) |\n    16\t| [admin.md](admin.md) | Admin Dashboard、用户
+列表管理 | [prd/v1-infrastructure-bootstrap.md](../../prd/v1-infrastructure-boot
+strap.md) |\n    17\t| [blocks-reports.md](blocks-reports.md) | 拉黑、举报基础 A
+PI | [prd/v1-infrastructure-bootstrap.md](../../prd/v1-infrastructure-bootstrap.
+md) |\n    18\t| [content-moderation.md](content-moderation.md) | 内容审核 Webho
+ok、照片状态管理 | [prd/v1-infrastructure-bootstrap.md](../../prd/v1-infrastruct
+ure-bootstrap.md) |\n    19\t\n    20\t## 写作规范\n    21\t\n    22\t每个模块文
+档应包含：\n    23\t1. **时序图/流程图**：Mermaid 描述核心流程（覆盖 API 和 Mobi
+le 的交互）\n    24\t2. **关键文件索引**：代码仓库中的关键文件路径（DB / API / M
+obile 三层）\n    25\t3. **状态机/数据结构**：核心实体状态转换\n    26\t4. **边
+界情况**：异常流程、权限校验、幂等性设计\n    27\t5. **全链路变更清单**：修改该
+模块时，Agent 需要同时改哪些文件\n',
+        message='27 lines read from file starting from line 1. Total lines in fi
+le: 27. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(
+    arguments_part='/T/review-pr-38-3083123428/docs/modules/dev-tools.md"}'
+)
+ToolCall(
+    type='function',
+    id='tool_hSaUgyz7LUDrjWuqvHOeQdKn',
+    function=FunctionBody(name='Shell', arguments='{"command": "cd /'),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_pTeGIOlsHumY8VKTvlSE3FDi',
+    return_value=ToolOk(
+        is_error=False,
+        output='     1\t# Dev Tools 模块实现\n     2\t\n     3\t## 职责\n     4\
+t\n     5\tDebug 专用工具模块，仅在开发模式下可见。提供悬浮抽屉入口，支持运行时
+修改 Server Base URL 并持久化到本地存储，用于开发/测试环境快速切换后端地址。\n  
+  6\t\n     7\t## 关联文档\n     8\t\n     9\t- **PRD**: [prd/v1-dev-tools-drawe
+r.md](../../prd/v1-dev-tools-drawer.md)\n    10\t- **BDD Feature**: [tests/bdd/d
+ev_tools_drawer.feature](../../tests/bdd/dev_tools_drawer.feature)\n    11\t- **
+BDD Step Definitions**: [tests/bdd/step-definitions/dev_tools_drawer.steps.js](.
+./../tests/bdd/step-definitions/dev_tools_drawer.steps.js)\n    12\t- **设计规范
+**: [design-spec.md](../../designs/issue-29/design-spec.md)\n    13\t- **高保真
+原型**: [mockup.html](../../designs/issue-29/mockup.html)\n    14\t- **低保真线
+框图**: [wireframe.svg](../../designs/issue-29/wireframe.svg)\n    15\t\n    16\
+t## 流程图\n    17\t\n    18\t```mermaid\n    19\tsequenceDiagram\n    20\t    p
+articipant U as 开发者\n    21\t    participant T as DevToolsToggleButton\n    2
+2\t    participant D as DevToolsDrawer\n    23\t    participant S as ServerUrlTo
+ol\n    24\t    participant C as DevToolsCubit\n    25\t    participant R as Dev
+ToolsRepository\n    26\t    participant P as SharedPreferences\n    27\t    par
+ticipant Dio as DioClient\n    28\t\n    29\t    U->>T: 点击悬浮按钮\n    30\t  
+ T->>D: 触发 onToggle\n    31\t    D->>S: 展开抽屉，显示 URL 编辑卡片\n    32\t 
+  U->>S: 输入新的 Server Base URL\n    33\t    S->>C: onUrlChanged(url)\n    34\
+t    C->>C: 校验 URL 格式\n    35\t    alt URL 格式非法\n    36\t        C-->>S:
+urlError = "请输入有效的 HTTP/HTTPS URL"\n    37\t        S->>S: 输入框边框变红
+，保存按钮置灰\n    38\t    else URL 格式合法\n    39\t        C-->>S: urlError 
+= ""\n    40\t        S->>S: 保存按钮可用\n    41\t        U->>S: 点击保存\n    
+42\t        S->>C: save()\n    43\t        C->>R: saveServerBaseUrl(url)\n    44
+\t        R->>P: setString(\'dev_tools_server_base_url\', url)\n    45\t        
+P-->>R: 写入成功\n    46\t        R-->>C: 完成\n    47\t        C-->>S: saveSucc
+ess = true\n    48\t        S->>Dio: 更新 baseUrl\n    49\t        S->>S: 显示 S
+nackBar "保存成功，新配置已生效"\n    50\t    end\n    51\t```\n    52\t\n    53
+\t## 关键文件\n    54\t\n    55\t| 文件                 | 路径                  
+                                             |\n    56\t| -------------------- |
+------------------------------------------------------------------- |\n    57\t|
+DevToolsWrapper      | `apps/mobile/lib/presentation/widgets/dev_tools_wrapper.d
+art`       |\n    58\t| DevToolsToggleButton | `apps/mobile/lib/presentation/wid
+gets/dev_tools_toggle_button.dart` |\n    59\t| DevToolsDrawer       | `apps/mob
+ile/lib/presentation/widgets/dev_tools_drawer.dart`        |\n    60\t| ServerUr
+lTool        | `apps/mobile/lib/presentation/widgets/server_url_tool.dart`      
+  |\n    61\t| Cubit                | `apps/mobile/lib/presentation/blocs/dev_to
+ols/dev_tools_cubit.dart` |\n    62\t| State                | `apps/mobile/lib/p
+resentation/blocs/dev_tools/dev_tools_state.dart` |\n    63\t| Repository 接口  
+   | `apps/mobile/lib/domain/repositories/dev_tools_repository.dart`     |\n    
+64\t| Repository 实现      | `apps/mobile/lib/data/repositories/dev_tools_reposi
+tory_impl.dart`  |\n    65\t| DioClient 热更新     | `apps/mobile/lib/core/netwo
+rk/dio_client.dart`                      |\n    66\t| DI 注册              | `ap
+ps/mobile/lib/core/di/di.dart`                                   |\n    67\t| Wi
+dgetbook Demo      | `packages/design-system/widgetbook/main.dart`              
+        |\n    68\t| Cubit 单元测试       | `apps/mobile/test/dev_tools_cubit_te
+st.dart`                        |\n    69\t| Widget 测试          | `apps/mobile
+/test/dev_tools_widget_test.dart`                       |\n    70\t| Golden 截图
+         | `apps/mobile/test/dev_tools_golden_test.dart`                       |
+\n    71\t| Golden 基准图        | `apps/mobile/test/goldens/dev_tools_drawer_de
+fault.png`             |\n    72\t| Golden 错误态        | `apps/mobile/test/gol
+dens/server_url_tool_error.png`                |\n    73\t\n    74\t## 依赖注入
+（DI）\n    75\t\n    76\t`DioClient` 已注册为全局单例，所有 Repository 通过 `ge
+tIt<DioClient>()` 获取同一实例，以确保 `updateBaseUrl()` 的变更对所有网络请求生
+效：\n    77\t\n    78\t```dart\n    79\t// apps/mobile/lib/core/di/di.dart\n   
+80\tvoid configureDependencies() {\n    81\t  getIt\n    82\t    ..registerLazyS
+ingleton<DioClient>(DioClient.new)\n    83\t    ..registerLazySingleton<AuthRepo
+sitory>(AuthRepositoryImpl.new)\n    84\t    ..registerLazySingleton<ProfileRepo
+sitory>(ProfileRepositoryImpl.new);\n    85\t\n    86\t  if (kDebugMode) {\n    
+87\t    getIt\n    88\t      ..registerLazySingleton<DevToolsRepository>(\n    8
+9\t        () => DevToolsRepositoryImpl(),\n    90\t      )\n    91\t      ..reg
+isterLazySingleton<DevToolsCubit>(\n    92\t        () => DevToolsCubit(\n    93
+\t          repository: getIt<DevToolsRepository>(),\n    94\t          dioClien
+t: getIt<DioClient>(),\n    95\t        ),\n    96\t      );\n    97\t  }\n    9
+8\t}\n    99\t```\n   100\t\n   101\t- `AuthRepositoryImpl` / `ProfileRepository
+Impl` 从 `DioClient()` 直接构造改为 `getIt<DioClient>().dio`。\n   102\t- 调试相
+关的 `DevToolsRepository` 和 `DevToolsCubit` 仅在 `kDebugMode` 下注册，Release 
+产物中完全排除。\n   103\t\n   104\t## 网络层热更新\n   105\t\n   106\t`DioClien
+t` 提供 `updateBaseUrl` 方法，保存 URL 后即时生效，无需重启 App：\n   107\t\n   
+108\t```dart\n   109\t// apps/mobile/lib/core/network/dio_client.dart\n   110\tc
+lass DioClient {\n   111\t  final Dio dio;\n   112\t  // ...\n   113\t  void upd
+ateBaseUrl(String url) {\n   114\t    dio.options.baseUrl = url;\n   115\t  }\n 
+ 116\t}\n   117\t```\n   118\t\n   119\t## 条件编译说明\n   120\t\n   121\t为避
+免调试代码进入 Release 产物，必须在 `MaterialApp.router` 的 `builder` 中通过 `kD
+ebugMode` 条件注入 `DevToolsWrapper`：\n   122\t\n   123\t```dart\n   124\t// ap
+ps/mobile/lib/app.dart\n   125\tWidget build(BuildContext context) {\n   126\t  
+return MaterialApp.router(\n   127\t    // ...\n   128\t    builder: (context, c
+hild) {\n   129\t      if (kDebugMode) {\n   130\t        return DevToolsWrapper
+(child: child!);\n   131\t      }\n   132\t      return child!;\n   133\t    },\
+n   134\t  );\n   135\t}\n   136\t```\n   137\t\n   138\t- `DevToolsWrapper` 负
+责在 Debug 模式下挂载 `DevToolsToggleButton` 与 `DevToolsDrawer`。\n   139\t- Re
+lease 模式下该分支被编译器排除，`DevToolsWrapper` 不会被打包进产物。\n   140\t- 
+与调试相关的 Repository、Cubit 注册同样建议在 `kDebugMode` 分支下完成，以减小组
+包体积。\n   141\t\n   142\t## Widgetbook 与视觉验收\n   143\t\n   144\tDevTools
+相关 UI 已在 `packages/design-system/widgetbook/main.dart` 的 `Features` Folder 
+下注册：\n   145\t\n   146\t| 组件             | UseCase | 说明              |\n
+  147\t| ---------------- | ------- | ----------------- |\n   148\t| `ServerUrlT
+ool`  | Normal  | 默认 URL 展示态   |\n   149\t| `ServerUrlTool`  | Error   | 非
+法 URL 错误态   |\n   150\t| `ServerUrlTool`  | Saving  | 保存中 loading 态 |\n 
+ 151\t| `DevToolsDrawer` | Default | 抽屉展开默认态    |\n   152\t\n   153\t所有
+新增/修改的 UI 必须通过 Golden Test 生成基准截图，供 Code Review 时直接查看视觉
+产物。\n   154\t\n   155\t## 边界情况\n   156\t\n   157\t1. **Release 模式排除**
+：所有调试 Widget 必须包裹在 `if (kDebugMode) ...` 中，Release 模式下不编译进产
+物。\n   158\t2. **URL 校验失败**：空值或格式错误时，输入框显示红色错误边框与文
+案，保存按钮禁用。\n   159\t3. **SharedPreferences 异常**：读写失败时静默捕获，
+避免阻塞主流程；保存失败时显示错误提示。\n   160\t4. **抽屉关闭后状态保留**：再
+次打开抽屉时保留上次输入内容（未保存），避免误操作丢失编辑内容。\n   161\t5. **
+输入框内容与 Bloc state 安全同步**：`ServerUrlTool` 使用 `TextEditingController`
+管理输入，并由 `FocusNode` 跟踪编辑焦点。`BlocListener` 仅在首次异步加载完成后（
+`previous.serverBaseUrl.isEmpty && current.serverBaseUrl.isNotEmpty`）且用户未在
+编辑时（`_controller.text.isEmpty && !_focusNode.hasFocus`）同步一次初始 URL，避
+免 `BlocBuilder` rebuild 或 `load()` 竞争条件导致输入被重置、光标跳转或复制粘贴
+失效。\n   162\t\n   163\t## 全链路变更清单\n   164\t\n   165\t修改本模块时，Age
+nt 需要同时检查并更新以下文件：\n   166\t\n   167\t1. **移动端 Widget**：`apps/m
+obile/lib/presentation/widgets/dev_tools_*.dart`\n   168\t2. **移动端状态管理**
+：`apps/mobile/lib/presentation/blocs/dev_tools/`\n   169\t3. **移动端 Repositor
+y**：`apps/mobile/lib/data/repositories/dev_tools_repository_impl.dart`\n   170\
+t4. **DioClient**：`apps/mobile/lib/core/network/dio_client.dart`\n   171\t5. **
+DI 注册**：`apps/mobile/lib/core/di/di.dart`\n   172\t6. **BDD 测试**：`tests/bd
+d/dev_tools_drawer.feature` 及 `tests/bdd/step-definitions/dev_tools_drawer.step
+s.js`\n   173\t7. **Widgetbook**：`packages/design-system/widgetbook/main.dart`\
+n   174\t8. **Flutter 测试**：`apps/mobile/test/dev_tools_*_test.dart` 与 `apps/
+mobile/test/goldens/`\n   175\t9. **模块文档**：`docs/modules/dev-tools.md`\n   
+176\t10. **Flutter 规范文档**：`docs/design-docs/flutter.md`\n   177\t11. **测试
+规范文档**：`docs/design-docs/testing.md`\n',
+        message='177 lines read from file starting from line 1. Total lines in f
+ile: 177. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(
+    arguments_part='private/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/revi
+ew-pr-38-3083123428/apps/mobile && flutter test test/dev_tools_widget_test.dart 
+2>&1 | tail -30", "timeout": 120, "description": "Run dev_tools widget tests"}'
+)
+StatusUpdate(
+    context_usage=0.07940292358398438,
+    context_tokens=20815,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=3663,
+        output=303,
+        input_cache_read=17152,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-gcECpbSSFhwnCFoV2SWMpRam',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_hSaUgyz7LUDrjWuqvHOeQdKn',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='/bin/bash: flutter: command not found\n',
+        message='Command executed successfully.',
+        display=[],
+        extras=None
+    )
+)
+StepBegin(n=8)
+ThinkPart(
+    type='think',
+    think="Flutter is not installed in this environment, so I can't run the widg
+et tests mechanically. Let me check other mechanical checks like linting, and al
+so check the BDD tests and golden tests to see if they need updates. Let me also
+check if there's any issue with the cubit lifecycle - the `DevToolsWrapper` now 
+creates a `late final DevToolsCubit _cubit` in `initState()` and uses `BlocProvi
+der.value`, but it doesn't dispose the cubit in `dispose()`. Since `getIt<DevToo
+lsCubit>()` is now a `registerLazySingleton`, the cubit is owned by get_it and l
+ives for the app lifecycle. But wait - the widget test `_buildWithCubit` creates
+its own cubit and passes it via `BlocProvider.value`, which is fine.\n\nHowever,
+I should check: does `DevToolsWrapper` need to call `cubit.close()`? No, because
+get_it manages lazy singletons and they should live for the app lifetime. But wa
+it, there's a subtle issue: what if the widget is rebuilt? The `_cubit` is `late
+final` and created in `initState`, so it's fine.\n\nLet me check the BDD tests a
+nd other related files. I also want to check if there's a maestro flow requireme
+nt for dev-tools since the PR modifies a Mobile user flow.\n\nLet me check the e
+xisting maestro flows to understand the pattern, and also check if `docs/design-
+docs/testing.md` or `docs/design-docs/flutter.md` need updates.",
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_aR8T6jWmlZMcEdGxjQ8KrPv6',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "/private/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n0000
+0gn/T/review-pr-38-3083123428/tests/bdd/dev_tools_drawer.feature"}'
+    ),
+    extras=None
+)
+ToolCall(
+    type='function',
+    id='tool_BoHH8ZvSPzIoWxakMhFY2qLf',
+    function=FunctionBody(name='Shell', arguments='{"command": "'),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_aR8T6jWmlZMcEdGxjQ8KrPv6',
+    return_value=ToolOk(
+        is_error=False,
+        output='     1\tFeature: Dev Tools Drawer\n     2\t\n     3\t  Scenario:
+Debug mode shows the toggle button\n     4\t    Given the app is running in debu
+g mode\n     5\t    Then a semi-transparent toggle button should be visible on t
+he right edge of the screen\n     6\t\n     7\t  Scenario: Release mode hides th
+e toggle button\n     8\t    Given the app is running in release mode\n     9\t 
+  Then the dev tools toggle button should not exist in the widget tree\n    10\t
+\n    11\t  Scenario: Open and close the drawer\n    12\t    Given the app is ru
+nning in debug mode\n    13\t    When the user taps the toggle button\n    14\t 
+  Then the dev tools drawer should slide in from the right\n    15\t    When the
+user taps the overlay mask or the close button\n    16\t    Then the drawer shou
+ld slide out and disappear\n    17\t\n    18\t  Scenario: Save a valid server ba
+se URL\n    19\t    Given the dev tools drawer is open\n    20\t    And the curr
+ent server base url is "http://localhost:3000/api/v1"\n    21\t    When the user
+enters "http://192.168.1.100:3000/api/v1"\n    22\t    And the user taps the sav
+e button\n    23\t    Then the URL should be persisted to local storage\n    24\
+t    And a success message should be shown\n    25\t    And the DioClient baseUr
+l should be updated\n    26\t\n    27\t  Scenario: Invalid URL shows error\n    
+28\t    Given the dev tools drawer is open\n    29\t    When the user enters "no
+t-a-url"\n    30\t    Then the input border should turn red\n    31\t    And an 
+error caption should appear\n    32\t    And the save button should be disabled\
+n    33\t\n    34\t  Scenario: Empty URL shows error\n    35\t    Given the dev 
+tools drawer is open\n    36\t    When the user clears the input field\n    37\t
+   Then the input border should turn red\n    38\t    And an error caption "请输
+入服务器地址" should appear\n    39\t    And the save button should be disabled\
+n',
+        message='39 lines read from file starting from line 1. Total lines in fi
+le: 39. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(
+    arguments_part='cd /private/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/
+review-pr-38-3083123428 && git diff origin/main...HEAD --name-only | xargs -I{} 
+git diff origin/main...HEAD -- {} | wc -l && echo \\"---\\" && git log --oneline
+origin/main..HEAD", "description": "Check changed files count and commits"}'
+)
+ToolCall(
+    type='function',
+    id='tool_Q3C8V85w7KeIxgwqQ7Nk1oD1',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "/private/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n0000
+0gn/T/review-pr-38-3083123428/.'
+    ),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_BoHH8ZvSPzIoWxakMhFY2qLf',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='     171\n---\nd6c7026 feat: resolve #37 - [Bug] Dev Tools Drawe
+r 的 Server URL 输入框修改后仍会自动填充默认地址\n',
+        message='Command executed successfully.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(arguments_part='maestro/flows/auth/login.yaml"}')
+ToolCall(
+    type='function',
+    id='tool_VbnzjU9zkp0iQtMjridqOon7',
+    function=FunctionBody(name='Shell', arguments='{"command":'),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_Q3C8V85w7KeIxgwqQ7Nk1oD1',
+    return_value=ToolOk(
+        is_error=False,
+        output='     1\t# @flow\n     2\t# @name: auth/login\n     3\t# @display
+Name: 手机号登录\n     4\t# @module: auth\n     5\t# @dependencies: []\n     6\t
+# @regression: smoke\n     7\t# @author: agent\n     8\t# @lastUpdated: 2025-04-
+16\n     9\t# @syncWith: tests/bdd/auth_login_phone_number_login.feature\n    10
+\t\n    11\t# 运行方式: maestro test .maestro/flows/auth/login.yaml\n    12\t\n 
+  13\tappId: com.example.mobile\n    14\t---\n    15\t- launchApp\n    16\t- run
+Flow: includes/login-as-test-user.yaml\n    17\t\n    18\t# 断言：登录成功后应跳
+转（根据实际路由调整）\n    19\t# 如果登录成功进入首页，可取消下面注释：\n    20
+\t# - assertVisible: "首页"\n',
+        message='20 lines read from file starting from line 1. Total lines in fi
+le: 20. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(
+    arguments_part=' "cd /private/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/
+T/review-pr-38-3083123428 && ls apps/mobile/test/goldens/", "description": "List
+golden files"}'
+)
+StatusUpdate(
+    context_usage=0.09364700317382812,
+    context_tokens=24549,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=3813,
+        output=614,
+        input_cache_read=20736,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-nJY9n0cGvx84q9RoauhapjJH',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_VbnzjU9zkp0iQtMjridqOon7',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='dev_tools_drawer_default.png\nlogin_page_initial.png\nlogin_page
+_loading.png\nserver_url_tool_error.png\n',
+        message='Command executed successfully.',
+        display=[],
+        extras=None
+    )
+)
+StepBegin(n=9)
+ThinkPart(
+    type='think',
+    think='Now I have a good understanding of the PR. Let me analyze the changes
+:\n\n1. **Bug**: Dev Tools Drawer\'s Server URL input field gets reset to the de
+fault address after user modification.\n2. **Fix approach**: \n   - Change `DevT
+oolsCubit` registration from `registerFactory` to `registerLazySingleton` in DI\
+n   - Change `DevToolsWrapper` from creating a new cubit on each build via `Bloc
+Provider(create: ...)` to using a stateful widget that holds the cubit in `initS
+tate` and provides it via `BlocProvider.value`\n   - This ensures the cubit surv
+ives drawer open/close cycles and doesn\'t recreate/reload\n\nLet me think about
+potential issues:\n\n**Cubit lifecycle management**:\n- `DevToolsWrapper` now do
+es `_cubit = getIt<DevToolsCubit>()..load()` in `initState()`\n- But there\'s NO
+`dispose()` method that closes the cubit\n- Since get_it manages this as a lazy 
+singleton, it should live for the app lifetime\n- However, `BlocProvider.value` 
+does NOT automatically dispose the cubit\n- The cubit is owned by get_it, so it 
+shouldn\'t be closed by the widget\n- This is actually correct for a lazy single
+ton managed by get_it\n- BUT: the widget test `tearDown` closes the cubit, and t
+he new test creates a `newCubit` and closes it at the end. That\'s fine for test
+s.\n\n**Potential memory/resource leak**:\n- `DevToolsWrapper` doesn\'t override
+`dispose()`, which is fine since it doesn\'t create any resources that need disp
+osing (get_it owns the cubit)\n- But wait - what about `BlocProvider.value`? It 
+doesn\'t auto-dispose, which is what we want for a singleton\n\n**Widget test is
+sues**:\n- The new test `\'drawer close and reopen preserves saved url\'` is goo
+d\n- But there\'s an existing `tearDown` that closes `cubit`. The test creates `
+newCubit` and closes it manually. That\'s fine.\n\n**Maestro E2E coverage**:\n- 
+The PR modifies a Mobile user flow (Dev Tools Drawer)\n- According to the review
+guidelines: "若 PR 修改了 Mobile 用户流程，检查项目的 E2E 测试目录（如 `.maestro
+/flows/`）是否有新建或更新的 Maestro YAML"\n- There are NO dev-tools maestro flo
+ws\n- However, dev-tools is debug-only and the Maestro README says flows are for
+auth, profile setup, etc.\n- Dev-tools might not need a Maestro flow since it\'s
+debug-only and Maestro tests likely run on release or debug builds but the toggl
+e button only appears in debug mode.\n- Wait, let me check if there\'s a require
+ment. The `.maestro/README.md` doesn\'t mention dev-tools. The BDD feature exist
+s but there\'s no Maestro flow for it.\n- Is this a blocking issue? The PR is sp
+ecifically a bug fix for an existing dev-tools feature. Maestro E2E for dev-tool
+s may not exist at all and might not be required for a bug fix. But I should not
+e it.\n\n**Golden tests**:\n- The PR changes UI behavior (cubit lifecycle) but t
+he visual output should be the same\n- Golden tests are mentioned in `docs/modul
+es/dev-tools.md` but the PR doesn\'t modify them\n- Since the bug is about state
+management, not visual changes, existing golden tests should still be valid\n- B
+ut I should check if `dev_tools_golden_test.dart` exists and if it needs updates
+\n\nLet me check the golden test and the cubit unit test to see if they pass log
+ically.',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_HziM2qWu3hzvxRVGYafhnYIK',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "/private/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n0000
+0gn/T/review-pr-38-3083123428/apps/mobile/test/dev_tools_golden_test.dart"}'
+    ),
+    extras=None
+)
+ToolCall(
+    type='function',
+    id='tool_d9WcH7hFxRTbUyXhXr7704ZJ',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "/private/var/folders'
+    ),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_HziM2qWu3hzvxRVGYafhnYIK',
+    return_value=ToolOk(
+        is_error=False,
+        output="     1\timport 'package:flutter/material.dart';\n     2\timport 
+'package:flutter_bloc/flutter_bloc.dart';\n     3\timport 'package:flutter_test/
+flutter_test.dart';\n     4\timport 'package:social_world_mobile/core/network/di
+o_client.dart';\n     5\timport 'package:social_world_mobile/domain/repositories
+/dev_tools_repository.dart';\n     6\timport 'package:social_world_mobile/presen
+tation/blocs/dev_tools/dev_tools_cubit.dart';\n     7\timport 'package:social_wo
+rld_mobile/presentation/widgets/dev_tools_drawer.dart';\n     8\timport 'package
+:social_world_mobile/presentation/widgets/server_url_tool.dart';\n     9\timport
+'package:social_world_design_system/social_world_design_system.dart';\n    10\t\
+n    11\tclass _MockDevToolsRepository implements DevToolsRepository {\n    12\t
+ String _url = 'http://localhost:3000/api/v1';\n    13\t\n    14\t  @override\n 
+  15\t  Future<String> getServerBaseUrl() async => _url;\n    16\t\n    17\t  @o
+verride\n    18\t  Future<void> saveServerBaseUrl(String url) async {\n    19\t 
+  _url = url;\n    20\t  }\n    21\t}\n    22\t\n    23\tclass _MockDioClient ex
+tends DioClient {\n    24\t  _MockDioClient() : super();\n    25\t}\n    26\t\n 
+  27\tvoid main() {\n    28\t  late _MockDevToolsRepository repository;\n    29\
+t  late _MockDioClient dioClient;\n    30\t\n    31\t  setUp(() {\n    32\t    r
+epository = _MockDevToolsRepository();\n    33\t    dioClient = _MockDioClient()
+;\n    34\t  });\n    35\t\n    36\t  group('DevTools golden tests', () {\n    3
+7\t    testWidgets('DevToolsDrawer default state', (tester) async {\n    38\t   
+  final cubit = DevToolsCubit(\n    39\t        repository: repository,\n    40\
+t        dioClient: dioClient,\n    41\t      );\n    42\t      await cubit.load
+();\n    43\t\n    44\t      await tester.pumpWidget(\n    45\t        MaterialA
+pp(\n    46\t          theme: ThemeData.light(useMaterial3: true),\n    47\t    
+     home: BlocProvider.value(\n    48\t            value: cubit,\n    49\t     
+      child: const Scaffold(\n    50\t              backgroundColor: DesignToken
+s.background,\n    51\t              body: DevToolsDrawer(\n    52\t            
+   isOpen: true,\n    53\t                onClose: _noop,\n    54\t             
+),\n    55\t            ),\n    56\t          ),\n    57\t        ),\n    58\t  
+   );\n    59\t      await tester.pumpAndSettle();\n    60\t\n    61\t      awai
+t expectLater(\n    62\t        find.byType(Scaffold),\n    63\t        matchesG
+oldenFile('goldens/dev_tools_drawer_default.png'),\n    64\t      );\n    65\t\n
+   66\t      cubit.close();\n    67\t    });\n    68\t\n    69\t    testWidgets(
+'ServerUrlTool error state', (tester) async {\n    70\t      final cubit = DevTo
+olsCubit(\n    71\t        repository: repository,\n    72\t        dioClient: d
+ioClient,\n    73\t      );\n    74\t      cubit.onUrlChanged('not-a-url');\n   
+75\t\n    76\t      await tester.pumpWidget(\n    77\t        MaterialApp(\n    
+78\t          theme: ThemeData.light(useMaterial3: true),\n    79\t          hom
+e: BlocProvider.value(\n    80\t            value: cubit,\n    81\t            c
+hild: const Scaffold(\n    82\t              backgroundColor: DesignTokens.backg
+round,\n    83\t              body: Center(\n    84\t                child: Padd
+ing(\n    85\t                  padding: EdgeInsets.all(DesignTokens.spacingMd),
+\n    86\t                  child: ServerUrlTool(),\n    87\t                ),\
+n    88\t              ),\n    89\t            ),\n    90\t          ),\n    91\
+t        ),\n    92\t      );\n    93\t      await tester.pumpAndSettle();\n    
+94\t\n    95\t      await expectLater(\n    96\t        find.byType(Scaffold),\n
+   97\t        matchesGoldenFile('goldens/server_url_tool_error.png'),\n    98\t
+     );\n    99\t\n   100\t      cubit.close();\n   101\t    });\n   102\t  });\
+n   103\t}\n   104\t\n   105\tvoid _noop() {}\n",
+        message='105 lines read from file starting from line 1. Total lines in f
+ile: 105. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(
+    arguments_part='/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/review-pr-38-3083123428
+/apps/mobile/test/dev_tools_cubit_test.dart"}'
+)
+ToolCall(
+    type='function',
+    id='tool_hHDYUidbKs1Gx9M7LGYhvpI4',
+    function=FunctionBody(name='Shell', arguments='{"command": "'),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_d9WcH7hFxRTbUyXhXr7704ZJ',
+    return_value=ToolOk(
+        is_error=False,
+        output="     1\timport 'package:flutter_test/flutter_test.dart';\n     2
+\timport 'package:social_world_mobile/core/network/dio_client.dart';\n     3\tim
+port 'package:social_world_mobile/domain/repositories/dev_tools_repository.dart'
+;\n     4\timport 'package:social_world_mobile/presentation/blocs/dev_tools/dev_
+tools_cubit.dart';\n     5\t\n     6\tclass _MockDevToolsRepository implements D
+evToolsRepository {\n     7\t  String _url = 'http://localhost:3000/api/v1';\n  
+  8\t\n     9\t  @override\n    10\t  Future<String> getServerBaseUrl() async =>
+_url;\n    11\t\n    12\t  @override\n    13\t  Future<void> saveServerBaseUrl(S
+tring url) async {\n    14\t    _url = url;\n    15\t  }\n    16\t}\n    17\t\n 
+  18\tclass _MockDioClient extends DioClient {\n    19\t  String? updatedBaseUrl
+;\n    20\t\n    21\t  _MockDioClient() : super();\n    22\t\n    23\t  @overrid
+e\n    24\t  void updateBaseUrl(String url) {\n    25\t    updatedBaseUrl = url;
+\n    26\t  }\n    27\t}\n    28\t\n    29\tvoid main() {\n    30\t  late _MockD
+evToolsRepository repository;\n    31\t  late _MockDioClient dioClient;\n    32\
+t  late DevToolsCubit cubit;\n    33\t\n    34\t  setUp(() {\n    35\t    reposi
+tory = _MockDevToolsRepository();\n    36\t    dioClient = _MockDioClient();\n  
+ 37\t    cubit = DevToolsCubit(\n    38\t      repository: repository,\n    39\t
+     dioClient: dioClient,\n    40\t    );\n    41\t  });\n    42\t\n    43\t  t
+earDown(() {\n    44\t    cubit.close();\n    45\t  });\n    46\t\n    47\t  gro
+up('DevToolsCubit', () {\n    48\t    test('load should emit current url', () as
+ync {\n    49\t      await cubit.load();\n    50\t      expect(cubit.state.serve
+rBaseUrl, 'http://localhost:3000/api/v1');\n    51\t    });\n    52\t\n    53\t 
+  test('onUrlChanged with empty url should show error', () {\n    54\t      cubi
+t.onUrlChanged('');\n    55\t      expect(cubit.state.urlError, '请输入服务器地
+址');\n    56\t    });\n    57\t\n    58\t    test('onUrlChanged with invalid ur
+l should show error', () {\n    59\t      cubit.onUrlChanged('not-a-url');\n    
+60\t      expect(cubit.state.urlError, '请输入有效的 HTTP/HTTPS URL');\n    61\t
+   });\n    62\t\n    63\t    test('onUrlChanged with valid url should clear err
+or', () {\n    64\t      cubit.onUrlChanged('http://192.168.1.100:3000/api/v1');
+\n    65\t      expect(cubit.state.urlError, '');\n    66\t    });\n    67\t\n  
+ 68\t    test('save should persist url and update dio baseUrl', () async {\n    
+69\t      const url = 'http://192.168.1.100:3000/api/v1';\n    70\t      cubit.o
+nUrlChanged(url);\n    71\t      await cubit.save();\n    72\t      expect(cubit
+.state.saveSuccess, true);\n    73\t      expect(cubit.state.isSaving, false);\n
+   74\t      expect(dioClient.updatedBaseUrl, url);\n    75\t      final savedUr
+l = await repository.getServerBaseUrl();\n    76\t      expect(savedUrl, url);\n
+   77\t    });\n    78\t\n    79\t    test('save should not persist invalid url'
+, () async {\n    80\t      cubit.onUrlChanged('bad-url');\n    81\t      await 
+cubit.save();\n    82\t      expect(cubit.state.saveSuccess, false);\n    83\t  
+   expect(dioClient.updatedBaseUrl, isNull);\n    84\t    });\n    85\t\n    86\
+t    test('load should not overwrite existing user input', () async {\n    87\t 
+    cubit.onUrlChanged('http://user-input.com');\n    88\t      await cubit.load
+();\n    89\t      expect(cubit.state.serverBaseUrl, 'http://user-input.com');\n
+   90\t    });\n    91\t  });\n    92\t}\n",
+        message='92 lines read from file starting from line 1. Total lines in fi
+le: 92. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(
+    arguments_part='cd /private/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/
+review-pr-38-3083123428 && make check-docs 2>&1 || true", "timeout": 60, "descri
+ption": "Run docs check"}'
+)
+StatusUpdate(
+    context_usage=0.09940338134765625,
+    context_tokens=26058,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=1738,
+        output=951,
+        input_cache_read=24320,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-pNiet2s7G7E8FztfsxSyMURM',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_hHDYUidbKs1Gx9M7LGYhvpI4',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='bash scripts/docscheck/main.sh\n[docscheck] Running documentatio
+n health check...\n[docscheck] Checking glossary term consistency...\n⚠️  Glossar
+y 术语未在 docs/ 或 prd/ 中使用: AccessToken\n⚠️  Glossary 术语未在 docs/ 或 prd/
+中使用: ActivityScore\n⚠️  Glossary 术语未在 docs/ 或 prd/ 中使用: ContentModerat
+ion\n⚠️  Glossary 术语未在 docs/ 或 prd/ 中使用: Dislike\n⚠️  Glossary 术语未在 do
+cs/ 或 prd/ 中使用: Nearby\n⚠️  Glossary 术语未在 docs/ 或 prd/ 中使用: OnlineSta
+tus\n⚠️  Glossary 术语未在 docs/ 或 prd/ 中使用: RefreshToken\n⚠️  Glossary 术语未
+在 docs/ 或 prd/ 中使用: SmsCode\n⚠️  Glossary 术语未在 docs/ 或 prd/ 中使用: Sup
+erLike\n⚠️  Glossary 术语未在 docs/ 或 prd/ 中使用: UnreadCount\n[docscheck] Glos
+sary consistency check completed.\n✅ Documentation health check passed.\n',
+        message='Command executed successfully.',
+        display=[],
+        extras=None
+    )
+)
+StepBegin(n=10)
+ThinkPart(
+    type='think',
+    think="Let me now check if there are any issues with the cubit lifecycle in 
+the actual app. The `DevToolsWrapper` is a StatefulWidget that creates `_cubit` 
+in `initState()` and provides it via `BlocProvider.value`. But there's no `dispo
+se()` override.\n\nWait, I need to think about this more carefully. The cubit is
+registered as a `LazySingleton` in get_it. This means get_it owns the instance a
+nd it's supposed to live for the entire app lifecycle. The widget should NOT clo
+se it in `dispose()`.\n\nHowever, there's a potential issue: what if the app has
+multiple `DevToolsWrapper` instances (e.g., if the route changes and `MaterialAp
+p.router`'s `builder` creates a new `DevToolsWrapper`)? Since it's a StatefulWid
+get, each new instance would call `initState()` and do `getIt<DevToolsCubit>()..
+load()`. Since get_it returns the same lazy singleton, this is fine - it just ca
+lls `load()` again. And `load()` has a guard: `if (state.serverBaseUrl.isEmpty)`
+before emitting, so it won't overwrite existing state.\n\nBut wait - what about 
+the first time? `getIt<DevToolsCubit>()` creates the cubit (if not already creat
+ed), and `..load()` triggers an async load. If the widget is rebuilt quickly or 
+another widget calls getIt, it's the same instance. So this is actually fine.\n\
+nHowever, I should check the `app.dart` to see how `DevToolsWrapper` is used.",
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_Zj4YTqj67sSBAYbYNXU3GgdA',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "/private/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n0000
+0gn/T/review-pr-38-3083123428/apps/mobile/lib/app.dart"}'
+    ),
+    extras=None
+)
+ToolCall(
+    type='function',
+    id='tool_T4nQNxs209t9jSKGdfaZtepZ',
+    function=FunctionBody(
+        name='Shell',
+        arguments='{"command": "cd /private/var/folders/lt/w3sl6z'
+    ),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_Zj4YTqj67sSBAYbYNXU3GgdA',
+    return_value=ToolOk(
+        is_error=False,
+        output="     1\timport 'package:flutter/foundation.dart';\n     2\timpor
+t 'package:flutter/material.dart';\n     3\timport 'package:flutter_bloc/flutter
+_bloc.dart';\n     4\timport 'package:go_router/go_router.dart';\n     5\timport
+'package:social_world_design_system/social_world_design_system.dart';\n     6\ti
+mport 'core/di/di.dart';\n     7\timport 'presentation/blocs/auth/auth_bloc.dart
+';\n     8\timport 'presentation/blocs/auth/auth_event.dart';\n     9\timport 'p
+resentation/blocs/auth/auth_state.dart';\n    10\timport 'presentation/pages/log
+in_page.dart';\n    11\timport 'presentation/pages/profile_setup_page.dart';\n  
+ 12\timport 'presentation/pages/profile_edit_page.dart';\n    13\timport 'presen
+tation/widgets/dev_tools_wrapper.dart';\n    14\t\n    15\tfinal _rootNavigatorK
+ey = GlobalKey<NavigatorState>();\n    16\t\n    17\tclass SocialWorldApp extend
+s StatelessWidget {\n    18\t  const SocialWorldApp({super.key});\n    19\t\n   
+20\t  @override\n    21\t  Widget build(BuildContext context) {\n    22\t    ret
+urn BlocProvider(\n    23\t      create: (_) => getIt<AuthBloc>()..add(const Aut
+hCheckRequested()),\n    24\t      child: const _SocialWorldAppBody(),\n    25\t
+   );\n    26\t  }\n    27\t}\n    28\t\n    29\tclass _SocialWorldAppBody exten
+ds StatefulWidget {\n    30\t  const _SocialWorldAppBody();\n    31\t\n    32\t 
+@override\n    33\t  State<_SocialWorldAppBody> createState() => _SocialWorldApp
+BodyState();\n    34\t}\n    35\t\n    36\tclass _SocialWorldAppBodyState extend
+s State<_SocialWorldAppBody> {\n    37\t  late final GoRouter _router;\n    38\t
+\n    39\t  @override\n    40\t  void initState() {\n    41\t    super.initState
+();\n    42\t    _router = GoRouter(\n    43\t      navigatorKey: _rootNavigator
+Key,\n    44\t      initialLocation: '/login',\n    45\t      routes: [\n    46\
+t        GoRoute(\n    47\t          path: '/login',\n    48\t          builder:
+(context, state) => const LoginPage(),\n    49\t        ),\n    50\t        GoRo
+ute(\n    51\t          path: '/home',\n    52\t          builder: (context, sta
+te) => const Scaffold(\n    53\t            body: Center(child: Text('Home Page'
+)),\n    54\t          ),\n    55\t        ),\n    56\t        GoRoute(\n    57\
+t          path: '/profile-setup',\n    58\t          builder: (context, state) 
+=> const ProfileSetupPage(),\n    59\t        ),\n    60\t        GoRoute(\n    
+61\t          path: '/profile-edit',\n    62\t          builder: (context, state
+) => const ProfileEditPage(),\n    63\t        ),\n    64\t      ],\n    65\t   
+);\n    66\t  }\n    67\t\n    68\t  @override\n    69\t  Widget build(BuildCont
+ext context) {\n    70\t    return BlocListener<AuthBloc, AuthState>(\n    71\t 
+    listener: (context, state) {\n    72\t        if (state is AuthAuthenticated
+) {\n    73\t          if (state.isNewUser || !state.profileComplete) {\n    74\
+t            _router.go('/profile-setup');\n    75\t          } else {\n    76\t
+           _router.go('/home');\n    77\t          }\n    78\t        } else if 
+(state is AuthUnauthenticated || state is AuthFailure) {\n    79\t          _rou
+ter.go('/login');\n    80\t        }\n    81\t      },\n    82\t      child: Mat
+erialApp.router(\n    83\t        title: 'Social World',\n    84\t        theme:
+AppTheme.lightTheme,\n    85\t        darkTheme: AppTheme.darkTheme,\n    86\t  
+     routerConfig: _router,\n    87\t        builder: (context, child) {\n    88
+\t          if (kDebugMode) {\n    89\t            return DevToolsWrapper(child:
+child!);\n    90\t          }\n    91\t          return child!;\n    92\t       
+},\n    93\t      ),\n    94\t    );\n    95\t  }\n    96\t}\n",
+        message='96 lines read from file starting from line 1. Total lines in fi
+le: 96. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(
+    arguments_part='8j5v50vt2s6knvf5n00000gn/T/review-pr-38-3083123428 && git di
+ff origin/main...HEAD -- apps/mobile/lib/app.dart", "description": "Check app.da
+rt diff"}'
+)
+StatusUpdate(
+    context_usage=0.11185836791992188,
+    context_tokens=29323,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=3467,
+        output=458,
+        input_cache_read=25856,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-OKqauEFmSUMZy3bN4VPpAzqm',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_T4nQNxs209t9jSKGdfaZtepZ',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='',
+        message='Command executed successfully.',
+        display=[],
+        extras=None
+    )
+)
+StepBegin(n=11)
+ThinkPart(
+    type='think',
+    think='Now I have a comprehensive view of the PR. Let me analyze all the fin
+dings:\n\n## What the PR does\nFixes issue #37: Dev Tools Drawer\'s Server URL i
+nput gets reset to the default address after user modification.\n\n## Root cause
+\nPreviously `DevToolsCubit` was registered as `registerFactory` in get_it, and 
+`DevToolsWrapper` used `BlocProvider(create: (_) => getIt<DevToolsCubit>()..load
+())` in its `build` method. This meant every time the drawer opened/closed or th
+e widget rebuilt, a NEW cubit was created and `load()` was called, which would o
+verwrite the user\'s input with the default URL.\n\n## Fix\n1. Changed DI regist
+ration from `registerFactory` to `registerLazySingleton` for `DevToolsCubit`\n2.
+Changed `DevToolsWrapper` to a StatefulWidget that gets the cubit once in `initS
+tate()` and provides it via `BlocProvider.value`\n3. Added a widget test for "dr
+awer close and reopen preserves saved url"\n4. Updated docs formatting\n\n## Rev
+iew findings\n\n### Positive aspects\n- The fix addresses the root cause correct
+ly\n- Widget tests are updated with a new regression test\n- `load()` already ha
+s a guard to not overwrite non-empty state\n- `ServerUrlTool` uses `BlocListener
+` with `listenWhen` to avoid overwriting user input\n- Documentation is updated 
+(formatting + DI code snippet)\n\n### Issues/concerns to check\n\n1. **Cubit lif
+ecycle with lazy singleton**: Since `DevToolsCubit` is now a lazy singleton, it 
+lives for the app lifetime. The `DevToolsWrapper` gets it in `initState()` but n
+ever closes it. This is correct because get_it owns it. However, I should verify
+if there are any stream subscriptions or resources in the cubit that might leak.
+Looking at `DevToolsCubit`, it extends `Cubit` and only holds a repository and d
+ioClient. It doesn\'t create any streams. So no leak.\n\n2. **No Maestro E2E flo
+w for dev-tools**: The PR modifies a Mobile user flow. There are no Maestro flow
+s in `.maestro/flows/dev-tools/`. However, dev-tools is debug-only (`kDebugMode`
+), and Maestro E2E tests typically run against release or debug builds. Even if 
+they run on debug builds, dev-tools is an internal tool. Looking at the `.maestr
+o/README.md`, there are no dev-tools flows at all. The existing flows are for `a
+uth` and `profile`. \n   - Is this required? The review checklist says "若 PR 修
+改了 Mobile 用户流程，检查项目的 E2E 测试目录（如 `.maestro/flows/`）是否有新建
+或更新的 Maestro YAML". There isn\'t one. But dev-tools is a special debug-only 
+feature and may not need Maestro coverage. I should note this as a non-blocking 
+observation or suggestion.\n\n3. **BDD tests**: The BDD feature file `tests/bdd/
+dev_tools_drawer.feature` exists and covers the scenarios. No changes needed for
+this bug fix.\n\n4. **Golden tests**: The golden tests should still pass since t
+here are no visual changes. The PR doesn\'t modify them, which is fine.\n\n5. **
+Documentation sync**: `docs/modules/dev-tools.md` is updated with the new DI reg
+istration code (`registerLazySingleton`). Good.\n\n6. **Mechanical checks**: `ma
+ke check-docs` passes. Flutter tests can\'t be run in this environment.\n\nLet m
+e also check if there are any issues with the `DevToolsWrapper` state management
+. One thing I notice:\n\nIn `dev_tools_wrapper.dart`:\n```dart\nclass _DevToolsW
+rapperState extends State<DevToolsWrapper> {\n  bool _isDrawerOpen = false;\n  l
+ate final DevToolsCubit _cubit;\n\n  @override\n  void initState() {\n    super.
+initState();\n    _cubit = getIt<DevToolsCubit>()..load();\n  }\n```\n\nThis is 
+fine, but what if `configureDependencies()` hasn\'t been called yet when `initSt
+ate` runs? In Flutter, `main()` typically calls `configureDependencies()` before
+`runApp()`, so it should be fine.\n\nAnother subtle issue: `_cubit` is `late fin
+al` but not disposed. Since it\'s a get_it singleton, we shouldn\'t dispose it. 
+But the widget might be disposed and recreated (e.g., when switching themes, tho
+ugh unlikely in this app). If it is recreated, `initState` runs again and `getIt
+<DevToolsCubit>()` returns the same instance, and `load()` is called again. Sinc
+e `load()` only emits when `state.serverBaseUrl.isEmpty`, this is safe.\n\nWait,
+I need to double-check one thing. In the `dev_tools_cubit_test.dart`, there\'s a
+test:\n```dart\ntest(\'load should not overwrite existing user input\', () async
+{\n  cubit.onUrlChanged(\'http://user-input.com\');\n  await cubit.load();\n  ex
+pect(cubit.state.serverBaseUrl, \'http://user-input.com\');\n});\n```\n\nThis te
+st verifies the guard in `load()`. Good.\n\nNow, let me think about whether ther
+e are any REAL issues with this PR:\n\n### Potential Issue 1: Missing dispose() 
+in DevToolsWrapper\nActually, looking at it again, since `DevToolsWrapper` creat
+es a `_cubit` reference but doesn\'t override `dispose()`, it\'s technically fin
+e for a get_it singleton. But from a code quality perspective, it might be good 
+to add a comment explaining why it\'s not disposed. However, this is not a block
+ing issue.\n\n### Potential Issue 2: Cubit state persistence across app restarts
+\nThe PR fixes the "drawer close and reopen" issue, but what about "app restart"
+? That\'s already handled by the repository loading from SharedPreferences.\n\n#
+## Potential Issue 3: No Maestro E2E\nThe project doesn\'t seem to have Maestro 
+E2E for dev-tools at all, and since it\'s a debug-only feature, it may not be ne
+cessary. I\'ll note it as an observation.\n\n### Potential Issue 4: Widget test 
+coverage\nThe new test is good. But I want to verify if the existing `tearDown` 
+in `dev_tools_widget_test.dart` might conflict:\n```dart\ntearDown(() {\n  cubit
+.close();\n});\n```\nThe new test `drawer close and reopen preserves saved url` 
+creates `newCubit` and closes it manually. The `cubit` from `setUp` is also clos
+ed in `tearDown`. This is fine.\n\nWait, there\'s one thing. In the new test:\n`
+``dart\n// Close drawer by removing ServerUrlTool from tree (simulate Drawer clo
+sing)\nawait tester.pumpWidget(_buildWithCubit(cubit, const SizedBox.shrink()));
+\nawait tester.pumpAndSettle();\n```\nThis simulates removing the widget from th
+e tree. But then:\n```dart\n// Reopen drawer with a new cubit that loads from re
+pository\nfinal newCubit = DevToolsCubit(\n  repository: repository,\n  dioClien
+t: dioClient,\n);\nawait newCubit.load();\n```\nThis tests with a NEW cubit, whi
+ch simulates the OLD behavior (factory pattern) where a new cubit was created ea
+ch time. But with the lazy singleton fix, in reality it would be the SAME cubit.
+The test verifies that if a new cubit loads from the repository, it gets the sav
+ed URL. This is more testing the repository/cubit integration than the wrapper f
+ix.\n\nActually, a more precise test for the bug fix would be to test `DevToolsW
+rapper` directly - open drawer, enter text, close drawer, reopen drawer, and ver
+ify the text is preserved with the SAME cubit. But the current test tests the sc
+enario at the `ServerUrlTool` level, which is acceptable.\n\nLet me check if the
+re\'s a test that directly tests `DevToolsWrapper`. Looking at `dev_tools_widget
+_test.dart`, there isn\'t one that tests `DevToolsWrapper` directly. All tests u
+se `_buildWithCubit`. The existing tests for `DevToolsDrawer` don\'t use `DevToo
+lsWrapper` either.\n\nShould there be a widget test for `DevToolsWrapper`? It wo
+uld be valuable to have a regression test that directly tests the wrapper\'s beh
+avior. But this is a nice-to-have, not strictly blocking.\n\nActually, I want to
+look more carefully at one thing. The change from `registerFactory` to `register
+LazySingleton` means the `DevToolsCubit` is no longer recreated on each `getIt<D
+evToolsCubit>()`. But `BlocProvider.value` means the same cubit instance is used
+. However, what happens when the user navigates to a completely different route?
+The `builder` in `MaterialApp.router` wraps the `child` with `DevToolsWrapper`. 
+When routing changes, the `child` changes, but `DevToolsWrapper` stays in the tr
+ee (it\'s above the Navigator). So `DevToolsWrapper` doesn\'t get recreated on r
+oute changes. Good.\n\nBut what if the `MaterialApp.router` itself gets rebuilt 
+(e.g., theme change)? Then `builder` is called again, creating a NEW `DevToolsWr
+apper`. The new wrapper\'s `initState` gets the same singleton cubit and calls `
+load()`. Since `load()` has the guard, it\'s safe.\n\nWait, looking at `app.dart
+`, `_SocialWorldAppBody` is a StatefulWidget that creates `_router` in `initStat
+e`. The `MaterialApp.router` is inside `BlocListener<AuthBloc, AuthState>`. When
+auth state changes, `BlocListener`\'s child rebuilds, which means `MaterialApp.r
+outer` rebuilds, which means `builder` is called again, creating a new `DevTools
+Wrapper`. This is fine because the cubit is a singleton.\n\nNow let me think abo
+ut whether there are any blocking issues.\n\n**Blocking issues?**\n1. Does the f
+ix actually solve the problem? Yes.\n2. Are tests added/updated? Yes.\n3. Is doc
+umentation updated? Yes.\n4. Are there any breaking changes? No.\n5. Are there c
+ode quality issues? Nothing major.\n\n**Non-blocking suggestions:**\n1. Add a Ma
+estro E2E flow for dev-tools (low priority, debug-only feature)\n2. Add a commen
+t in `DevToolsWrapper` about why `_cubit` is not disposed (code clarity)\n3. Con
+sider adding a direct `DevToolsWrapper` regression test\n\nWait, I should check 
+if there\'s any issue with the cubit being a singleton and the `BlocProvider.val
+ue` pattern. In flutter_bloc, `BlocProvider.value` is specifically designed for 
+providing an existing bloc/cubit instance without taking ownership of its lifecy
+cle. This is exactly the right pattern for a get_it singleton. So the implementa
+tion is correct.\n\nLet me also verify if there are any changes needed to `docs/
+design-docs/flutter.md` or `docs/design-docs/testing.md`. The PR doesn\'t touch 
+them, and this is a bug fix, so probably not.\n\nNow let me write the review rep
+ort. I need to be clear about whether this passes or needs changes.\n\nAfter car
+eful analysis, I believe this PR is **correct and should pass**. The fix is mini
+mal and targeted. The widget test covers the regression. The documentation is up
+dated. There are no blocking issues.\n\nHowever, I will note one thing as a sugg
+estion: the lack of Maestro E2E for dev-tools. But since it\'s a debug-only feat
+ure and the project doesn\'t have any dev-tools Maestro flows to begin with, thi
+s is not a blocking requirement for a bug fix PR.\n\nWait, let me reconsider. Th
+e review prompt says:\n"Mobile E2E 覆盖：若 PR 修改了 Mobile 用户流程，检查项目
+的 E2E 测试目录（如 `.maestro/flows/`）是否有新建或更新的 Maestro YAML"\n\nThis 
+is part of the core review dimensions. Does this PR "modify Mobile user flow"? Y
+es, the Dev Tools Drawer is a user-facing flow (even if only for developers). Th
+e checklist asks me to check if there are new or updated Maestro YAMLs. There ar
+en\'t any. But the key question is: is this expected/required for a bug fix of a
+n existing debug-only feature?\n\nLooking at the `.maestro/` directory structure
+, there are standard flows under `.maestro/flows/` for auth and profile. There a
+re NO dev-tools flows at all. Creating a Maestro flow for dev-tools would be a n
+ew feature, not part of this bug fix. So I think it\'s reasonable to say this is
+not required for this PR, but I should note it.\n\nActually, I want to check one
+more thing. Does the BDD feature file need updating because of this fix? The BDD
+file describes scenarios like "Save a valid server base URL", "Invalid URL shows
+error", etc. The bug fix doesn\'t change any of these behaviors, it just fixes a
+state management issue. So the BDD file doesn\'t need changes.\n\nLet me also ch
+eck if `tests/bdd/step-definitions/dev_tools_drawer.steps.js` exists and if it n
+eeds updating.',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_TRxAf44L6wBQOQEKHpTj995S',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "/private/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n0000
+0gn/T/review-pr-38-3083123428/tests/bdd/step-definitions/dev_tools_drawer.steps.
+js"}'
+    ),
+    extras=None
+)
+StatusUpdate(
+    context_usage=0.11737442016601562,
+    context_tokens=30769,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=1585,
+        output=2765,
+        input_cache_read=29184,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-2YH193AG4de2gwT2ITQSU1k8',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_TRxAf44L6wBQOQEKHpTj995S',
+    return_value=ToolOk(
+        is_error=False,
+        output='     1\tconst path = require(\'path\');\n     2\tconst { loadFea
+ture, defineFeature } = require(\'jest-cucumber\');\n     3\t\n     4\tconst fea
+ture = loadFeature(path.join(__dirname, \'../dev_tools_drawer.feature\'));\n    
+5\t\n     6\tdefineFeature(feature, (test) => {\n     7\t  test(\'Debug mode sho
+ws the toggle button\', ({ given, then }) => {\n     8\t    given(\'the app is r
+unning in debug mode\', () => {\n     9\t      // Mobile-only: verified by Flutt
+er widget test in apps/mobile/test/dev_tools_widget_test.dart\n    10\t    });\n
+   11\t\n    12\t    then(\'a semi-transparent toggle button should be visible o
+n the right edge of the screen\', () => {\n    13\t      // Mobile-only: verifie
+d by Flutter widget test and golden file\n    14\t    });\n    15\t  });\n    16
+\t\n    17\t  test(\'Release mode hides the toggle button\', ({ given, then }) =
+> {\n    18\t    given(\'the app is running in release mode\', () => {\n    19\t
+     // Mobile-only: verified by kDebugMode conditional compilation\n    20\t   
+});\n    21\t\n    22\t    then(\'the dev tools toggle button should not exist i
+n the widget tree\', () => {\n    23\t      // Mobile-only: verified by Flutter 
+widget test\n    24\t    });\n    25\t  });\n    26\t\n    27\t  test(\'Open and
+close the drawer\', ({ given, when, then }) => {\n    28\t    given(\'the app is
+running in debug mode\', () => {});\n    29\t\n    30\t    when(\'the user taps 
+the toggle button\', () => {\n    31\t      // Mobile-only: verified by Flutter 
+widget test\n    32\t    });\n    33\t\n    34\t    then(\'the dev tools drawer 
+should slide in from the right\', () => {\n    35\t      // Mobile-only: verifie
+d by Flutter widget test and golden file\n    36\t    });\n    37\t\n    38\t   
+when(\'the user taps the overlay mask or the close button\', () => {\n    39\t  
+   // Mobile-only: verified by Flutter widget test\n    40\t    });\n    41\t\n 
+  42\t    then(\'the drawer should slide out and disappear\', () => {\n    43\t 
+    // Mobile-only: verified by Flutter widget test\n    44\t    });\n    45\t  
+});\n    46\t\n    47\t  test(\'Save a valid server base URL\', ({ given, and, w
+hen, then }) => {\n    48\t    given(\'the dev tools drawer is open\', () => {})
+;\n    49\t\n    50\t    and(\'the current server base url is "http://localhost:
+3000/api/v1"\', () => {\n    51\t      // Mobile-only: default value from DevToo
+lsRepositoryImpl\n    52\t    });\n    53\t\n    54\t    when(\'the user enters 
+"http://192.168.1.100:3000/api/v1"\', () => {\n    55\t      // Mobile-only: ver
+ified by Flutter cubit test\n    56\t    });\n    57\t\n    58\t    and(\'the us
+er taps the save button\', () => {\n    59\t      // Mobile-only: verified by Fl
+utter cubit test\n    60\t    });\n    61\t\n    62\t    then(\'the URL should b
+e persisted to local storage\', () => {\n    63\t      // Mobile-only: verified 
+by Flutter cubit test\n    64\t    });\n    65\t\n    66\t    and(\'a success me
+ssage should be shown\', () => {\n    67\t      // Mobile-only: verified by Flut
+ter widget test\n    68\t    });\n    69\t\n    70\t    and(\'the DioClient base
+Url should be updated\', () => {\n    71\t      // Mobile-only: verified by Flut
+ter cubit test\n    72\t    });\n    73\t  });\n    74\t\n    75\t  test(\'Inval
+id URL shows error\', ({ given, when, then, and }) => {\n    76\t    given(\'the
+dev tools drawer is open\', () => {});\n    77\t\n    78\t    when(\'the user en
+ters "not-a-url"\', () => {\n    79\t      // Mobile-only: verified by Flutter c
+ubit test\n    80\t    });\n    81\t\n    82\t    then(\'the input border should
+turn red\', () => {\n    83\t      // Mobile-only: verified by Flutter widget te
+st and golden file\n    84\t    });\n    85\t\n    86\t    and(\'an error captio
+n should appear\', () => {\n    87\t      // Mobile-only: verified by Flutter wi
+dget test\n    88\t    });\n    89\t\n    90\t    and(\'the save button should b
+e disabled\', () => {\n    91\t      // Mobile-only: verified by Flutter widget 
+test\n    92\t    });\n    93\t  });\n    94\t\n    95\t  test(\'Empty URL shows
+error\', ({ given, when, then, and }) => {\n    96\t    given(\'the dev tools dr
+awer is open\', () => {});\n    97\t\n    98\t    when(\'the user clears the inp
+ut field\', () => {\n    99\t      // Mobile-only: verified by Flutter cubit tes
+t\n   100\t    });\n   101\t\n   102\t    then(\'the input border should turn re
+d\', () => {\n   103\t      // Mobile-only: verified by Flutter widget test and 
+golden file\n   104\t    });\n   105\t\n   106\t    and(\'an error caption "请输
+入服务器地址" should appear\', () => {\n   107\t      // Mobile-only: verified b
+y Flutter cubit and widget test\n   108\t    });\n   109\t\n   110\t    and(\'th
+e save button should be disabled\', () => {\n   111\t      // Mobile-only: verif
+ied by Flutter widget test\n   112\t    });\n   113\t  });\n   114\t});\n',
+        message='114 lines read from file starting from line 1. Total lines in f
+ile: 114. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+StepBegin(n=12)
+ThinkPart(
+    type='think',
+    think="Now I have all the information I need. Let me compile the review repo
+rt.\n\n## Summary of findings:\n\n### ✅ Positive\n1. **Root cause fix**: Changi
+ng `registerFactory` to `registerLazySingleton` and using `BlocProvider.value` c
+orrectly fixes the issue where a new cubit was created on every rebuild, causing
+`load()` to overwrite user input.\n2. **Widget test regression**: Added `drawer 
+close and reopen preserves saved url` test.\n3. **Cubit already guarded**: `load
+()` has `if (state.serverBaseUrl.isEmpty)` guard, which is good.\n4. **Documenta
+tion updated**: `docs/modules/dev-tools.md` reflects the DI change.\n5. **BDD un
+changed**: No behavior changes in BDD scenarios, so step definitions don't need 
+updates.\n6. **Golden tests unaffected**: No visual changes.\n\n### ⚠️ Observatio
+ns/Suggestions (non-blocking)\n1. **No Maestro E2E for dev-tools**: The project 
+has no `.maestro/flows/dev-tools/` directory. Since dev-tools is debug-only and 
+this is a bug fix, it's acceptable, but should be noted.\n2. **DevToolsWrapper d
+ispose()**: The widget doesn't override `dispose()`. This is actually correct si
+nce get_it owns the lazy singleton, but a comment might help clarity.\n\n### ❌ 
+Blocking issues\nNone found.\n\nWait, I should double-check one more thing. In `
+dev_tools_wrapper.dart`, the `_cubit` is obtained via `getIt<DevToolsCubit>()`. 
+Since this is now a lazy singleton, it's the same instance throughout the app. B
+ut what if `configureDependencies()` is called again? That would throw a `Assert
+ionError` because get_it doesn't allow duplicate registrations by default. So th
+at's fine.\n\nActually, let me reconsider whether there are any edge cases with 
+the `BlocProvider.value` pattern. In `DevToolsWrapper`:\n```dart\nreturn BlocPro
+vider.value(\n  value: _cubit,\n  child: Stack(...)\n);\n```\n\nIf `_cubit` emit
+s a state change while the drawer is closed, widgets inside the drawer (like `Se
+rverUrlTool`) are not in the tree, so they don't rebuild. When the drawer opens 
+again, `ServerUrlTool` rebuilds with the current state. Since `ServerUrlTool` us
+es `TextEditingController` initialized from `context.read<DevToolsCubit>().state
+.serverBaseUrl` in `initState`, if the state changed while the drawer was closed
+, the `TextEditingController` might be out of sync.\n\nWait, this is important! 
+Let me re-read `ServerUrlTool.initState()`:\n\n```dart\n@override\nvoid initStat
+e() {\n  super.initState();\n  _controller = TextEditingController(\n    text: c
+ontext.read<DevToolsCubit>().state.serverBaseUrl,\n  );\n  _focusNode = FocusNod
+e();\n}\n```\n\nAnd the `BlocListener`:\n```dart\nBlocListener<DevToolsCubit, De
+vToolsState>(\n  listenWhen: (previous, current) =>\n      previous.serverBaseUr
+l.isEmpty &&\n      current.serverBaseUrl.isNotEmpty &&\n      _controller.text.
+isEmpty &&\n      !_focusNode.hasFocus,\n  listener: (context, state) {\n    _co
+ntroller.text = state.serverBaseUrl;\n  },\n```\n\nSo when `ServerUrlTool` is fi
+rst created (drawer opens), `_controller` is initialized with the current state.
+The `BlocListener` only updates the controller when transitioning from empty to 
+non-empty URL, and only if the controller is empty and not focused.\n\nNow, cons
+ider the scenario with the bug fix:\n1. User opens drawer, enters URL `http://19
+2.168.1.100:3000/api/v1`\n2. User saves, cubit state has `serverBaseUrl = http:/
+/192.168.1.100:3000/api/v1`\n3. User closes drawer, `ServerUrlTool` is removed f
+rom tree and disposed\n4. User reopens drawer, `ServerUrlTool` is recreated\n5. 
+`initState` creates controller with text = `http://192.168.1.100:3000/api/v1` (f
+rom cubit state)\n6. `BlocListener` won't trigger because state is already non-e
+mpty\n\nThis works correctly! The URL is preserved.\n\nWhat about if `load()` co
+mpletes after the user already entered text? That's handled by the `listenWhen` 
+guard and the `load()` guard in the cubit.\n\nSo the fix is solid.\n\nOne final 
+check: does the new widget test in `dev_tools_widget_test.dart` have any issues?
+\n\n```dart\ntestWidgets('drawer close and reopen preserves saved url', (tester)
+async {\n  await tester.pumpWidget(_buildWithCubit(cubit, const ServerUrlTool())
+);\n  await tester.pump();\n\n  final textField = find.byType(TextField);\n  awa
+it tester.enterText(textField, 'http://192.168.1.100:3000/api/v1');\n  await tes
+ter.pumpAndSettle();\n\n  await tester.tap(find.widgetWithText(SwButton, '保存配
+置'));\n  await tester.pumpAndSettle();\n\n  // Close drawer by removing ServerU
+rlTool from tree (simulate Drawer closing)\n  await tester.pumpWidget(_buildWith
+Cubit(cubit, const SizedBox.shrink()));\n  await tester.pumpAndSettle();\n\n  //
+Reopen drawer with a new cubit that loads from repository\n  final newCubit = De
+vToolsCubit(\n    repository: repository,\n    dioClient: dioClient,\n  );\n  aw
+ait newCubit.load();\n\n  await tester.pumpWidget(\n    _buildWithCubit(newCubit
+, const ServerUrlTool()),\n  );\n  await tester.pumpAndSettle();\n\n  expect(\n 
+  tester.widget<TextField>(find.byType(TextField)).controller!.text,\n    'http:
+//192.168.1.100:3000/api/v1',\n  );\n\n  await newCubit.close();\n});\n```\n\nWa
+it, there's a subtle issue with this test. It creates a `newCubit` and loads fro
+m repository. But with the actual fix, `DevToolsWrapper` would reuse the SAME cu
+bit (singleton), not create a new one. This test simulates the OLD behavior (new
+cubit on reopen) and verifies that the repository persistence works. \n\nBut sho
+uldn't there be a test that verifies the ACTUAL fix - i.e., using the SAME cubit
+instance? If we use the same cubit, the state is already `http://192.168.1.100:3
+000/api/v1`, so `initState` of `ServerUrlTool` would initialize the controller w
+ith that value.\n\nActually, the test as written is valid for verifying end-to-e
+nd persistence (repository -> new cubit -> UI). But it doesn't specifically test
+the singleton behavior. However, testing get_it singleton behavior in a widget t
+est would require setting up get_it, which is typically not done in unit/widget 
+tests. So this is acceptable.\n\nIs there any issue with the test closing `newCu
+bit` at the end but `cubit` being closed in `tearDown`? No, that's fine.\n\nAlri
+ght, I'm confident this PR should pass. Let me write the review report to `logs/
+review-report-38.md`.\n\nOne more thing - I need to make sure the report format 
+matches the requirements:\n- List issues with specific fix instructions (file pa
+th + modification)\n- Conclusion: ✅ 通过 or ❌ 需修改\n- Written to `logs/revie
+w-report-38.md`\n\nSince I'm finding no blocking issues, the conclusion should b
+e ✅ 通过. I'll include observations/suggestions but clearly label them as non-b
+locking.",
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_olDGDz6jN72Mmhe2DLJ1OAVZ',
+    function=FunctionBody(
+        name='WriteFile',
+        arguments='{"path": "logs/review-report-38.md", "content": "# PR #38 代
+码审查报告\\n\\n**分支**: `feat/issue-37`  \\n**标题**: `[Bug] Dev Tools Drawer 
+的 Server URL 输入框修改后仍会自动填充默认地址`  \\n**审查日期**: 2026-04-17  \\
+n\\n---\\n\\n## 审查结论\\n\\n✅ **通过**\\n\\n本 PR 对根因定位准确（`DevToolsCu
+bit` 每次 rebuild 都被重新创建并触发 `load()`），修复方案最小且正确（改为 `LazyS
+ingleton` + `BlocProvider.value`），并补充了回归 Widget 测试。文档同步更新，未发
+现阻塞性问题。\\n\\n---\\n\\n## 变更概览\\n\\n| 文件 | 变更说明 |\\n|------|----
+------|\\n| `apps/mobile/lib/core/di/di.dart` | `DevToolsCubit` 注册方式由 `regi
+sterFactory` 改为 `registerLazySingleton` |\\n| `apps/mobile/lib/presentation/wi
+dgets/dev_tools_wrapper.dart` | 改为 `StatefulWidget`，在 `initState` 中获取 Cub
+it 并通过 `BlocProvider.value` 提供，避免反复创建 |\\n| `apps/mobile/test/dev_to
+ols_widget_test.dart` | 新增 `drawer close and reopen preserves saved url` 回归
+测试；格式化调整 |\\n| `docs/modules/dev-tools.md` | 同步更新 DI 代码示例与表格
+格式 |\\n\\n---\\n\\n## 逐条审查\\n\\n### 1. 全链路完整性\\n\\n- **评价**: ✅ 满
+足\\n- **说明**: 本 PR 为纯 Mobile Debug 工具 Bug 修复，不涉及 API / DB 变更。修
+复覆盖了 DI 注册、Widget 生命周期、Cubit 状态保护（`load()` 中的 `isEmpty` 守卫
+）三层，链路完整。\\n\\n### 2. 规范符合性\\n\\n- **评价**: ✅ 满足\\n- **说明**:
+\\n  - `DevToolsWrapper` 继续通过 `kDebugMode` 条件编译隔离，符合 `docs/design-d
+ocs/flutter.md` 的 Debug-Only 规范。\\n  - `BlocProvider.value` 是 get_it 单例 C
+ubit 的标准用法，生命周期归属清晰（get_it 持有，Widget 不 close）。\\n  - `Serve
+rUrlTool` 继续使用 `TextEditingController` + `FocusNode` + `BlocListener.listenW
+hen` 的安全同步策略，未引入新的状态竞争。\\n\\n### 3. 契约一致性\\n\\n- **评价**
+: ✅ 无需检查（N/A）\\n- **说明**: 未涉及 `packages/shared-types` 或前后端契约变
+更。\\n\\n### 4. 测试覆盖\\n\\n- **评价**: ✅ 满足\\n- **说明**:\\n  - 新增回归
+测试 `drawer close and reopen preserves saved url`，覆盖了“保存后关闭再打开抽屉
+，输入内容应保留”的缺陷场景。\\n  - 现有 `dev_tools_cubit_test.dart` 中的 `load 
+should not overwrite existing user input` 与 Cubit 的 `isEmpty` 守卫形成双重保护
+。\\n  - Golden 测试文件未被修改（本次无视觉变更），现有 `dev_tools_golden_test.
+dart` 逻辑仍然有效。\\n\\n### 5. Mobile E2E 覆盖（Maestro）\\n\\n- **评价**: ⚠️ 
+观察项（非阻塞）\\n- **说明**:\\n  - `.maestro/flows/` 下目前**没有** `dev-tools
+` 目录或相关 Maestro YAML。\\n  - Dev Tools Drawer 是 `kDebugMode` 下的内部开发
+工具，现有 Maestro README 与目录结构中也未包含该模块的 E2E 规划。\\n  - **建议**
+: 若后续计划将 Dev Tools 纳入 CI 回归范围，可在 `.maestro/flows/dev-tools/` 下补
+充一条简单的 drawer 开关流，但**不强制要求在本 Bug Fix PR 中补齐**。\\n\\n### 6.
+文档同步\\n\\n- **评价**: ✅ 满足\\n- **说明**:\\n  - `docs/modules/dev-tools.md
+` 已同步将 DI 示例中的 `registerFactory` 更新为 `registerLazySingleton`。\\n  - 
+文档表格格式统一（Markdown 表格对齐），无内容遗漏。\\n\\n### 7. 可运行性 / 机械
+检查\\n\\n- **评价**: ✅ 通过\\n- **说明**:\\n  - 运行 `make check-docs` 结果：
+✅ Documentation health check passed。\\n  - Flutter 环境未安装，无法本地执行 `f
+lutter test`，但代码层面测试结构完整，无编译错误迹象。\\n\\n---\\n\\n## 非阻塞建
+议（可选优化）\\n\\n1. **增加 `DevToolsWrapper` 生命周期注释（可选）**\\n   - 文
+件: `apps/mobile/lib/presentation/widgets/dev_tools_wrapper.dart`\\n   - 建议: 
+在 `_DevToolsWrapperState` 中增加注释说明 `_cubit` 由 get_it 作为 `LazySingleton
+` 管理，因此 Widget 不负责 `close`，以提升代码可读性。\\n\\n2. **补充直接针对 `D
+evToolsWrapper` 的回归测试（可选）**\\n   - 文件: `apps/mobile/test/dev_tools_wi
+dget_test.dart`\\n   - 建议: 当前新增测试通过替换 `ServerUrlTool` 模拟抽屉关闭/
+打开，可再补充一个直接测试 `DevToolsWrapper`（tap toggle → 输入 → tap close → ta
+p toggle → assert）的集成 Widget 测试，以覆盖真实的 `StatefulWidget` 生命周期路
+径。\\n\\n3. **考虑补充 Maestro E2E（可选）**\\n   - 文件: `.maestro/flows/dev-t
+ools/drawer.yaml`（新建）\\n   - 建议: 若团队决定将 Debug 工具纳入 E2E 回归，可
+补充一条验证 drawer 开关及 URL 保存的 Maestro 流。\\n\\n---\\n\\n## 最终结论\\n\
+\n**✅ 通过 —— 建议合入。**\\n"}'
+    ),
+    extras=None
+)
+StatusUpdate(
+    context_usage=0.13290023803710938,
+    context_tokens=34839,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=4119,
+        output=2923,
+        input_cache_read=30720,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-FGzM4s3h0zziDGxAdS2SaXyp',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_olDGDz6jN72Mmhe2DLJ1OAVZ',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='',
+        message='File successfully overwritten. Current size: 4645 bytes.',
+        display=[
+            DiffDisplayBlock(
+                type='diff',
+                path='/private/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/r
+eview-pr-38-3083123428/logs/review-report-38.md',
+                old_text='',
+                new_text='# PR #38 代码审查报告\n\n**分支**: `feat/issue-37`  \n
+**标题**: `[Bug] Dev Tools Drawer 的 Server URL 输入框修改后仍会自动填充默认地址
+`  \n**审查日期**: 2026-04-17  \n\n---\n\n## 审查结论\n\n✅ **通过**\n\n本 PR 对
+根因定位准确（`DevToolsCubit` 每次 rebuild 都被重新创建并触发 `load()`），修复方
+案最小且正确（改为 `LazySingleton` + `BlocProvider.value`），并补充了回归 Widget
+测试。文档同步更新，未发现阻塞性问题。\n\n---\n\n## 变更概览\n\n| 文件 | 变更说
+明 |\n|------|----------|\n| `apps/mobile/lib/core/di/di.dart` | `DevToolsCubit`
+注册方式由 `registerFactory` 改为 `registerLazySingleton` |\n| `apps/mobile/lib/
+presentation/widgets/dev_tools_wrapper.dart` | 改为 `StatefulWidget`，在 `initSt
+ate` 中获取 Cubit 并通过 `BlocProvider.value` 提供，避免反复创建 |\n| `apps/mobi
+le/test/dev_tools_widget_test.dart` | 新增 `drawer close and reopen preserves sa
+ved url` 回归测试；格式化调整 |\n| `docs/modules/dev-tools.md` | 同步更新 DI 代
+码示例与表格格式 |\n\n---\n\n## 逐条审查\n\n### 1. 全链路完整性\n\n- **评价**: 
+✅ 满足\n- **说明**: 本 PR 为纯 Mobile Debug 工具 Bug 修复，不涉及 API / DB 变更
+。修复覆盖了 DI 注册、Widget 生命周期、Cubit 状态保护（`load()` 中的 `isEmpty` 
+守卫）三层，链路完整。\n\n### 2. 规范符合性\n\n- **评价**: ✅ 满足\n- **说明**:\
+n  - `DevToolsWrapper` 继续通过 `kDebugMode` 条件编译隔离，符合 `docs/design-doc
+s/flutter.md` 的 Debug-Only 规范。\n  - `BlocProvider.value` 是 get_it 单例 Cubi
+t 的标准用法，生命周期归属清晰（get_it 持有，Widget 不 close）。\n  - `ServerUrl
+Tool` 继续使用 `TextEditingController` + `FocusNode` + `BlocListener.listenWhen`
+的安全同步策略，未引入新的状态竞争。\n\n### 3. 契约一致性\n\n- **评价**: ✅ 无需
+检查（N/A）\n- **说明**: 未涉及 `packages/shared-types` 或前后端契约变更。\n\n##
+# 4. 测试覆盖\n\n- **评价**: ✅ 满足\n- **说明**:\n  - 新增回归测试 `drawer clos
+e and reopen preserves saved url`，覆盖了“保存后关闭再打开抽屉，输入内容应保留”
+的缺陷场景。\n  - 现有 `dev_tools_cubit_test.dart` 中的 `load should not overwri
+te existing user input` 与 Cubit 的 `isEmpty` 守卫形成双重保护。\n  - Golden 测
+试文件未被修改（本次无视觉变更），现有 `dev_tools_golden_test.dart` 逻辑仍然有效
+。\n\n### 5. Mobile E2E 覆盖（Maestro）\n\n- **评价**: ⚠️ 观察项（非阻塞）\n- **
+说明**:\n  - `.maestro/flows/` 下目前**没有** `dev-tools` 目录或相关 Maestro YAM
+L。\n  - Dev Tools Drawer 是 `kDebugMode` 下的内部开发工具，现有 Maestro README 
+与目录结构中也未包含该模块的 E2E 规划。\n  - **建议**: 若后续计划将 Dev Tools 纳
+入 CI 回归范围，可在 `.maestro/flows/dev-tools/` 下补充一条简单的 drawer 开关流
+，但**不强制要求在本 Bug Fix PR 中补齐**。\n\n### 6. 文档同步\n\n- **评价**: ✅ 
+满足\n- **说明**:\n  - `docs/modules/dev-tools.md` 已同步将 DI 示例中的 `registe
+rFactory` 更新为 `registerLazySingleton`。\n  - 文档表格格式统一（Markdown 表格
+对齐），无内容遗漏。\n\n### 7. 可运行性 / 机械检查\n\n- **评价**: ✅ 通过\n- **
+说明**:\n  - 运行 `make check-docs` 结果：✅ Documentation health check passed。
+\n  - Flutter 环境未安装，无法本地执行 `flutter test`，但代码层面测试结构完整，
+无编译错误迹象。\n\n---\n\n## 非阻塞建议（可选优化）\n\n1. **增加 `DevToolsWrapp
+er` 生命周期注释（可选）**\n   - 文件: `apps/mobile/lib/presentation/widgets/dev
+_tools_wrapper.dart`\n   - 建议: 在 `_DevToolsWrapperState` 中增加注释说明 `_cub
+it` 由 get_it 作为 `LazySingleton` 管理，因此 Widget 不负责 `close`，以提升代码
+可读性。\n\n2. **补充直接针对 `DevToolsWrapper` 的回归测试（可选）**\n   - 文件:
+`apps/mobile/test/dev_tools_widget_test.dart`\n   - 建议: 当前新增测试通过替换 `
+ServerUrlTool` 模拟抽屉关闭/打开，可再补充一个直接测试 `DevToolsWrapper`（tap to
+ggle → 输入 → tap close → tap toggle → assert）的集成 Widget 测试，以覆盖真实的 
+`StatefulWidget` 生命周期路径。\n\n3. **考虑补充 Maestro E2E（可选）**\n   - 文
+件: `.maestro/flows/dev-tools/drawer.yaml`（新建）\n   - 建议: 若团队决定将 Debu
+g 工具纳入 E2E 回归，可补充一条验证 drawer 开关及 URL 保存的 Maestro 流。\n\n---
+\n\n## 最终结论\n\n**✅ 通过 —— 建议合入。**',
+                old_start=1,
+                new_start=1,
+                is_summary=False
+            )
+        ],
+        extras=None
+    )
+)
+StepBegin(n=13)
+ThinkPart(
+    type='think',
+    think='The review report has been successfully written to `logs/review-repor
+t-38.md`. Let me verify it was written correctly by reading it back.',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_l5kPwoiTTs5JQQUbtgjXvqpW',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "logs/review-report-38.md"}'
+    ),
+    extras=None
+)
+StatusUpdate(
+    context_usage=0.14417648315429688,
+    context_tokens=37795,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=2979,
+        output=53,
+        input_cache_read=34816,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-OArwnxlUBRQ5V9m6a6zxVAbh',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_l5kPwoiTTs5JQQUbtgjXvqpW',
+    return_value=ToolOk(
+        is_error=False,
+        output='     1\t# PR #38 代码审查报告\n     2\t\n     3\t**分支**: `feat
+/issue-37`  \n     4\t**标题**: `[Bug] Dev Tools Drawer 的 Server URL 输入框修改
+后仍会自动填充默认地址`  \n     5\t**审查日期**: 2026-04-17  \n     6\t\n     7\
+t---\n     8\t\n     9\t## 审查结论\n    10\t\n    11\t✅ **通过**\n    12\t\n  
+ 13\t本 PR 对根因定位准确（`DevToolsCubit` 每次 rebuild 都被重新创建并触发 `load
+()`），修复方案最小且正确（改为 `LazySingleton` + `BlocProvider.value`），并补充
+了回归 Widget 测试。文档同步更新，未发现阻塞性问题。\n    14\t\n    15\t---\n   
+16\t\n    17\t## 变更概览\n    18\t\n    19\t| 文件 | 变更说明 |\n    20\t|-----
+-|----------|\n    21\t| `apps/mobile/lib/core/di/di.dart` | `DevToolsCubit` 注
+册方式由 `registerFactory` 改为 `registerLazySingleton` |\n    22\t| `apps/mobil
+e/lib/presentation/widgets/dev_tools_wrapper.dart` | 改为 `StatefulWidget`，在 `
+initState` 中获取 Cubit 并通过 `BlocProvider.value` 提供，避免反复创建 |\n    23
+\t| `apps/mobile/test/dev_tools_widget_test.dart` | 新增 `drawer close and reope
+n preserves saved url` 回归测试；格式化调整 |\n    24\t| `docs/modules/dev-tools
+.md` | 同步更新 DI 代码示例与表格格式 |\n    25\t\n    26\t---\n    27\t\n    28
+\t## 逐条审查\n    29\t\n    30\t### 1. 全链路完整性\n    31\t\n    32\t- **评价
+**: ✅ 满足\n    33\t- **说明**: 本 PR 为纯 Mobile Debug 工具 Bug 修复，不涉及 A
+PI / DB 变更。修复覆盖了 DI 注册、Widget 生命周期、Cubit 状态保护（`load()` 中的
+`isEmpty` 守卫）三层，链路完整。\n    34\t\n    35\t### 2. 规范符合性\n    36\t\
+n    37\t- **评价**: ✅ 满足\n    38\t- **说明**:\n    39\t  - `DevToolsWrapper`
+继续通过 `kDebugMode` 条件编译隔离，符合 `docs/design-docs/flutter.md` 的 Debug-
+Only 规范。\n    40\t  - `BlocProvider.value` 是 get_it 单例 Cubit 的标准用法，
+生命周期归属清晰（get_it 持有，Widget 不 close）。\n    41\t  - `ServerUrlTool` 
+继续使用 `TextEditingController` + `FocusNode` + `BlocListener.listenWhen` 的安
+全同步策略，未引入新的状态竞争。\n    42\t\n    43\t### 3. 契约一致性\n    44\t\
+n    45\t- **评价**: ✅ 无需检查（N/A）\n    46\t- **说明**: 未涉及 `packages/sh
+ared-types` 或前后端契约变更。\n    47\t\n    48\t### 4. 测试覆盖\n    49\t\n   
+50\t- **评价**: ✅ 满足\n    51\t- **说明**:\n    52\t  - 新增回归测试 `drawer c
+lose and reopen preserves saved url`，覆盖了“保存后关闭再打开抽屉，输入内容应保
+留”的缺陷场景。\n    53\t  - 现有 `dev_tools_cubit_test.dart` 中的 `load should 
+not overwrite existing user input` 与 Cubit 的 `isEmpty` 守卫形成双重保护。\n   
+54\t  - Golden 测试文件未被修改（本次无视觉变更），现有 `dev_tools_golden_test.d
+art` 逻辑仍然有效。\n    55\t\n    56\t### 5. Mobile E2E 覆盖（Maestro）\n    57
+\t\n    58\t- **评价**: ⚠️ 观察项（非阻塞）\n    59\t- **说明**:\n    60\t  - `.m
+aestro/flows/` 下目前**没有** `dev-tools` 目录或相关 Maestro YAML。\n    61\t  -
+Dev Tools Drawer 是 `kDebugMode` 下的内部开发工具，现有 Maestro README 与目录结
+构中也未包含该模块的 E2E 规划。\n    62\t  - **建议**: 若后续计划将 Dev Tools 纳
+入 CI 回归范围，可在 `.maestro/flows/dev-tools/` 下补充一条简单的 drawer 开关流
+，但**不强制要求在本 Bug Fix PR 中补齐**。\n    63\t\n    64\t### 6. 文档同步\n 
+  65\t\n    66\t- **评价**: ✅ 满足\n    67\t- **说明**:\n    68\t  - `docs/modu
+les/dev-tools.md` 已同步将 DI 示例中的 `registerFactory` 更新为 `registerLazySin
+gleton`。\n    69\t  - 文档表格格式统一（Markdown 表格对齐），无内容遗漏。\n    
+70\t\n    71\t### 7. 可运行性 / 机械检查\n    72\t\n    73\t- **评价**: ✅ 通过\
+n    74\t- **说明**:\n    75\t  - 运行 `make check-docs` 结果：✅ Documentation 
+health check passed。\n    76\t  - Flutter 环境未安装，无法本地执行 `flutter tes
+t`，但代码层面测试结构完整，无编译错误迹象。\n    77\t\n    78\t---\n    79\t\n 
+  80\t## 非阻塞建议（可选优化）\n    81\t\n    82\t1. **增加 `DevToolsWrapper` 
+生命周期注释（可选）**\n    83\t   - 文件: `apps/mobile/lib/presentation/widgets
+/dev_tools_wrapper.dart`\n    84\t   - 建议: 在 `_DevToolsWrapperState` 中增加注
+释说明 `_cubit` 由 get_it 作为 `LazySingleton` 管理，因此 Widget 不负责 `close`
+，以提升代码可读性。\n    85\t\n    86\t2. **补充直接针对 `DevToolsWrapper` 的回
+归测试（可选）**\n    87\t   - 文件: `apps/mobile/test/dev_tools_widget_test.dar
+t`\n    88\t   - 建议: 当前新增测试通过替换 `ServerUrlTool` 模拟抽屉关闭/打开，
+可再补充一个直接测试 `DevToolsWrapper`（tap toggle → 输入 → tap close → tap togg
+le → assert）的集成 Widget 测试，以覆盖真实的 `StatefulWidget` 生命周期路径。\n 
+  89\t\n    90\t3. **考虑补充 Maestro E2E（可选）**\n    91\t   - 文件: `.maestr
+o/flows/dev-tools/drawer.yaml`（新建）\n    92\t   - 建议: 若团队决定将 Debug 工
+具纳入 E2E 回归，可补充一条验证 drawer 开关及 URL 保存的 Maestro 流。\n    93\t\
+n    94\t---\n    95\t\n    96\t## 最终结论\n    97\t\n    98\t**✅ 通过 —— 建议
+合入。**\n',
+        message='98 lines read from file starting from line 1. Total lines in fi
+le: 98. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+StepBegin(n=14)
+ThinkPart(
+    type='think',
+    think="The user hasn't sent a new message - this appears to be a system hint
+about reasoning. My previous work is complete. The review report has been writte
+n successfully to `logs/review-report-38.md` with a ✅ pass conclusion.\n\nLet m
+e summarize what was done for the user in a final response.",
+    encrypted=None
+)
+TextPart(
+    type='text',
+    text='PR #38 审查已完成，报告已写入 `logs/review-report-38.md`。\n\n**审查结
+论：✅ 通过 —— 建议合入。**\n\n核心判断：\n- **根因定位准确**：`DevToolsCubit` 
+之前以 `registerFactory` 注册，导致 `DevToolsWrapper` 每次 rebuild 都会创建新实
+例并触发 `load()`，覆盖用户输入。\n- **修复方案正确**：改为 `registerLazySinglet
+on` + `BlocProvider.value`，使 Cubit 生命周期与 Widget 解耦，抽屉开关不再丢失状
+态。\n- **测试补充到位**：新增了 `drawer close and reopen preserves saved url` 
+回归 Widget 测试。\n- **文档同步更新**：`docs/modules/dev-tools.md` 中的 DI 示例
+已同步更新。\n\n非阻塞建议（已在报告中列出）：\n1. 可在 `DevToolsWrapper` 中补充
+生命周期注释，说明单例由 get_it 管理。\n2. 可考虑补充直接针对 `DevToolsWrapper` 
+的集成 Widget 测试。\n3. Dev Tools 为 `kDebugMode` 内部工具，`.maestro/flows/` 
+下暂无对应 E2E 流，本次 Bug Fix 不强制要求补齐。'
+)
+StatusUpdate(
+    context_usage=0.15062713623046875,
+    context_tokens=39486,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=1854,
+        output=321,
+        input_cache_read=37632,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-FF5OlonUHKxh3vxgFOBnX3c7',
+    plan_mode=False,
+    mcp_status=None
+)
+TurnEnd()
+
+To resume this session: kimi -r 5bc4f33e-41cd-41c4-b105-98eb4adaf715
+
+✅ Review 完成

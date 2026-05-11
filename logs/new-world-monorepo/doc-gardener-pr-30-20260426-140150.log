@@ -1,0 +1,2928 @@
+[2026-04-26 14:01:50] PR #30 Doc Gardener 启动
+Merged: false
+Base: main
+Head: main
+日志: /Users/insulate/Desktop/new-world/new-world-ops/logs/new-world-monorepo/doc-gardener-pr-30-20260426-140150.log
+【任务上下文】
+- PR 编号: #30
+- 项目路径: /var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/doc-gardener-30-180
+7164934
+- 项目地图: ../../new-world-monorepo/AGENTS.md
+- 关联 PRD: ../../new-world-monorepo/prd/PRD-004-ui-component-library-redesign.m
+d,../../new-world-monorepo/prd/TEMPLATE.md,../../new-world-monorepo/prd/PRD-003-
+leaderboard-system.md
+- 文档目录: ../../new-world-monorepo/docs
+
+你是规范演进 Agent。
+
+【输入】
+- 以下是一个 PR 的多次代码审查报告汇总
+- 请读取项目的 AGENTS.md 了解规范文档结构
+
+【PR #30 历史 Review 报告汇总（共 9 次）】
+
+--- 第 1 次 Review ---
+## 审查结论
+
+审查结论: NEEDS_FIX
+
+> PR #30（`design/issue-19`）是对 UI 容器组件（UIPanel / UIDialog / UIToast / UI
+Alert）的设计资产重做，整体架构清晰、规范对齐度高，修复了旧版大量违规问题（`expo
+rt default`、纯黑遮罩、emoji 关闭按钮、缺失动画等）。
+>
+> 但在与上游基础设施（issue-18 `utils.ts`）的兼容性、PRD-004 接口契约、Foundatio
+n 色值规范上存在 **4 个 Major 问题**，必须在合并前修复。
+
+---
+
+## 阻塞问题（Blocking）
+
+无。
+
+---
+
+## 严重问题（Major）
+
+### 1. UIDialog.ts 引用了 issue-18 utils.ts 中不存在的 UITheme 常量
+- **位置**: `designs/issue-19/src/ui/UIDialog.ts:125`、`designs/issue-19/src/ui/
+UIDialog.ts:139`
+- **问题**: 
+  - 第 125 行使用 `UITheme.cinnabarRedLight`
+  - 第 139 行使用 `UITheme.mediumInk`
+  - 但 issue-18 已完成的基础设施 `designs/issue-18/src/ui/utils.ts` 中 `UITheme`
+仅定义了 10 个颜色（`inkBlack`、`paperYellow`、`cinnabarRed`、`stoneCyan`、`indi
+goBlue`、`goldBrown`、`lightInk`、`white`、`inkText`、`warning`），**不存在** `c
+innabarRedLight` 和 `mediumInk`
+- **影响**: Developer Agent 将 issue-19 代码迁移到 `apps/phaser3/src/ui/` 时，Ty
+peScript 会报 `Property 'cinnabarRedLight' does not exist on type ...` 编译错误
+，导致构建失败
+- **修复**:
+  ```typescript
+  //  designs/issue-19/src/ui/UIDialog.ts
+  // 确认按钮 hover：改用 issue-18 中已存在的 cinnabarRed
+  hoverColor: UITheme.cinnabarRed,
+  // 取消按钮 hover：改用 issue-18 中已存在的 indigoBlue 或 lightInk
+  hoverColor: UITheme.indigoBlue,
+  ```
+- **依据**: 
+  - `designs/issue-18/src/ui/utils.ts` 第 16-37 行 `UITheme` 定义仅含 10 色
+  - `designs/issue-19/design-spec.md` 1.1 节明确声明单向依赖 `UIDialog → UIPanel
+→ utils.ts / types.ts`，不得引用依赖中不存在的符号
+
+---
+
+### 2. UIDialogConfig 未按 PRD-004 继承 UIPanelConfig
+- **位置**: `designs/issue-19/src/ui/UIDialog.ts:16`
+- **问题**: 
+  - PRD-004 5.6 明确要求 `export interface UIDialogConfig extends Omit<UIPanelCo
+nfig, 'title' | 'showClose'>`
+  - 当前实现为 `export interface UIDialogConfig extends UIPositionConfig, Partia
+l<UISizeConfig>`，**未继承** `UIPanelConfig`
+  - 导致 `UIDialog` 无法通过配置传入 `showOverlay`、`overlayAlpha`、`isModal`、`
+onClose`、`onOverlayClick`、`bgColor`、`strokeColor`、`texture` 等 `UIPanel` 已
+支持的属性
+- **影响**: 配置灵活性受限，与 PRD-004 定义的标准接口不兼容，Developer Agent 迁
+移后若业务需要自定义 Dialog 背景/遮罩行为，必须回头修改接口
+- **修复**:
+  ```typescript
+  // designs/issue-19/src/ui/UIDialog.ts
+  export interface UIDialogConfig extends Omit<UIPanelConfig, 'title' | 'showClo
+se'> {
+    title: string;
+    message: string;
+    // ... 保留其余字段
+  }
+  ```
+- **依据**: PRD-004 第 5.6 节接口设计代码块明确声明 `extends Omit<UIPanelConfig,
+'title' | 'showClose'>`
+
+---
+
+### 3. UIToast 背景边框颜色与设计规范不一致
+- **位置**: `designs/issue-19/src/ui/UIToast.ts:83-91`
+- **问题**: 
+  - `design-spec.md` 3.3 节视觉标准明确规定边框为 `2px solid UITheme.goldBrown`
+  - 但 `UIToast.ts` 第 83 行 `const strokeColor = this.getTypeColor();`，将边框
+色设置为**类型色**（info/success/warning/error 各不同）
+  - 这导致 Toast 同时拥有「左侧 4px 类型色条」和「类型色边框」，视觉强调过度，且
+与规范文档冲突
+- **影响**: 视觉风格偏离设计规范，可能导致国风水墨风格失衡
+- **修复**:
+  ```typescript
+  // designs/issue-19/src/ui/UIToast.ts
+  // 将第 83 行改为：
+  const strokeColor = UITheme.goldBrown;
+  // 若需支持 Config 传入自定义边框色，可改为：
+  // const strokeColor = config.strokeColor ?? UITheme.goldBrown;
+  ```
+- **依据**: `designs/issue-19/design-spec.md` 3.3 节视觉标准表格「边框」行：`2px
+solid UITheme.goldBrown`
+
+---
+
+### 4. 硬编码色值违反 Foundation 规范 F-07
+- **位置**: 
+  - `designs/issue-19/src/ui/UIAlert.ts:113`：`color: '#ffffff'`
+  - `designs/issue-19/src/ui/UIDialog.ts:104`：`color: '#cccccc'`
+- **问题**: 
+  - 两处文字样式均直接手写对象，未使用 `getInkTextStyle()`，且使用了硬编码 HEX 
+色值
+  - `01-foundation.md` F-07 明确禁止「在业务代码中直接写魔法数字色值」
+  - `01-foundation.md` 1.2 节指出「通过 `getInkTextStyle()` 自动注入，不需要手动
+写」
+  - 尤其 `#cccccc`（浅灰）不在 `UITheme` 常量中，属于纯魔法数字
+- **影响**: 风格不一致，维护困难；后续统一调整色板时无法通过修改 `UITheme` 常量
+批量生效
+- **修复**:
+  ```typescript
+  // designs/issue-19/src/ui/UIAlert.ts
+  this.messageText = this.scene.add.text(
+    0, 0, message,
+    getInkTextStyle('14px', colorToHex(UITheme.white))
+  ).setOrigin(0.5);
+
+  // designs/issue-19/src/ui/UIDialog.ts
+  this.messageText = this.scene.add.text(
+    0, -10, message,
+    getInkTextStyle('14px', colorToHex(UITheme.lightInk), {
+      align: 'center',
+      wordWrap: { width: width - 40 },
+    })
+  ).setOrigin(0.5);
+  ```
+  > 注：`#cccccc` 与 `UITheme.lightInk`（`#666666`）差异较大。若设计 spec 确实需
+要浅灰，应在 `UITheme` 中新增常量（如 `subText: 0xcccccc`），否则建议改用 `UIThe
+me.lightInk` 以符合色板规范。
+- **依据**: 
+  - `docs/design-docs/ui-style-guide/01-foundation.md` 1.2 节字体规范
+  - `docs/design-docs/ui-style-guide/01-foundation.md` F-07 禁止清单
+
+---
+
+## 轻微问题（Minor）
+
+### 5. UIToast.ts 与 UIAlert.ts 本地重复定义 `colorToHex`
+- **位置**: `designs/issue-19/src/ui/UIToast.ts:210-212`、`designs/issue-19/src/
+ui/UIAlert.ts:299-301`
+- **问题**: `utils.ts` 已提供同名同功能的 `colorToHex` 导出，两处本地重复定义造
+成代码冗余
+- **修复**: 从 `'./utils'` 导入 `colorToHex`，删除本地定义
+
+### 6. ToastManager 使用字符串索引访问私有方法
+- **位置**: `designs/issue-19/src/ui/UIToast.ts:257-261`
+- **问题**: `toast['dismiss'] = () => { ... }` 绕过 TypeScript `private` 访问控
+制，属于类型系统 hack，长期维护易引发问题
+- **修复**: 将 `UIToast.dismiss()` 的访问修饰符改为 `protected`，或通过事件机制
+（如 `toast.once('destroy', ...)`）在 Manager 中监听销毁
+
+### 7. UIDialog.confirm/cancel 中 killTweensOf 冗余
+- **位置**: `designs/issue-19/src/ui/UIDialog.ts:149`、`designs/issue-19/src/ui/
+UIDialog.ts:157`
+- **问题**: `confirm()` / `cancel()` 已调用 `killTweensOf(this.scene, this)`，而
+`hide()` 内部也会再次调用，存在冗余
+- **修复**: 移除 `confirm()` / `cancel()` 中的 `killTweensOf`，由 `hide()` 统一
+处理（防御性保留亦可，非强制）
+
+### 8. Warning 类型色与 PRD-004 5.15 存在项目级文档冲突
+- **位置**: `designs/issue-19/src/ui/UIAlert.ts:67`、`designs/issue-19/src/ui/UI
+Toast.ts:74`、`designs/issue-19/design-spec.md:231/310`
+- **问题**: 
+  - PRD-004 5.15 明确要求 warning 色为 `0xffaa00`（即 `UITheme.warning`）
+  - 但代码与设计 spec 均使用 `UITheme.goldBrown`（`0xc9a227`）
+  - `docs/design-docs/ui-style-guide/03-component.md` 3.7 节同样使用 `goldBrown`
+- **说明**: 这是项目内部 **PRD 与组件规范之间的冲突**，并非代码单方面错误。建议
+产品侧确认以哪个为准，并同步更新冲突文档
+- **修复（二选一）**: 
+  - 方案 A：代码改用 `UITheme.warning`，同步更新 `03-component.md`
+  - 方案 B：保持 `UITheme.goldBrown`，在 PRD-004 中修正 warning 色说明
+
+---
+
+## 验证结果
+
+| 维度 | 状态 | 说明 |
+|------|------|------|
+| 功能完整性 | ✅ | 实现了 design-spec.md 定义的全部四个组件（UIPanel、UIDialog
+、UIToast、UIAlert）及 ToastManager；修复了旧版 15+ 项违规问题 |
+| 代码规范性 | ❌ | 存在硬编码色值（Major #4）、未使用 `getInkTextStyle()`、接口
+未继承 UIPanelConfig（Major #2）、引用了不存在的 UITheme 常量（Major #1） |
+| 全链路完整性 | ⚪ 不适用 | 本 PR 为设计资产 PR（`designs/issue-19/`），不直接
+修改 `apps/phaser3/src/ui/`，全链路验证在 Developer Agent 迁移阶段完成 |
+| 规范符合性 | ❌ | UIToast 边框色偏离设计 spec（Major #3）；warning 色与 PRD-00
+4 存在冲突（Minor #8）；动画参数、深度规范、命名规范均正确对齐 |
+| 测试覆盖 | ⚪ 未验证 | 设计资产 PR 未包含测试文件；PRD-004 要求迁移后单元测试
+覆盖率 ≥ 80% |
+| 文档同步 | ✅ | `designs/issue-19/design-spec.md` 完整覆盖了架构总览、问题分析
+、组件设计、状态机、Accessibility、验收标准；未要求同步更新 `docs/` 目录（设计资
+产阶段） |
+
+---
+
+## 风险与建议
+
+1. **上游依赖断裂风险（高）**：Major #1 表明 issue-19 的设计资产与 issue-18 已完
+成的基础设施存在符号不兼容。建议在合并前，由生成 Agent 在本地执行一次 `pnpm --fi
+lter phaser3 type-check`（将代码临时拷贝到 `apps/phaser3/src/ui/` 并替换 utils.t
+s 为 issue-18 版本），验证无编译错误后再合并。
+
+2. **接口契约漂移风险（中）**：Major #2 的 `UIDialogConfig` 未继承 `UIPanelConfi
+g`，若后续 Developer Agent 严格按 PRD-004 迁移，会发现接口不一致。建议现在即按 P
+RD-004 修正，避免二次返工。
+
+3. **视觉规范冲突风险（中）**：Major #3 的 Toast 边框色与 Minor #8 的 warning 色
+均属于「设计文档内部冲突」。建议在项目侧建立「PRD-004 > 组件规范 > 设计 spec」的
+优先级裁决机制，避免不同 Agent 反复摇摆。
+
+4. **代码复用建议**：Minor #5-7 均为低成本的代码清理，建议在修复 Major 问题时一
+并处理，提升代码整洁度。
+
+
+--- 第 2 次 Review ---
+## 审查结论
+
+审查结论: **NEEDS_MAJOR_FIX**
+
+PR #30（design/issue-19）对 4 个核心 UI 容器组件（UIPanel、UIDialog、UIToast、UI
+Alert）进行了重做，并同步修改了 `UISegmentedControl`、`UIBadge` 及 `SceneSwitchB
+ar`。设计规范 `design-spec.md` 写得非常详尽，新组件的实现也较好地遵循了 PRD-004 
+的视觉与行为标准。但存在 **3 个阻塞性编译问题** 和若干规范违规，必须在合并前修复
+。
+
+---
+
+## 阻塞问题（Blocking）
+
+### 1. `designs/issue-19/src/ui/` 缺少 `utils.ts` 与 `types.ts`，导致新组件无法
+编译
+- **位置**: `designs/issue-19/src/ui/UIAlert.ts:9-12`、`UIPanel.ts:8-22`、`UIDia
+log.ts:8-14`、`UIToast.ts:8-12`
+- **问题**: 四个新组件均通过 `import { ... } from './utils'` 和 `import { ... } 
+from './types'` 导入基础设施，但 `designs/issue-19/src/ui/` 目录下仅有 4 个组件
+文件，没有 `utils.ts` 和 `types.ts`。
+- **影响**: `tsc --noEmit` 在 `designs/issue-19/src/ui/` 目录下必然失败，设计交
+付物不可编译。
+- **修复**: 将 `designs/issue-18/src/ui/utils.ts` 和 `designs/issue-18/src/ui/ty
+pes.ts` 复制到 `designs/issue-19/src/ui/`（或建立符号链接 / 统一公共目录引用），
+确保设计目录自包含且可编译。
+- **依据**: `docs/frontend/agent-design-guide.md` 3.1 节要求 `designs/issue-xxx/
+src/` 目录结构与 `apps/phaser3/src/` 对齐；Step 4 检查清单要求"所有 `src/` 代码
+在 `designs/` 目录内可编译（无导入错误）
+
+### 2. `designs/issue-19/src/ui/UIDialog.ts` 导入不存在的 `./UIButton`
+- **位置**: `designs/issue-19/src/ui/UIDialog.ts:12`
+- **问题**: `import { UIButton } from './UIButton';` 指向同级目录下的 `UIButton.
+ts`，但 `designs/issue-19/src/ui/` 下无此文件。
+- **影响**: `UIDialog.ts` 单独编译失败。
+- **修复**: 将 `apps/phaser3/src/ui/UIButton.ts`（或 `designs/issue-18/src/ui/UI
+Button.ts` 若存在）复制到 `designs/issue-19/src/ui/UIButton.ts`；或在本次 PR 中
+将 `UIButton.ts` 的重做/迁移一并带入 issue-19 目录。
+- **依据**: 同 Blocking-1，设计交付物必须自包含可编译
+
+### 3. `SceneSwitchBar.ts` 使用 `export default`
+- **位置**: `apps/phaser3/src/city-builder/ui/SceneSwitchBar.ts:147`
+- **问题**: 文件末尾存在 `export default SceneSwitchBar;`
+- **影响**: 违反项目强制禁止清单 F-11，不利于 tree-shaking 和命名规范统一。
+- **修复**: 删除 `export default SceneSwitchBar;`，统一使用已有的命名导出 `expor
+t class SceneSwitchBar`。
+- **依据**: `docs/design-docs/ui-style-guide/01-foundation.md` 1.5 节 F-11："组
+件文件使用 `export default` … 合法替代：统一使用 `export class UIXxx` 命名导出"
+
+---
+
+## 严重问题（Major）
+
+### 4. `SceneSwitchBar.ts` 存在魔法数字色值
+- **位置**: `apps/phaser3/src/city-builder/ui/SceneSwitchBar.ts:65-67`
+- **问题**: 
+  - `0x1a1a2e`（应使用 `UITheme.inkBlack`）
+  - `0x4a9eff`（应使用 `UITheme.stoneCyan`）
+- **影响**: 违反 F-07，色值漂移后难以统一维护。
+- **修复**: 导入 `UITheme`，替换为 `UITheme.inkBlack` 和 `UITheme.stoneCyan`。
+- **依据**: `docs/design-docs/ui-style-guide/01-foundation.md` 1.5 节 F-07
+
+### 5. `UIBadge.ts` 存在硬编码颜色 `'#ffffff'`
+- **位置**: `apps/phaser3/src/ui/UIBadge.ts:95`
+- **问题**: 文字颜色直接写死为 `'#ffffff'`，未使用 `colorToHex(UITheme.white)`。
+- **影响**: 违反 F-07，风格不一致。
+- **修复**: 导入 `colorToHex`，将 `'#ffffff'` 替换为 `colorToHex(UITheme.white)`
+。
+- **依据**: `docs/design-docs/ui-style-guide/01-foundation.md` 1.1 节和 1.5 节 F
+-07
+
+### 6. `UISegmentedControl.ts` 存在魔法数字色值
+- **位置**: 
+  - `apps/phaser3/src/ui/UISegmentedControl.ts:118`：`0x000000`（hitArea 透明背
+景，应使用 `UITheme.inkBlack`）
+  - `apps/phaser3/src/ui/UISegmentedControl.ts:139` 和 `245`：`#aaaaaa`（未选中
+标签颜色，应使用 `colorToHex(UITheme.lightInk)`）
+- **影响**: 违反 F-07。
+- **修复**: 统一替换为 `UITheme` 常量。
+- **依据**: 同上
+
+### 7. 新组件（UIPanel / UIDialog / UIToast / UIAlert）缺少单元测试
+- **位置**: `designs/issue-19/src/ui/` 目录下无 `__tests__/` 或任何 `.test.ts` 
+文件
+- **问题**: PRD-004 明确要求每个 Layer 1 原子组件配套独立测试文件，覆盖初始化、
+交互状态、资源回退、动画、内存清理。
+- **影响**: 无法自动化验证组件行为，后续回归风险高。
+- **修复**: 在 `designs/issue-19/src/ui/__tests__/` 下补充：
+  - `UIPanel.test.ts`（覆盖 show/hide 动画、遮罩、关闭按钮、getContentBounds）
+  - `UIDialog.test.ts`（覆盖继承关系、confirm/cancel 回调在 hide 后触发、closeOn
+Overlay）
+  - `UIToast.test.ts`（覆盖 show/dismiss 动画、ToastManager 单例、队列满策略、re
+position）
+  - `UIAlert.test.ts`（覆盖 show/hide 动画、isAutoHide、getTypeColor）
+- **依据**: `prd/PRD-004-ui-component-library-redesign.md` 7.3 节测试要求
+
+### 8. 项目文档未同步更新
+- **位置**: `docs/` 目录
+- **问题**: PR 未变更任何 `docs/` 文件。PRD-004 9.3 文档验收要求更新 `docs/front
+end/ui-components.md`、`docs/modules/client/ui.md`、`docs/design-docs/ui-style-g
+uide/03-component.md`。
+- **影响**: 文档与代码实现不一致，后续 Agent/开发者无法获得准确参考。
+- **修复**: 至少更新 `docs/design-docs/ui-style-guide/03-component.md` 中 UIPane
+l、UIDialog、UIToast、UIAlert 的视觉与行为描述，与本次重做对齐。
+- **依据**: `prd/PRD-004-ui-component-library-redesign.md` 9.3 节；`AGENTS.md` 
+维护规则第 6 条
+
+### 9. `UIBadge.ts` 的 `setSize` 被重命名为 `setBadgeSize`，偏离 PRD-004 接口
+- **位置**: `apps/phaser3/src/ui/UIBadge.ts:128`
+- **问题**: PRD-004 5.16 明确定义接口为 `setSize(size: 'small' | 'medium' | 'lar
+ge'): void`。代码改为 `setBadgeSize` 以规避 `Phaser.GameObjects.Container.setSiz
+e()` 冲突，这是合理的工程折中，但 PRD 文档未同步更新。
+- **影响**: 接口契约与文档不一致。
+- **修复**: 在 PRD-004 或 `docs/modules/client/ui.md` 中注明 `setSize` 已更名为 
+`setBadgeSize`（因与 Phaser Container 基类冲突），保持文档与代码一致。
+- **依据**: `prd/PRD-004-ui-component-library-redesign.md` 5.16 节
+
+---
+
+## 轻微问题（Minor）
+
+### 10. `UISegmentedControl.ts` 的 `import type` 位置不当
+- **位置**: `apps/phaser3/src/ui/UISegmentedControl.ts:17`
+- **问题**: `import type { UIPositionConfig, UISizeConfig } from './types';` 放
+在 `export interface UISegmentedOption` 之后，与其他 import 语句分离。
+- **修复**: 将该 `import type` 移至文件顶部，与其他 import 语句聚合。
+
+### 11. `UIPanel.ts` 底部冗余定义 `colorToHex`
+- **位置**: `designs/issue-19/src/ui/UIPanel.ts:299-301`
+- **问题**: 文件底部重复实现了 `colorToHex`，但 `UIPanel.ts` 与 `utils.ts` 之间
+不存在循环导入，完全可以直接从 `utils.ts` 导入。
+- **修复**: 在文件顶部导入列表中加入 `colorToHex`，删除底部局部定义。
+
+### 12. `UIToast.ts` 与 `UIAlert.ts` 动画参数未使用 `UITweens` 常量
+- **位置**: 
+  - `designs/issue-19/src/ui/UIToast.ts:155-163`（show 动画硬编码 `duration: 300
+, ease: 'Back.out'`）
+  - `designs/issue-19/src/ui/UIToast.ts:180-191`（dismiss 动画硬编码 `duration: 
+200, ease: 'Power2'`）
+  - `designs/issue-19/src/ui/UIAlert.ts:117-125`（show 动画硬编码 `duration: 200
+, ease: 'Back.out'`）
+  - `designs/issue-19/src/ui/UIAlert.ts:135-151`（hide 动画硬编码 `duration: 200
+, ease: 'Power2'`）
+- **问题**: 虽然数值与规范一致，但未引用 `UITweens.toastIn` / `UITweens.toastOut
+` / `UITweens.popup` / `UITweens.fade` 等集中配置。
+- **修复**: 统一改用 `UITweens` 常量，便于后续全局调整动画参数。
+- **依据**: `docs/design-docs/ui-style-guide/01-foundation.md` 1.3 节："所有 UI 
+动效必须统一使用 `src/ui/utils.ts` 中的 `UITweens` 配置"
+
+### 13. `ToastManager.clear()` 直接调用 `destroy()`，缺少退场动画
+- **位置**: `designs/issue-19/src/ui/UIToast.ts:264-267`
+- **问题**: `clear()` 对每个 Toast 直接 `destroy()`，未走 `dismiss()` 的退场动画
+流程。虽然语义上可能是"立即清空"，但与组件动画规范不一致。
+- **修复**: 若预期为立即强制清理，可在代码注释中注明 `// 强制立即销毁，不播放退
+场动画`；若预期为优雅清理，改为调用 `toast.dismiss()`。
+
+### 14. `UIAlert.ts` 使用类型色作为整体边框色
+- **位置**: `designs/issue-19/src/ui/UIAlert.ts:79`
+- **问题**: `this.background.setStrokeStyle(2, color);` 使用 `type` 对应的类型色
+作为外边框。而 PRD-004 / design-spec 中 UIAlert 的视觉标准仅要求"左侧 4px 色条"
+作为类型标识，未要求整体边框变色。UIPanel 的规范边框是 `UITheme.goldBrown`。
+- **修复**: 将边框色统一为 `UITheme.goldBrown`，或仅在 design-spec 中明确补充"整
+体边框使用类型色"的设计决策。
+
+---
+
+## 验证结果
+
+| 维度 | 状态 | 说明 |
+|------|------|------|
+| 功能完整性 | ⚠️ 部分通过 | UIPanel/UIDialog/UIToast/UIAlert 核心功能已实现，但
+编译失败阻止验证 |
+| 代码规范性 | ❌ | 存在 `export default`、多处魔法数字色值、动画参数未统一使用 
+`UITweens` |
+| 全链路完整性 | ⏭️ 不涉及 | 本次 PR 纯前端 UI 组件，不涉及 DB/API |
+| 规范符合性 | ⚠️ 部分通过 | 视觉与行为基本对齐 PRD-004，但色值和导出规范有违规 |
+| 测试覆盖 | ❌ | 仅 `UISegmentedControl` 有测试；4 个新组件无测试 |
+| 文档同步 | ❌ | `design-spec.md` 详尽，但项目级 `docs/` 未更新；PRD 接口与 `se
+tBadgeSize` 不一致 |
+
+---
+
+## 风险与建议
+
+1. **编译阻断风险最高**：`designs/issue-19/src/ui/` 目录下缺少 `utils.ts`、`type
+s.ts`、`UIButton.ts`，导致整个设计交付物无法编译。建议开发 Agent 优先补齐这三个
+文件，再执行 `pnpm --filter phaser3 type-check` 验证。
+
+2. **迁移接口冲突**：`UISegmentedControl` 的接口从 `selectedId` / `onSelect` 改
+为 `selectedIndex` / `onChange`，`SceneSwitchBar` 已适配，但需确认其他引用 `UISe
+gmentedControl` 的旧业务代码是否已全部迁移（本次 diff 仅看到 `SceneSwitchBar.ts`
+一处修改）。
+
+3. **Phaser 基类方法覆盖**：`UIBadge.setSize` 更名为 `setBadgeSize` 是必要的技术
+决策（规避 `Container.setSize`），但请在 PRD / 接口文档中同步更新，避免 Develope
+r Agent 迁移时按旧接口调用导致编译错误。
+
+4. **建议补充截图验收**：根据 `agent-design-guide.md` Step 5，新组件应产出 Norma
+l / Hover / Pressed / Disabled / page-context 截图，存入 `designs/issue-19/scree
+nshots/`。
+
+
+--- 第 3 次 Review ---
+## 审查结论
+
+审查结论: **NEEDS_MAJOR_FIX**
+
+PR #30（branch: `design/issue-19`）包含两部分内容：
+1. `designs/issue-19/` 下新的设计交付物（UIPanel / UIDialog / UIToast / UIAlert 
+/ UIButton 及基础设施）
+2. `apps/phaser3/src/ui/` 下现有组件的集成更新（UIBadge、UIButton、UISegmentedCo
+ntrol、UIAlert、UIPanel、UIDialog、UIToast 等）
+
+设计交付物整体质量较高，但生产代码（`apps/phaser3/src/ui/`）存在大量与 PRD-004 
+及设计规范不一致的遗留实现未清理问题，且部分核心架构要求（如 UIDialog 继承 UIPan
+el）未在生产代码中落地。
+
+---
+
+## 阻塞问题（Blocking）
+
+### 1. UIDialog 生产代码未继承 UIPanel（核心架构违反）
+- **位置**: `apps/phaser3/src/ui/UIDialog.ts:22`
+- **问题**: `UIDialog` 仍 `extends Phaser.GameObjects.Container`，自行实现背景/
+标题/遮罩/按钮。设计规范 `designs/issue-19/design-spec.md` 2.2 节 D-01 明确要求
+「**必须继承 UIPanel**」，PRD-004 5.6 节同样要求继承以复用遮罩和动画。
+- **影响**: 遮罩逻辑、show/hide 动画、深度管理在 UIDialog 和 UIPanel 中重复实现
+且参数不一致；后续维护需要改两处。
+- **修复**: 将 `apps/phaser3/src/ui/UIDialog.ts` 重构为 `extends UIPanel`，复用 
+`show()`/`hide()`/遮罩/关闭逻辑，删除自行实现的 `createOverlay()`/`createBackgro
+und()`/`createTitle()`。
+- **依据**: `designs/issue-19/design-spec.md` D-01 / PRD-004 5.6
+
+### 2. UIPanel 关闭按钮仍使用 Unicode `×`（F-01 违反）
+- **位置**: `apps/phaser3/src/ui/UIPanel.ts:86`
+- **问题**: `createCloseButton()` 中使用 `this.scene.add.text(closeX, closeY, '×
+', ...)` 渲染关闭按钮。`designs/issue-19/design-spec.md` 2.1 节 P-02 及 `docs/de
+sign-docs/ui-style-guide/03-component.md` 3.3 均明确禁止使用 `UIText` 渲染 `×` 
+字符，要求使用 `UIIcon` 加载 `cancel-btn-0.png`。
+- **影响**: 直接违反国风水墨风格规范 F-01（emoji/Unicode 图标禁令）。
+- **修复**: 参照 `designs/issue-19/src/ui/UIPanel.ts:160-221` 的实现，将关闭按钮
+改为 `UIIcon` 或 `Phaser.GameObjects.Image` 加载 `cancel-btn-0.png`，Hover 时边
+框变为 `UITheme.cinnabarRed`。
+- **依据**: `designs/issue-19/design-spec.md` P-02 / `docs/design-docs/ui-style-
+guide/03-component.md` 3.3
+
+### 3. UIAlert 仍使用 Unicode 符号作为类型图标（F-01 违反）
+- **位置**: `apps/phaser3/src/ui/UIAlert.ts:63-70`
+- **问题**: `getTypeIcon()` 返回 `'✓'`、`'!'`、`'×'`、`'i'` 等 Unicode 符号，并
+在 `createIcon()` 中渲染。`designs/issue-19/design-spec.md` 2.4 节 A-01 及 `docs
+/design-docs/ui-style-guide/03-component.md` 3.7 均明确禁止此行为，要求「**删除
+图标文字，仅用左侧 4px 色条标识类型**」。
+- **影响**: 违反 F-01，与设计稿不一致。
+- **修复**: 删除 `getTypeIcon()` 和 `createIcon()` 方法，仅保留左侧 4px 色条（已
+在 `createBackground()` 中部分实现，但需删除多余的图标文字）。
+- **依据**: `designs/issue-19/design-spec.md` A-01 / `docs/design-docs/ui-style-
+guide/03-component.md` 3.7
+
+### 4. UIToast 生产代码未按 PRD-004 重做（类型体系/深度/动画/色条全错）
+- **位置**: `apps/phaser3/src/ui/UIToast.ts`
+- **问题**: 
+  - 仍使用业务语义 `ToastType = 'build' | 'upgrade' | 'remove' | ...`，未迁移为 
+`UINotificationType`（设计规范 T-08）
+  - `depth = 4000`（应为 5000+，设计规范 T-06）
+  - 缺少左侧 4px 类型色条（设计规范 T-02）
+  - `show()` 动画 duration 为 200ms（PRD-004 3.4 要求 300ms）
+  - `hide()` 动画方向为 `y + 20`（向下，PRD-004 要求 `y 0 → -10` 向上），duratio
+n 300ms（应为 200ms）
+  - `ToastManager` 非单例，无 `getInstance()`（设计规范 T-05）
+  - 未使用 `killTweensOf` 防止动画叠加（PRD-004 3.4）
+- **影响**: 生产代码的视觉与行为与新版规范完全脱节；`designs/issue-19` 中的正确
+实现未同步到 `apps/phaser3`。
+- **修复**: 将 `apps/phaser3/src/ui/UIToast.ts` 替换为 `designs/issue-19/src/ui/
+UIToast.ts` 的实现（或等效重构），保留必要的旧接口兼容性包装。
+- **依据**: `designs/issue-19/design-spec.md` T-01~T-08 / PRD-004 3.4、5.11
+
+### 5. UIButton 生产代码缺少 pressedColor 与 killTweensOf（PRD-004 违反）
+- **位置**: `apps/phaser3/src/ui/UIButton.ts:11-21`（接口）、`77-122`（交互）
+- **问题**: 
+  - `UIButtonConfig` 缺少 `pressedColor?: number`（PRD-004 5.3 明确要求）
+  - `pointerover`/`pointerout`/`pointerdown` 均**未**在 tween 前调用 `killTweens
+Of`（PRD-004 3.4 禁止项：「禁止连续触发时动画叠加，必须先 killTweensOf」）
+  - `pointerout` 恢复 Normal 时硬编码 `fillAlpha: 0.9`（`docs/design-docs/ui-sty
+le-guide/03-component.md` 3.1 要求「应读取 `this.background.fillAlpha` 恢复，禁
+止硬编码」）
+- **影响**: 快速 hover/click 时动画叠加；Pressed 态无独立颜色支持。
+- **修复**: 
+  1. 在 `UIButtonConfig` 中增加 `pressedColor?: number`
+  2. 所有 tween 播放前增加 `killTweensOf(this.scene, this)`
+  3. `pointerout` 时记录并恢复原始 `fillAlpha`
+- **依据**: PRD-004 5.3、3.4 / `docs/design-docs/ui-style-guide/03-component.md`
+3.1
+
+---
+
+## 严重问题（Major）
+
+### 6. UIPanel 生产代码缺少 show/hide 动画与模态遮罩
+- **位置**: `apps/phaser3/src/ui/UIPanel.ts`
+- **问题**: 生产代码的 `UIPanel` 仅有 `getContentBounds()`/`addContent()`，**缺
+少** `show()`/`hide()` 标准动画、`showOverlay`/`overlayAlpha`/`isModal`/`onOverl
+ayClick` 等配置（设计规范 P-01、P-04、P-05）。由于 UIDialog 未继承 UIPanel，这些
+缺失被进一步放大。
+- **修复**: 将生产代码 `UIPanel` 升级至与设计规范一致，或至少在现有代码中补全 `s
+how()`/`hide()` 与遮罩能力。
+- **依据**: `designs/issue-19/design-spec.md` P-01、P-04、P-05 / PRD-004 5.5
+
+### 7. UIDialog 生产代码 confirm/cancel 回调在 hide 动画之前执行
+- **位置**: `apps/phaser3/src/ui/UIDialog.ts:152-160`
+- **问题**: 
+  ```ts
+  private confirm(): void {
+    this.hide();
+    this.config.onConfirm?.();  // ← hide 动画刚开始就执行回调
+  }
+  ```
+PRD-004 5.6 及设计规范 3.2 均要求「先播放 hide 动画，动画**完成后**再执行 `onCon
+firm`」。
+- **修复**: 修改 `confirm()`/`cancel()` 为 `this.hide(() => this.config.onConfir
+m?.())`，确保 `hide` tween 的 `onComplete` 中触发回调。
+- **依据**: PRD-004 5.6 / `designs/issue-19/design-spec.md` 3.2
+
+### 8. UIDialog 生产代码 depth 为 5000（应为 3000）
+- **位置**: `apps/phaser3/src/ui/UIDialog.ts:53`
+- **问题**: `this.setDepth(5000)`，但 PRD-004 3.5 及设计规范均要求 Dialog 层级为
+3000。
+- **修复**: 改为 `this.setDepth(UIDepthLayer.Dialog)` 或使用 `getNextDepth(UIDep
+thLayer.Dialog, scene)`。
+- **依据**: PRD-004 3.5 / `designs/issue-19/design-spec.md` D-03
+
+### 9. UIAlert 生产代码缺少 show() 方法与正确退场动画
+- **位置**: `apps/phaser3/src/ui/UIAlert.ts`
+- **问题**: 
+  - 无 `show()` 方法（设计规范 A-02 要求增加显式 show 接口含入场动画）
+  - `hide()` 中 `y: this.y - 20`（应为 `y: this.y - 10`，PRD-004 3.4 及设计规范 
+3.4）
+  - `static show()` 未调用 `alert.show()`（只是 new 后返回）
+  - 未使用 `getNextDepth`，depth 硬编码为 `UIDepthLayer.Toast`（虽满足最低要求，
+但无法处理多个 Alert 叠加）
+- **修复**: 参照 `designs/issue-19/src/ui/UIAlert.ts` 补全 `show()` 与正确的 `hi
+de()` 动画参数。
+- **依据**: `designs/issue-19/design-spec.md` A-02、A-03 / PRD-004 3.4
+
+### 10. UIBadge 修改后无配套单元测试
+- **位置**: `apps/phaser3/src/ui/UIBadge.ts`
+- **问题**: PR 修改了 `UIBadge.ts`（新增 `maxWidth`、文本截断、`depth`、UITheme 
+语义色），但 `apps/phaser3/src/ui/__tests__/` 目录下**不存在 `UIBadge.test.ts`**
+。
+- **修复**: 新增 `UIBadge.test.ts`，覆盖初始化、类型色切换、`setText`、`setBadge
+Size`、`maxWidth` 截断。
+- **依据**: PRD-004 7.3「所有组件在 `src/ui/__tests__/` 有对应测试文件」
+
+### 11. designs/issue-19 UIButton 设计稿也存在 killTweensOf 与 pressedColor 缺失
+- **位置**: `designs/issue-19/src/ui/UIButton.ts:87-122`
+- **问题**: 作为设计交付物，该文件同样缺少 `pressedColor` 配置，且所有 tween 前
+未调用 `killTweensOf`。虽然生产代码的 `UIButton.ts` 问题更严重，但设计稿本身也未
+完全对齐 PRD-004 5.3。
+- **修复**: 在设计稿中补全 `pressedColor` 与 `killTweensOf`。
+- **依据**: PRD-004 5.3、3.4
+
+---
+
+## 轻微问题（Minor）
+
+### 12. designs/issue-19 缺少统一导出 index.ts
+- **位置**: `designs/issue-19/src/ui/`
+- **问题**: 目录下无 `index.ts`，无法统一导出组件。`apps/phaser3/src/ui/index.ts
+` 已存在统一导出，但设计目录自身缺少该文件。
+- **修复**: 新增 `designs/issue-19/src/ui/index.ts`，按规范统一导出本 Issue 涉及
+的组件与类型。
+- **依据**: PRD-004 5.1 目录结构
+
+### 13. UIButton setDisabled 参数命名不一致
+- **位置**: `designs/issue-19/src/ui/UIButton.ts:129`
+- **问题**: `setDisabled(disabled: boolean)` 参数未使用 `isDisabled` 前缀，与方
+法体内部使用的 `this.config.isDisabled` 不一致。
+- **修复**: 改为 `setDisabled(isDisabled: boolean)`。
+- **依据**: PRD-004 3.2 命名规范
+
+### 14. UISegmentedControl 测试未覆盖新接口
+- **位置**: `apps/phaser3/src/ui/__tests__/UISegmentedControl.test.ts`
+- **问题**: 测试未覆盖 `setOptionDisabled`、`getSelectedIndex`、禁用项点击不触发
+等新增功能。
+- **修复**: 补充对应测试用例。
+- **依据**: PRD-004 7.3
+
+### 15. UIToast.show() 中 duration 硬编码 200ms（应为 300ms）
+- **位置**: `apps/phaser3/src/ui/UIToast.ts:85`
+- **问题**: `show()` 入场动画 duration 为 `200`，但 PRD-004 3.4 要求 Toast 入场
+为 300ms。
+- **修复**: 改为 `UITweens.toastIn.duration`（300ms）。
+- **依据**: PRD-004 3.4
+
+---
+
+## 验证结果
+
+| 维度 | 状态 | 说明 |
+|------|------|------|
+| 功能完整性 | ❌ | `designs/issue-19` 交付物基本完整，但 `apps/phaser3` 生产代
+码中 UIPanel/UIDialog/UIToast/UIAlert 均未完成与 PRD-004 对齐的重做，大量旧实现
+残留。 |
+| 代码规范性 | ❌ | 生产代码存在 F-01 违反（Unicode 图标/×字符）、深度值错误、动
+画参数错误；设计稿 UIButton 缺少 pressedColor。 |
+| 全链路完整性 | ❌ | DB/API 不涉及。但设计交付物 → 生产代码的迁移链路断裂：`des
+igns/issue-19` 中的正确实现未同步到 `apps/phaser3/src/ui/`。 |
+| 规范符合性 | ❌ | `apps/phaser3` 的 UIDialog（未继承 UIPanel）、UIPanel（×关闭
+按钮）、UIAlert（Unicode 图标）、UIToast（旧类型体系）均不符合新版规范。 |
+| 测试覆盖 | ⚠️ | `designs/issue-19` 四个组件均有测试；`apps/phaser3` UISegmented
+Control 有测试但覆盖不全，UIBadge 修改后无测试，UIAlert/UIToast/UIDialog/UIPanel
+生产代码无新增测试。 |
+| 文档同步 | ✅ | `docs/design-docs/ui-style-guide/03-component.md`、`docs/modul
+es/client/ui.md`、`prd/PRD-004-ui-component-library-redesign.md` 均已更新。 |
+
+---
+
+## 风险与建议
+
+1. **生产代码与设计稿严重脱节的风险**：本 PR 的最大风险是 `apps/phaser3/src/ui/`
+下的组件仅做了「兼容性补丁」式修改（如改 import、改命名、加 createFallbackRect）
+，而 PRD-004 要求的结构性重做（UIDialog 继承 UIPanel、Toast 类型体系更换、Alert/
+Toast 左侧色条、show/hide 标准动画）**完全没有在生产代码落地**。这会导致后续业务
+模块（Fish/Weapon/Market 等）基于旧版不一致的接口开发，技术债务进一步扩大。
+
+2. **建议合并策略**：
+   - **方案 A（推荐）**：在合并前，要求将 `designs/issue-19/src/ui/` 中经过测试
+验证的实现（UIPanel、UIDialog、UIToast、UIAlert）**完整迁移**到 `apps/phaser3/sr
+c/ui/`，替换旧实现，并确保 `city-builder/ui/SceneSwitchBar.ts` 等调用方兼容。
+   - **方案 B**：如果本 PR 的定位仅为「设计交付 + 文档更新」，则应明确将 `apps/p
+haser3/src/ui/` 中的修改拆出，另开 Integration PR，避免给代码库留下半重做的混乱
+状态。
+
+3. **测试建议**：在将设计稿迁移到生产代码时，优先复用 `designs/issue-19/src/ui/_
+_tests__/setup.ts` 中的 `UIMockScene` 和 helper，并统一替换 `apps/phaser3/src/ui
+/__tests__/setup.ts` 中的旧基础设施。
+
+
+--- 第 4 次 Review ---
+# PR #30 代码审查报告
+
+**分支**: `design/issue-19` **审查范围**: UI 容器组件重做（UIPanel / UIDialog / 
+UIToast / UIAlert）及关联基础设施 **审查日期**: 2026-04-26 **审查依据**: `AGENTS
+.md` → `docs/frontend/agent-design-guide.md` / `docs/design-docs/ui-style-guide/
+03-component.md` / `prd/PRD-004-ui-component-library-redesign.md` / `designs/iss
+ue-19/design-spec.md`
+
+---
+
+## 审查结论
+
+审查结论: **NEEDS_MAJOR_FIX**
+
+本 PR 对四个核心容器组件进行了系统性重做，整体架构正确（UIDialog 继承 UIPanel、T
+oastManager 单例、左侧色条、动画前 killTweensOf 等），测试基础设施完备，文档同步
+较充分。但存在违反项目强制规范（F-11 `export default` 禁令）的残留、一个交互功能
+缺陷（UIButton 动态启用失效），以及若干与 PRD-004 不一致的实现细节，需在合并前修
+复。
+
+---
+
+## 阻塞问题（Blocking）
+
+无。
+
+---
+
+## 严重问题（Major）
+
+### 1. 全部 UI 组件文件仍保留 `export default`，违反 F-11 强制规范
+- **位置**: 全部 16 个 `apps/phaser3/src/ui/*.ts` 组件文件末尾
+  - `UIPanel.ts:299` — `export default UIPanel;`
+  - `UIDialog.ts:187` — `export default UIDialog;`
+  - `UIToast.ts:407` — `export default UIToast;`
+  - `UIAlert.ts:182` — `export default UIAlert;`
+  - `UIButton.ts:163` / `UIIcon.ts:98` / `UIIconButton.ts:173` / `UIInput.ts:167
+` / `UIList.ts:164` / `UIListItem.ts:131` / `UIAvatar.ts:121` / `UIProgressBar.t
+s:123` / `UIResourceDisplay.ts:107` / `UIScrollView.ts:164` / `UISegmentedContro
+l.ts:250` / `UIText.ts:46` / `UITooltip.ts:146`
+- **问题**: 设计规范 `designs/issue-19/design-spec.md` 明确将 `export default` 
+列为 F-11 违反项（P-06、D-07、T-07、A-05），要求改为命名导出 `export class`。`do
+cs/design-docs/ui-style-guide/03-component.md` 3.9 检查清单也强制要求：「组件文
+件使用命名导出 `export class`，不使用 `export default`」。`docs/modules/client/u
+i.md` 同样重申此规则。
+- **影响**: 虽然 `index.ts` 使用命名导入，但文件内同时存在命名导出和默认导出会导
+致规范混乱，且给后续重构和 tree-shaking 带来隐患。
+- **修复**: 从上述 16 个文件中删除每一行的 `export default Xxx;`。
+- **依据**: `designs/issue-19/design-spec.md` 第 2 节问题分析表（P-06 / D-07 / T
+-07 / A-05）; `docs/design-docs/ui-style-guide/03-component.md` 第 289-296 行。
+
+### 2. UIButton `setDisabled(false)` 无法恢复交互事件监听
+- **位置**: `apps/phaser3/src/ui/UIButton.ts:84-141`（`setupInteraction`）及 `:1
+49-160`（`setDisabled`）
+- **问题**: 构造函数中若传入 `isDisabled: true`，`setupInteraction()` 会在 `:89-
+92` 提前 `return`，导致 `pointerover` / `pointerout` / `pointerdown` / `pointeru
+p` 事件监听器**从未被注册**。后续调用 `setDisabled(false)` 仅执行 `target.setInt
+eractive({ useHandCursor: true })` 和 `this.setAlpha(1)`，但事件监听仍然缺失，按
+钮虽可交互但无 Hover / Pressed / Click 响应。
+- **影响**: 任何在构造时禁用、后续启用的 UIButton 将处于“假交互”状态，破坏状态机
+完整性。
+- **修复**: 重构 `setupInteraction()`，使其**始终注册**事件监听，仅在回调内部判
+断 `this.config.isDisabled` 来决定是否执行视觉反馈和 `onClick`；`setDisabled()` 
+仅负责切换 `isDisabled` 标志和 `disableInteractive()` / `setAlpha()`。
+  ```typescript
+  // 示例修复思路
+  target.on('pointerover', () => {
+    if (this.config.isDisabled) return;
+    killTweensOf(this.scene, this);
+    ...
+  });
+  // 构造函数中不再因 isDisabled 提前 retur
+
+  if (this.config.isDisabled) {
+    target.disableInteractive();
+    this.setAlpha(0.6);
+  }
+  ```
+- **依据**: `docs/design-docs/ui-style-guide/03-component.md` 3.1 节要求「所有按
+钮组件都有 Normal / Hover / Pressed / Disabled 四态视觉区分」；PRD-004 3.6 组件
+状态机要求从 DISABLED 恢复后自动回到 NORMAL 态。
+
+### 3. `apps/phaser3/src/ui/__tests__/` 缺少 `UIAlert.test.ts`
+- **位置**: `apps/phaser3/src/ui/__tests__/`
+- **问题**: PRD-004 成功指标要求「单元测试覆盖率 ≥ 80%（全部组件）」，且 `design
+s/issue-19/design-spec.md` 9.4 验收标准列明需测试 `show()` / `hide()` / `isAutoH
+ide` / `getTypeColor()` 等。设计目录 `designs/issue-19/src/ui/__tests__/UIAlert.
+test.ts` 已存在较完善的测试（12 个 case），但生产代码目录 `apps/phaser3` 中未同
+步创建对应测试文件。
+- **影响**: 生产测试覆盖不完整；后续 CI 无法验证 UIAlert 回归。
+- **修复**: 将 `designs/issue-19/src/ui/__tests__/UIAlert.test.ts` 适配到 `apps/
+phaser3/src/ui/__tests__/UIAlert.test.ts`，使用 `MockScene` 替代 `UIMockScene`（
+或复用 `src/ui/__tests__/setup.ts` 中的 `UIMockScene`）。
+- **依据**: PRD-004 第 1.2 节测试覆盖率指标；`designs/issue-19/design-spec.md` 9
+.4 验收标准。
+
+### 4. UISegmentedControl 存在魔法数字色值且默认选中色与 PRD-004 不一致
+- **位置**: `apps/phaser3/src/ui/UISegmentedControl.ts:138` 及 `:54`
+- **问题**:
+  1. **魔法数字**: 非选中标签颜色硬编码为 `'#aaaaaa'`（`:138`），违反 `docs/fron
+tend/agent-design-guide.md` Step 3.2「颜色使用 `UITheme` 常量，禁止魔法数字」。
+  2. **PRD 不一致**: 默认 `selectedColor` 为 `UITheme.stoneCyan`（`:54`），但 PR
+D-004 5.13 明确规定「选中态使用 `UITheme.indigoBlue`」。
+- **影响**: 视觉风格与国风色板不一致；若主题色调整，该组件不会同步变更。
+- **修复**:
+  ```typescript
+  // :54
+  selectedColor: config.selectedColor ?? UITheme.indigoBlue,
+  // :138
+  color: colorToHex(UITheme.lightInk),  // 替代 '#aaaaaa'
+  ```
+- **依据**: `docs/frontend/agent-design-guide.md` 第 114 行；PRD-004 5.13 变更要
+点。
+
+### 5. UIAlert `hide()` 动画时长 150ms，与 PRD-004 及设计规范要求的 200ms 不符
+- **位置**: `apps/phaser3/src/ui/UIAlert.ts:148`
+- **问题**: `UIAlert.hide()` 使用 `duration: UITweens.fade.duration`（150ms）。
+但 `prd/PRD-004-ui-component-library-redesign.md` 5.15 明确规定退场动画 `duratio
+n=200ms`；`designs/issue-19/design-spec.md` 3.4 节同样写明 `duration=200ms`。
+- **影响**: UIAlert 退场动画比规范快 50ms，与其他弹窗/提示组件的视觉节奏不一致。
+- **修复**: 将 `UIAlert.hide()` 中 `duration` 改为字面量 `200`（或新增 `UITweens
+.alertOut` 配置）。
+  ```typescript
+  duration: 200,  // 替代 UITweens.fade.duratio
+
+  ```
+- **依据**: `prd/PRD-004-ui-component-library-redesign.md` 5.15；`designs/issue-
+19/design-spec.md` 3.4 动画标准表。
+
+---
+
+## 轻微问题（Minor）
+
+### 1. UIListItem 使用魔法数字色值
+- **位置**: `apps/phaser3/src/ui/UIListItem.ts:83` (`#dddddd`)、`:92` (`#888888`
+)
+- **问题**: 标题和副标题颜色使用硬编码 HEX，应使用 `UITheme.white` / `UITheme.me
+diumInk` 等常量。
+- **修复**: 替换为 `colorToHex(UITheme.white)` 和 `colorToHex(UITheme.mediumInk)
+`。
+- **依据**: `docs/frontend/agent-design-guide.md` 第 114 行。
+
+### 2. UIPanel 关闭按钮未使用 `UIIcon` 组件
+- **位置**: `apps/phaser3/src/ui/UIPanel.ts:160-221`
+- **问题**: `designs/issue-19/design-spec.md` 3.1 节要求「关闭按钮使用 `UIIcon` 
+加载 `cancel-btn-0.png` 纹理」。实际实现手动创建 `Phaser.GameObjects.Image` / `R
+ectangle` 并自行管理交互和 Hover 边框变色，未实例化 `UIIcon` 类。
+- **影响**: 规范符合性轻微偏差；关闭按钮的 Hover 边框变色逻辑无法在 `UIIcon` 中
+复用。
+- **修复建议**: 若 `UIIcon` 不支持 Hover 边框变色，可在设计规范中记录此例外，或
+扩展 `UIIcon` 支持 `onHover` / `onOut` 回调后统一替换。
+- **依据**: `designs/issue-19/design-spec.md` 3.1 关闭按钮标准。
+
+### 3. 文档中 UIAlert 退场时长存在内部不一致
+- **位置**: `docs/design-docs/ui-style-guide/03-component.md:225`
+- **问题**: 该文件写 UIAlert 退场 `duration=150ms`，但 PRD-004 和设计规范均要求 
+200ms。作为本次 PR 中被修改的文档，应与上级规范保持一致。
+- **修复**: 将 `03-component.md` 中 UIAlert 退场时长改为 `duration=200ms`。
+- **依据**: PRD-004 5.15；`designs/issue-19/design-spec.md` 3.4。
+
+### 4. `docs/modules/client/ui.md` 对 `createInkBackground` 的原点描述错误
+- **位置**: `docs/modules/client/ui.md:509`
+- **问题**: 文档写「默认原点左上角」，但 `apps/phaser3/src/ui/utils.ts:186` 实际
+设置 `bg.setOrigin(0.5)`（中心原点）。
+- **修复**: 将描述改为「默认原点中心（0.5）」。
+- **依据**: `apps/phaser3/src/ui/utils.ts:177-188` 源码。
+
+### 5. `UIListItem` 的 `icon` 参数以文本方式渲染，存在误用 emoji 风险
+- **位置**: `apps/phaser3/src/ui/UIListItem.ts:72-75`
+- **问题**: `icon` 被直接传入 `scene.add.text(...)` 作为字符串渲染。若调用方传入
+emoji，将违反 F-01 禁令。PRD-004 5.7 定义 `icon?: string` 为纹理键名，但实现按文
+本处理。
+- **修复建议**: 若 `icon` 应为纹理键名，应使用 `hasTexture` + `scene.add.image` 
+渲染；若保留文本方式，需在文档中明确禁止 emoji 并添加运行时检查。
+- **依据**: `docs/design-docs/ui-style-guide/03-component.md` 3.7 / 3.8 F-01 禁
+止项；PRD-004 5.7。
+
+---
+
+## 验证结果
+
+| 维度 | 状态 | 说明 |
+|------|------|------|
+| 功能完整性 | ✅ | 四个目标组件的接口（show/hide、遮罩、ToastManager 单例、aler
+t() 工厂、getTypeColor 等）均已实现。 |
+| 代码规范性 | ❌ | `export default` 残留（全部 16 个组件文件）；UISegmentedCont
+rol / UIListItem 存在魔法数字色值；UIButton 状态机实现不完整。 |
+| 全链路完整性 | ✅ | 本次 PR 为纯前端 UI 层变更，不涉及 DB / API / Mobile 链路
+。 |
+| 规范符合性 | ⚠️ | 核心容器组件对齐 PRD-004 约 90%，但 UIAlert hide 时长、UISegm
+entedControl 默认选中色、关闭按钮未使用 UIIcon 存在偏差。 |
+| 测试覆盖 | ⚠️ | `apps/phaser3` 测试目录缺少 `UIAlert.test.ts`；其余目标组件（UI
+Panel/UIDialog/UIToast）已有测试但覆盖度中等。`pnpm test` 183 项全部通过（唯一失
+败为与本次 PR 无关的 `props-config.test.ts`）。 |
+| 文档同步 | ⚠️ | `docs/modules/client/ui.md` 更新较完整；`docs/design-docs/ui-st
+yle-guide/03-component.md` 存在 UIAlert 退场时长与 PRD 不一致；`createInkBackgro
+und` 原点描述错误。 |
+
+---
+
+## 风险与建议
+
+1. **export default 遗留风险**: 虽然当前 `index.ts` 统一使用命名导出，但文件级 `
+export default` 的长期存在会诱使后续开发者使用默认导入，破坏规范一致性。建议一次
+性全部清理。
+
+2. **UIButton 状态机脆弱性**: `setDisabled(false)` 的事件监听缺失是**状态机实现
+缺陷**，在动态权限/表单校验场景中极易触发。建议将事件监听注册与 `isDisabled` 状
+态判断解耦。
+
+3. **设计资产与生产代码的测试漂移**: `designs/issue-19/src/ui/__tests__/` 中的测
+试比 `apps/phaser3/src/ui/__tests__/` 更完善（使用了 `UIMockScene`、`expectTween
+Created` 等 helper）。建议建立规范：设计目录的测试在合并前必须同步到生产目录，或
+统一从生产目录运行。
+
+4. **文档三处不一致**: PRD-004（200ms）/ design-spec（200ms）/ ui-style-guide（1
+50ms）对 UIAlert 退场时长的描述不一致，应在修复代码后统一文档。
+
+5. **建议补充的测试场景**（非阻塞，但建议后续迭代）：
+   - UIPanel: `show()` 在 `hide()` 动画中途被调用的行为（killTweensOf + 新动画）
+。
+   - UIDialog: 确认回调确实在 `hide` 动画 `onComplete` 后触发（当前 `apps/phaser
+3` 的测试仅检查 `dialog` 被定义，未触发按钮）。
+   - UIToast: ToastManager 队列满时最早 Toast 被 dismiss 后，剩余 Toast 的 repos
+ition 验证。
+   - UIAlert: `getTypeColor` 静态方法的四态返回值验证（设计目录已有，生产目录缺
+失）。
+
+---
+
+*审查完成。以上问题修复后，本 PR 可视为满足合并条件。*
+
+
+--- 第 5 次 Review ---
+## 审查结论
+
+审查结论: **NEEDS_FIX**
+
+> PR #30 对 `apps/phaser3/src/ui/` 下的 Layer 1 原子组件进行了系统性重做（UIPane
+l、UIDialog、UIToast、UIAlert）及配套调整（UIButton、UIBadge、UISegmentedControl
+、UIListItem），同步更新了设计文档和测试。整体架构符合 PRD-004 与设计规范，但存
+在 1 个 Major 规范违反项和若干 Minor 问题，修复后可合并。
+
+---
+
+## 阻塞问题（Blocking）
+
+无。
+
+---
+
+## 严重问题（Major）
+
+### 1. UIIcon 的 pointerdown 动画违反「动画铁律」—— 未执行 `killTweensOf`
+- **位置**: `apps/phaser3/src/ui/UIIcon.ts:73-83`
+- **问题**: `UIIcon` 的 `pointerdown` 事件处理器直接创建 tween，未在播放前调用 `
+killTweensOf`。根据 `docs/design-docs/ui-style-guide/03-component.md` 3.2 节「动
+画铁律」：
+  > **Pressed tween 播放前必须先 `killTweensOf(this.scene, this)`。**
+快速连续点击时，tween 会叠加，导致缩放动画异常。
+- **影响**: 所有使用 `UIIcon` 且开启 `isInteractive` 的交互图标（如关闭按钮、道
+具图标）在连续点击时动画冲突。
+- **修复**: 在 `pointerdown` 回调第一行添加 `killTweensOf(this.scene, this);`：
+  ```typescript
+  target.on('pointerdown', () => {
+    killTweensOf(this.scene, this); // 新增
+    this.scene.tweens.add({
+      targets: this,
+      scale: 0.95,
+      duration: UITweens.press.duration, // 建议同步改为 UITweens.press
+      ease: UITweens.press.ease,
+      yoyo: true,
+      onComplete: () => {
+        this.config.onClick?.();
+      },
+    });
+  });
+  ```
+- **依据**: `docs/design-docs/ui-style-guide/03-component.md` 第 76-78 行；PRD-0
+04 3.4 节「禁止连续触发时动画叠加，必须先 `killTweensOf(target)`」。
+
+---
+
+## 轻微问题（Minor）
+
+### 2. UIListItem 图标缺失时未执行资源回退契约
+- **位置**: `apps/phaser3/src/ui/UIListItem.ts:71-78`
+- **问题**: 当传入 `icon` 但纹理不存在时，代码仅跳过创建图标：
+  ```typescript
+  if (icon) {
+    if (hasTexture(this.scene, icon)) {
+      // 创建 image
+    }
+    // 无 else 分支：既没有 fallback Rectangle，也没有 console.war
+
+    textX = 10;
+  }
+  ```
+这违反了 PRD-004 3.3 节资源回退统一标准：
+  > 1. **检查**：`if (texture && hasTexture(scene, texture))`
+  > 2. **回退**：使用 `createInkBackground()` 或 `scene.add.rectangle()` + `setS
+trokeStyle()`
+  > 3. **告警**：`console.warn(\`[UI] fallback: ${textureKey}\`)`
+- **影响**: 列表项在缺少图标纹理时左侧出现空白偏移，且无回退提示，不利于资源缺失
+排查。
+- **修复**: 补充 `else` 分支：
+  ```typescript
+  if (icon) {
+    if (hasTexture(this.scene, icon)) {
+      const iconImage = this.scene.add.image(-width / 2 + 20, 0, icon);
+      iconImage.setDisplaySize(18, 18);
+      iconImage.setOrigin(0.5);
+      elements.push(iconImage);
+    } else {
+      const fallback = createFallbackRect(this.scene, 18, 18, icon, UITheme.ligh
+tInk, UITheme.goldBrown);
+      fallback.setPosition(-width / 2 + 20, 0);
+      elements.push(fallback);
+    }
+    textX = 10;
+  }
+  ```
+同时需要在文件顶部引入 `createFallbackRect`。
+- **依据**: PRD-004 3.3 节「资源回退统一标准」；`apps/phaser3/src/ui/utils.ts` 
+中 `createFallbackRect` 的实现。
+
+### 3. UIListItem 存在未使用的 dead code
+- **位置**: `apps/phaser3/src/ui/UIListItem.ts:26`
+- **问题**: `private iconText?: Phaser.GameObjects.Text;` 在重构后（从 Unicode 
+字符回退改为 Image/Rectangle）不再被赋值，但属性声明仍保留。
+- **修复**: 删除 `iconText` 属性声明。
+
+### 4. ToastManager 构造器应为 private（设计规范偏差）
+- **位置**: `apps/phaser3/src/ui/UIToast.ts:317`
+- **问题**: 设计规范 `designs/issue-19/design-spec.md` 及 PRD-004 均要求 `ToastM
+anager` 为单例模式，构造器应为 `private constructor`。实际实现为 `constructor(sc
+ene: Scene, startY?: number)`（public），允许外部直接 `new ToastManager(scene)`
+，弱化了单例约束。
+- **修复**: 将构造器改为 `private`：
+  ```typescript
+  private constructor(scene: Scene, startY?: number) { ... }
+  ```
+现有测试中的 `new ToastManager(scene)` 调用应替换为 `ToastManager.getInstance(sc
+ene)`。
+- **依据**: `designs/issue-19/design-spec.md` 第 221-224 行；PRD-004 5.11 ToastM
+anager 接口设计。
+
+### 5. UIBadge 深度测试未做实际断言
+- **位置**: `apps/phaser3/src/ui/__tests__/UIBadge.test.ts:49-52`
+- **问题**: 测试用例仅断言 `toBeDefined()`，未验证 `depth` 是否被正确设置：
+  ```typescript
+  it('should respect explicit depth', () => {
+    const badge = new UIBadge(scene as unknown as Scene, { text: '深度', depth: 
+100 });
+    expect(badge).toBeDefined();
+  });
+  ```
+- **修复**: 增加深度断言：
+  ```typescript
+  expect(badge.depth).toBe(100);
+  ```
+
+### 6. 文档存在重复的检查清单条目
+- **位置**: `docs/design-docs/ui-style-guide/03-component.md:293-296`
+- **问题**: 文件末尾出现重复的两行：
+  ```markdow
+
+  - [ ] 所有布尔参数使用 `isXxx` 或 `showXxx` 前缀
+  - [ ] 组件文件使用命名导出 `export class`，不使用 `export default`
+  ```
+- **修复**: 删除重复的两行。
+
+### 7. 视觉验收截图证据缺失（PR 描述层面）
+- **问题**: 根据 `docs/design-docs/visual-qa-sop.md` 第 6 节，涉及 UI 改动的 PR 
+必须在 PR 描述中提供截图证据（normal / hover / pressed / disabled / page-context
+）。本次 PR 改动了 UIPanel、UIDialog、UIAlert、UIToast 等容器的视觉表现，但未在
+仓库内提供截图目录或基线对比。
+- **建议**: 在 `designs/issue-19/screenshots/` 补充各组件状态的 Playwright 截图
+，或在 PR 描述中贴出截图证据。若当前环境无法运行 Playwright，至少补充 Demo Scene
+（`src/scenes/demo/`）以便后续人工验收。
+- **依据**: `docs/design-docs/visual-qa-sop.md` 第 139-160 行「视觉验收清单（PR 
+描述必填）」。
+
+---
+
+## 验证结果
+
+| 维度 | 状态 | 说明 |
+|------|------|------|
+| 功能完整性 | ✅ | UIPanel/UIDialog/UIToast/UIAlert 均实现了 PRD-004 和设计规范
+要求的全部接口与行为。UIDialog 正确继承 UIPanel 并复用动画/遮罩。ToastManager 支
+持单例与队列。 |
+| 代码规范性 | ⚠️ | 整体规范良好：命名统一为 `isXxx`/`showXxx`/`onXxx`；移除了全
+部 `export default`；使用 `UITheme` 常量替代魔法数字。但存在 1 处 Major 动画规范
+违反（UIIcon `killTweensOf` 缺失）和 2 处 Minor 回退/清理问题。 |
+| 全链路完整性 | ✅ | 本次为纯前端 UI 组件 PR，不涉及 DB/API/Mobile。组件间的单
+向依赖关系（UIDialog → UIPanel → utils）正确，无循环依赖。 |
+| 规范符合性 | ✅ | 深度规范（UIDepthLayer）、动画标准（UITweens）、四态交互、资
+源回退机制在核心组件（UIPanel/UIDialog/UIAlert/UIToast/UIButton）上均已落实。 |
+| 测试覆盖 | ✅ | 新增 4 个测试文件（UIAlert、UIBadge、UISegmentedControl、UIToa
+st），现有测试同步更新。全部 UI 相关测试通过（194 tests passed）。仅 `src/config
+s/test/props-config.test.ts` 失败（与本次 PR 无关的 path.join 问题）。 |
+| 文档同步 | ✅ | `docs/design-docs/ui-style-guide/03-component.md` 和 `docs/mod
+ules/client/ui.md` 已同步更新接口定义、命名变更和深度说明。`designs/issue-19/des
+ign-spec.md` 完整记录了设计决策。 |
+
+---
+
+## 风险与建议
+
+1. **向后兼容风险**：`UISegmentedControl` 的 API 发生了破坏性变更（`selectedId` 
+→ `selectedIndex`/`key`，`onSelect` → `onChange`）。`SceneSwitchBar.ts` 已同步迁
+移，但建议全局搜索确认无其他业务代码使用旧 API。
+2. **UIToast 旧 API 兼容层**：当前保留了 `title`、`startTime`、`endTime`、`progr
+ess`、`showProgress`、`onComplete`、`onClick` 等废弃字段。建议在后续迭代中标记具
+体移除版本，避免兼容层长期累积。
+3. **深度计数器未重置**：`getNextDepth` 使用 Scene 级 WeakMap 计数器，但仅在 `To
+astManager.clear()` 等极少数场景重置。如果同一 Scene 反复创建/销毁大量同层级组件
+，depth 可能无限增长（虽然实际场景中 5000+ 的 depth 在 Phaser3 中通常不会导致问
+题）。
+4. **缺少 Layer 2 组件**：PRD-004 规划了 6 个 Layer 2 组件（UISlider、UIToggle、
+UIStepper、UIDropdown、UIPagination、UILoading），本次 PR 未交付。建议在后续 PR 
+中继续推进，并在 `docs/modules/client/ui.md` 的「后续计划」中保持更新。
+
+
+--- 第 6 次 Review ---
+# PR #30 代码审查报告
+
+> **分支**: `design/issue-19`  
+> **范围**: UIPanel / UIDialog / UIToast / UIAlert / UIButton 重做 + 基础设施更
+新 + 文档同步  
+> **审查依据**: PRD-004-ui-component-library-redesign.md、`docs/design-docs/ui-s
+tyle-guide/`、`docs/frontend/agent-design-guide.md`
+
+---
+
+## 审查结论
+
+审查结论: **NEEDS_MAJOR_FIX**
+
+PR 整体完成了 Issue #19 的核心目标：四个容器组件（UIPanel / UIDialog / UIToast /
+UIAlert）已按 PRD-004 重做，命名规范统一（`isXxx`、`onXxx`）、动画契约正确（`kil
+lTweensOf` + `UITweens`）、深度层正确（`UIDepthLayer`）、旧版 `export default` 
+已清理。城市建造模块的 `ProgressToast` 兼容包装也保持了向后兼容。
+
+但存在 **5 项 Major 问题** 需要修复，主要集中在：
+1. PRD-004 接口实现不完整（`UIButton` 缺少公开方法）
+2. 警告色值与 PRD-004 冲突（`goldBrown` vs `warning`）
+3. 设计产物编译缺陷（`designs/issue-19/src/ui/index.ts` 导出不存在类型）
+4. 文档格式错误（重复章节编号）
+5. `UIDialog` 存在无效继承参数
+
+---
+
+## 阻塞问题（Blocking）
+
+无阻塞问题。
+
+---
+
+## 严重问题（Major）
+
+### 1. UIButton 缺少 PRD-004 规定的 `setTexture()` 和 `setColors()` 公开方法
+
+- **位置**: `apps/phaser3/src/ui/UIButton.ts`（整文件，缺少方法实现）
+- **问题**: PRD-004 5.3 节明确定义了 `UIButton` 的公开 API：
+  ```typescript
+  class UIButton {
+    setText(text: string): void;
+    setDisabled(isDisabled: boolean): void;
+    setTexture(texture: string): void;          // ❌ 未实现
+    setColors(bgColor: number, hoverColor: number, strokeColor: number): void;  
+// ❌ 未实现
+  }
+  ```
+同时 `docs/modules/client/ui.md` 也已更新并 documenting 了这两个方法，但代码中不
+存在。
+- **影响**: 业务代码按新版文档调用 `setTexture()` / `setColors()` 时将报运行时错
+误；PRD-004 接口一致性验收不通过。
+- **修复**: 在 `UIButton` 类中补充：
+  ```typescript
+  setTexture(texture: string): void {
+    this.config.texture = texture;
+    // 销毁旧 background，按 createBackground() 逻辑重建
+  }
+  setColors(bgColor: number, hoverColor: number, strokeColor: number): void {
+    this.config.bgColor = bgColor;
+    this.config.hoverColor = hoverColor;
+    this.config.strokeColor = strokeColor;
+    if (this.background instanceof Phaser.GameObjects.Rectangle) {
+      this.background.setFillStyle(bgColor, this.originalFillAlpha);
+      this.background.setStrokeStyle(2, strokeColor);
+    }
+  }
+  ```
+- **依据**: PRD-004 5.3 节接口设计；`docs/modules/client/ui.md` 第 86–89 行。
+
+---
+
+### 2. UIAlert / UIToast 的 `warning` 类型色错误使用了 `UITheme.goldBrown`
+
+- **位置**:
+  - `apps/phaser3/src/ui/UIAlert.ts:70` / `UIAlert.ts:167`
+  - `apps/phaser3/src/ui/UIToast.ts:129`
+- **问题**: 当 `type === 'warning'` 时，代码返回 `UITheme.goldBrown` (`0xc9a227`
+)。但 PRD-004 5.15 节强制规定 warning 色为 `0xffaa00`，且 `UITheme.warning` 已定
+义为此值。文档 `docs/design-docs/ui-style-guide/03-component.md` 3.7/3.8 节虽然
+写了 `UITheme.goldBrown`，但该文档是在 PR 中新增/更新的，与 PRD-004 源规范冲突。
+应以 PRD-004 为准。
+- **影响**: 警告提示条视觉色值与产品规范不一致；测试 `UIAlert.test.ts` 第 76–78 
+行也在验证错误的 `goldBrown`，导致测试成为“假阳性”。
+- **修复**:
+  1. 将 `UIAlert.getTypeColor()` 和 `UIToast.getTypeColor()` 中 `case 'warning'`
+的返回值改为 `UITheme.warning`
+  2. 同步修正 `docs/design-docs/ui-style-guide/03-component.md` 中 warning 色条
+说明
+  3. 同步修正 `apps/phaser3/src/ui/__tests__/UIAlert.test.ts` 中断言：`expect(UI
+Alert.getTypeColor('warning')).toBe(UITheme.warning)`
+- **依据**: PRD-004 5.15 节类型色标准表格：`warning: 0xffaa00`；`apps/phaser3/sr
+c/ui/utils.ts:30` 已定义 `warning: 0xffaa00`。
+
+---
+
+### 3. `designs/issue-19/src/ui/index.ts` 导出了不存在的类型
+
+- **位置**: `designs/issue-19/src/ui/index.ts:44–45`
+- **问题**:
+  ```typescript
+  export { UIAlert, type UIAlertConfig, type UIAlertType } from './UIAlert';  //
+UIAlertType 不存在
+  export { UIToast, ToastManager, type ToastType, type UIToastConfig } from './U
+IToast';  // ToastType 不存在
+  ```
+在 `designs/issue-19/src/ui/UIAlert.ts` 中无 `UIAlertType` 导出；在 `designs/iss
+ue-19/src/ui/UIToast.ts` 中无 `ToastType` 导出（仅有 `UINotificationType`）。
+- **影响**: `designs/issue-19/` 目录无法通过 `tsc --noEmit`，违反 `agent-design-
+guide.md` Step 4 检查清单：“所有 `src/` 代码在 `designs/` 目录内可编译”。
+- **修复**: 在对应的设计产物文件中补充类型别名：
+  ```typescript
+  // designs/issue-19/src/ui/UIAlert.ts
+  export type UIAlertType = UINotificationType;
+  
+  // designs/issue-19/src/ui/UIToast.ts
+  export type ToastType = UINotificationType;
+  ```
+- **依据**: `docs/frontend/agent-design-guide.md` Step 4 检查清单：“若设计 Issue
+依赖上游 Issue 的基础设施……必须将依赖文件复制到本 Issue 目录，确保 `tsc --noEmit
+` 通过”。
+
+---
+
+### 4. `docs/design-docs/ui-style-guide/03-component.md` 存在重复章节编号
+
+- **位置**: `docs/design-docs/ui-style-guide/03-component.md`
+- **问题**: 文件中出现了两个 `## 3.8`：
+  - 第一个 `## 3.8` 是 **UIAlert**（第 236 行）
+  - 第二个 `## 3.8` 是 **UIToast**（第 244 行）
+随后 `## 3.9` 是组件层检查清单（第 286 行）。UIToast 应编号为 `3.8` 或 `3.9`，而
+检查清单应顺延。
+- **影响**: 文档索引和交叉链接失效；AGENTS.md 要求“禁止孤立文档、交叉链接”，编号
+冲突会导致锚点引用错误。
+- **修复**: 将 UIToast 章节改为 `## 3.8 UIToast`（若保留 UIAlert 为 3.7），检查
+清单改为 `## 3.9`。或按实际层级调整为连续编号。
+- **依据**: AGENTS.md 维护规则第 3 条：“交叉链接：相关文档之间应互相链接”。
+
+---
+
+### 5. `UIDialog` 未将 `onClose` 回调传递给 `UIPanel` 基类
+
+- **位置**: `apps/phaser3/src/ui/UIDialog.ts:47–69`
+- **问题**: `UIDialogConfig` 通过 `Omit<UIPanelConfig, 'title' | 'showClose'>` 
+继承了 `onClose`，但 `UIDialog` 构造 `panelConfig` 时未传递 `onClose: config.onC
+lose`，导致用户传入的 `onClose` 被静默丢弃。虽然 `UIDialog` 当前不显示关闭按钮（
+`showClose: false`），但 API 层面存在“无效参数”。
+- **影响**: 调用方传入 `onClose` 时期望在面板关闭时触发，实际永远不会执行，造成
+难以调试的交互缺陷。
+- **修复**: 在 `panelConfig` 中增加 `onClose: config.onClose`，或在 `UIDialogCon
+fig` 中显式 `Omit<UIPanelConfig, 'title' | 'showClose' | 'onClose'>` 以移除该参
+数，避免误导。
+- **依据**: PRD-004 5.6 节：`UIDialogConfig` 必须继承 `UIPanelConfig`（通过 `Omi
+t` 排除），确保 Dialog 可复用 UIPanel 的全部配置能力。
+
+---
+
+## 轻微问题（Minor）
+
+### 1. `ProgressToast.ts` 仍保留 `export default`
+
+- **位置**: `apps/phaser3/src/city-builder/ui/ProgressToast.ts:140`
+- **问题**: 文件末尾有 `export default ProgressToast;`，违反 F-11（组件文件必须
+使用命名导出 `export class`）。
+- **修复**: 删除 `export default ProgressToast;`，统一使用命名导出。所有引用方应
+改为 `import { ProgressToast } from '...'`。
+- **依据**: `docs/design-docs/ui-style-guide/03-component.md` 3.9 检查清单：“组
+件文件使用命名导出 `export class`，不使用 `export default`”。
+
+### 2. `UIAlert.show()` 未清除已存在的 `autoHideEvent`
+
+- **位置**: `apps/phaser3/src/ui/UIAlert.ts:119–133`
+- **问题**: 若 `show()` 被多次调用，前一次创建的 `delayedCall` 不会被取消，导致
+旧的自动隐藏定时器仍在运行，可能引发重复 `hide()` 动画或过早销毁。
+- **修复**: 在 `show()` 开头增加：
+  ```typescript
+  if (this.autoHideEvent) {
+    this.autoHideEvent.remove();
+    this.autoHideEvent = undefined;
+  }
+  ```
+- **依据**: 与 `UIToast.show()` 的现有防御性处理保持一致（`UIToast.ts:220–224`）
+。
+
+### 3. `UIButton` 默认文字色使用硬编码 `'#ffffff'`
+
+- **位置**: `apps/phaser3/src/ui/UIButton.ts:44`
+- **问题**: `textColor: config.textColor ?? '#ffffff'` 直接硬编码了 HEX 字符串，
+而规范要求通过 `UITheme` + `colorToHex()` 注入。
+- **修复**: 改为 `textColor: config.textColor ?? colorToHex(UITheme.white)`。
+- **依据**: `docs/design-docs/ui-style-guide/03-component.md` 3.1 禁止事项：“文
+字颜色通过 `getInkTextStyle()` + `colorToHex()` 注入，禁止硬编码 HEX 字符串”。
+
+### 4. `UIToast` 构造器隐式自动播放 `show()`，与 designs 版本行为不一致
+
+- **位置**: `apps/phaser3/src/ui/UIToast.ts:111`
+- **问题**: 为了兼容旧 API，构造器内自动调用 `this.show()`。而 designs 版本和 PR
+D-004 的契约是：构造后显式调用 `show()` 或 `static show()` 才播放入场动画。这导
+致 `UIToast.static show()` 在 apps 版本中无法显式再调用 `toast.show()`（否则会重
+置动画）。
+- **修复建议（可选）**: 在 `ToastManager.show()` 中显式调用 `toast.show()`，并将
+构造器内的自动 `show()` 逻辑改为仅在检测到旧 API 参数（如 `title`、`startTime`）
+时才触发，以减少新 API 的副作用。
+- **依据**: `designs/issue-19/src/ui/UIToast.ts` 中 `static show()` 显式调用 `to
+ast.show()`；PRD-004 5.11 接口设计未提及构造器自动播放。
+
+### 5. `apps/phaser3/src/ui/__tests__/setup.ts` 中 `assertFallbackWarn` 未在 app
+测试中使用
+
+- **位置**: `apps/phaser3/src/ui/__tests__/setup.ts:117–130`
+- **问题**: 虽然导出了 `assertFallbackWarn`，但当前所有 app 层测试文件（`UIAlert
+.test.ts`、`UIBadge.test.ts`、`UISegmentedControl.test.ts`、`UIToast.test.ts`）
+均未调用该辅助函数，导致纹理缺失回退的 `console.warn` 验证缺失。PRD-004 3.3 节要
+求“回退时打印 `[UI] fallback: ${textureKey}` warn”。
+- **修复**: 在至少一个组件测试中补充 fallback 验证用例，例如：
+  ```typescript
+  const warnSpy = createFallbackWarnSpy();
+  new UIButton(scene, { text: '测试', texture: 'non-existent' });
+  assertFallbackWarn(warnSpy, 'non-existent');
+  ```
+- **依据**: PRD-004 3.3 资源回退统一标准第 3 条：“告警：`console.warn(\`[UI] fal
+lback: ${textureKey}\`)`”。
+
+---
+
+## 验证结果
+
+| 维度 | 状态 | 说明 |
+|------|------|------|
+| 功能完整性 | ⚠️ | 核心四组件（UIPanel/UIDialog/UIToast/UIAlert）功能完整，但 `U
+IButton` 缺少 PRD-004 规定的 `setTexture`/`setColors` 方法。 |
+| 代码规范性 | ⚠️ | 命名规范、`killTweensOf`、深度层、动画参数整体合规；`UIButton
+` 存在硬编码 `'#ffffff'`；`ProgressToast.ts` 残留 `export default`。 |
+| 全链路完整性 | ✅ | 城市建造模块 `ProgressToast` / `SceneSwitchBar` 已迁移使用
+新版组件，数据流贯通。 |
+| 规范符合性 | ⚠️ | `UIAlert` / `UIToast` warning 色值使用 `goldBrown` 而非 PRD-0
+04 规定的 `warning`（`#ffaa00`）；`docs/design-docs/ui-style-guide/03-component.
+md` 编号冲突。 |
+| 测试覆盖 | ⚠️ | App 层现有 4 个测试文件覆盖基本路径，但缺少纹理回退 `console.wa
+rn` 验证；`UIButton` 新增方法无测试。 |
+| 文档同步 | ⚠️ | `docs/modules/client/ui.md` 已同步更新 API 文档，但文档中包含了
+尚未实现的 `setTexture`/`setColors`；`03-component.md` 存在重复章节编号。 |
+
+---
+
+## 风险与建议
+
+1. **色值规范冲突风险**：`docs/design-docs/ui-style-guide/03-component.md` 在 PR
+中被写入了 `warning: UITheme.goldBrown`，与 PRD-004 的 `0xffaa00` 冲突。建议在合
+并前统一以 PRD-004 为准，否则后续业务模块 Agent 会引用错误色值。
+2. **设计产物编译风险**：`designs/issue-19/src/ui/index.ts` 当前无法编译。若 Dev
+eloper Agent 直接复制该目录文件到 `apps/phaser3/src/ui/`，构建将失败。建议修复导
+出后重新验证 `tsc --noEmit`。
+3. **UIToast 构造器副作用风险**：apps 版 `UIToast` 构造器自动 `show()` 是为了兼
+容旧版 `ProgressToast`，但长期维护中应通过显式调用消除隐式副作用。建议在后续清理
+旧 API 时一并移除构造器内的 `this.show()`。
+4. **UIButton API 缺口风险**：文档与 PRD 已承诺 `setTexture()` / `setColors()`，
+但代码缺失。建议优先补齐，避免业务模块前端开发时遭遇 `TypeError: btn.setTexture 
+is not a function`。
+
+
+--- 第 7 次 Review ---
+# PR #30 代码审查报告
+
+**审查分支**: `design/issue-19` **PR 范围**: Issue #19 — UIPanel / UIDialog / UI
+Toast / UIAlert 四个核心容器组件重做 **关联 PRD**: PRD-004-ui-component-library-
+redesign.md **审查日期**: 2025-04-26
+
+---
+
+## 审查结论
+
+**审查结论: NEEDS_MAJOR_FIX**
+
+本 PR 在视觉规范对齐（色条、动画参数、命名导出）方面完成度较高，但存在一个 **Blo
+cking** 级别的编译/运行时错误（UIDialog 构造函数中 `super()` 之前使用 `this`），
+以及多个 **Major** 级别的交互逻辑缺陷和测试缺失。必须在合并前修复 Blocking 问题
+，并强烈建议同步修复 Major 问题。
+
+---
+
+## 阻塞问题（Blocking）
+
+### 1. UIDialog 构造函数在 `super()` 之前通过箭头函数引用 `this`
+
+- **位置**: `apps/phaser3/src/ui/UIDialog.ts:63-67`
+- **问题**: `panelConfig` 对象字面量在 `super(scene, panelConfig)` 之前创建，其
+中包含箭头函数 `onOverlayClick: () => { this.cancel(); }`。箭头函数在定义时会词
+法捕获外围的 `this`，而在 `super()` 调用之前，`this` 绑定处于未初始化状态（TDZ）
+。这会导致：
+  1. **TypeScript 编译错误**: `ts(17009) 'super' must be called before accessing
+'this'`
+  2. **运行时 ReferenceError**: 在严格模式下访问未初始化的 `this` 会抛出异常
+- **影响**: UIDialog 组件完全无法实例化，任何使用 `new UIDialog()` 或 `UIDialog.
+show()` 的代码都会崩溃。
+- **修复**:
+  ```typescript
+  // apps/phaser3/src/ui/UIDialog.ts
+  constructor(scene: Scene, config: UIDialogConfig) {
+    const camera = scene.cameras.main;
+    const panelConfig = {
+      x: config.x ?? camera.width / 2,
+      y: config.y ?? camera.height / 2,
+      width: config.width ?? 360,
+      height: config.height ?? 220,
+      title: config.title,
+      showClose: false,
+      showOverlay: true,
+      overlayAlpha: 0.6,
+      isModal: true,
+      depth: config.depth ?? getNextDepth(UIDepthLayer.Dialog, scene),
+      onClose: config.onClose,
+      // 不在 super 前传递依赖 this 的回调
+      onOverlayClick: undefined,
+    };
+
+    super(scene, panelConfig);
+
+    // super() 之后手动绑定 overlay 点击事件
+    if (config.closeOnOverlay && this.overlay) {
+      this.overlay.removeListener('pointerdown');
+      this.overlay.on('pointerdown', () => this.cancel());
+    }
+
+    // ...后续代码不变
+  }
+  ```
+- **依据**: ECMAScript Class Fields & TDZ 规范；TypeScript `noImplicitAny`/`stri
+ct` 模式下编译器明确报错。
+
+---
+
+## 严重问题（Major）
+
+### 2. UIButton `onClick` 在 yoyo tween `onComplete` 中触发，造成 ~100ms 交互延
+迟
+
+- **位置**: `apps/phaser3/src/ui/UIButton.ts:116-132`
+- **问题**: `pointerdown` 事件启动了一个 `scale: 0.95` + `yoyo: true` 的 tween（
+总时长 100ms），并在 `onComplete` 中调用 `this.config.onClick?.()`。这意味着用户
+点击按钮后，必须等待 100ms 的动画完成后才能触发业务逻辑。快速点击或需要即时响应
+的场景（如战斗、关闭弹窗）会明显感到迟滞。此外，`pointerup` 事件中仅恢复背景颜色
+，从不触发 `onClick`。
+- **影响**: 所有使用 `UIButton` 的交互场景都存在非预期的点击延迟；快速连续点击时
+第二次点击可能被第一次的 tween 覆盖（虽然已有 `killTweensOf` 保护，但 onComplete
+的时序仍然混乱）。
+- **修复**:
+  ```typescript
+  // apps/phaser3/src/ui/UIButton.ts
+  private setupInteraction(): void {
+    const target = this.background as Phaser.GameObjects.Rectangle & Phaser.Game
+Objects.Image;
+    target.setInteractive({ useHandCursor: true });
+
+    // pointerdown: 仅处理视觉反馈（Pressed 态）
+    target.on('pointerdown', () => {
+      if (this.config.isDisabled) return;
+      killTweensOf(this.scene, this);
+      if (this.background instanceof Phaser.GameObjects.Rectangle && this.config
+.pressedColor !== -1) {
+        this.background.setFillStyle(this.config.pressedColor, 1);
+      }
+      this.scene.tweens.add({
+        targets: this,
+        scale: 0.95,
+        duration: UITweens.press.duration,
+        ease: UITweens.press.ease,
+        yoyo: true,
+        // 移除 onComplete 中的 onClick 调用
+      });
+    });
+
+    // pointerup: 恢复视觉并立即触发点击
+    target.on('pointerup', () => {
+      if (this.config.isDisabled) return;
+      if (this.background instanceof Phaser.GameObjects.Rectangle) {
+        this.background.setFillStyle(this.config.bgColor, this.originalFillAlpha
+);
+      }
+      this.config.onClick?.(); // ← 立即触发
+    });
+
+    // pointerupoutside: 取消 Pressed 态，不触发点击
+    target.on('pointerupoutside', () => {
+      if (this.config.isDisabled) return;
+      if (this.background instanceof Phaser.GameObjects.Rectangle) {
+        this.background.setFillStyle(this.config.bgColor, this.originalFillAlpha
+);
+      }
+      killTweensOf(this.scene, this);
+      this.setScale(1);
+    });
+
+    // ...isDisabled 处理不变
+  }
+  ```
+同步修改测试文件 `UIButton.test.ts`：
+  ```typescript
+  // 需要同时触发 pointerdown + pointerup 才能触发 onClick
+  emitEvent(bg, 'pointerdown');
+  emitEvent(bg, 'pointerup');
+  expect(onClick).toHaveBeenCalled();
+  ```
+- **依据**: PRD-004 3.6 节组件状态机图：`[PRESSED] ──pointerup──▶ [HOVER]`，点击
+触发应在 `pointerup` 时完成；03-component.md 3.1 节 "Pressed 缩小...yoyo 恢复" 
+仅描述视觉动画，不意味着回调应在动画完成后触发。
+
+### 3. SceneSwitchBar 误用 `emit()` 返回值作为权限判断依据
+
+- **位置**: `apps/phaser3/src/city-builder/ui/SceneSwitchBar.ts:102-107`
+- **问题**: `const canSwitch = this.emit('before-switch', sceneType);` 中，`Phas
+er.Events.EventEmitter.emit()` 的返回值是 `boolean`（表示该事件是否至少有一个监
+听器），**不是监听器的返回值**。因此：
+  - 若没有 `before-switch` 监听器 → `emit` 返回 `false` → 错误地阻止切换
+  - 若有监听器（即使监听器返回 `false` 表示不允许）→ `emit` 返回 `true` → 错误地
+允许切换
+- **影响**: `before-switch` 事件机制完全失效，业务层无法通过事件监听阻止场景切换
+。
+- **修复**:
+  ```typescript
+  // apps/phaser3/src/city-builder/ui/SceneSwitchBar.ts
+  private switchScene(sceneType: SceneType): void {
+    if (this.currentScene === sceneType) return;
+
+    if (sceneType === SceneType.Battle) {
+      const listeners = this.listeners('before-switch') as Array<(type: SceneTyp
+e) => boolean>;
+      const canSwitch = listeners.length === 0 || listeners.every(fn => fn(scene
+Type));
+      if (!canSwitch) {
+        this.segmentedControl.setSelectedIndex(this.currentScene === SceneType.C
+ity ? 0 : 1);
+        return;
+      }
+    }
+
+    this.currentScene = sceneType;
+    this.emit('scene-switch', sceneType);
+  }
+  ```
+- **依据**: Phaser 3 API 文档 `Phaser.Events.EventEmitter#emit` 返回类型为 `bool
+ean`；代码逻辑意图（根据监听器返回值判断是否允许切换）与 API 实际行为不符。
+
+### 4. UIPanel 和 UIDialog 单元测试未从 `designs/` 迁移到 `apps/phaser3/src/ui/_
+_tests__/`
+
+- **位置**: `designs/issue-19/src/ui/__tests__/UIPanel.test.ts`、`UIDialog.test.
+ts`
+- **问题**: Issue #19 的设计资产目录中包含了 UIPanel 和 UIDialog 的完整单元测试
+（各 ~120 行），但 PR 的变更文件列表（`.doc-coverage.txt`）和实际 `apps/phaser3/
+src/ui/__tests__/` 目录中均缺少这两个文件。四个核心交付组件中，仅 UIAlert 和 UIT
+oast 的测试被正确迁移。
+- **影响**: 主代码库缺少对 UIPanel（show/hide 动画、遮罩、关闭按钮、内容区计算）
+和 UIDialog（继承行为、确认/取消回调时序、静态工厂方法）的自动化验证。后续重构极
+易引入回归缺陷。
+- **修复**:
+  1. 将 `designs/issue-19/src/ui/__tests__/UIPanel.test.ts` 和 `UIDialog.test.ts
+` 复制到 `apps/phaser3/src/ui/__tests__/`。
+  2. **注意**：designs 中的测试使用了 `scene.native` API（来自 designs 自己的 se
+tup.ts），而 `apps/phaser3/src/ui/__tests__/setup.ts` 中的 `UIMockScene` 是直接
+继承 `MockScene` 的，没有 `.native` 属性。迁移时需要将 `scene.native` 替换为 `sc
+ene`（因为 apps 中的 `UIMockScene` 本身就已经是 MockScene 的扩展）。
+- **依据**: PRD-004 7.3 节测试要求："每个组件独立测试文件，覆盖初始化、交互状态
+、资源回退、动画、内存清理"；design-spec.md 9.1/9.2 验收标准明确要求 UIPanel/UID
+ialog 的 show/hide 动画和遮罩逻辑通过测试验证。
+
+### 5. UIToast / UIAlert `show()` 在重复调用时导致 y 坐标累积漂移
+
+- **位置**: 
+  - `apps/phaser3/src/ui/UIToast.ts:104-106` 和 `show():222-235`
+  - `apps/phaser3/src/ui/UIAlert.ts:59-61` 和 `show():119-132`
+- **问题**: 构造函数中执行 `this.y += 20`，`show()` 的 tween 目标为 `this.y - 20
+`（即回到原始位置）。但如果 `show()` 被调用两次（例如手动调用，或 tween 被 kill 
+后重新 show），第二次的 tween 目标会变成 `原始位置 - 20`，导致 Toast/Alert 位置
+上移。UIToast 的 `show()` 在旧 API 兼容分支（`config.title || config.startTime`
+）下会自动调用，与新 API 的手动调用叠加时也可能导致问题。
+- **影响**: Toast/Alert 在特定交互序列下位置错位；多个 Toast 的垂直堆叠逻辑（Toa
+stManager）可能因此产生不可预期的间距。
+- **修复**:
+  ```typescript
+  // apps/phaser3/src/ui/UIToast.ts（UIAlert 同理）
+  export class UIToast extends Phaser.GameObjects.Container {
+    private config: Required<UIToastConfig>;
+    private originY: number; // 保存原始目标 Y 坐标
+
+    constructor(scene: Scene, config: UIToastConfig) {
+      // ...
+      this.originY = this.y; // 在 y += 20 之前保存原始位置
+      this.y += 20;
+      // ...
+    }
+
+    show(): void {
+      // ...
+      killTweensOf(this.scene, this);
+      this.scene.tweens.add({
+        targets: this,
+        alpha: 1,
+        y: this.originY, // 使用保存的原始位置，而非 this.y - 20
+        duration: UITweens.toastIn.duration,
+        ease: UITweens.toastIn.ease,
+      });
+      // ...
+    }
+  }
+  ```
+- **依据**: design-spec.md 3.3/3.4 中动画标准描述为 "y: +20 → 0"（相对于目标位置
+），意味着无论 show() 被调用多少次，最终位置应稳定在同一目标点；当前实现违反幂等
+性原则。
+
+---
+
+## 轻微问题（Minor）
+
+### 6. UIAlert `hide()` duration 硬编码，与 `UITweens` 常量不一致
+
+- **位置**: `apps/phaser3/src/ui/UIAlert.ts:153`
+- **问题**: `duration: 200` 直接硬编码，而项目已定义 `UITweens.toastOut.duration
+= 200`。
+- **修复**: 将 `duration: 200` 改为 `duration: UITweens.toastOut.duration`。
+- **依据**: PRD-004 3.4 节要求统一使用 `UITweens` 常量；agent-design-guide.md 3.
+1 节禁止魔法数字。
+
+### 7. `apps/phaser3/src/ui/__tests__/setup.ts` 与 `designs/issue-19/src/ui/__te
+sts__/setup.ts` API 不兼容
+
+- **位置**: `apps/phaser3/src/ui/__tests__/setup.ts` vs `designs/issue-19/src/ui
+/__tests__/setup.ts`
+- **问题**: 两个目录下的 `UIMockScene` 设计完全不同：
+  - `apps/` 中：`class UIMockScene extends MockScene`
+  - `designs/` 中：`class UIMockScene { get native(): MockScene }`（包装器模式）
+这导致 designs 中的测试代码（如 `UIPanel.test.ts` 使用 `scene.native`）无法直接
+在 apps 的测试基础设施上运行。
+- **修复**: 统一测试基础设施，或迁移 designs 测试时同步替换 `scene.native` 为 `s
+cene`。
+- **依据**: AGENTS.md 维护规则第 5 条："债务同步：发现代码与文档不一致时，更新对
+应文档或在 tech-debt-tracker 中追加条目"。两套测试基础设施并存是隐性技术债务。
+
+---
+
+## 验证结果
+
+| 维度 | 状态 | 说明 |
+|------|------|------|
+| 功能完整性 | ✅ | Issue #19 四个核心组件（UIPanel/UIDialog/UIToast/UIAlert）的
+核心功能已实现；city-builder/ui/ 兼容层已更新 |
+| 代码规范性 | ❌ | UIDialog 有编译/运行时错误；UIButton 交互时序不符合常规 UX 
+模式；SceneSwitchBar emit 返回值误用 |
+| 全链路完整性 | ✅ | `designs/issue-19/src/ui/*` → `apps/phaser3/src/ui/*` 代码
+迁移完成，diff 基本一致（仅空行和 colorToHex 微小差异） |
+| 规范符合性 | ⚠️ | UIAlert/UIToast 的色条宽度、动画参数、命名导出均符合 03-compo
+nent.md；UIPanel/UIDialog 基本符合；UIButton onClick 时序未对齐状态机规范 |
+| 测试覆盖 | ❌ | 仅有 5 个测试文件（UIAlert/UIBadge/UIButton/UISegmentedControl
+/UIToast），缺失 UIPanel 和 UIDialog 的测试 |
+| 文档同步 | ✅ | `docs/modules/client/ui.md` 已更新新版 API；`docs/design-docs/
+ui-style-guide/03-component.md` 已修正 warning 色值和退场时长 |
+
+---
+
+## 风险与建议
+
+1. **UIDialog 运行时崩溃风险（高）**：Blocking 问题导致 UIDialog 完全不可用。建
+议将此修复作为最高优先级，并在修复后补充一个 E2E 或集成测试，验证 `UIDialog.show
+()` 和 `UIDialog.alert()` 能正常弹出不抛异常。
+
+2. **UIButton 交互延迟风险（中）**：100ms 的点击延迟在战斗、建造等高频操作场景下
+会显著降低用户体验。建议在修复后，通过 Playwright 截图验收或手动测试验证快速连续
+点击的响应性。
+
+3. **测试基础设施碎片化风险（中）**：`apps/` 和 `designs/` 下的测试 helper API 
+不统一，长期会导致 designs 中的测试无法作为回归测试资产复用。建议后续由专门的测
+试 Agent 统一两套 setup.ts，或明确约定 designs 中的测试在迁移时必须适配 apps 的 
+API。
+
+4. **SceneSwitchBar 业务逻辑失效风险（中）**：`before-switch` 事件无法正确阻止场
+景切换，可能导致玩家在编辑模式下误切到战斗场景。建议修复后，在 `SceneSwitchBar` 
+的测试或 city-builder 的 E2E 场景中覆盖此边界条件。
+
+5. **PR 范围外组件的规范漂移（低）**：本次 PR 仅重做了四个容器组件，但 `UIButton
+.ts`、`UIBadge.ts`、`UISegmentedControl.ts` 等也在 diff 中被修改。虽然改动较小（
+如移除 `export default`、增加 `colorToHex`），但分散了 review 注意力。建议未来将
+纯重构（如统一导出方式、统一颜色调用）单独提一个 "代码清理" PR，降低单个 PR 的认
+知负荷。
+
+
+--- 第 8 次 Review ---
+## 审查结论
+
+审查结论: **NEEDS_MAJOR_FIX**
+
+PR #30（`design/issue-19`）对 UIPanel、UIDialog、UIToast、UIAlert 四个核心容器组
+件进行了系统性重做，并同步更新了 UIButton 的交互状态机、测试覆盖与项目文档。整体
+代码质量较高，动画标准与命名规范基本对齐 PRD-004 和 `docs/design-docs/ui-style-g
+uide/`。但存在 **4 个 Major 问题**（含 1 个运行时功能缺陷、1 个规范合规问题、2 
+个设计资产/文档不同步问题）需要在合并前修复。
+
+---
+
+## 阻塞问题（Blocking）
+
+无。
+
+---
+
+## 严重问题（Major）
+
+### 1. UIButton.setTexture() 替换背景后丢失交互能力
+- **位置**: `apps/phaser3/src/ui/UIButton.ts:175-182`
+- **问题**: `setTexture()` 调用 `this.background.destroy()` 后执行 `this.createB
+ackground()`，但**没有重新调用 `setupInteraction()`**。新创建的 `background` Gam
+eObject 未设置 `setInteractive`，导致按钮在 `setTexture()` 后完全失去点击、Hover
+、Pressed 响应。
+- **影响**: 任何依赖动态切换按钮纹理的业务场景（如换肤、状态切换）将导致按钮不可
+用。
+- **修复**: 在 `setTexture()` 末尾追加 `this.setupInteraction()` 调用，并确保旧
+事件监听已被清理：
+  ```ts
+  setTexture(texture: string): void {
+    this.config.texture = texture;
+    this.background.destroy();
+    this.createBackground();
+    this.remove(this.label);
+    this.add(this.label);
+    this.setupInteraction(); // 新增
+  }
+  ```
+- **依据**: PRD-004 5.3 要求 `setTexture()` 为动态切换纹理的公开 API，其交互功能
+必须保持可用。
+
+### 2. UIButton Disabled 态 alpha = 0.6 违反 PRD-004 强制规范
+- **位置**: `apps/phaser3/src/ui/UIButton.ts:152-153`, `:167-168`
+- **问题**: PRD-004 3.6 组件状态机章节明确要求 **"DISABLED 态 … alpha ≤ 0.5"**，
+但 `UIButton` 在 `setupInteraction()` 和 `setDisabled(true)` 中均硬编码 `this.se
+tAlpha(0.6)`。
+- **影响**: 视觉验收环节会被判定为不通过；与 PRD-004 的合规性要求冲突。
+- **修复**: 将两处 `0.6` 改为 `0.5`：
+  ```ts
+  this.setAlpha(0.5);
+  ```
+- **依据**: PRD-004 3.6 原文 — "DISABLED 态必须调用 disableInteractive()，alpha 
+≤ 0.5"。（注：`docs/design-docs/ui-style-guide/03-component.md` 3.1 节写为 0.6，
+属于文档内部矛盾，应以更高层级 PRD-004 为准。）
+
+### 3. ProgressToastManager 自定义 startY 对 ToastManager 失效
+- **位置**: `apps/phaser3/src/city-builder/ui/ProgressToast.ts:100-104`
+- **问题**: `ProgressToastManager` 构造函数接收可选的 `startY` 参数并保存在 `thi
+s.startY`，但底层 `ToastManager` 通过 `ToastManager.getInstance(scene)` 获取，该
+单例**不接受**自定义 `startY`，始终使用默认值 `scene.cameras.main.height - 100`
+。当 `ProgressToastManager` 使用自定义 `startY` 时，`ToastManager.repositionToas
+ts()` 在 Toast dismiss 后会按默认 `startY` 重新计算位置，导致垂直堆叠错位。
+- **影响**: 若业务层传入非默认 `startY`，Toast 队列的自动补位动画会跳到错误坐标
+。
+- **修复**: 方案 A（推荐）：让 `ProgressToastManager` 直接管理 Y 坐标，不依赖 `T
+oastManager` 的 `repositionToasts`；或在 `register` 时传入自定义的 `startY` 并覆
+盖单例内部值。方案 B：恢复 `ToastManager` 支持带 `startY` 的工厂方法，如 `ToastM
+anager.getInstance(scene, startY)`。
+- **依据**: `ProgressToastManager` 原实现通过 `new ToastManager(scene, startY)` 
+传递了该值，PR 修改后此链路断裂。
+
+### 4. designs/issue-19 设计资产文档存在多处与实现不一致或含运行时错误
+- **位置**: 
+  - `designs/issue-19/src/ui/UIDialog.ts:62-65`
+  - `designs/issue-19/src/ui/UIToast.ts:67, 162`
+  - `designs/issue-19/src/ui/UIAlert.ts:60, 124`
+  - `designs/issue-19/design-spec.md` 3.3 / 3.4
+- **问题**: 
+  1. **UIDialog 设计文件含 `this` 前置访问错误**：`panelConfig.onOverlayClick` 
+使用箭头函数 `() => { this.cancel(); }`，该配置对象在 `super(scene, panelConfig)
+` 之前构造，箭头函数提前捕获了尚未初始化的 `this`，在真实运行时会导致 ReferenceE
+rror（`Must call super constructor`）。实际源码已修复，但设计资产作为后续开发者
+的参考文档，残留致命错误。
+  2. **UIToast / UIAlert 设计文件缺少 `baseY`**：构造器中执行 `this.y += 20`，`s
+how()` 中 tween 到 `this.y - 20`。若 `show()` 被调用两次，第二次会以已 tween 后
+的 `this.y` 为基准再减 20，造成持续上浮漂移。实际源码已引入 `baseY` 修复，设计文
+件未同步。
+  3. **design-spec.md warning 色值与实现不一致**：设计规范 3.3/3.4 表格中 warnin
+g 色条写为 `UITheme.goldBrown`，但实际代码与更新后的 `03-component.md` 均使用 `U
+ITheme.warning`（`0xffaa00`）。
+- **影响**: 设计资产（`designs/issue-19/`）是 Issue #19 的交付物之一，会被后续 A
+gent 或开发者引用。错误的代码示例和规范不一致会导致后续实现踩坑。
+- **修复**: 
+  - `designs/issue-19/src/ui/UIDialog.ts`: 参照实际源码，将 `onOverlayClick` 设
+为 `undefined`，在 `super()` 后手动绑定 overlay 事件。
+  - `designs/issue-19/src/ui/UIToast.ts` 与 `UIAlert.ts`: 引入 `private baseY: n
+umber`，在 `show()` 中使用 `y: this.baseY`。
+  - `designs/issue-19/design-spec.md`: 将 warning 类型色条统一改为 `UITheme.warn
+ing`。
+- **依据**: AGENTS.md 维护规则第 5 条 — "发现代码与文档不一致时，更新对应文档或
+在 tech-debt-tracker 中追加条目"。
+
+---
+
+## 轻微问题（Minor）
+
+### 1. docs/frontend/ui-components.md 未按 PRD-004 要求重写
+- **位置**: `docs/frontend/ui-components.md`
+- **问题**: PRD-004 9.3 文档验收清单明确要求 "`docs/frontend/ui-components.md` 
+已重写为本 PRD 内容"。当前该文件仅在头部加了迁移提示，主体内容仍为旧版设计参考，
+未被重写。
+- **修复**: 将该文件内容重写为指向 PRD-004、`docs/modules/client/ui.md` 和 `docs
+/design-docs/ui-style-guide/` 的导航页，或删除旧内容并放置重定向说明。
+- **依据**: PRD-004 9.3 文档验收清单。
+
+### 2. UIDialog 中 `overlay.off('pointerdown')` 的鲁棒性
+- **位置**: `apps/phaser3/src/ui/UIDialog.ts:70`
+- **问题**: `this.overlay.off('pointerdown')` 会移除 overlay 上所有 `pointerdown
+` 监听器。虽然当前 UIPanel 只注册了一个 `onOverlayClick` 空回调，但如果未来 UIPa
+nel 追加其他监听器，会被误删。
+- **修复**: 使用具名函数引用或 `removeAllListeners('pointerdown')`，并在注释中说
+明意图。
+
+### 3. 部分组件文件末尾存在多余空行或缺少换行符
+- **位置**: `apps/phaser3/src/ui/UIPanel.ts`（末行空行缺失后多了一个空行）、`UID
+ialog.ts`、`UIAlert.ts`、`UIToast.ts`
+- **问题**: `git diff` 显示原 `export default` 删除后，部分文件末尾留下不一致的
+空白。不影响功能，建议统一格式化。
+- **修复**: 运行 `pnpm --filter phaser3 lint` 自动修复（当前测试环境缺少 node_mo
+dules，无法验证）。
+
+### 4. UIButton 构造函数未暴露 `depth` 参数
+- **位置**: `apps/phaser3/src/ui/UIButton.ts:11-22`
+- **问题**: `UIButtonConfig` 接口和 PRD-004 5.3 均缺少 `depth` 字段。虽然按钮通
+常不需要显式 depth，但 PRD-004 接口设计中 `UIButtonConfig` 未列出 `depth`，与其
+他组件不一致。
+- **修复**: 如需严格对齐 PRD-004，可补充 `depth?: number` 并使用 `getNextDepth(U
+IDepthLayer.UI, scene)` 作为默认值。若故意省略，建议在 `docs/modules/client/ui.m
+d` 中注明。
+
+---
+
+## 验证结果
+
+| 维度 | 状态 | 说明 |
+|------|------|------|
+| 功能完整性 | ⚠️ | 核心重做功能（UIPanel/UIDialog/UIToast/UIAlert 动画、四态、遮
+罩、单例）已实现，但 `UIButton.setTexture()` 存在交互丢失缺陷（Major #1）。 |
+| 代码规范性 | ⚠️ | 命名规范（`isXxx`、`onXxx`）、导出方式（命名导出）、资源回退
+（`createFallbackRect` + warn）基本合规；但 `UIButton` Disabled alpha 违反 PRD-0
+04（Major #2）。 |
+| 全链路完整性 | ✅ | 仅涉及前端 UI 层，无 DB/API/Mobile 链路；`city-builder/ui/
+` 旧组件已适配 `ToastManager.getInstance()`。 |
+| 规范符合性 | ⚠️ | 视觉规范（色条 4px、动画时长、缓动曲线）基本合规；设计资产 `d
+esigns/issue-19/` 与实现存在 3 处不一致（Major #4）。 |
+| 测试覆盖 | ⚠️ | 新增/重写了 UIButton、UIPanel、UIDialog、UIAlert、UIToast 的测
+试，覆盖了初始化、交互、show/hide、静态工厂；但测试环境 `vitest` 缺失，无法实际
+执行验证。 |
+| 文档同步 | ⚠️ | `docs/design-docs/ui-style-guide/03-component.md` 与 `docs/modu
+les/client/ui.md` 已更新；但 `docs/frontend/ui-components.md` 未按 PRD-004 要求
+重写（Minor #1），且设计资产存在不同步（Major #4）。 |
+
+---
+
+## 风险与建议
+
+1. **设计资产与源码漂移风险**：`designs/issue-19/` 中的源码文件（`src/ui/*.ts`）
+与实际 `apps/phaser3/src/ui/*.ts` 存在功能性差异（`baseY`、`this` 前置访问、`clo
+seOnOverlay` 绑定方式）。建议后续流程中明确：
+   - `designs/issue-xxx/src/` 为**设计草稿**，迁移到 `apps/phaser3/src/` 后应以 
+`apps/` 目录为准；
+   - 或建立自动化 diff 检查，防止设计资产中的错误代码被后续 Agent 直接复制粘贴。
+
+2. **ToastManager 单例参数丢失风险**：将 `ToastManager` 构造函数设为 `private` 
+并强制使用 `getInstance(scene)` 虽然实现了单例，但丢失了 `startY` 配置能力。建议
+评估是否需要在 `getInstance` 中支持可选的 `startY` 覆盖，或让业务层完全自行管理 
+Y 坐标。
+
+3. **UIButton 交互状态机已改善**：PR 将 `onClick` 从 `pointerdown` 的 tween `onC
+omplete` 中移到了 `pointerup`，并新增了 `pointerupoutside` 取消逻辑，显著改善了
+手感，符合 PRD-004 3.6 状态机要求。但需配合 Major #1 的修复，确保 `setTexture()`
+后状态机仍然完整。
+
+4. **旧 API 兼容策略**：UIToast 保留了 `title`、`startTime`、`markAsComplete()` 
+等旧接口，并仅在检测到旧参数时自动 `show()`，这种渐进式迁移策略合理。但建议在 `d
+ocs/modules/client/ui.md` 中标注旧 API 的废弃计划与移除版本。
+
+
+--- 第 9 次 Review ---
+## 🤖 Agent Code Review Report
+
+
+【任务】
+1. 分析所有审查报告，识别**反复出现的问题模式**
+2. 判断哪些问题是因为规范缺失、过时或不明确导致的
+3. 读取现有的规范文档（通过 AGENTS.md 发现路径）
+4. **优先更新历史文档**：在已有文档中补充、修改
+5. **禁止创建新文档**，除非现有文档体系确实无法覆盖且你确认有必要
+6. 保持文档风格一致性
+7. 基于 main 创建新分支 docs/spec-evolution-30：git checkout -b docs/spec-evolut
+ion-30 origin/main
+8. 修改规范文档后提交：git add -A && git commit -m 'docs: 规范演进 PR #30'
+9. push 新分支：git push origin docs/spec-evolution-30
+10. 创建 PR：gh pr create --base main --title 'docs: 规范演进 PR #30' --body '由
+规范演进 Agent 自动生成的规范文档更新。'
+
+【约束】
+- 只修改 .md 文件，不修改任何业务代码（.ts/.tsx/.dart/.go/.py 等）
+- 重点关注反复出现的问题，偶发问题不需要更新规范
+- 提交前使用 git status 确认只有 .md 文件被修改
+TurnBegin(
+    user_input='【任务上下文】\n- PR 编号: #30\n- 项目路径: /var/folders/lt/w3sl
+6z8j5v50vt2s6knvf5n00000gn/T/doc-gardener-30-1807164934\n- 项目地图: ../../new-w
+orld-monorepo/AGENTS.md\n- 关联 PRD: ../../new-world-monorepo/prd/PRD-004-ui-com
+ponent-library-redesign.md,../../new-world-monorepo/prd/TEMPLATE.md,../../new-wo
+rld-monorepo/prd/PRD-003-leaderboard-system.md\n- 文档目录: ../../new-world-mono
+repo/docs\n\n你是规范演进 Agent。\n\n【输入】\n- 以下是一个 PR 的多次代码审查报
+告汇总\n- 请读取项目的 AGENTS.md 了解规范文档结构\n\n【PR #30 历史 Review 报告汇
+总（共 9 次）】\n\n--- 第 1 次 Review ---\n## 审查结论\n\n审查结论: NEEDS_FIX\n\
+n> PR #30（`design/issue-19`）是对 UI 容器组件（UIPanel / UIDialog / UIToast / U
+IAlert）的设计资产重做，整体架构清晰、规范对齐度高，修复了旧版大量违规问题（`exp
+ort default`、纯黑遮罩、emoji 关闭按钮、缺失动画等）。\n>\n> 但在与上游基础设施
+（issue-18 `utils.ts`）的兼容性、PRD-004 接口契约、Foundation 色值规范上存在 **4
+个 Major 问题**，必须在合并前修复。\n\n---\n\n## 阻塞问题（Blocking）\n\n无。\n\
+n---\n\n## 严重问题（Major）\n\n### 1. UIDialog.ts 引用了 issue-18 utils.ts 中不
+存在的 UITheme 常量\n- **位置**: `designs/issue-19/src/ui/UIDialog.ts:125`、`des
+igns/issue-19/src/ui/UIDialog.ts:139`\n- **问题**: \n  - 第 125 行使用 `UITheme.
+cinnabarRedLight`\n  - 第 139 行使用 `UITheme.mediumInk`\n  - 但 issue-18 已完成
+的基础设施 `designs/issue-18/src/ui/utils.ts` 中 `UITheme` 仅定义了 10 个颜色（`
+inkBlack`、`paperYellow`、`cinnabarRed`、`stoneCyan`、`indigoBlue`、`goldBrown`
+、`lightInk`、`white`、`inkText`、`warning`），**不存在** `cinnabarRedLight` 和 
+`mediumInk`\n- **影响**: Developer Agent 将 issue-19 代码迁移到 `apps/phaser3/sr
+c/ui/` 时，TypeScript 会报 `Property \'cinnabarRedLight\' does not exist on type
+...` 编译错误，导致构建失败\n- **修复**:\n  ```typescript\n  //  designs/issue-1
+9/src/ui/UIDialog.ts\n  // 确认按钮 hover：改用 issue-18 中已存在的 cinnabarRed\
+n  hoverColor: UITheme.cinnabarRed,\n  // 取消按钮 hover：改用 issue-18 中已存在
+的 indigoBlue 或 lightInk\n  hoverColor: UITheme.indigoBlue,\n  ```\n- **依据**:
+\n  - `designs/issue-18/src/ui/utils.ts` 第 16-37 行 `UITheme` 定义仅含 10 色\n 
+- `designs/issue-19/design-spec.md` 1.1 节明确声明单向依赖 `UIDialog → UIPanel →
+utils.ts / types.ts`，不得引用依赖中不存在的符号\n\n---\n\n### 2. UIDialogConfig
+未按 PRD-004 继承 UIPanelConfig\n- **位置**: `designs/issue-19/src/ui/UIDialog.t
+s:16`\n- **问题**: \n  - PRD-004 5.6 明确要求 `export interface UIDialogConfig e
+xtends Omit<UIPanelConfig, \'title\' | \'showClose\'>`\n  - 当前实现为 `export i
+nterface UIDialogConfig extends UIPositionConfig, Partial<UISizeConfig>`，**未继
+承** `UIPanelConfig`\n  - 导致 `UIDialog` 无法通过配置传入 `showOverlay`、`overl
+ayAlpha`、`isModal`、`onClose`、`onOverlayClick`、`bgColor`、`strokeColor`、`tex
+ture` 等 `UIPanel` 已支持的属性\n- **影响**: 配置灵活性受限，与 PRD-004 定义的标
+准接口不兼容，Developer Agent 迁移后若业务需要自定义 Dialog 背景/遮罩行为，必须
+回头修改接口\n- **修复**:\n  ```typescript\n  // designs/issue-19/src/ui/UIDialo
+g.ts\n  export interface UIDialogConfig extends Omit<UIPanelConfig, \'title\' | 
+\'showClose\'> {\n    title: string;\n    message: string;\n    // ... 保留其余
+字段\n  }\n  ```\n- **依据**: PRD-004 第 5.6 节接口设计代码块明确声明 `extends O
+mit<UIPanelConfig, \'title\' | \'showClose\'>`\n\n---\n\n### 3. UIToast 背景边框
+颜色与设计规范不一致\n- **位置**: `designs/issue-19/src/ui/UIToast.ts:83-91`\n- 
+**问题**: \n  - `design-spec.md` 3.3 节视觉标准明确规定边框为 `2px solid UITheme
+.goldBrown`\n  - 但 `UIToast.ts` 第 83 行 `const strokeColor = this.getTypeColor
+();`，将边框色设置为**类型色**（info/success/warning/error 各不同）\n  - 这导致 
+Toast 同时拥有「左侧 4px 类型色条」和「类型色边框」，视觉强调过度，且与规范文档
+冲突\n- **影响**: 视觉风格偏离设计规范，可能导致国风水墨风格失衡\n- **修复**:\n 
+```typescript\n  // designs/issue-19/src/ui/UIToast.ts\n  // 将第 83 行改为：\n 
+const strokeColor = UITheme.goldBrown;\n  // 若需支持 Config 传入自定义边框色，
+可改为：\n  // const strokeColor = config.strokeColor ?? UITheme.goldBrown;\n  `
+``\n- **依据**: `designs/issue-19/design-spec.md` 3.3 节视觉标准表格「边框」行：
+`2px solid UITheme.goldBrown`\n\n---\n\n### 4. 硬编码色值违反 Foundation 规范 F-
+07\n- **位置**: \n  - `designs/issue-19/src/ui/UIAlert.ts:113`：`color: \'#fffff
+f\'`\n  - `designs/issue-19/src/ui/UIDialog.ts:104`：`color: \'#cccccc\'`\n- **
+问题**: \n  - 两处文字样式均直接手写对象，未使用 `getInkTextStyle()`，且使用了硬
+编码 HEX 色值\n  - `01-foundation.md` F-07 明确禁止「在业务代码中直接写魔法数字
+色值」\n  - `01-foundation.md` 1.2 节指出「通过 `getInkTextStyle()` 自动注入，不
+需要手动写」\n  - 尤其 `#cccccc`（浅灰）不在 `UITheme` 常量中，属于纯魔法数字\n-
+**影响**: 风格不一致，维护困难；后续统一调整色板时无法通过修改 `UITheme` 常量批
+量生效\n- **修复**:\n  ```typescript\n  // designs/issue-19/src/ui/UIAlert.ts\n 
+this.messageText = this.scene.add.text(\n    0, 0, message,\n    getInkTextStyle
+(\'14px\', colorToHex(UITheme.white))\n  ).setOrigin(0.5);\n\n  // designs/issue
+-19/src/ui/UIDialog.ts\n  this.messageText = this.scene.add.text(\n    0, -10, m
+essage,\n    getInkTextStyle(\'14px\', colorToHex(UITheme.lightInk), {\n      al
+ign: \'center\',\n      wordWrap: { width: width - 40 },\n    })\n  ).setOrigin(
+0.5);\n  ```\n  > 注：`#cccccc` 与 `UITheme.lightInk`（`#666666`）差异较大。若设
+计 spec 确实需要浅灰，应在 `UITheme` 中新增常量（如 `subText: 0xcccccc`），否则
+建议改用 `UITheme.lightInk` 以符合色板规范。\n- **依据**: \n  - `docs/design-doc
+s/ui-style-guide/01-foundation.md` 1.2 节字体规范\n  - `docs/design-docs/ui-styl
+e-guide/01-foundation.md` F-07 禁止清单\n\n---\n\n## 轻微问题（Minor）\n\n### 5.
+UIToast.ts 与 UIAlert.ts 本地重复定义 `colorToHex`\n- **位置**: `designs/issue-1
+9/src/ui/UIToast.ts:210-212`、`designs/issue-19/src/ui/UIAlert.ts:299-301`\n- **
+问题**: `utils.ts` 已提供同名同功能的 `colorToHex` 导出，两处本地重复定义造成代
+码冗余\n- **修复**: 从 `\'./utils\'` 导入 `colorToHex`，删除本地定义\n\n### 6. T
+oastManager 使用字符串索引访问私有方法\n- **位置**: `designs/issue-19/src/ui/UIT
+oast.ts:257-261`\n- **问题**: `toast[\'dismiss\'] = () => { ... }` 绕过 TypeScri
+pt `private` 访问控制，属于类型系统 hack，长期维护易引发问题\n- **修复**: 将 `UI
+Toast.dismiss()` 的访问修饰符改为 `protected`，或通过事件机制（如 `toast.once(\'
+destroy\', ...)`）在 Manager 中监听销毁\n\n### 7. UIDialog.confirm/cancel 中 kil
+lTweensOf 冗余\n- **位置**: `designs/issue-19/src/ui/UIDialog.ts:149`、`designs/
+issue-19/src/ui/UIDialog.ts:157`\n- **问题**: `confirm()` / `cancel()` 已调用 `k
+illTweensOf(this.scene, this)`，而 `hide()` 内部也会再次调用，存在冗余\n- **修复
+**: 移除 `confirm()` / `cancel()` 中的 `killTweensOf`，由 `hide()` 统一处理（防
+御性保留亦可，非强制）\n\n### 8. Warning 类型色与 PRD-004 5.15 存在项目级文档冲
+突\n- **位置**: `designs/issue-19/src/ui/UIAlert.ts:67`、`designs/issue-19/src/u
+i/UIToast.ts:74`、`designs/issue-19/design-spec.md:231/310`\n- **问题**: \n  - P
+RD-004 5.15 明确要求 warning 色为 `0xffaa00`（即 `UITheme.warning`）\n  - 但代码
+与设计 spec 均使用 `UITheme.goldBrown`（`0xc9a227`）\n  - `docs/design-docs/ui-s
+tyle-guide/03-component.md` 3.7 节同样使用 `goldBrown`\n- **说明**: 这是项目内部
+**PRD 与组件规范之间的冲突**，并非代码单方面错误。建议产品侧确认以哪个为准，并同
+步更新冲突文档\n- **修复（二选一）**: \n  - 方案 A：代码改用 `UITheme.warning`，
+同步更新 `03-component.md`\n  - 方案 B：保持 `UITheme.goldBrown`，在 PRD-004 中
+修正 warning 色说明\n\n---\n\n## 验证结果\n\n| 维度 | 状态 | 说明 |\n|------|---
+---|------|\n| 功能完整性 | ✅ | 实现了 design-spec.md 定义的全部四个组件（UIPan
+el、UIDialog、UIToast、UIAlert）及 ToastManager；修复了旧版 15+ 项违规问题 |\n| 
+代码规范性 | ❌ | 存在硬编码色值（Major #4）、未使用 `getInkTextStyle()`、接口未
+继承 UIPanelConfig（Major #2）、引用了不存在的 UITheme 常量（Major #1） |\n| 全
+链路完整性 | ⚪ 不适用 | 本 PR 为设计资产 PR（`designs/issue-19/`），不直接修改 
+`apps/phaser3/src/ui/`，全链路验证在 Developer Agent 迁移阶段完成 |\n| 规范符合
+性 | ❌ | UIToast 边框色偏离设计 spec（Major #3）；warning 色与 PRD-004 存在冲突
+（Minor #8）；动画参数、深度规范、命名规范均正确对齐 |\n| 测试覆盖 | ⚪ 未验证 |
+设计资产 PR 未包含测试文件；PRD-004 要求迁移后单元测试覆盖率 ≥ 80% |\n| 文档同步
+| ✅ | `designs/issue-19/design-spec.md` 完整覆盖了架构总览、问题分析、组件设计
+、状态机、Accessibility、验收标准；未要求同步更新 `docs/` 目录（设计资产阶段） |
+\n\n---\n\n## 风险与建议\n\n1. **上游依赖断裂风险（高）**：Major #1 表明 issue-1
+9 的设计资产与 issue-18 已完成的基础设施存在符号不兼容。建议在合并前，由生成 Age
+nt 在本地执行一次 `pnpm --filter phaser3 type-check`（将代码临时拷贝到 `apps/pha
+ser3/src/ui/` 并替换 utils.ts 为 issue-18 版本），验证无编译错误后再合并。\n\n2.
+**接口契约漂移风险（中）**：Major #2 的 `UIDialogConfig` 未继承 `UIPanelConfig`
+，若后续 Developer Agent 严格按 PRD-004 迁移，会发现接口不一致。建议现在即按 PRD
+-004 修正，避免二次返工。\n\n3. **视觉规范冲突风险（中）**：Major #3 的 Toast 边
+框色与 Minor #8 的 warning 色均属于「设计文档内部冲突」。建议在项目侧建立「PRD-0
+04 > 组件规范 > 设计 spec」的优先级裁决机制，避免不同 Agent 反复摇摆。\n\n4. **
+代码复用建议**：Minor #5-7 均为低成本的代码清理，建议在修复 Major 问题时一并处理
+，提升代码整洁度。\n\n\n--- 第 2 次 Review ---\n## 审查结论\n\n审查结论: **NEEDS
+_MAJOR_FIX**\n\nPR #30（design/issue-19）对 4 个核心 UI 容器组件（UIPanel、UIDia
+log、UIToast、UIAlert）进行了重做，并同步修改了 `UISegmentedControl`、`UIBadge` 
+及 `SceneSwitchBar`。设计规范 `design-spec.md` 写得非常详尽，新组件的实现也较好
+地遵循了 PRD-004 的视觉与行为标准。但存在 **3 个阻塞性编译问题** 和若干规范违规
+，必须在合并前修复。\n\n---\n\n## 阻塞问题（Blocking）\n\n### 1. `designs/issue-
+19/src/ui/` 缺少 `utils.ts` 与 `types.ts`，导致新组件无法编译\n- **位置**: `desi
+gns/issue-19/src/ui/UIAlert.ts:9-12`、`UIPanel.ts:8-22`、`UIDialog.ts:8-14`、`UI
+Toast.ts:8-12`\n- **问题**: 四个新组件均通过 `import { ... } from \'./utils\'` 
+和 `import { ... } from \'./types\'` 导入基础设施，但 `designs/issue-19/src/ui/`
+目录下仅有 4 个组件文件，没有 `utils.ts` 和 `types.ts`。\n- **影响**: `tsc --noE
+mit` 在 `designs/issue-19/src/ui/` 目录下必然失败，设计交付物不可编译。\n- **修
+复**: 将 `designs/issue-18/src/ui/utils.ts` 和 `designs/issue-18/src/ui/types.ts
+` 复制到 `designs/issue-19/src/ui/`（或建立符号链接 / 统一公共目录引用），确保设
+计目录自包含且可编译。\n- **依据**: `docs/frontend/agent-design-guide.md` 3.1 节
+要求 `designs/issue-xxx/src/` 目录结构与 `apps/phaser3/src/` 对齐；Step 4 检查清
+单要求"所有 `src/` 代码在 `designs/` 目录内可编译（无导入错误）\n\n### 2. `desig
+ns/issue-19/src/ui/UIDialog.ts` 导入不存在的 `./UIButton`\n- **位置**: `designs/
+issue-19/src/ui/UIDialog.ts:12`\n- **问题**: `import { UIButton } from \'./UIBut
+ton\';` 指向同级目录下的 `UIButton.ts`，但 `designs/issue-19/src/ui/` 下无此文件
+。\n- **影响**: `UIDialog.ts` 单独编译失败。\n- **修复**: 将 `apps/phaser3/src/u
+i/UIButton.ts`（或 `designs/issue-18/src/ui/UIButton.ts` 若存在）复制到 `designs
+/issue-19/src/ui/UIButton.ts`；或在本次 PR 中将 `UIButton.ts` 的重做/迁移一并带
+入 issue-19 目录。\n- **依据**: 同 Blocking-1，设计交付物必须自包含可编译\n\n###
+3. `SceneSwitchBar.ts` 使用 `export default`\n- **位置**: `apps/phaser3/src/city
+-builder/ui/SceneSwitchBar.ts:147`\n- **问题**: 文件末尾存在 `export default Sce
+neSwitchBar;`\n- **影响**: 违反项目强制禁止清单 F-11，不利于 tree-shaking 和命名
+规范统一。\n- **修复**: 删除 `export default SceneSwitchBar;`，统一使用已有的命
+名导出 `export class SceneSwitchBar`。\n- **依据**: `docs/design-docs/ui-style-g
+uide/01-foundation.md` 1.5 节 F-11："组件文件使用 `export default` … 合法替代：
+统一使用 `export class UIXxx` 命名导出"\n\n---\n\n## 严重问题（Major）\n\n### 4.
+`SceneSwitchBar.ts` 存在魔法数字色值\n- **位置**: `apps/phaser3/src/city-builder
+/ui/SceneSwitchBar.ts:65-67`\n- **问题**: \n  - `0x1a1a2e`（应使用 `UITheme.inkB
+lack`）\n  - `0x4a9eff`（应使用 `UITheme.stoneCyan`）\n- **影响**: 违反 F-07，色
+值漂移后难以统一维护。\n- **修复**: 导入 `UITheme`，替换为 `UITheme.inkBlack` 和
+`UITheme.stoneCyan`。\n- **依据**: `docs/design-docs/ui-style-guide/01-foundatio
+n.md` 1.5 节 F-07\n\n### 5. `UIBadge.ts` 存在硬编码颜色 `\'#ffffff\'`\n- **位置*
+*: `apps/phaser3/src/ui/UIBadge.ts:95`\n- **问题**: 文字颜色直接写死为 `\'#fffff
+f\'`，未使用 `colorToHex(UITheme.white)`。\n- **影响**: 违反 F-07，风格不一致。\
+n- **修复**: 导入 `colorToHex`，将 `\'#ffffff\'` 替换为 `colorToHex(UITheme.whit
+e)`。\n- **依据**: `docs/design-docs/ui-style-guide/01-foundation.md` 1.1 节和 1
+.5 节 F-07\n\n### 6. `UISegmentedControl.ts` 存在魔法数字色值\n- **位置**: \n  -
+`apps/phaser3/src/ui/UISegmentedControl.ts:118`：`0x000000`（hitArea 透明背景，
+应使用 `UITheme.inkBlack`）\n  - `apps/phaser3/src/ui/UISegmentedControl.ts:139`
+和 `245`：`#aaaaaa`（未选中标签颜色，应使用 `colorToHex(UITheme.lightInk)`）\n- 
+**影响**: 违反 F-07。\n- **修复**: 统一替换为 `UITheme` 常量。\n- **依据**: 同上
+\n\n### 7. 新组件（UIPanel / UIDialog / UIToast / UIAlert）缺少单元测试\n- **位
+置**: `designs/issue-19/src/ui/` 目录下无 `__tests__/` 或任何 `.test.ts` 文件\n-
+**问题**: PRD-004 明确要求每个 Layer 1 原子组件配套独立测试文件，覆盖初始化、交
+互状态、资源回退、动画、内存清理。\n- **影响**: 无法自动化验证组件行为，后续回归
+风险高。\n- **修复**: 在 `designs/issue-19/src/ui/__tests__/` 下补充：\n  - `UIP
+anel.test.ts`（覆盖 show/hide 动画、遮罩、关闭按钮、getContentBounds）\n  - `UID
+ialog.test.ts`（覆盖继承关系、confirm/cancel 回调在 hide 后触发、closeOnOverlay
+）\n  - `UIToast.test.ts`（覆盖 show/dismiss 动画、ToastManager 单例、队列满策略
+、reposition）\n  - `UIAlert.test.ts`（覆盖 show/hide 动画、isAutoHide、getTypeC
+olor）\n- **依据**: `prd/PRD-004-ui-component-library-redesign.md` 7.3 节测试要
+求\n\n### 8. 项目文档未同步更新\n- **位置**: `docs/` 目录\n- **问题**: PR 未变更
+任何 `docs/` 文件。PRD-004 9.3 文档验收要求更新 `docs/frontend/ui-components.md`
+、`docs/modules/client/ui.md`、`docs/design-docs/ui-style-guide/03-component.md`
+。\n- **影响**: 文档与代码实现不一致，后续 Agent/开发者无法获得准确参考。\n- **
+修复**: 至少更新 `docs/design-docs/ui-style-guide/03-component.md` 中 UIPanel、U
+IDialog、UIToast、UIAlert 的视觉与行为描述，与本次重做对齐。\n- **依据**: `prd/P
+RD-004-ui-component-library-redesign.md` 9.3 节；`AGENTS.md` 维护规则第 6 条\n\n
+### 9. `UIBadge.ts` 的 `setSize` 被重命名为 `setBadgeSize`，偏离 PRD-004 接口\n-
+**位置**: `apps/phaser3/src/ui/UIBadge.ts:128`\n- **问题**: PRD-004 5.16 明确定
+义接口为 `setSize(size: \'small\' | \'medium\' | \'large\'): void`。代码改为 `se
+tBadgeSize` 以规避 `Phaser.GameObjects.Container.setSize()` 冲突，这是合理的工程
+折中，但 PRD 文档未同步更新。\n- **影响**: 接口契约与文档不一致。\n- **修复**: 
+在 PRD-004 或 `docs/modules/client/ui.md` 中注明 `setSize` 已更名为 `setBadgeSiz
+e`（因与 Phaser Container 基类冲突），保持文档与代码一致。\n- **依据**: `prd/PRD
+-004-ui-component-library-redesign.md` 5.16 节\n\n---\n\n## 轻微问题（Minor）\n\
+n### 10. `UISegmentedControl.ts` 的 `import type` 位置不当\n- **位置**: `apps/ph
+aser3/src/ui/UISegmentedControl.ts:17`\n- **问题**: `import type { UIPositionCon
+fig, UISizeConfig } from \'./types\';` 放在 `export interface UISegmentedOption`
+之后，与其他 import 语句分离。\n- **修复**: 将该 `import type` 移至文件顶部，与
+其他 import 语句聚合。\n\n### 11. `UIPanel.ts` 底部冗余定义 `colorToHex`\n- **位
+置**: `designs/issue-19/src/ui/UIPanel.ts:299-301`\n- **问题**: 文件底部重复实现
+了 `colorToHex`，但 `UIPanel.ts` 与 `utils.ts` 之间不存在循环导入，完全可以直接
+从 `utils.ts` 导入。\n- **修复**: 在文件顶部导入列表中加入 `colorToHex`，删除底
+部局部定义。\n\n### 12. `UIToast.ts` 与 `UIAlert.ts` 动画参数未使用 `UITweens` 
+常量\n- **位置**: \n  - `designs/issue-19/src/ui/UIToast.ts:155-163`（show 动画
+硬编码 `duration: 300, ease: \'Back.out\'`）\n  - `designs/issue-19/src/ui/UIToa
+st.ts:180-191`（dismiss 动画硬编码 `duration: 200, ease: \'Power2\'`）\n  - `des
+igns/issue-19/src/ui/UIAlert.ts:117-125`（show 动画硬编码 `duration: 200, ease: 
+\'Back.out\'`）\n  - `designs/issue-19/src/ui/UIAlert.ts:135-151`（hide 动画硬编
+码 `duration: 200, ease: \'Power2\'`）\n- **问题**: 虽然数值与规范一致，但未引用
+`UITweens.toastIn` / `UITweens.toastOut` / `UITweens.popup` / `UITweens.fade` 等
+集中配置。\n- **修复**: 统一改用 `UITweens` 常量，便于后续全局调整动画参数。\n- 
+**依据**: `docs/design-docs/ui-style-guide/01-foundation.md` 1.3 节："所有 UI 动
+效必须统一使用 `src/ui/utils.ts` 中的 `UITweens` 配置"\n\n### 13. `ToastManager.
+clear()` 直接调用 `destroy()`，缺少退场动画\n- **位置**: `designs/issue-19/src/u
+i/UIToast.ts:264-267`\n- **问题**: `clear()` 对每个 Toast 直接 `destroy()`，未走
+`dismiss()` 的退场动画流程。虽然语义上可能是"立即清空"，但与组件动画规范不一致。
+\n- **修复**: 若预期为立即强制清理，可在代码注释中注明 `// 强制立即销毁，不播放
+退场动画`；若预期为优雅清理，改为调用 `toast.dismiss()`。\n\n### 14. `UIAlert.ts
+` 使用类型色作为整体边框色\n- **位置**: `designs/issue-19/src/ui/UIAlert.ts:79`\
+n- **问题**: `this.background.setStrokeStyle(2, color);` 使用 `type` 对应的类型
+色作为外边框。而 PRD-004 / design-spec 中 UIAlert 的视觉标准仅要求"左侧 4px 色条
+"作为类型标识，未要求整体边框变色。UIPanel 的规范边框是 `UITheme.goldBrown`。\n-
+**修复**: 将边框色统一为 `UITheme.goldBrown`，或仅在 design-spec 中明确补充"整体
+边框使用类型色"的设计决策。\n\n---\n\n## 验证结果\n\n| 维度 | 状态 | 说明 |\n|--
+----|------|------|\n| 功能完整性 | ⚠️ 部分通过 | UIPanel/UIDialog/UIToast/UIAler
+t 核心功能已实现，但编译失败阻止验证 |\n| 代码规范性 | ❌ | 存在 `export default
+`、多处魔法数字色值、动画参数未统一使用 `UITweens` |\n| 全链路完整性 | ⏭️ 不涉及 
+| 本次 PR 纯前端 UI 组件，不涉及 DB/API |\n| 规范符合性 | ⚠️ 部分通过 | 视觉与行
+为基本对齐 PRD-004，但色值和导出规范有违规 |\n| 测试覆盖 | ❌ | 仅 `UISegmentedC
+ontrol` 有测试；4 个新组件无测试 |\n| 文档同步 | ❌ | `design-spec.md` 详尽，但
+项目级 `docs/` 未更新；PRD 接口与 `setBadgeSize` 不一致 |\n\n---\n\n## 风险与建
+议\n\n1. **编译阻断风险最高**：`designs/issue-19/src/ui/` 目录下缺少 `utils.ts`
+、`types.ts`、`UIButton.ts`，导致整个设计交付物无法编译。建议开发 Agent 优先补齐
+这三个文件，再执行 `pnpm --filter phaser3 type-check` 验证。\n\n2. **迁移接口冲
+突**：`UISegmentedControl` 的接口从 `selectedId` / `onSelect` 改为 `selectedInde
+x` / `onChange`，`SceneSwitchBar` 已适配，但需确认其他引用 `UISegmentedControl` 
+的旧业务代码是否已全部迁移（本次 diff 仅看到 `SceneSwitchBar.ts` 一处修改）。\n\
+n3. **Phaser 基类方法覆盖**：`UIBadge.setSize` 更名为 `setBadgeSize` 是必要的技
+术决策（规避 `Container.setSize`），但请在 PRD / 接口文档中同步更新，避免 Develo
+per Agent 迁移时按旧接口调用导致编译错误。\n\n4. **建议补充截图验收**：根据 `age
+nt-design-guide.md` Step 5，新组件应产出 Normal / Hover / Pressed / Disabled / p
+age-context 截图，存入 `designs/issue-19/screenshots/`。\n\n\n--- 第 3 次 Review
+---\n## 审查结论\n\n审查结论: **NEEDS_MAJOR_FIX**\n\nPR #30（branch: `design/iss
+ue-19`）包含两部分内容：\n1. `designs/issue-19/` 下新的设计交付物（UIPanel / UID
+ialog / UIToast / UIAlert / UIButton 及基础设施）\n2. `apps/phaser3/src/ui/` 下
+现有组件的集成更新（UIBadge、UIButton、UISegmentedControl、UIAlert、UIPanel、UID
+ialog、UIToast 等）\n\n设计交付物整体质量较高，但生产代码（`apps/phaser3/src/ui/
+`）存在大量与 PRD-004 及设计规范不一致的遗留实现未清理问题，且部分核心架构要求（
+如 UIDialog 继承 UIPanel）未在生产代码中落地。\n\n---\n\n## 阻塞问题（Blocking）
+\n\n### 1. UIDialog 生产代码未继承 UIPanel（核心架构违反）\n- **位置**: `apps/ph
+aser3/src/ui/UIDialog.ts:22`\n- **问题**: `UIDialog` 仍 `extends Phaser.GameObje
+cts.Container`，自行实现背景/标题/遮罩/按钮。设计规范 `designs/issue-19/design-s
+pec.md` 2.2 节 D-01 明确要求「**必须继承 UIPanel**」，PRD-004 5.6 节同样要求继承
+以复用遮罩和动画。\n- **影响**: 遮罩逻辑、show/hide 动画、深度管理在 UIDialog 和
+UIPanel 中重复实现且参数不一致；后续维护需要改两处。\n- **修复**: 将 `apps/phase
+r3/src/ui/UIDialog.ts` 重构为 `extends UIPanel`，复用 `show()`/`hide()`/遮罩/关
+闭逻辑，删除自行实现的 `createOverlay()`/`createBackground()`/`createTitle()`。\
+n- **依据**: `designs/issue-19/design-spec.md` D-01 / PRD-004 5.6\n\n### 2. UIPa
+nel 关闭按钮仍使用 Unicode `×`（F-01 违反）\n- **位置**: `apps/phaser3/src/ui/UI
+Panel.ts:86`\n- **问题**: `createCloseButton()` 中使用 `this.scene.add.text(clos
+eX, closeY, \'×\', ...)` 渲染关闭按钮。`designs/issue-19/design-spec.md` 2.1 节 
+P-02 及 `docs/design-docs/ui-style-guide/03-component.md` 3.3 均明确禁止使用 `UI
+Text` 渲染 `×` 字符，要求使用 `UIIcon` 加载 `cancel-btn-0.png`。\n- **影响**: 直
+接违反国风水墨风格规范 F-01（emoji/Unicode 图标禁令）。\n- **修复**: 参照 `desig
+ns/issue-19/src/ui/UIPanel.ts:160-221` 的实现，将关闭按钮改为 `UIIcon` 或 `Phase
+r.GameObjects.Image` 加载 `cancel-btn-0.png`，Hover 时边框变为 `UITheme.cinnabar
+Red`。\n- **依据**: `designs/issue-19/design-spec.md` P-02 / `docs/design-docs/u
+i-style-guide/03-component.md` 3.3\n\n### 3. UIAlert 仍使用 Unicode 符号作为类型
+图标（F-01 违反）\n- **位置**: `apps/phaser3/src/ui/UIAlert.ts:63-70`\n- **问题*
+*: `getTypeIcon()` 返回 `\'✓\'`、`\'!\'`、`\'×\'`、`\'i\'` 等 Unicode 符号，并在
+`createIcon()` 中渲染。`designs/issue-19/design-spec.md` 2.4 节 A-01 及 `docs/de
+sign-docs/ui-style-guide/03-component.md` 3.7 均明确禁止此行为，要求「**删除图标
+文字，仅用左侧 4px 色条标识类型**」。\n- **影响**: 违反 F-01，与设计稿不一致。\n
+- **修复**: 删除 `getTypeIcon()` 和 `createIcon()` 方法，仅保留左侧 4px 色条（已
+在 `createBackground()` 中部分实现，但需删除多余的图标文字）。\n- **依据**: `des
+igns/issue-19/design-spec.md` A-01 / `docs/design-docs/ui-style-guide/03-compone
+nt.md` 3.7\n\n### 4. UIToast 生产代码未按 PRD-004 重做（类型体系/深度/动画/色条
+全错）\n- **位置**: `apps/phaser3/src/ui/UIToast.ts`\n- **问题**: \n  - 仍使用业
+务语义 `ToastType = \'build\' | \'upgrade\' | \'remove\' | ...`，未迁移为 `UINot
+ificationType`（设计规范 T-08）\n  - `depth = 4000`（应为 5000+，设计规范 T-06）
+\n  - 缺少左侧 4px 类型色条（设计规范 T-02）\n  - `show()` 动画 duration 为 200m
+s（PRD-004 3.4 要求 300ms）\n  - `hide()` 动画方向为 `y + 20`（向下，PRD-004 要
+求 `y 0 → -10` 向上），duration 300ms（应为 200ms）\n  - `ToastManager` 非单例，
+无 `getInstance()`（设计规范 T-05）\n  - 未使用 `killTweensOf` 防止动画叠加（PRD
+-004 3.4）\n- **影响**: 生产代码的视觉与行为与新版规范完全脱节；`designs/issue-1
+9` 中的正确实现未同步到 `apps/phaser3`。\n- **修复**: 将 `apps/phaser3/src/ui/UI
+Toast.ts` 替换为 `designs/issue-19/src/ui/UIToast.ts` 的实现（或等效重构），保留
+必要的旧接口兼容性包装。\n- **依据**: `designs/issue-19/design-spec.md` T-01~T-0
+8 / PRD-004 3.4、5.11\n\n### 5. UIButton 生产代码缺少 pressedColor 与 killTweens
+Of（PRD-004 违反）\n- **位置**: `apps/phaser3/src/ui/UIButton.ts:11-21`（接口）
+、`77-122`（交互）\n- **问题**: \n  - `UIButtonConfig` 缺少 `pressedColor?: numb
+er`（PRD-004 5.3 明确要求）\n  - `pointerover`/`pointerout`/`pointerdown` 均**未
+**在 tween 前调用 `killTweensOf`（PRD-004 3.4 禁止项：「禁止连续触发时动画叠加，
+必须先 killTweensOf」）\n  - `pointerout` 恢复 Normal 时硬编码 `fillAlpha: 0.9`
+（`docs/design-docs/ui-style-guide/03-component.md` 3.1 要求「应读取 `this.backg
+round.fillAlpha` 恢复，禁止硬编码」）\n- **影响**: 快速 hover/click 时动画叠加；
+Pressed 态无独立颜色支持。\n- **修复**: \n  1. 在 `UIButtonConfig` 中增加 `press
+edColor?: number`\n  2. 所有 tween 播放前增加 `killTweensOf(this.scene, this)`\n
+ 3. `pointerout` 时记录并恢复原始 `fillAlpha`\n- **依据**: PRD-004 5.3、3.4 / `d
+ocs/design-docs/ui-style-guide/03-component.md` 3.1\n\n---\n\n## 严重问题（Major
+）\n\n### 6. UIPanel 生产代码缺少 show/hide 动画与模态遮罩\n- **位置**: `apps/ph
+aser3/src/ui/UIPanel.ts`\n- **问题**: 生产代码的 `UIPanel` 仅有 `getContentBound
+s()`/`addContent()`，**缺少** `show()`/`hide()` 标准动画、`showOverlay`/`overlay
+Alpha`/`isModal`/`onOverlayClick` 等配置（设计规范 P-01、P-04、P-05）。由于 UIDi
+alog 未继承 UIPanel，这些缺失被进一步放大。\n- **修复**: 将生产代码 `UIPanel` 升
+级至与设计规范一致，或至少在现有代码中补全 `show()`/`hide()` 与遮罩能力。\n- **
+依据**: `designs/issue-19/design-spec.md` P-01、P-04、P-05 / PRD-004 5.5\n\n### 
+7. UIDialog 生产代码 confirm/cancel 回调在 hide 动画之前执行\n- **位置**: `apps/
+phaser3/src/ui/UIDialog.ts:152-160`\n- **问题**: \n  ```ts\n  private confirm():
+void {\n    this.hide();\n    this.config.onConfirm?.();  // ← hide 动画刚开始就
+执行回调\n  }\n  ```\nPRD-004 5.6 及设计规范 3.2 均要求「先播放 hide 动画，动画*
+*完成后**再执行 `onConfirm`」。\n- **修复**: 修改 `confirm()`/`cancel()` 为 `thi
+s.hide(() => this.config.onConfirm?.())`，确保 `hide` tween 的 `onComplete` 中触
+发回调。\n- **依据**: PRD-004 5.6 / `designs/issue-19/design-spec.md` 3.2\n\n###
+8. UIDialog 生产代码 depth 为 5000（应为 3000）\n- **位置**: `apps/phaser3/src/u
+i/UIDialog.ts:53`\n- **问题**: `this.setDepth(5000)`，但 PRD-004 3.5 及设计规范
+均要求 Dialog 层级为 3000。\n- **修复**: 改为 `this.setDepth(UIDepthLayer.Dialog
+)` 或使用 `getNextDepth(UIDepthLayer.Dialog, scene)`。\n- **依据**: PRD-004 3.5 
+/ `designs/issue-19/design-spec.md` D-03\n\n### 9. UIAlert 生产代码缺少 show() 
+方法与正确退场动画\n- **位置**: `apps/phaser3/src/ui/UIAlert.ts`\n- **问题**: \n
+ - 无 `show()` 方法（设计规范 A-02 要求增加显式 show 接口含入场动画）\n  - `hide
+()` 中 `y: this.y - 20`（应为 `y: this.y - 10`，PRD-004 3.4 及设计规范 3.4）\n  
+- `static show()` 未调用 `alert.show()`（只是 new 后返回）\n  - 未使用 `getNextD
+epth`，depth 硬编码为 `UIDepthLayer.Toast`（虽满足最低要求，但无法处理多个 Alert
+叠加）\n- **修复**: 参照 `designs/issue-19/src/ui/UIAlert.ts` 补全 `show()` 与正
+确的 `hide()` 动画参数。\n- **依据**: `designs/issue-19/design-spec.md` A-02、A-
+03 / PRD-004 3.4\n\n### 10. UIBadge 修改后无配套单元测试\n- **位置**: `apps/phas
+er3/src/ui/UIBadge.ts`\n- **问题**: PR 修改了 `UIBadge.ts`（新增 `maxWidth`、文
+本截断、`depth`、UITheme 语义色），但 `apps/phaser3/src/ui/__tests__/` 目录下**
+不存在 `UIBadge.test.ts`**。\n- **修复**: 新增 `UIBadge.test.ts`，覆盖初始化、类
+型色切换、`setText`、`setBadgeSize`、`maxWidth` 截断。\n- **依据**: PRD-004 7.3
+「所有组件在 `src/ui/__tests__/` 有对应测试文件」\n\n### 11. designs/issue-19 UI
+Button 设计稿也存在 killTweensOf 与 pressedColor 缺失\n- **位置**: `designs/issu
+e-19/src/ui/UIButton.ts:87-122`\n- **问题**: 作为设计交付物，该文件同样缺少 `pre
+ssedColor` 配置，且所有 tween 前未调用 `killTweensOf`。虽然生产代码的 `UIButton.
+ts` 问题更严重，但设计稿本身也未完全对齐 PRD-004 5.3。\n- **修复**: 在设计稿中补
+全 `pressedColor` 与 `killTweensOf`。\n- **依据**: PRD-004 5.3、3.4\n\n---\n\n##
+轻微问题（Minor）\n\n### 12. designs/issue-19 缺少统一导出 index.ts\n- **位置**:
+`designs/issue-19/src/ui/`\n- **问题**: 目录下无 `index.ts`，无法统一导出组件。`
+apps/phaser3/src/ui/index.ts` 已存在统一导出，但设计目录自身缺少该文件。\n- **修
+复**: 新增 `designs/issue-19/src/ui/index.ts`，按规范统一导出本 Issue 涉及的组件
+与类型。\n- **依据**: PRD-004 5.1 目录结构\n\n### 13. UIButton setDisabled 参数
+命名不一致\n- **位置**: `designs/issue-19/src/ui/UIButton.ts:129`\n- **问题**: `
+setDisabled(disabled: boolean)` 参数未使用 `isDisabled` 前缀，与方法体内部使用的
+`this.config.isDisabled` 不一致。\n- **修复**: 改为 `setDisabled(isDisabled: boo
+lean)`。\n- **依据**: PRD-004 3.2 命名规范\n\n### 14. UISegmentedControl 测试未
+覆盖新接口\n- **位置**: `apps/phaser3/src/ui/__tests__/UISegmentedControl.test.t
+s`\n- **问题**: 测试未覆盖 `setOptionDisabled`、`getSelectedIndex`、禁用项点击不
+触发等新增功能。\n- **修复**: 补充对应测试用例。\n- **依据**: PRD-004 7.3\n\n###
+15. UIToast.show() 中 duration 硬编码 200ms（应为 300ms）\n- **位置**: `apps/pha
+ser3/src/ui/UIToast.ts:85`\n- **问题**: `show()` 入场动画 duration 为 `200`，但 
+PRD-004 3.4 要求 Toast 入场为 300ms。\n- **修复**: 改为 `UITweens.toastIn.durati
+on`（300ms）。\n- **依据**: PRD-004 3.4\n\n---\n\n## 验证结果\n\n| 维度 | 状态 |
+说明 |\n|------|------|------|\n| 功能完整性 | ❌ | `designs/issue-19` 交付物基
+本完整，但 `apps/phaser3` 生产代码中 UIPanel/UIDialog/UIToast/UIAlert 均未完成与
+PRD-004 对齐的重做，大量旧实现残留。 |\n| 代码规范性 | ❌ | 生产代码存在 F-01 违
+反（Unicode 图标/×字符）、深度值错误、动画参数错误；设计稿 UIButton 缺少 pressed
+Color。 |\n| 全链路完整性 | ❌ | DB/API 不涉及。但设计交付物 → 生产代码的迁移链
+路断裂：`designs/issue-19` 中的正确实现未同步到 `apps/phaser3/src/ui/`。 |\n| 规
+范符合性 | ❌ | `apps/phaser3` 的 UIDialog（未继承 UIPanel）、UIPanel（×关闭按钮
+）、UIAlert（Unicode 图标）、UIToast（旧类型体系）均不符合新版规范。 |\n| 测试覆
+盖 | ⚠️ | `designs/issue-19` 四个组件均有测试；`apps/phaser3` UISegmentedControl 
+有测试但覆盖不全，UIBadge 修改后无测试，UIAlert/UIToast/UIDialog/UIPanel 生产代
+码无新增测试。 |\n| 文档同步 | ✅ | `docs/design-docs/ui-style-guide/03-componen
+t.md`、`docs/modules/client/ui.md`、`prd/PRD-004-ui-component-library-redesign.m
+d` 均已更新。 |\n\n---\n\n## 风险与建议\n\n1. **生产代码与设计稿严重脱节的风险**
+：本 PR 的最大风险是 `apps/phaser3/src/ui/` 下的组件仅做了「兼容性补丁」式修改（
+如改 import、改命名、加 createFallbackRect），而 PRD-004 要求的结构性重做（UIDia
+log 继承 UIPanel、Toast 类型体系更换、Alert/Toast 左侧色条、show/hide 标准动画）
+**完全没有在生产代码落地**。这会导致后续业务模块（Fish/Weapon/Market 等）基于旧
+版不一致的接口开发，技术债务进一步扩大。\n\n2. **建议合并策略**：\n   - **方案 A
+（推荐）**：在合并前，要求将 `designs/issue-19/src/ui/` 中经过测试验证的实现（UI
+Panel、UIDialog、UIToast、UIAlert）**完整迁移**到 `apps/phaser3/src/ui/`，替换旧
+实现，并确保 `city-builder/ui/SceneSwitchBar.ts` 等调用方兼容。\n   - **方案 B**
+：如果本 PR 的定位仅为「设计交付 + 文档更新」，则应明确将 `apps/phaser3/src/ui/`
+中的修改拆出，另开 Integration PR，避免给代码库留下半重做的混乱状态。\n\n3. **测
+试建议**：在将设计稿迁移到生产代码时，优先复用 `designs/issue-19/src/ui/__tests_
+_/setup.ts` 中的 `UIMockScene` 和 helper，并统一替换 `apps/phaser3/src/ui/__test
+s__/setup.ts` 中的旧基础设施。\n\n\n--- 第 4 次 Review ---\n# PR #30 代码审查报
+告\n\n**分支**: `design/issue-19` **审查范围**: UI 容器组件重做（UIPanel / UIDia
+log / UIToast / UIAlert）及关联基础设施 **审查日期**: 2026-04-26 **审查依据**: `
+AGENTS.md` → `docs/frontend/agent-design-guide.md` / `docs/design-docs/ui-style-
+guide/03-component.md` / `prd/PRD-004-ui-component-library-redesign.md` / `desig
+ns/issue-19/design-spec.md`\n\n---\n\n## 审查结论\n\n审查结论: **NEEDS_MAJOR_FIX
+**\n\n本 PR 对四个核心容器组件进行了系统性重做，整体架构正确（UIDialog 继承 UIPa
+nel、ToastManager 单例、左侧色条、动画前 killTweensOf 等），测试基础设施完备，文
+档同步较充分。但存在违反项目强制规范（F-11 `export default` 禁令）的残留、一个交
+互功能缺陷（UIButton 动态启用失效），以及若干与 PRD-004 不一致的实现细节，需在合
+并前修复。\n\n---\n\n## 阻塞问题（Blocking）\n\n无。\n\n---\n\n## 严重问题（Majo
+r）\n\n### 1. 全部 UI 组件文件仍保留 `export default`，违反 F-11 强制规范\n- **
+位置**: 全部 16 个 `apps/phaser3/src/ui/*.ts` 组件文件末尾\n  - `UIPanel.ts:299`
+— `export default UIPanel;`\n  - `UIDialog.ts:187` — `export default UIDialog;`\
+n  - `UIToast.ts:407` — `export default UIToast;`\n  - `UIAlert.ts:182` — `expor
+t default UIAlert;`\n  - `UIButton.ts:163` / `UIIcon.ts:98` / `UIIconButton.ts:1
+73` / `UIInput.ts:167` / `UIList.ts:164` / `UIListItem.ts:131` / `UIAvatar.ts:12
+1` / `UIProgressBar.ts:123` / `UIResourceDisplay.ts:107` / `UIScrollView.ts:164`
+/ `UISegmentedControl.ts:250` / `UIText.ts:46` / `UITooltip.ts:146`\n- **问题**:
+设计规范 `designs/issue-19/design-spec.md` 明确将 `export default` 列为 F-11 违
+反项（P-06、D-07、T-07、A-05），要求改为命名导出 `export class`。`docs/design-do
+cs/ui-style-guide/03-component.md` 3.9 检查清单也强制要求：「组件文件使用命名导
+出 `export class`，不使用 `export default`」。`docs/modules/client/ui.md` 同样重
+申此规则。\n- **影响**: 虽然 `index.ts` 使用命名导入，但文件内同时存在命名导出和
+默认导出会导致规范混乱，且给后续重构和 tree-shaking 带来隐患。\n- **修复**: 从上
+述 16 个文件中删除每一行的 `export default Xxx;`。\n- **依据**: `designs/issue-1
+9/design-spec.md` 第 2 节问题分析表（P-06 / D-07 / T-07 / A-05）; `docs/design-d
+ocs/ui-style-guide/03-component.md` 第 289-296 行。\n\n### 2. UIButton `setDisab
+led(false)` 无法恢复交互事件监听\n- **位置**: `apps/phaser3/src/ui/UIButton.ts:8
+4-141`（`setupInteraction`）及 `:149-160`（`setDisabled`）\n- **问题**: 构造函数
+中若传入 `isDisabled: true`，`setupInteraction()` 会在 `:89-92` 提前 `return`，
+导致 `pointerover` / `pointerout` / `pointerdown` / `pointerup` 事件监听器**从未
+被注册**。后续调用 `setDisabled(false)` 仅执行 `target.setInteractive({ useHandC
+ursor: true })` 和 `this.setAlpha(1)`，但事件监听仍然缺失，按钮虽可交互但无 Hove
+r / Pressed / Click 响应。\n- **影响**: 任何在构造时禁用、后续启用的 UIButton 将
+处于“假交互”状态，破坏状态机完整性。\n- **修复**: 重构 `setupInteraction()`，使
+其**始终注册**事件监听，仅在回调内部判断 `this.config.isDisabled` 来决定是否执行
+视觉反馈和 `onClick`；`setDisabled()` 仅负责切换 `isDisabled` 标志和 `disableInt
+eractive()` / `setAlpha()`。\n  ```typescript\n  // 示例修复思路\n  target.on(\'
+pointerover\', () => {\n    if (this.config.isDisabled) return;\n    killTweensO
+f(this.scene, this);\n    ...\n  });\n  // 构造函数中不再因 isDisabled 提前 retu
+r\n\n  if (this.config.isDisabled) {\n    target.disableInteractive();\n    this
+.setAlpha(0.6);\n  }\n  ```\n- **依据**: `docs/design-docs/ui-style-guide/03-com
+ponent.md` 3.1 节要求「所有按钮组件都有 Normal / Hover / Pressed / Disabled 四态
+视觉区分」；PRD-004 3.6 组件状态机要求从 DISABLED 恢复后自动回到 NORMAL 态。\n\n
+### 3. `apps/phaser3/src/ui/__tests__/` 缺少 `UIAlert.test.ts`\n- **位置**: `app
+s/phaser3/src/ui/__tests__/`\n- **问题**: PRD-004 成功指标要求「单元测试覆盖率 ≥
+80%（全部组件）」，且 `designs/issue-19/design-spec.md` 9.4 验收标准列明需测试 `
+show()` / `hide()` / `isAutoHide` / `getTypeColor()` 等。设计目录 `designs/issue
+-19/src/ui/__tests__/UIAlert.test.ts` 已存在较完善的测试（12 个 case），但生产代
+码目录 `apps/phaser3` 中未同步创建对应测试文件。\n- **影响**: 生产测试覆盖不完整
+；后续 CI 无法验证 UIAlert 回归。\n- **修复**: 将 `designs/issue-19/src/ui/__tes
+ts__/UIAlert.test.ts` 适配到 `apps/phaser3/src/ui/__tests__/UIAlert.test.ts`，使
+用 `MockScene` 替代 `UIMockScene`（或复用 `src/ui/__tests__/setup.ts` 中的 `UIMo
+ckScene`）。\n- **依据**: PRD-004 第 1.2 节测试覆盖率指标；`designs/issue-19/des
+ign-spec.md` 9.4 验收标准。\n\n### 4. UISegmentedControl 存在魔法数字色值且默认
+选中色与 PRD-004 不一致\n- **位置**: `apps/phaser3/src/ui/UISegmentedControl.ts:
+138` 及 `:54`\n- **问题**:\n  1. **魔法数字**: 非选中标签颜色硬编码为 `\'#aaaaaa
+\'`（`:138`），违反 `docs/frontend/agent-design-guide.md` Step 3.2「颜色使用 `UI
+Theme` 常量，禁止魔法数字」。\n  2. **PRD 不一致**: 默认 `selectedColor` 为 `UIT
+heme.stoneCyan`（`:54`），但 PRD-004 5.13 明确规定「选中态使用 `UITheme.indigoBl
+ue`」。\n- **影响**: 视觉风格与国风色板不一致；若主题色调整，该组件不会同步变更
+。\n- **修复**:\n  ```typescript\n  // :54\n  selectedColor: config.selectedColo
+r ?? UITheme.indigoBlue,\n  // :138\n  color: colorToHex(UITheme.lightInk),  // 
+替代 \'#aaaaaa\'\n  ```\n- **依据**: `docs/frontend/agent-design-guide.md` 第 11
+4 行；PRD-004 5.13 变更要点。\n\n### 5. UIAlert `hide()` 动画时长 150ms，与 PRD-
+004 及设计规范要求的 200ms 不符\n- **位置**: `apps/phaser3/src/ui/UIAlert.ts:148
+`\n- **问题**: `UIAlert.hide()` 使用 `duration: UITweens.fade.duration`（150ms）
+。但 `prd/PRD-004-ui-component-library-redesign.md` 5.15 明确规定退场动画 `durat
+ion=200ms`；`designs/issue-19/design-spec.md` 3.4 节同样写明 `duration=200ms`。\
+n- **影响**: UIAlert 退场动画比规范快 50ms，与其他弹窗/提示组件的视觉节奏不一致
+。\n- **修复**: 将 `UIAlert.hide()` 中 `duration` 改为字面量 `200`（或新增 `UITw
+eens.alertOut` 配置）。\n  ```typescript\n  duration: 200,  // 替代 UITweens.fad
+e.duratio\n\n  ```\n- **依据**: `prd/PRD-004-ui-component-library-redesign.md` 5
+.15；`designs/issue-19/design-spec.md` 3.4 动画标准表。\n\n---\n\n## 轻微问题（M
+inor）\n\n### 1. UIListItem 使用魔法数字色值\n- **位置**: `apps/phaser3/src/ui/U
+IListItem.ts:83` (`#dddddd`)、`:92` (`#888888`)\n- **问题**: 标题和副标题颜色使
+用硬编码 HEX，应使用 `UITheme.white` / `UITheme.mediumInk` 等常量。\n- **修复**:
+替换为 `colorToHex(UITheme.white)` 和 `colorToHex(UITheme.mediumInk)`。\n- **依
+据**: `docs/frontend/agent-design-guide.md` 第 114 行。\n\n### 2. UIPanel 关闭按
+钮未使用 `UIIcon` 组件\n- **位置**: `apps/phaser3/src/ui/UIPanel.ts:160-221`\n- 
+**问题**: `designs/issue-19/design-spec.md` 3.1 节要求「关闭按钮使用 `UIIcon` 加
+载 `cancel-btn-0.png` 纹理」。实际实现手动创建 `Phaser.GameObjects.Image` / `Rec
+tangle` 并自行管理交互和 Hover 边框变色，未实例化 `UIIcon` 类。\n- **影响**: 规
+范符合性轻微偏差；关闭按钮的 Hover 边框变色逻辑无法在 `UIIcon` 中复用。\n- **修
+复建议**: 若 `UIIcon` 不支持 Hover 边框变色，可在设计规范中记录此例外，或扩展 `U
+IIcon` 支持 `onHover` / `onOut` 回调后统一替换。\n- **依据**: `designs/issue-19/
+design-spec.md` 3.1 关闭按钮标准。\n\n### 3. 文档中 UIAlert 退场时长存在内部不一
+致\n- **位置**: `docs/design-docs/ui-style-guide/03-component.md:225`\n- **问题*
+*: 该文件写 UIAlert 退场 `duration=150ms`，但 PRD-004 和设计规范均要求 200ms。作
+为本次 PR 中被修改的文档，应与上级规范保持一致。\n- **修复**: 将 `03-component.m
+d` 中 UIAlert 退场时长改为 `duration=200ms`。\n- **依据**: PRD-004 5.15；`design
+s/issue-19/design-spec.md` 3.4。\n\n### 4. `docs/modules/client/ui.md` 对 `creat
+eInkBackground` 的原点描述错误\n- **位置**: `docs/modules/client/ui.md:509`\n- *
+*问题**: 文档写「默认原点左上角」，但 `apps/phaser3/src/ui/utils.ts:186` 实际设
+置 `bg.setOrigin(0.5)`（中心原点）。\n- **修复**: 将描述改为「默认原点中心（0.5
+）」。\n- **依据**: `apps/phaser3/src/ui/utils.ts:177-188` 源码。\n\n### 5. `UIL
+istItem` 的 `icon` 参数以文本方式渲染，存在误用 emoji 风险\n- **位置**: `apps/ph
+aser3/src/ui/UIListItem.ts:72-75`\n- **问题**: `icon` 被直接传入 `scene.add.text
+(...)` 作为字符串渲染。若调用方传入 emoji，将违反 F-01 禁令。PRD-004 5.7 定义 `i
+con?: string` 为纹理键名，但实现按文本处理。\n- **修复建议**: 若 `icon` 应为纹理
+键名，应使用 `hasTexture` + `scene.add.image` 渲染；若保留文本方式，需在文档中明
+确禁止 emoji 并添加运行时检查。\n- **依据**: `docs/design-docs/ui-style-guide/03
+-component.md` 3.7 / 3.8 F-01 禁止项；PRD-004 5.7。\n\n---\n\n## 验证结果\n\n| 
+维度 | 状态 | 说明 |\n|------|------|------|\n| 功能完整性 | ✅ | 四个目标组件的
+接口（show/hide、遮罩、ToastManager 单例、alert() 工厂、getTypeColor 等）均已实
+现。 |\n| 代码规范性 | ❌ | `export default` 残留（全部 16 个组件文件）；UISegme
+ntedControl / UIListItem 存在魔法数字色值；UIButton 状态机实现不完整。 |\n| 全链
+路完整性 | ✅ | 本次 PR 为纯前端 UI 层变更，不涉及 DB / API / Mobile 链路。 |\n|
+规范符合性 | ⚠️ | 核心容器组件对齐 PRD-004 约 90%，但 UIAlert hide 时长、UISegmen
+tedControl 默认选中色、关闭按钮未使用 UIIcon 存在偏差。 |\n| 测试覆盖 | ⚠️ | `app
+s/phaser3` 测试目录缺少 `UIAlert.test.ts`；其余目标组件（UIPanel/UIDialog/UIToas
+t）已有测试但覆盖度中等。`pnpm test` 183 项全部通过（唯一失败为与本次 PR 无关的 
+`props-config.test.ts`）。 |\n| 文档同步 | ⚠️ | `docs/modules/client/ui.md` 更新
+较完整；`docs/design-docs/ui-style-guide/03-component.md` 存在 UIAlert 退场时长
+与 PRD 不一致；`createInkBackground` 原点描述错误。 |\n\n---\n\n## 风险与建议\n\
+n1. **export default 遗留风险**: 虽然当前 `index.ts` 统一使用命名导出，但文件级 
+`export default` 的长期存在会诱使后续开发者使用默认导入，破坏规范一致性。建议一
+次性全部清理。\n\n2. **UIButton 状态机脆弱性**: `setDisabled(false)` 的事件监听
+缺失是**状态机实现缺陷**，在动态权限/表单校验场景中极易触发。建议将事件监听注册
+与 `isDisabled` 状态判断解耦。\n\n3. **设计资产与生产代码的测试漂移**: `designs/
+issue-19/src/ui/__tests__/` 中的测试比 `apps/phaser3/src/ui/__tests__/` 更完善（
+使用了 `UIMockScene`、`expectTweenCreated` 等 helper）。建议建立规范：设计目录的
+测试在合并前必须同步到生产目录，或统一从生产目录运行。\n\n4. **文档三处不一致**:
+PRD-004（200ms）/ design-spec（200ms）/ ui-style-guide（150ms）对 UIAlert 退场时
+长的描述不一致，应在修复代码后统一文档。\n\n5. **建议补充的测试场景**（非阻塞，
+但建议后续迭代）：\n   - UIPanel: `show()` 在 `hide()` 动画中途被调用的行为（kil
+lTweensOf + 新动画）。\n   - UIDialog: 确认回调确实在 `hide` 动画 `onComplete` 
+后触发（当前 `apps/phaser3` 的测试仅检查 `dialog` 被定义，未触发按钮）。\n   - U
+IToast: ToastManager 队列满时最早 Toast 被 dismiss 后，剩余 Toast 的 reposition 
+验证。\n   - UIAlert: `getTypeColor` 静态方法的四态返回值验证（设计目录已有，生
+产目录缺失）。\n\n---\n\n*审查完成。以上问题修复后，本 PR 可视为满足合并条件。*\
+n\n\n--- 第 5 次 Review ---\n## 审查结论\n\n审查结论: **NEEDS_FIX**\n\n> PR #30 
+对 `apps/phaser3/src/ui/` 下的 Layer 1 原子组件进行了系统性重做（UIPanel、UIDial
+og、UIToast、UIAlert）及配套调整（UIButton、UIBadge、UISegmentedControl、UIListI
+tem），同步更新了设计文档和测试。整体架构符合 PRD-004 与设计规范，但存在 1 个 Ma
+jor 规范违反项和若干 Minor 问题，修复后可合并。\n\n---\n\n## 阻塞问题（Blocking
+）\n\n无。\n\n---\n\n## 严重问题（Major）\n\n### 1. UIIcon 的 pointerdown 动画违
+反「动画铁律」—— 未执行 `killTweensOf`\n- **位置**: `apps/phaser3/src/ui/UIIcon.
+ts:73-83`\n- **问题**: `UIIcon` 的 `pointerdown` 事件处理器直接创建 tween，未在
+播放前调用 `killTweensOf`。根据 `docs/design-docs/ui-style-guide/03-component.md
+` 3.2 节「动画铁律」：\n  > **Pressed tween 播放前必须先 `killTweensOf(this.scen
+e, this)`。**\n快速连续点击时，tween 会叠加，导致缩放动画异常。\n- **影响**: 所
+有使用 `UIIcon` 且开启 `isInteractive` 的交互图标（如关闭按钮、道具图标）在连续
+点击时动画冲突。\n- **修复**: 在 `pointerdown` 回调第一行添加 `killTweensOf(this
+.scene, this);`：\n  ```typescript\n  target.on(\'pointerdown\', () => {\n    ki
+llTweensOf(this.scene, this); // 新增\n    this.scene.tweens.add({\n      target
+s: this,\n      scale: 0.95,\n      duration: UITweens.press.duration, // 建议同
+步改为 UITweens.press\n      ease: UITweens.press.ease,\n      yoyo: true,\n    
+ onComplete: () => {\n        this.config.onClick?.();\n      },\n    });\n  });
+\n  ```\n- **依据**: `docs/design-docs/ui-style-guide/03-component.md` 第 76-78 
+行；PRD-004 3.4 节「禁止连续触发时动画叠加，必须先 `killTweensOf(target)`」。\n\
+n---\n\n## 轻微问题（Minor）\n\n### 2. UIListItem 图标缺失时未执行资源回退契约\n
+- **位置**: `apps/phaser3/src/ui/UIListItem.ts:71-78`\n- **问题**: 当传入 `icon`
+但纹理不存在时，代码仅跳过创建图标：\n  ```typescript\n  if (icon) {\n    if (ha
+sTexture(this.scene, icon)) {\n      // 创建 image\n    }\n    // 无 else 分支：
+既没有 fallback Rectangle，也没有 console.war\n\n    textX = 10;\n  }\n  ```\n这
+违反了 PRD-004 3.3 节资源回退统一标准：\n  > 1. **检查**：`if (texture && hasTex
+ture(scene, texture))`\n  > 2. **回退**：使用 `createInkBackground()` 或 `scene.
+add.rectangle()` + `setStrokeStyle()`\n  > 3. **告警**：`console.warn(\\`[UI] fa
+llback: ${textureKey}\\`)`\n- **影响**: 列表项在缺少图标纹理时左侧出现空白偏移，
+且无回退提示，不利于资源缺失排查。\n- **修复**: 补充 `else` 分支：\n  ```typescr
+ipt\n  if (icon) {\n    if (hasTexture(this.scene, icon)) {\n      const iconIma
+ge = this.scene.add.image(-width / 2 + 20, 0, icon);\n      iconImage.setDisplay
+Size(18, 18);\n      iconImage.setOrigin(0.5);\n      elements.push(iconImage);\
+n    } else {\n      const fallback = createFallbackRect(this.scene, 18, 18, ico
+n, UITheme.lightInk, UITheme.goldBrown);\n      fallback.setPosition(-width / 2 
++ 20, 0);\n      elements.push(fallback);\n    }\n    textX = 10;\n  }\n  ```\n
+同时需要在文件顶部引入 `createFallbackRect`。\n- **依据**: PRD-004 3.3 节「资源
+回退统一标准」；`apps/phaser3/src/ui/utils.ts` 中 `createFallbackRect` 的实现。\
+n\n### 3. UIListItem 存在未使用的 dead code\n- **位置**: `apps/phaser3/src/ui/UI
+ListItem.ts:26`\n- **问题**: `private iconText?: Phaser.GameObjects.Text;` 在重
+构后（从 Unicode 字符回退改为 Image/Rectangle）不再被赋值，但属性声明仍保留。\n-
+**修复**: 删除 `iconText` 属性声明。\n\n### 4. ToastManager 构造器应为 private（
+设计规范偏差）\n- **位置**: `apps/phaser3/src/ui/UIToast.ts:317`\n- **问题**: 设
+计规范 `designs/issue-19/design-spec.md` 及 PRD-004 均要求 `ToastManager` 为单例
+模式，构造器应为 `private constructor`。实际实现为 `constructor(scene: Scene, st
+artY?: number)`（public），允许外部直接 `new ToastManager(scene)`，弱化了单例约
+束。\n- **修复**: 将构造器改为 `private`：\n  ```typescript\n  private construct
+or(scene: Scene, startY?: number) { ... }\n  ```\n现有测试中的 `new ToastManager
+(scene)` 调用应替换为 `ToastManager.getInstance(scene)`。\n- **依据**: `designs/
+issue-19/design-spec.md` 第 221-224 行；PRD-004 5.11 ToastManager 接口设计。\n\n
+### 5. UIBadge 深度测试未做实际断言\n- **位置**: `apps/phaser3/src/ui/__tests__/
+UIBadge.test.ts:49-52`\n- **问题**: 测试用例仅断言 `toBeDefined()`，未验证 `dept
+h` 是否被正确设置：\n  ```typescript\n  it(\'should respect explicit depth\', ()
+=> {\n    const badge = new UIBadge(scene as unknown as Scene, { text: \'深度\',
+depth: 100 });\n    expect(badge).toBeDefined();\n  });\n  ```\n- **修复**: 增加
+深度断言：\n  ```typescript\n  expect(badge.depth).toBe(100);\n  ```\n\n### 6. 
+文档存在重复的检查清单条目\n- **位置**: `docs/design-docs/ui-style-guide/03-comp
+onent.md:293-296`\n- **问题**: 文件末尾出现重复的两行：\n  ```markdow\n\n  - [ ]
+所有布尔参数使用 `isXxx` 或 `showXxx` 前缀\n  - [ ] 组件文件使用命名导出 `export
+class`，不使用 `export default`\n  ```\n- **修复**: 删除重复的两行。\n\n### 7. 
+视觉验收截图证据缺失（PR 描述层面）\n- **问题**: 根据 `docs/design-docs/visual-q
+a-sop.md` 第 6 节，涉及 UI 改动的 PR 必须在 PR 描述中提供截图证据（normal / hove
+r / pressed / disabled / page-context）。本次 PR 改动了 UIPanel、UIDialog、UIAle
+rt、UIToast 等容器的视觉表现，但未在仓库内提供截图目录或基线对比。\n- **建议**: 
+在 `designs/issue-19/screenshots/` 补充各组件状态的 Playwright 截图，或在 PR 描
+述中贴出截图证据。若当前环境无法运行 Playwright，至少补充 Demo Scene（`src/scene
+s/demo/`）以便后续人工验收。\n- **依据**: `docs/design-docs/visual-qa-sop.md` 第
+139-160 行「视觉验收清单（PR 描述必填）」。\n\n---\n\n## 验证结果\n\n| 维度 | 状
+态 | 说明 |\n|------|------|------|\n| 功能完整性 | ✅ | UIPanel/UIDialog/UIToas
+t/UIAlert 均实现了 PRD-004 和设计规范要求的全部接口与行为。UIDialog 正确继承 UIP
+anel 并复用动画/遮罩。ToastManager 支持单例与队列。 |\n| 代码规范性 | ⚠️ | 整体规
+范良好：命名统一为 `isXxx`/`showXxx`/`onXxx`；移除了全部 `export default`；使用 
+`UITheme` 常量替代魔法数字。但存在 1 处 Major 动画规范违反（UIIcon `killTweensOf
+` 缺失）和 2 处 Minor 回退/清理问题。 |\n| 全链路完整性 | ✅ | 本次为纯前端 UI 
+组件 PR，不涉及 DB/API/Mobile。组件间的单向依赖关系（UIDialog → UIPanel → utils
+）正确，无循环依赖。 |\n| 规范符合性 | ✅ | 深度规范（UIDepthLayer）、动画标准（
+UITweens）、四态交互、资源回退机制在核心组件（UIPanel/UIDialog/UIAlert/UIToast/U
+IButton）上均已落实。 |\n| 测试覆盖 | ✅ | 新增 4 个测试文件（UIAlert、UIBadge、
+UISegmentedControl、UIToast），现有测试同步更新。全部 UI 相关测试通过（194 tests
+passed）。仅 `src/configs/test/props-config.test.ts` 失败（与本次 PR 无关的 path
+.join 问题）。 |\n| 文档同步 | ✅ | `docs/design-docs/ui-style-guide/03-componen
+t.md` 和 `docs/modules/client/ui.md` 已同步更新接口定义、命名变更和深度说明。`de
+signs/issue-19/design-spec.md` 完整记录了设计决策。 |\n\n---\n\n## 风险与建议\n\
+n1. **向后兼容风险**：`UISegmentedControl` 的 API 发生了破坏性变更（`selectedId`
+→ `selectedIndex`/`key`，`onSelect` → `onChange`）。`SceneSwitchBar.ts` 已同步迁
+移，但建议全局搜索确认无其他业务代码使用旧 API。\n2. **UIToast 旧 API 兼容层**：
+当前保留了 `title`、`startTime`、`endTime`、`progress`、`showProgress`、`onCompl
+ete`、`onClick` 等废弃字段。建议在后续迭代中标记具体移除版本，避免兼容层长期累积
+。\n3. **深度计数器未重置**：`getNextDepth` 使用 Scene 级 WeakMap 计数器，但仅在
+`ToastManager.clear()` 等极少数场景重置。如果同一 Scene 反复创建/销毁大量同层级
+组件，depth 可能无限增长（虽然实际场景中 5000+ 的 depth 在 Phaser3 中通常不会导
+致问题）。\n4. **缺少 Layer 2 组件**：PRD-004 规划了 6 个 Layer 2 组件（UISlider
+、UIToggle、UIStepper、UIDropdown、UIPagination、UILoading），本次 PR 未交付。建
+议在后续 PR 中继续推进，并在 `docs/modules/client/ui.md` 的「后续计划」中保持更
+新。\n\n\n--- 第 6 次 Review ---\n# PR #30 代码审查报告\n\n> **分支**: `design/i
+ssue-19`  \n> **范围**: UIPanel / UIDialog / UIToast / UIAlert / UIButton 重做 +
+基础设施更新 + 文档同步  \n> **审查依据**: PRD-004-ui-component-library-redesign
+.md、`docs/design-docs/ui-style-guide/`、`docs/frontend/agent-design-guide.md`\n
+\n---\n\n## 审查结论\n\n审查结论: **NEEDS_MAJOR_FIX**\n\nPR 整体完成了 Issue #19
+的核心目标：四个容器组件（UIPanel / UIDialog / UIToast / UIAlert）已按 PRD-004 
+重做，命名规范统一（`isXxx`、`onXxx`）、动画契约正确（`killTweensOf` + `UITweens
+`）、深度层正确（`UIDepthLayer`）、旧版 `export default` 已清理。城市建造模块的 
+`ProgressToast` 兼容包装也保持了向后兼容。\n\n但存在 **5 项 Major 问题** 需要修
+复，主要集中在：\n1. PRD-004 接口实现不完整（`UIButton` 缺少公开方法）\n2. 警告
+色值与 PRD-004 冲突（`goldBrown` vs `warning`）\n3. 设计产物编译缺陷（`designs/i
+ssue-19/src/ui/index.ts` 导出不存在类型）\n4. 文档格式错误（重复章节编号）\n5. `
+UIDialog` 存在无效继承参数\n\n---\n\n## 阻塞问题（Blocking）\n\n无阻塞问题。\n\n
+---\n\n## 严重问题（Major）\n\n### 1. UIButton 缺少 PRD-004 规定的 `setTexture()
+` 和 `setColors()` 公开方法\n\n- **位置**: `apps/phaser3/src/ui/UIButton.ts`（整
+文件，缺少方法实现）\n- **问题**: PRD-004 5.3 节明确定义了 `UIButton` 的公开 API
+：\n  ```typescript\n  class UIButton {\n    setText(text: string): void;\n    s
+etDisabled(isDisabled: boolean): void;\n    setTexture(texture: string): void;  
+       // ❌ 未实现\n    setColors(bgColor: number, hoverColor: number, strokeCo
+lor: number): void;  // ❌ 未实现\n  }\n  ```\n同时 `docs/modules/client/ui.md` 
+也已更新并 documenting 了这两个方法，但代码中不存在。\n- **影响**: 业务代码按新
+版文档调用 `setTexture()` / `setColors()` 时将报运行时错误；PRD-004 接口一致性验
+收不通过。\n- **修复**: 在 `UIButton` 类中补充：\n  ```typescript\n  setTexture(
+texture: string): void {\n    this.config.texture = texture;\n    // 销毁旧 back
+ground，按 createBackground() 逻辑重建\n  }\n  setColors(bgColor: number, hoverC
+olor: number, strokeColor: number): void {\n    this.config.bgColor = bgColor;\n
+   this.config.hoverColor = hoverColor;\n    this.config.strokeColor = strokeCol
+or;\n    if (this.background instanceof Phaser.GameObjects.Rectangle) {\n      t
+his.background.setFillStyle(bgColor, this.originalFillAlpha);\n      this.backgr
+ound.setStrokeStyle(2, strokeColor);\n    }\n  }\n  ```\n- **依据**: PRD-004 5.3
+节接口设计；`docs/modules/client/ui.md` 第 86–89 行。\n\n---\n\n### 2. UIAlert /
+UIToast 的 `warning` 类型色错误使用了 `UITheme.goldBrown`\n\n- **位置**:\n  - `a
+pps/phaser3/src/ui/UIAlert.ts:70` / `UIAlert.ts:167`\n  - `apps/phaser3/src/ui/U
+IToast.ts:129`\n- **问题**: 当 `type === \'warning\'` 时，代码返回 `UITheme.gold
+Brown` (`0xc9a227`)。但 PRD-004 5.15 节强制规定 warning 色为 `0xffaa00`，且 `UIT
+heme.warning` 已定义为此值。文档 `docs/design-docs/ui-style-guide/03-component.m
+d` 3.7/3.8 节虽然写了 `UITheme.goldBrown`，但该文档是在 PR 中新增/更新的，与 PRD
+-004 源规范冲突。应以 PRD-004 为准。\n- **影响**: 警告提示条视觉色值与产品规范不
+一致；测试 `UIAlert.test.ts` 第 76–78 行也在验证错误的 `goldBrown`，导致测试成为
+“假阳性”。\n- **修复**:\n  1. 将 `UIAlert.getTypeColor()` 和 `UIToast.getTypeCol
+or()` 中 `case \'warning\'` 的返回值改为 `UITheme.warning`\n  2. 同步修正 `docs/
+design-docs/ui-style-guide/03-component.md` 中 warning 色条说明\n  3. 同步修正 `
+apps/phaser3/src/ui/__tests__/UIAlert.test.ts` 中断言：`expect(UIAlert.getTypeCo
+lor(\'warning\')).toBe(UITheme.warning)`\n- **依据**: PRD-004 5.15 节类型色标准
+表格：`warning: 0xffaa00`；`apps/phaser3/src/ui/utils.ts:30` 已定义 `warning: 0x
+ffaa00`。\n\n---\n\n### 3. `designs/issue-19/src/ui/index.ts` 导出了不存在的类型
+\n\n- **位置**: `designs/issue-19/src/ui/index.ts:44–45`\n- **问题**:\n  ```type
+script\n  export { UIAlert, type UIAlertConfig, type UIAlertType } from \'./UIAl
+ert\';  // UIAlertType 不存在\n  export { UIToast, ToastManager, type ToastType,
+type UIToastConfig } from \'./UIToast\';  // ToastType 不存在\n  ```\n在 `design
+s/issue-19/src/ui/UIAlert.ts` 中无 `UIAlertType` 导出；在 `designs/issue-19/src/
+ui/UIToast.ts` 中无 `ToastType` 导出（仅有 `UINotificationType`）。\n- **影响**:
+`designs/issue-19/` 目录无法通过 `tsc --noEmit`，违反 `agent-design-guide.md` St
+ep 4 检查清单：“所有 `src/` 代码在 `designs/` 目录内可编译”。\n- **修复**: 在对
+应的设计产物文件中补充类型别名：\n  ```typescript\n  // designs/issue-19/src/ui/
+UIAlert.ts\n  export type UIAlertType = UINotificationType;\n  \n  // designs/is
+sue-19/src/ui/UIToast.ts\n  export type ToastType = UINotificationType;\n  ```\n
+- **依据**: `docs/frontend/agent-design-guide.md` Step 4 检查清单：“若设计 Issue
+依赖上游 Issue 的基础设施……必须将依赖文件复制到本 Issue 目录，确保 `tsc --noEmit
+` 通过”。\n\n---\n\n### 4. `docs/design-docs/ui-style-guide/03-component.md` 存
+在重复章节编号\n\n- **位置**: `docs/design-docs/ui-style-guide/03-component.md`\
+n- **问题**: 文件中出现了两个 `## 3.8`：\n  - 第一个 `## 3.8` 是 **UIAlert**（第
+236 行）\n  - 第二个 `## 3.8` 是 **UIToast**（第 244 行）\n随后 `## 3.9` 是组件
+层检查清单（第 286 行）。UIToast 应编号为 `3.8` 或 `3.9`，而检查清单应顺延。\n- 
+**影响**: 文档索引和交叉链接失效；AGENTS.md 要求“禁止孤立文档、交叉链接”，编号冲
+突会导致锚点引用错误。\n- **修复**: 将 UIToast 章节改为 `## 3.8 UIToast`（若保留
+UIAlert 为 3.7），检查清单改为 `## 3.9`。或按实际层级调整为连续编号。\n- **依据*
+*: AGENTS.md 维护规则第 3 条：“交叉链接：相关文档之间应互相链接”。\n\n---\n\n###
+5. `UIDialog` 未将 `onClose` 回调传递给 `UIPanel` 基类\n\n- **位置**: `apps/phas
+er3/src/ui/UIDialog.ts:47–69`\n- **问题**: `UIDialogConfig` 通过 `Omit<UIPanelCo
+nfig, \'title\' | \'showClose\'>` 继承了 `onClose`，但 `UIDialog` 构造 `panelCon
+fig` 时未传递 `onClose: config.onClose`，导致用户传入的 `onClose` 被静默丢弃。虽
+然 `UIDialog` 当前不显示关闭按钮（`showClose: false`），但 API 层面存在“无效参数
+”。\n- **影响**: 调用方传入 `onClose` 时期望在面板关闭时触发，实际永远不会执行，
+造成难以调试的交互缺陷。\n- **修复**: 在 `panelConfig` 中增加 `onClose: config.o
+nClose`，或在 `UIDialogConfig` 中显式 `Omit<UIPanelConfig, \'title\' | \'showClo
+se\' | \'onClose\'>` 以移除该参数，避免误导。\n- **依据**: PRD-004 5.6 节：`UIDi
+alogConfig` 必须继承 `UIPanelConfig`（通过 `Omit` 排除），确保 Dialog 可复用 UIP
+anel 的全部配置能力。\n\n---\n\n## 轻微问题（Minor）\n\n### 1. `ProgressToast.ts
+` 仍保留 `export default`\n\n- **位置**: `apps/phaser3/src/city-builder/ui/Progr
+essToast.ts:140`\n- **问题**: 文件末尾有 `export default ProgressToast;`，违反 F
+-11（组件文件必须使用命名导出 `export class`）。\n- **修复**: 删除 `export defau
+lt ProgressToast;`，统一使用命名导出。所有引用方应改为 `import { ProgressToast }
+from \'...\'`。\n- **依据**: `docs/design-docs/ui-style-guide/03-component.md` 3
+.9 检查清单：“组件文件使用命名导出 `export class`，不使用 `export default`”。\n\
+n### 2. `UIAlert.show()` 未清除已存在的 `autoHideEvent`\n\n- **位置**: `apps/pha
+ser3/src/ui/UIAlert.ts:119–133`\n- **问题**: 若 `show()` 被多次调用，前一次创建
+的 `delayedCall` 不会被取消，导致旧的自动隐藏定时器仍在运行，可能引发重复 `hide(
+)` 动画或过早销毁。\n- **修复**: 在 `show()` 开头增加：\n  ```typescript\n  if (
+this.autoHideEvent) {\n    this.autoHideEvent.remove();\n    this.autoHideEvent 
+= undefined;\n  }\n  ```\n- **依据**: 与 `UIToast.show()` 的现有防御性处理保持一
+致（`UIToast.ts:220–224`）。\n\n### 3. `UIButton` 默认文字色使用硬编码 `\'#fffff
+f\'`\n\n- **位置**: `apps/phaser3/src/ui/UIButton.ts:44`\n- **问题**: `textColor
+: config.textColor ?? \'#ffffff\'` 直接硬编码了 HEX 字符串，而规范要求通过 `UITh
+eme` + `colorToHex()` 注入。\n- **修复**: 改为 `textColor: config.textColor ?? c
+olorToHex(UITheme.white)`。\n- **依据**: `docs/design-docs/ui-style-guide/03-com
+ponent.md` 3.1 禁止事项：“文字颜色通过 `getInkTextStyle()` + `colorToHex()` 注入
+，禁止硬编码 HEX 字符串”。\n\n### 4. `UIToast` 构造器隐式自动播放 `show()`，与 d
+esigns 版本行为不一致\n\n- **位置**: `apps/phaser3/src/ui/UIToast.ts:111`\n- **
+问题**: 为了兼容旧 API，构造器内自动调用 `this.show()`。而 designs 版本和 PRD-00
+4 的契约是：构造后显式调用 `show()` 或 `static show()` 才播放入场动画。这导致 `U
+IToast.static show()` 在 apps 版本中无法显式再调用 `toast.show()`（否则会重置动
+画）。\n- **修复建议（可选）**: 在 `ToastManager.show()` 中显式调用 `toast.show(
+)`，并将构造器内的自动 `show()` 逻辑改为仅在检测到旧 API 参数（如 `title`、`star
+tTime`）时才触发，以减少新 API 的副作用。\n- **依据**: `designs/issue-19/src/ui/
+UIToast.ts` 中 `static show()` 显式调用 `toast.show()`；PRD-004 5.11 接口设计未
+提及构造器自动播放。\n\n### 5. `apps/phaser3/src/ui/__tests__/setup.ts` 中 `asse
+rtFallbackWarn` 未在 app 测试中使用\n\n- **位置**: `apps/phaser3/src/ui/__tests_
+_/setup.ts:117–130`\n- **问题**: 虽然导出了 `assertFallbackWarn`，但当前所有 app
+层测试文件（`UIAlert.test.ts`、`UIBadge.test.ts`、`UISegmentedControl.test.ts`、
+`UIToast.test.ts`）均未调用该辅助函数，导致纹理缺失回退的 `console.warn` 验证缺
+失。PRD-004 3.3 节要求“回退时打印 `[UI] fallback: ${textureKey}` warn”。\n- **修
+复**: 在至少一个组件测试中补充 fallback 验证用例，例如：\n  ```typescript\n  con
+st warnSpy = createFallbackWarnSpy();\n  new UIButton(scene, { text: \'测试\', t
+exture: \'non-existent\' });\n  assertFallbackWarn(warnSpy, \'non-existent\');\n
+ ```\n- **依据**: PRD-004 3.3 资源回退统一标准第 3 条：“告警：`console.warn(\\`[
+UI] fallback: ${textureKey}\\`)`”。\n\n---\n\n## 验证结果\n\n| 维度 | 状态 | 说
+明 |\n|------|------|------|\n| 功能完整性 | ⚠️ | 核心四组件（UIPanel/UIDialog/UI
+Toast/UIAlert）功能完整，但 `UIButton` 缺少 PRD-004 规定的 `setTexture`/`setColo
+rs` 方法。 |\n| 代码规范性 | ⚠️ | 命名规范、`killTweensOf`、深度层、动画参数整体
+合规；`UIButton` 存在硬编码 `\'#ffffff\'`；`ProgressToast.ts` 残留 `export defau
+lt`。 |\n| 全链路完整性 | ✅ | 城市建造模块 `ProgressToast` / `SceneSwitchBar` 
+已迁移使用新版组件，数据流贯通。 |\n| 规范符合性 | ⚠️ | `UIAlert` / `UIToast` war
+ning 色值使用 `goldBrown` 而非 PRD-004 规定的 `warning`（`#ffaa00`）；`docs/desi
+gn-docs/ui-style-guide/03-component.md` 编号冲突。 |\n| 测试覆盖 | ⚠️ | App 层现
+有 4 个测试文件覆盖基本路径，但缺少纹理回退 `console.warn` 验证；`UIButton` 新增
+方法无测试。 |\n| 文档同步 | ⚠️ | `docs/modules/client/ui.md` 已同步更新 API 文档
+，但文档中包含了尚未实现的 `setTexture`/`setColors`；`03-component.md` 存在重复
+章节编号。 |\n\n---\n\n## 风险与建议\n\n1. **色值规范冲突风险**：`docs/design-do
+cs/ui-style-guide/03-component.md` 在 PR 中被写入了 `warning: UITheme.goldBrown`
+，与 PRD-004 的 `0xffaa00` 冲突。建议在合并前统一以 PRD-004 为准，否则后续业务模
+块 Agent 会引用错误色值。\n2. **设计产物编译风险**：`designs/issue-19/src/ui/ind
+ex.ts` 当前无法编译。若 Developer Agent 直接复制该目录文件到 `apps/phaser3/src/u
+i/`，构建将失败。建议修复导出后重新验证 `tsc --noEmit`。\n3. **UIToast 构造器副
+作用风险**：apps 版 `UIToast` 构造器自动 `show()` 是为了兼容旧版 `ProgressToast`
+，但长期维护中应通过显式调用消除隐式副作用。建议在后续清理旧 API 时一并移除构造
+器内的 `this.show()`。\n4. **UIButton API 缺口风险**：文档与 PRD 已承诺 `setText
+ure()` / `setColors()`，但代码缺失。建议优先补齐，避免业务模块前端开发时遭遇 `Ty
+peError: btn.setTexture is not a function`。\n\n\n--- 第 7 次 Review ---\n# PR #
+30 代码审查报告\n\n**审查分支**: `design/issue-19` **PR 范围**: Issue #19 — UIPa
+nel / UIDialog / UIToast / UIAlert 四个核心容器组件重做 **关联 PRD**: PRD-004-ui
+-component-library-redesign.md **审查日期**: 2025-04-26\n\n---\n\n## 审查结论\n\
+n**审查结论: NEEDS_MAJOR_FIX**\n\n本 PR 在视觉规范对齐（色条、动画参数、命名导出
+）方面完成度较高，但存在一个 **Blocking** 级别的编译/运行时错误（UIDialog 构造函
+数中 `super()` 之前使用 `this`），以及多个 **Major** 级别的交互逻辑缺陷和测试缺
+失。必须在合并前修复 Blocking 问题，并强烈建议同步修复 Major 问题。\n\n---\n\n##
+阻塞问题（Blocking）\n\n### 1. UIDialog 构造函数在 `super()` 之前通过箭头函数引
+用 `this`\n\n- **位置**: `apps/phaser3/src/ui/UIDialog.ts:63-67`\n- **问题**: `p
+anelConfig` 对象字面量在 `super(scene, panelConfig)` 之前创建，其中包含箭头函数 
+`onOverlayClick: () => { this.cancel(); }`。箭头函数在定义时会词法捕获外围的 `th
+is`，而在 `super()` 调用之前，`this` 绑定处于未初始化状态（TDZ）。这会导致：\n  
+1. **TypeScript 编译错误**: `ts(17009) \'super\' must be called before accessing
+\'this\'`\n  2. **运行时 ReferenceError**: 在严格模式下访问未初始化的 `this` 会
+抛出异常\n- **影响**: UIDialog 组件完全无法实例化，任何使用 `new UIDialog()` 或 
+`UIDialog.show()` 的代码都会崩溃。\n- **修复**:\n  ```typescript\n  // apps/phas
+er3/src/ui/UIDialog.ts\n  constructor(scene: Scene, config: UIDialogConfig) {\n 
+  const camera = scene.cameras.main;\n    const panelConfig = {\n      x: config
+.x ?? camera.width / 2,\n      y: config.y ?? camera.height / 2,\n      width: c
+onfig.width ?? 360,\n      height: config.height ?? 220,\n      title: config.ti
+tle,\n      showClose: false,\n      showOverlay: true,\n      overlayAlpha: 0.6
+,\n      isModal: true,\n      depth: config.depth ?? getNextDepth(UIDepthLayer.
+Dialog, scene),\n      onClose: config.onClose,\n      // 不在 super 前传递依赖 
+this 的回调\n      onOverlayClick: undefined,\n    };\n\n    super(scene, panelC
+onfig);\n\n    // super() 之后手动绑定 overlay 点击事件\n    if (config.closeOnO
+verlay && this.overlay) {\n      this.overlay.removeListener(\'pointerdown\');\n
+     this.overlay.on(\'pointerdown\', () => this.cancel());\n    }\n\n    // ...
+后续代码不变\n  }\n  ```\n- **依据**: ECMAScript Class Fields & TDZ 规范；TypeSc
+ript `noImplicitAny`/`strict` 模式下编译器明确报错。\n\n---\n\n## 严重问题（Majo
+r）\n\n### 2. UIButton `onClick` 在 yoyo tween `onComplete` 中触发，造成 ~100ms 
+交互延迟\n\n- **位置**: `apps/phaser3/src/ui/UIButton.ts:116-132`\n- **问题**: `
+pointerdown` 事件启动了一个 `scale: 0.95` + `yoyo: true` 的 tween（总时长 100ms
+），并在 `onComplete` 中调用 `this.config.onClick?.()`。这意味着用户点击按钮后，
+必须等待 100ms 的动画完成后才能触发业务逻辑。快速点击或需要即时响应的场景（如战
+斗、关闭弹窗）会明显感到迟滞。此外，`pointerup` 事件中仅恢复背景颜色，从不触发 `
+onClick`。\n- **影响**: 所有使用 `UIButton` 的交互场景都存在非预期的点击延迟；快
+速连续点击时第二次点击可能被第一次的 tween 覆盖（虽然已有 `killTweensOf` 保护，
+但 onComplete 的时序仍然混乱）。\n- **修复**:\n  ```typescript\n  // apps/phaser
+3/src/ui/UIButton.ts\n  private setupInteraction(): void {\n    const target = t
+his.background as Phaser.GameObjects.Rectangle & Phaser.GameObjects.Image;\n    
+target.setInteractive({ useHandCursor: true });\n\n    // pointerdown: 仅处理视
+觉反馈（Pressed 态）\n    target.on(\'pointerdown\', () => {\n      if (this.con
+fig.isDisabled) return;\n      killTweensOf(this.scene, this);\n      if (this.b
+ackground instanceof Phaser.GameObjects.Rectangle && this.config.pressedColor !=
+= -1) {\n        this.background.setFillStyle(this.config.pressedColor, 1);\n   
+  }\n      this.scene.tweens.add({\n        targets: this,\n        scale: 0.95,
+\n        duration: UITweens.press.duration,\n        ease: UITweens.press.ease,
+\n        yoyo: true,\n        // 移除 onComplete 中的 onClick 调用\n      });\n
+   });\n\n    // pointerup: 恢复视觉并立即触发点击\n    target.on(\'pointerup\',
+() => {\n      if (this.config.isDisabled) return;\n      if (this.background in
+stanceof Phaser.GameObjects.Rectangle) {\n        this.background.setFillStyle(t
+his.config.bgColor, this.originalFillAlpha);\n      }\n      this.config.onClick
+?.(); // ← 立即触发\n    });\n\n    // pointerupoutside: 取消 Pressed 态，不触发
+点击\n    target.on(\'pointerupoutside\', () => {\n      if (this.config.isDisab
+led) return;\n      if (this.background instanceof Phaser.GameObjects.Rectangle)
+{\n        this.background.setFillStyle(this.config.bgColor, this.originalFillAl
+pha);\n      }\n      killTweensOf(this.scene, this);\n      this.setScale(1);\n
+   });\n\n    // ...isDisabled 处理不变\n  }\n  ```\n同步修改测试文件 `UIButton.
+test.ts`：\n  ```typescript\n  // 需要同时触发 pointerdown + pointerup 才能触发 
+onClick\n  emitEvent(bg, \'pointerdown\');\n  emitEvent(bg, \'pointerup\');\n  e
+xpect(onClick).toHaveBeenCalled();\n  ```\n- **依据**: PRD-004 3.6 节组件状态机
+图：`[PRESSED] ──pointerup──▶ [HOVER]`，点击触发应在 `pointerup` 时完成；03-comp
+onent.md 3.1 节 "Pressed 缩小...yoyo 恢复" 仅描述视觉动画，不意味着回调应在动画
+完成后触发。\n\n### 3. SceneSwitchBar 误用 `emit()` 返回值作为权限判断依据\n\n- 
+**位置**: `apps/phaser3/src/city-builder/ui/SceneSwitchBar.ts:102-107`\n- **问题
+**: `const canSwitch = this.emit(\'before-switch\', sceneType);` 中，`Phaser.Eve
+nts.EventEmitter.emit()` 的返回值是 `boolean`（表示该事件是否至少有一个监听器）
+，**不是监听器的返回值**。因此：\n  - 若没有 `before-switch` 监听器 → `emit` 返
+回 `false` → 错误地阻止切换\n  - 若有监听器（即使监听器返回 `false` 表示不允许）
+→ `emit` 返回 `true` → 错误地允许切换\n- **影响**: `before-switch` 事件机制完全
+失效，业务层无法通过事件监听阻止场景切换。\n- **修复**:\n  ```typescript\n  // a
+pps/phaser3/src/city-builder/ui/SceneSwitchBar.ts\n  private switchScene(sceneTy
+pe: SceneType): void {\n    if (this.currentScene === sceneType) return;\n\n    
+if (sceneType === SceneType.Battle) {\n      const listeners = this.listeners(\'
+before-switch\') as Array<(type: SceneType) => boolean>;\n      const canSwitch 
+= listeners.length === 0 || listeners.every(fn => fn(sceneType));\n      if (!ca
+nSwitch) {\n        this.segmentedControl.setSelectedIndex(this.currentScene ===
+SceneType.City ? 0 : 1);\n        return;\n      }\n    }\n\n    this.currentSce
+ne = sceneType;\n    this.emit(\'scene-switch\', sceneType);\n  }\n  ```\n- **依
+据**: Phaser 3 API 文档 `Phaser.Events.EventEmitter#emit` 返回类型为 `boolean`；
+代码逻辑意图（根据监听器返回值判断是否允许切换）与 API 实际行为不符。\n\n### 4. 
+UIPanel 和 UIDialog 单元测试未从 `designs/` 迁移到 `apps/phaser3/src/ui/__tests_
+_/`\n\n- **位置**: `designs/issue-19/src/ui/__tests__/UIPanel.test.ts`、`UIDialo
+g.test.ts`\n- **问题**: Issue #19 的设计资产目录中包含了 UIPanel 和 UIDialog 的
+完整单元测试（各 ~120 行），但 PR 的变更文件列表（`.doc-coverage.txt`）和实际 `a
+pps/phaser3/src/ui/__tests__/` 目录中均缺少这两个文件。四个核心交付组件中，仅 UI
+Alert 和 UIToast 的测试被正确迁移。\n- **影响**: 主代码库缺少对 UIPanel（show/hi
+de 动画、遮罩、关闭按钮、内容区计算）和 UIDialog（继承行为、确认/取消回调时序、
+静态工厂方法）的自动化验证。后续重构极易引入回归缺陷。\n- **修复**:\n  1. 将 `de
+signs/issue-19/src/ui/__tests__/UIPanel.test.ts` 和 `UIDialog.test.ts` 复制到 `a
+pps/phaser3/src/ui/__tests__/`。\n  2. **注意**：designs 中的测试使用了 `scene.n
+ative` API（来自 designs 自己的 setup.ts），而 `apps/phaser3/src/ui/__tests__/se
+tup.ts` 中的 `UIMockScene` 是直接继承 `MockScene` 的，没有 `.native` 属性。迁移
+时需要将 `scene.native` 替换为 `scene`（因为 apps 中的 `UIMockScene` 本身就已经
+是 MockScene 的扩展）。\n- **依据**: PRD-004 7.3 节测试要求："每个组件独立测试文
+件，覆盖初始化、交互状态、资源回退、动画、内存清理"；design-spec.md 9.1/9.2 验收
+标准明确要求 UIPanel/UIDialog 的 show/hide 动画和遮罩逻辑通过测试验证。\n\n### 5
+. UIToast / UIAlert `show()` 在重复调用时导致 y 坐标累积漂移\n\n- **位置**: \n  
+- `apps/phaser3/src/ui/UIToast.ts:104-106` 和 `show():222-235`\n  - `apps/phaser
+3/src/ui/UIAlert.ts:59-61` 和 `show():119-132`\n- **问题**: 构造函数中执行 `this
+.y += 20`，`show()` 的 tween 目标为 `this.y - 20`（即回到原始位置）。但如果 `sho
+w()` 被调用两次（例如手动调用，或 tween 被 kill 后重新 show），第二次的 tween 目
+标会变成 `原始位置 - 20`，导致 Toast/Alert 位置上移。UIToast 的 `show()` 在旧 AP
+I 兼容分支（`config.title || config.startTime`）下会自动调用，与新 API 的手动调
+用叠加时也可能导致问题。\n- **影响**: Toast/Alert 在特定交互序列下位置错位；多个
+Toast 的垂直堆叠逻辑（ToastManager）可能因此产生不可预期的间距。\n- **修复**:\n 
+```typescript\n  // apps/phaser3/src/ui/UIToast.ts（UIAlert 同理）\n  export cla
+ss UIToast extends Phaser.GameObjects.Container {\n    private config: Required<
+UIToastConfig>;\n    private originY: number; // 保存原始目标 Y 坐标\n\n    cons
+tructor(scene: Scene, config: UIToastConfig) {\n      // ...\n      this.originY
+= this.y; // 在 y += 20 之前保存原始位置\n      this.y += 20;\n      // ...\n   
+}\n\n    show(): void {\n      // ...\n      killTweensOf(this.scene, this);\n  
+   this.scene.tweens.add({\n        targets: this,\n        alpha: 1,\n        y
+: this.originY, // 使用保存的原始位置，而非 this.y - 20\n        duration: UITwe
+ens.toastIn.duration,\n        ease: UITweens.toastIn.ease,\n      });\n      //
+...\n    }\n  }\n  ```\n- **依据**: design-spec.md 3.3/3.4 中动画标准描述为 "y: 
++20 → 0"（相对于目标位置），意味着无论 show() 被调用多少次，最终位置应稳定在同一
+目标点；当前实现违反幂等性原则。\n\n---\n\n## 轻微问题（Minor）\n\n### 6. UIAler
+t `hide()` duration 硬编码，与 `UITweens` 常量不一致\n\n- **位置**: `apps/phaser
+3/src/ui/UIAlert.ts:153`\n- **问题**: `duration: 200` 直接硬编码，而项目已定义 `
+UITweens.toastOut.duration = 200`。\n- **修复**: 将 `duration: 200` 改为 `durati
+on: UITweens.toastOut.duration`。\n- **依据**: PRD-004 3.4 节要求统一使用 `UITwe
+ens` 常量；agent-design-guide.md 3.1 节禁止魔法数字。\n\n### 7. `apps/phaser3/sr
+c/ui/__tests__/setup.ts` 与 `designs/issue-19/src/ui/__tests__/setup.ts` API 不
+兼容\n\n- **位置**: `apps/phaser3/src/ui/__tests__/setup.ts` vs `designs/issue-1
+9/src/ui/__tests__/setup.ts`\n- **问题**: 两个目录下的 `UIMockScene` 设计完全不
+同：\n  - `apps/` 中：`class UIMockScene extends MockScene`\n  - `designs/` 中：
+`class UIMockScene { get native(): MockScene }`（包装器模式）\n这导致 designs 中
+的测试代码（如 `UIPanel.test.ts` 使用 `scene.native`）无法直接在 apps 的测试基础
+设施上运行。\n- **修复**: 统一测试基础设施，或迁移 designs 测试时同步替换 `scene
+.native` 为 `scene`。\n- **依据**: AGENTS.md 维护规则第 5 条："债务同步：发现代
+码与文档不一致时，更新对应文档或在 tech-debt-tracker 中追加条目"。两套测试基础设
+施并存是隐性技术债务。\n\n---\n\n## 验证结果\n\n| 维度 | 状态 | 说明 |\n|------|
+------|------|\n| 功能完整性 | ✅ | Issue #19 四个核心组件（UIPanel/UIDialog/UIT
+oast/UIAlert）的核心功能已实现；city-builder/ui/ 兼容层已更新 |\n| 代码规范性 | 
+❌ | UIDialog 有编译/运行时错误；UIButton 交互时序不符合常规 UX 模式；SceneSwitc
+hBar emit 返回值误用 |\n| 全链路完整性 | ✅ | `designs/issue-19/src/ui/*` → `app
+s/phaser3/src/ui/*` 代码迁移完成，diff 基本一致（仅空行和 colorToHex 微小差异） 
+|\n| 规范符合性 | ⚠️ | UIAlert/UIToast 的色条宽度、动画参数、命名导出均符合 03-co
+mponent.md；UIPanel/UIDialog 基本符合；UIButton onClick 时序未对齐状态机规范 |\n
+| 测试覆盖 | ❌ | 仅有 5 个测试文件（UIAlert/UIBadge/UIButton/UISegmentedControl
+/UIToast），缺失 UIPanel 和 UIDialog 的测试 |\n| 文档同步 | ✅ | `docs/modules/c
+lient/ui.md` 已更新新版 API；`docs/design-docs/ui-style-guide/03-component.md` 
+已修正 warning 色值和退场时长 |\n\n---\n\n## 风险与建议\n\n1. **UIDialog 运行时
+崩溃风险（高）**：Blocking 问题导致 UIDialog 完全不可用。建议将此修复作为最高优
+先级，并在修复后补充一个 E2E 或集成测试，验证 `UIDialog.show()` 和 `UIDialog.ale
+rt()` 能正常弹出不抛异常。\n\n2. **UIButton 交互延迟风险（中）**：100ms 的点击延
+迟在战斗、建造等高频操作场景下会显著降低用户体验。建议在修复后，通过 Playwright 
+截图验收或手动测试验证快速连续点击的响应性。\n\n3. **测试基础设施碎片化风险（中
+）**：`apps/` 和 `designs/` 下的测试 helper API 不统一，长期会导致 designs 中的
+测试无法作为回归测试资产复用。建议后续由专门的测试 Agent 统一两套 setup.ts，或明
+确约定 designs 中的测试在迁移时必须适配 apps 的 API。\n\n4. **SceneSwitchBar 业
+务逻辑失效风险（中）**：`before-switch` 事件无法正确阻止场景切换，可能导致玩家在
+编辑模式下误切到战斗场景。建议修复后，在 `SceneSwitchBar` 的测试或 city-builder 
+的 E2E 场景中覆盖此边界条件。\n\n5. **PR 范围外组件的规范漂移（低）**：本次 PR 
+仅重做了四个容器组件，但 `UIButton.ts`、`UIBadge.ts`、`UISegmentedControl.ts` 等
+也在 diff 中被修改。虽然改动较小（如移除 `export default`、增加 `colorToHex`），
+但分散了 review 注意力。建议未来将纯重构（如统一导出方式、统一颜色调用）单独提一
+个 "代码清理" PR，降低单个 PR 的认知负荷。\n\n\n--- 第 8 次 Review ---\n## 审查
+结论\n\n审查结论: **NEEDS_MAJOR_FIX**\n\nPR #30（`design/issue-19`）对 UIPanel、
+UIDialog、UIToast、UIAlert 四个核心容器组件进行了系统性重做，并同步更新了 UIButt
+on 的交互状态机、测试覆盖与项目文档。整体代码质量较高，动画标准与命名规范基本对
+齐 PRD-004 和 `docs/design-docs/ui-style-guide/`。但存在 **4 个 Major 问题**（含
+1 个运行时功能缺陷、1 个规范合规问题、2 个设计资产/文档不同步问题）需要在合并前
+修复。\n\n---\n\n## 阻塞问题（Blocking）\n\n无。\n\n---\n\n## 严重问题（Major）\
+n\n### 1. UIButton.setTexture() 替换背景后丢失交互能力\n- **位置**: `apps/phaser
+3/src/ui/UIButton.ts:175-182`\n- **问题**: `setTexture()` 调用 `this.background.
+destroy()` 后执行 `this.createBackground()`，但**没有重新调用 `setupInteraction(
+)`**。新创建的 `background` GameObject 未设置 `setInteractive`，导致按钮在 `setT
+exture()` 后完全失去点击、Hover、Pressed 响应。\n- **影响**: 任何依赖动态切换按
+钮纹理的业务场景（如换肤、状态切换）将导致按钮不可用。\n- **修复**: 在 `setTextu
+re()` 末尾追加 `this.setupInteraction()` 调用，并确保旧事件监听已被清理：\n  ```
+ts\n  setTexture(texture: string): void {\n    this.config.texture = texture;\n 
+  this.background.destroy();\n    this.createBackground();\n    this.remove(this
+.label);\n    this.add(this.label);\n    this.setupInteraction(); // 新增\n  }\n
+ ```\n- **依据**: PRD-004 5.3 要求 `setTexture()` 为动态切换纹理的公开 API，其交
+互功能必须保持可用。\n\n### 2. UIButton Disabled 态 alpha = 0.6 违反 PRD-004 强
+制规范\n- **位置**: `apps/phaser3/src/ui/UIButton.ts:152-153`, `:167-168`\n- **
+问题**: PRD-004 3.6 组件状态机章节明确要求 **"DISABLED 态 … alpha ≤ 0.5"**，但 `
+UIButton` 在 `setupInteraction()` 和 `setDisabled(true)` 中均硬编码 `this.setAlp
+ha(0.6)`。\n- **影响**: 视觉验收环节会被判定为不通过；与 PRD-004 的合规性要求冲
+突。\n- **修复**: 将两处 `0.6` 改为 `0.5`：\n  ```ts\n  this.setAlpha(0.5);\n  `
+``\n- **依据**: PRD-004 3.6 原文 — "DISABLED 态必须调用 disableInteractive()，al
+pha ≤ 0.5"。（注：`docs/design-docs/ui-style-guide/03-component.md` 3.1 节写为 0
+.6，属于文档内部矛盾，应以更高层级 PRD-004 为准。）\n\n### 3. ProgressToastManag
+er 自定义 startY 对 ToastManager 失效\n- **位置**: `apps/phaser3/src/city-builde
+r/ui/ProgressToast.ts:100-104`\n- **问题**: `ProgressToastManager` 构造函数接收
+可选的 `startY` 参数并保存在 `this.startY`，但底层 `ToastManager` 通过 `ToastMan
+ager.getInstance(scene)` 获取，该单例**不接受**自定义 `startY`，始终使用默认值 `
+scene.cameras.main.height - 100`。当 `ProgressToastManager` 使用自定义 `startY` 
+时，`ToastManager.repositionToasts()` 在 Toast dismiss 后会按默认 `startY` 重新
+计算位置，导致垂直堆叠错位。\n- **影响**: 若业务层传入非默认 `startY`，Toast 队
+列的自动补位动画会跳到错误坐标。\n- **修复**: 方案 A（推荐）：让 `ProgressToastM
+anager` 直接管理 Y 坐标，不依赖 `ToastManager` 的 `repositionToasts`；或在 `regi
+ster` 时传入自定义的 `startY` 并覆盖单例内部值。方案 B：恢复 `ToastManager` 支持
+带 `startY` 的工厂方法，如 `ToastManager.getInstance(scene, startY)`。\n- **依据
+**: `ProgressToastManager` 原实现通过 `new ToastManager(scene, startY)` 传递了该
+值，PR 修改后此链路断裂。\n\n### 4. designs/issue-19 设计资产文档存在多处与实现
+不一致或含运行时错误\n- **位置**: \n  - `designs/issue-19/src/ui/UIDialog.ts:62-
+65`\n  - `designs/issue-19/src/ui/UIToast.ts:67, 162`\n  - `designs/issue-19/src
+/ui/UIAlert.ts:60, 124`\n  - `designs/issue-19/design-spec.md` 3.3 / 3.4\n- **问
+题**: \n  1. **UIDialog 设计文件含 `this` 前置访问错误**：`panelConfig.onOverlay
+Click` 使用箭头函数 `() => { this.cancel(); }`，该配置对象在 `super(scene, panel
+Config)` 之前构造，箭头函数提前捕获了尚未初始化的 `this`，在真实运行时会导致 Ref
+erenceError（`Must call super constructor`）。实际源码已修复，但设计资产作为后续
+开发者的参考文档，残留致命错误。\n  2. **UIToast / UIAlert 设计文件缺少 `baseY`*
+*：构造器中执行 `this.y += 20`，`show()` 中 tween 到 `this.y - 20`。若 `show()` 
+被调用两次，第二次会以已 tween 后的 `this.y` 为基准再减 20，造成持续上浮漂移。实
+际源码已引入 `baseY` 修复，设计文件未同步。\n  3. **design-spec.md warning 色值
+与实现不一致**：设计规范 3.3/3.4 表格中 warning 色条写为 `UITheme.goldBrown`，但
+实际代码与更新后的 `03-component.md` 均使用 `UITheme.warning`（`0xffaa00`）。\n-
+**影响**: 设计资产（`designs/issue-19/`）是 Issue #19 的交付物之一，会被后续 Age
+nt 或开发者引用。错误的代码示例和规范不一致会导致后续实现踩坑。\n- **修复**: \n 
+- `designs/issue-19/src/ui/UIDialog.ts`: 参照实际源码，将 `onOverlayClick` 设为 
+`undefined`，在 `super()` 后手动绑定 overlay 事件。\n  - `designs/issue-19/src/u
+i/UIToast.ts` 与 `UIAlert.ts`: 引入 `private baseY: number`，在 `show()` 中使用 
+`y: this.baseY`。\n  - `designs/issue-19/design-spec.md`: 将 warning 类型色条统
+一改为 `UITheme.warning`。\n- **依据**: AGENTS.md 维护规则第 5 条 — "发现代码与
+文档不一致时，更新对应文档或在 tech-debt-tracker 中追加条目"。\n\n---\n\n## 轻微
+问题（Minor）\n\n### 1. docs/frontend/ui-components.md 未按 PRD-004 要求重写\n- 
+**位置**: `docs/frontend/ui-components.md`\n- **问题**: PRD-004 9.3 文档验收清单
+明确要求 "`docs/frontend/ui-components.md` 已重写为本 PRD 内容"。当前该文件仅在
+头部加了迁移提示，主体内容仍为旧版设计参考，未被重写。\n- **修复**: 将该文件内容
+重写为指向 PRD-004、`docs/modules/client/ui.md` 和 `docs/design-docs/ui-style-gu
+ide/` 的导航页，或删除旧内容并放置重定向说明。\n- **依据**: PRD-004 9.3 文档验收
+清单。\n\n### 2. UIDialog 中 `overlay.off(\'pointerdown\')` 的鲁棒性\n- **位置**
+: `apps/phaser3/src/ui/UIDialog.ts:70`\n- **问题**: `this.overlay.off(\'pointerd
+own\')` 会移除 overlay 上所有 `pointerdown` 监听器。虽然当前 UIPanel 只注册了一
+个 `onOverlayClick` 空回调，但如果未来 UIPanel 追加其他监听器，会被误删。\n- **
+修复**: 使用具名函数引用或 `removeAllListeners(\'pointerdown\')`，并在注释中说明
+意图。\n\n### 3. 部分组件文件末尾存在多余空行或缺少换行符\n- **位置**: `apps/pha
+ser3/src/ui/UIPanel.ts`（末行空行缺失后多了一个空行）、`UIDialog.ts`、`UIAlert.t
+s`、`UIToast.ts`\n- **问题**: `git diff` 显示原 `export default` 删除后，部分文
+件末尾留下不一致的空白。不影响功能，建议统一格式化。\n- **修复**: 运行 `pnpm --f
+ilter phaser3 lint` 自动修复（当前测试环境缺少 node_modules，无法验证）。\n\n###
+4. UIButton 构造函数未暴露 `depth` 参数\n- **位置**: `apps/phaser3/src/ui/UIButt
+on.ts:11-22`\n- **问题**: `UIButtonConfig` 接口和 PRD-004 5.3 均缺少 `depth` 字
+段。虽然按钮通常不需要显式 depth，但 PRD-004 接口设计中 `UIButtonConfig` 未列出 
+`depth`，与其他组件不一致。\n- **修复**: 如需严格对齐 PRD-004，可补充 `depth?: n
+umber` 并使用 `getNextDepth(UIDepthLayer.UI, scene)` 作为默认值。若故意省略，建
+议在 `docs/modules/client/ui.md` 中注明。\n\n---\n\n## 验证结果\n\n| 维度 | 状态
+| 说明 |\n|------|------|------|\n| 功能完整性 | ⚠️ | 核心重做功能（UIPanel/UIDia
+log/UIToast/UIAlert 动画、四态、遮罩、单例）已实现，但 `UIButton.setTexture()` 
+存在交互丢失缺陷（Major #1）。 |\n| 代码规范性 | ⚠️ | 命名规范（`isXxx`、`onXxx`
+）、导出方式（命名导出）、资源回退（`createFallbackRect` + warn）基本合规；但 `U
+IButton` Disabled alpha 违反 PRD-004（Major #2）。 |\n| 全链路完整性 | ✅ | 仅涉
+及前端 UI 层，无 DB/API/Mobile 链路；`city-builder/ui/` 旧组件已适配 `ToastManag
+er.getInstance()`。 |\n| 规范符合性 | ⚠️ | 视觉规范（色条 4px、动画时长、缓动曲线
+）基本合规；设计资产 `designs/issue-19/` 与实现存在 3 处不一致（Major #4）。 |\n
+| 测试覆盖 | ⚠️ | 新增/重写了 UIButton、UIPanel、UIDialog、UIAlert、UIToast 的测
+试，覆盖了初始化、交互、show/hide、静态工厂；但测试环境 `vitest` 缺失，无法实际
+执行验证。 |\n| 文档同步 | ⚠️ | `docs/design-docs/ui-style-guide/03-component.md`
+与 `docs/modules/client/ui.md` 已更新；但 `docs/frontend/ui-components.md` 未按 
+PRD-004 要求重写（Minor #1），且设计资产存在不同步（Major #4）。 |\n\n---\n\n## 
+风险与建议\n\n1. **设计资产与源码漂移风险**：`designs/issue-19/` 中的源码文件（`
+src/ui/*.ts`）与实际 `apps/phaser3/src/ui/*.ts` 存在功能性差异（`baseY`、`this` 
+前置访问、`closeOnOverlay` 绑定方式）。建议后续流程中明确：\n   - `designs/issue
+-xxx/src/` 为**设计草稿**，迁移到 `apps/phaser3/src/` 后应以 `apps/` 目录为准；\
+n   - 或建立自动化 diff 检查，防止设计资产中的错误代码被后续 Agent 直接复制粘贴
+。\n\n2. **ToastManager 单例参数丢失风险**：将 `ToastManager` 构造函数设为 `priv
+ate` 并强制使用 `getInstance(scene)` 虽然实现了单例，但丢失了 `startY` 配置能力
+。建议评估是否需要在 `getInstance` 中支持可选的 `startY` 覆盖，或让业务层完全自
+行管理 Y 坐标。\n\n3. **UIButton 交互状态机已改善**：PR 将 `onClick` 从 `pointer
+down` 的 tween `onComplete` 中移到了 `pointerup`，并新增了 `pointerupoutside` 取
+消逻辑，显著改善了手感，符合 PRD-004 3.6 状态机要求。但需配合 Major #1 的修复，
+确保 `setTexture()` 后状态机仍然完整。\n\n4. **旧 API 兼容策略**：UIToast 保留了
+`title`、`startTime`、`markAsComplete()` 等旧接口，并仅在检测到旧参数时自动 `sho
+w()`，这种渐进式迁移策略合理。但建议在 `docs/modules/client/ui.md` 中标注旧 API 
+的废弃计划与移除版本。\n\n\n--- 第 9 次 Review ---\n## 🤖 Agent Code Review Repo
+rt\n\n\n【任务】\n1. 分析所有审查报告，识别**反复出现的问题模式**\n2. 判断哪些问
+题是因为规范缺失、过时或不明确导致的\n3. 读取现有的规范文档（通过 AGENTS.md 发现
+路径）\n4. **优先更新历史文档**：在已有文档中补充、修改\n5. **禁止创建新文档**，
+除非现有文档体系确实无法覆盖且你确认有必要\n6. 保持文档风格一致性\n7. 基于 main 
+创建新分支 docs/spec-evolution-30：git checkout -b docs/spec-evolution-30 origin
+/main\n8. 修改规范文档后提交：git add -A && git commit -m \'docs: 规范演进 PR #3
+0\'\n9. push 新分支：git push origin docs/spec-evolution-30\n10. 创建 PR：gh pr 
+create --base main --title \'docs: 规范演进 PR #30\' --body \'由规范演进 Agent 
+自动生成的规范文档更新。\'\n\n【约束】\n- 只修改 .md 文件，不修改任何业务代码（.
+ts/.tsx/.dart/.go/.py 等）\n- 重点关注反复出现的问题，偶发问题不需要更新规范\n- 
+提交前使用 git status 确认只有 .md 文件被修改'
+)
+StepBegin(n=1)
+StepInterrupted()
+Error code: 400 - {'error': {'message': 'Invalid request: tokenization failed', 
+'type': 'invalid_request_error'}}
+
+To resume this session: kimi -r 498b9a6d-93f1-468f-b78f-69204e753098
+
+✅ 任务完成

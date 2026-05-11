@@ -1,0 +1,6 @@
+[2026-04-21 18:06:47] Issue #43: 启动开发
+Agent类型: developer
+项目路径: ../../social-world
+日志文件: /Users/insulate/Desktop/new-world/new-world-ops/logs/social-world/dev-issue-43-20260421-180647.log
+
+❌ dev失败: shell step fetchOrigin start failed: fork/exec /bin/bash: no such file or directory

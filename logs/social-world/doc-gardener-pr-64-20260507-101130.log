@@ -1,0 +1,2897 @@
+[2026-05-07 10:11:30] PR #64 Doc Gardener 启动
+Merged: false
+Base: main
+Head: feat/issue-5
+日志: /Users/insulate/Desktop/new-world/new-world-ops/logs/social-world/doc-gardener-pr-64-20260507-101130.log
+
+🛑 任务已停止
+【任务上下文】
+- PR 编号: #64
+- 项目路径: /var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/doc-gardener-64-886
+526752
+- 项目地图: /Users/insulate/Desktop/social-world/AGENTS.md
+- 关联 PRD: /Users/insulate/Desktop/social-world/prd/v1-ui-business-separation.m
+d,/Users/insulate/Desktop/social-world/prd/v1-mvp.md,/Users/insulate/Desktop/soc
+ial-world/prd/v1-matching.md
+- 文档目录: /Users/insulate/Desktop/social-world/docs
+- 上一轮 review report: /Users/insulate/Desktop/new-world/new-world-ops/logs/soc
+ial-world/review-report-64-20260507-082452.md
+  **这是后续审查，你必须先读取该文件，验证上一轮 Blocking/Major 问题是否已修复，
+再执行轻量级全量检查。**
+
+请对当前 open 的 PR 进行文档协同检查，并直接补充遗漏的文档。
+
+【上下文】
+- 这是一个尚未合并的 open PR
+- PR 编号: #64
+- 当前分支: feat/issue-5
+- Base 分支: main
+
+【变更文件列表】
+.maestro/README.md
+.maestro/flows/devtools/edit_server_url.yaml
+.maestro/flows/devtools/empty_server_url.yaml
+.maestro/flows/devtools/invalid_server_url.yaml
+.maestro/flows/devtools/save_persists_after_reopen.yaml
+.maestro/flows/im/_conversation_list_assertions.yaml
+.maestro/flows/im/_enter_chat_actions.yaml
+.maestro/flows/im/enter_chat.yaml
+.maestro/flows/im/includes
+.maestro/flows/im/send_message.yaml
+.maestro/flows/im/view_conversation_list.yaml
+.maestro/flows/matching/swipe_recommendations.yaml
+.maestro/flows/matching/view_match_list.yaml
+.maestro/flows/profile/setup.yaml
+.maestro/includes/profile-setup-actions.yaml
+.maestro/includes/send_message_actions.yaml
+.maestro/scripts/maestro-check.sh
+.maestro/scripts/run-e2e.sh
+Makefile
+apps/admin/package-lock.json
+apps/admin/package.json
+apps/api/package-lock.json
+apps/api/package.json
+apps/api/src/app.module.ts
+apps/api/src/common/utils/snowflake.ts
+apps/api/src/common/validators/message-content.validator.ts
+apps/api/src/config/jwt.config.ts
+apps/api/src/database/entities/message.entity.ts
+apps/api/src/database/migrations/20250426000000-CreateImTables.ts
+apps/api/src/database/migrations/20250426000001-AddLastLoginAtToUsers.ts
+apps/api/src/database/migrations/20250426000002-AddMessagesConvSeqIndex.ts
+apps/api/src/modules/auth/auth.service.ts
+apps/api/src/modules/auth/tests/auth.service.spec.ts
+apps/api/src/modules/im/dto/conversation-response.dto.ts
+apps/api/src/modules/im/dto/get-conversations-query.dto.ts
+apps/api/src/modules/im/dto/get-messages-query.dto.ts
+apps/api/src/modules/im/dto/mark-as-read.dto.ts
+apps/api/src/modules/im/dto/message-response.dto.ts
+apps/api/src/modules/im/dto/send-message.dto.ts
+apps/api/src/modules/im/im.controller.ts
+apps/api/src/modules/im/im.gateway.ts
+apps/api/src/modules/im/im.module.ts
+apps/api/src/modules/im/im.service.ts
+apps/api/src/modules/im/tests/im.service.spec.ts
+apps/api/src/modules/matching/matching.gateway.ts
+apps/api/src/modules/matching/matching.module.ts
+apps/api/src/modules/matching/matching.service.ts
+apps/api/src/modules/matching/tests/matching.service.spec.ts
+apps/api/src/modules/push/push.module.ts
+apps/api/src/modules/push/push.service.ts
+apps/api/src/modules/redis/redis.module.ts
+apps/api/src/scripts/seed-dev.ts
+apps/mobile/lib/app.dart
+apps/mobile/lib/core/di/di.dart
+apps/mobile/lib/core/network/im_socket_client.dart
+apps/mobile/lib/data/models/conversation.dart
+apps/mobile/lib/data/models/message.dart
+apps/mobile/lib/data/repositories/im_repository_impl.dart
+apps/mobile/lib/domain/repositories/im_repository.dart
+apps/mobile/lib/models/generated/im/.openapi-generator/FILES
+apps/mobile/lib/models/generated/im/README.md
+apps/mobile/lib/models/generated/im/doc/ConversationDto.md
+apps/mobile/lib/models/generated/im/doc/DefaultApi.md
+apps/mobile/lib/models/generated/im/doc/GetMessages200Response.md
+apps/mobile/lib/models/generated/im/doc/GetMessages200ResponseAllOfData.md
+apps/mobile/lib/models/generated/im/doc/LastMessageDto.md
+apps/mobile/lib/models/generated/im/doc/ListConversations200Response.md
+apps/mobile/lib/models/generated/im/doc/ListConversations200ResponseAllOfData.md
+apps/mobile/lib/models/generated/im/doc/MarkAsRead200Response.md
+apps/mobile/lib/models/generated/im/doc/MarkAsRead200ResponseAllOfData.md
+apps/mobile/lib/models/generated/im/doc/MarkAsReadRequest.md
+apps/mobile/lib/models/generated/im/doc/MatchedUserDto.md
+apps/mobile/lib/models/generated/im/doc/MessageDto.md
+apps/mobile/lib/models/generated/im/doc/SendMessage200Response.md
+apps/mobile/lib/models/generated/im/doc/SendMessageRequest.md
+apps/mobile/lib/models/generated/im/lib/api.dart
+apps/mobile/lib/models/generated/im/lib/api/default_api.dart
+apps/mobile/lib/models/generated/im/lib/api_client.dart
+apps/mobile/lib/models/generated/im/lib/model/conversation_dto.dart
+apps/mobile/lib/models/generated/im/lib/model/get_messages200_response.dart
+apps/mobile/lib/models/generated/im/lib/model/get_messages200_response_all_of_da
+ta.dart
+apps/mobile/lib/models/generated/im/lib/model/last_message_dto.dart
+apps/mobile/lib/models/generated/im/lib/model/list_conversations200_response.dar
+t
+apps/mobile/lib/models/generated/im/lib/model/list_conversations200_response_all
+_of_data.dart
+apps/mobile/lib/models/generated/im/lib/model/mark_as_read200_response.dart
+apps/mobile/lib/models/generated/im/lib/model/mark_as_read200_response_all_of_da
+ta.dart
+apps/mobile/lib/models/generated/im/lib/model/mark_as_read_request.dart
+apps/mobile/lib/models/generated/im/lib/model/matched_user_dto.dart
+apps/mobile/lib/models/generated/im/lib/model/message_dto.dart
+apps/mobile/lib/models/generated/im/lib/model/send_message200_response.dart
+apps/mobile/lib/models/generated/im/lib/model/send_message_request.dart
+apps/mobile/lib/models/generated/im/test/conversation_dto_test.dart
+apps/mobile/lib/models/generated/im/test/default_api_test.dart
+apps/mobile/lib/models/generated/im/test/get_messages200_response_all_of_data_te
+st.dart
+apps/mobile/lib/models/generated/im/test/get_messages200_response_test.dart
+apps/mobile/lib/models/generated/im/test/last_message_dto_test.dart
+apps/mobile/lib/models/generated/im/test/list_conversations200_response_all_of_d
+ata_test.dart
+apps/mobile/lib/models/generated/im/test/list_conversations200_response_test.dar
+t
+apps/mobile/lib/models/generated/im/test/mark_as_read200_response_all_of_data_te
+st.dart
+apps/mobile/lib/models/generated/im/test/mark_as_read200_response_test.dart
+apps/mobile/lib/models/generated/im/test/mark_as_read_request_test.dart
+apps/mobile/lib/models/generated/im/test/matched_user_dto_test.dart
+apps/mobile/lib/models/generated/im/test/message_dto_test.dart
+apps/mobile/lib/models/generated/im/test/send_message200_response_test.dart
+apps/mobile/lib/models/generated/im/test/send_message_request_test.dart
+apps/mobile/lib/presentation/blocs/im/conversation_list_cubit.dart
+apps/mobile/lib/presentation/blocs/im/conversation_list_state.dart
+apps/mobile/lib/presentation/blocs/im/im_bloc.dart
+apps/mobile/lib/presentation/blocs/im/im_event.dart
+apps/mobile/lib/presentation/blocs/im/im_state.dart
+apps/mobile/lib/presentation/blocs/profile/profile_bloc.dart
+apps/mobile/lib/presentation/pages/chat_page.dart
+apps/mobile/lib/presentation/pages/conversation_list_page.dart
+apps/mobile/lib/presentation/pages/match_list_page.dart
+apps/mobile/pubspec.lock
+apps/mobile/pubspec.yaml
+apps/mobile/test/goldens/sw_chat_bubble_variants.png
+apps/mobile/test/goldens/sw_chat_input_bar_variants.png
+apps/mobile/test/goldens/sw_chat_message_list_empty.png
+apps/mobile/test/goldens/sw_chat_message_list_with_messages.png
+apps/mobile/test/goldens/sw_conversation_list_item_variants.png
+apps/mobile/test/im_components_golden_test.dart
+apps/mobile/test/presentation/blocs/im_bloc_test.dart
+docker-compose.yml
+docs/api-contracts/im.yaml
+docs/api/INDEX.md
+docs/api/im.md
+docs/api/socket-events.md
+docs/design-docs/db.md
+docs/design-docs/nestjs.md
+docs/exec-plans/tech-debt-tracker.md
+docs/modules/im.md
+package-lock.json
+package.json
+packages/design-system/lib/social_world_design_system.dart
+packages/design-system/lib/src/molecules/sw_chat_bubble.dart
+packages/design-system/lib/src/molecules/sw_chat_input_bar.dart
+packages/design-system/lib/src/molecules/sw_conversation_list_item.dart
+packages/design-system/lib/src/organisms/sw_chat_message_list.dart
+packages/design-system/lib/widgetbook/main.dart
+packages/design-system/widgetbook/main.dart
+packages/shared-types/src/generated/im/.openapi-generator/FILES
+packages/shared-types/src/generated/im/README.md
+packages/shared-types/src/generated/im/docs/ConversationDto.md
+packages/shared-types/src/generated/im/docs/DefaultApi.md
+packages/shared-types/src/generated/im/docs/GetMessages200Response.md
+packages/shared-types/src/generated/im/docs/GetMessages200ResponseAllOfData.md
+packages/shared-types/src/generated/im/docs/LastMessageDto.md
+packages/shared-types/src/generated/im/docs/ListConversations200Response.md
+packages/shared-types/src/generated/im/docs/ListConversations200ResponseAllOfDat
+a.md
+packages/shared-types/src/generated/im/docs/MarkAsRead200Response.md
+packages/shared-types/src/generated/im/docs/MarkAsRead200ResponseAllOfData.md
+packages/shared-types/src/generated/im/docs/MarkAsReadRequest.md
+packages/shared-types/src/generated/im/docs/MatchedUserDto.md
+packages/shared-types/src/generated/im/docs/MessageDto.md
+packages/shared-types/src/generated/im/docs/SendMessage200Response.md
+packages/shared-types/src/generated/im/docs/SendMessageRequest.md
+packages/shared-types/src/generated/im/src/apis/DefaultApi.ts
+packages/shared-types/src/generated/im/src/models/ConversationDto.ts
+packages/shared-types/src/generated/im/src/models/GetMessages200Response.ts
+packages/shared-types/src/generated/im/src/models/GetMessages200ResponseAllOfDat
+a.ts
+packages/shared-types/src/generated/im/src/models/LastMessageDto.ts
+packages/shared-types/src/generated/im/src/models/ListConversations200Response.t
+s
+packages/shared-types/src/generated/im/src/models/ListConversations200ResponseAl
+lOfData.ts
+packages/shared-types/src/generated/im/src/models/MarkAsRead200Response.ts
+packages/shared-types/src/generated/im/src/models/MarkAsRead200ResponseAllOfData
+.ts
+packages/shared-types/src/generated/im/src/models/MarkAsReadRequest.ts
+packages/shared-types/src/generated/im/src/models/MatchedUserDto.ts
+packages/shared-types/src/generated/im/src/models/MessageDto.ts
+packages/shared-types/src/generated/im/src/models/Pagination.ts
+packages/shared-types/src/generated/im/src/models/SendMessage200Response.ts
+packages/shared-types/src/generated/im/src/models/SendMessageRequest.ts
+packages/shared-types/src/generated/im/src/models/index.ts
+pnpm-lock.yaml
+tests/bdd/jest.config.bdd.js
+tests/bdd/step-definitions/auth_login_phone_number_registration.steps.js
+tests/bdd/step-definitions/bdd-setup.js
+tests/bdd/step-definitions/im_conversation_list.steps.js
+tests/bdd/step-definitions/im_message_history.steps.js
+tests/bdd/step-definitions/im_message_idempotency_and_ordering.steps.js
+tests/bdd/step-definitions/im_read_receipts.steps.js
+tests/bdd/step-definitions/im_real_time_message_delivery.steps.js
+tests/bdd/step-definitions/im_start_chatting_after_match.steps.js
+tests/structure/test_docker_compose.py
+
+【必须执行的操作】
+1. 分析上述变更，检查对应文档是否已补充
+2. 对遗漏项，直接创建或修改对应的 .md 文档文件
+3. 检查 CHANGELOG.md：
+   - 如果 PR 包含用户可见的功能变更或接口变更，而 CHANGELOG.md 中尚未记录，必须
+在最新版本区块下追加条目 `- #64`
+4. 如果 PR 包含接口破坏性变更，必须创建或更新迁移指南 docs/migration/README.md
+5. 输出结构化报告到日志
+6. 将文档变更提交：git add -A && git commit -m 'docs: 补充 PR #64 文档 (by PR Do
+c Gardener)'
+7. push 到当前分支：git push origin feat/issue-5
+
+注意：只修改文档文件（.md），不要修改业务代码。
+TurnBegin(
+    user_input="【任务上下文】\n- PR 编号: #64\n- 项目路径: /var/folders/lt/w3sl
+6z8j5v50vt2s6knvf5n00000gn/T/doc-gardener-64-886526752\n- 项目地图: /Users/insul
+ate/Desktop/social-world/AGENTS.md\n- 关联 PRD: /Users/insulate/Desktop/social-w
+orld/prd/v1-ui-business-separation.md,/Users/insulate/Desktop/social-world/prd/v
+1-mvp.md,/Users/insulate/Desktop/social-world/prd/v1-matching.md\n- 文档目录: /U
+sers/insulate/Desktop/social-world/docs\n- 上一轮 review report: /Users/insulate
+/Desktop/new-world/new-world-ops/logs/social-world/review-report-64-20260507-082
+452.md\n  **这是后续审查，你必须先读取该文件，验证上一轮 Blocking/Major 问题是否
+已修复，再执行轻量级全量检查。**\n\n请对当前 open 的 PR 进行文档协同检查，并直接
+补充遗漏的文档。\n\n【上下文】\n- 这是一个尚未合并的 open PR\n- PR 编号: #64\n- 
+当前分支: feat/issue-5\n- Base 分支: main\n\n【变更文件列表】\n.maestro/README.m
+d\n.maestro/flows/devtools/edit_server_url.yaml\n.maestro/flows/devtools/empty_s
+erver_url.yaml\n.maestro/flows/devtools/invalid_server_url.yaml\n.maestro/flows/
+devtools/save_persists_after_reopen.yaml\n.maestro/flows/im/_conversation_list_a
+ssertions.yaml\n.maestro/flows/im/_enter_chat_actions.yaml\n.maestro/flows/im/en
+ter_chat.yaml\n.maestro/flows/im/includes\n.maestro/flows/im/send_message.yaml\n
+.maestro/flows/im/view_conversation_list.yaml\n.maestro/flows/matching/swipe_rec
+ommendations.yaml\n.maestro/flows/matching/view_match_list.yaml\n.maestro/flows/
+profile/setup.yaml\n.maestro/includes/profile-setup-actions.yaml\n.maestro/inclu
+des/send_message_actions.yaml\n.maestro/scripts/maestro-check.sh\n.maestro/scrip
+ts/run-e2e.sh\nMakefile\napps/admin/package-lock.json\napps/admin/package.json\n
+apps/api/package-lock.json\napps/api/package.json\napps/api/src/app.module.ts\na
+pps/api/src/common/utils/snowflake.ts\napps/api/src/common/validators/message-co
+ntent.validator.ts\napps/api/src/config/jwt.config.ts\napps/api/src/database/ent
+ities/message.entity.ts\napps/api/src/database/migrations/20250426000000-CreateI
+mTables.ts\napps/api/src/database/migrations/20250426000001-AddLastLoginAtToUser
+s.ts\napps/api/src/database/migrations/20250426000002-AddMessagesConvSeqIndex.ts
+\napps/api/src/modules/auth/auth.service.ts\napps/api/src/modules/auth/tests/aut
+h.service.spec.ts\napps/api/src/modules/im/dto/conversation-response.dto.ts\napp
+s/api/src/modules/im/dto/get-conversations-query.dto.ts\napps/api/src/modules/im
+/dto/get-messages-query.dto.ts\napps/api/src/modules/im/dto/mark-as-read.dto.ts\
+napps/api/src/modules/im/dto/message-response.dto.ts\napps/api/src/modules/im/dt
+o/send-message.dto.ts\napps/api/src/modules/im/im.controller.ts\napps/api/src/mo
+dules/im/im.gateway.ts\napps/api/src/modules/im/im.module.ts\napps/api/src/modul
+es/im/im.service.ts\napps/api/src/modules/im/tests/im.service.spec.ts\napps/api/
+src/modules/matching/matching.gateway.ts\napps/api/src/modules/matching/matching
+.module.ts\napps/api/src/modules/matching/matching.service.ts\napps/api/src/modu
+les/matching/tests/matching.service.spec.ts\napps/api/src/modules/push/push.modu
+le.ts\napps/api/src/modules/push/push.service.ts\napps/api/src/modules/redis/red
+is.module.ts\napps/api/src/scripts/seed-dev.ts\napps/mobile/lib/app.dart\napps/m
+obile/lib/core/di/di.dart\napps/mobile/lib/core/network/im_socket_client.dart\na
+pps/mobile/lib/data/models/conversation.dart\napps/mobile/lib/data/models/messag
+e.dart\napps/mobile/lib/data/repositories/im_repository_impl.dart\napps/mobile/l
+ib/domain/repositories/im_repository.dart\napps/mobile/lib/models/generated/im/.
+openapi-generator/FILES\napps/mobile/lib/models/generated/im/README.md\napps/mob
+ile/lib/models/generated/im/doc/ConversationDto.md\napps/mobile/lib/models/gener
+ated/im/doc/DefaultApi.md\napps/mobile/lib/models/generated/im/doc/GetMessages20
+0Response.md\napps/mobile/lib/models/generated/im/doc/GetMessages200ResponseAllO
+fData.md\napps/mobile/lib/models/generated/im/doc/LastMessageDto.md\napps/mobile
+/lib/models/generated/im/doc/ListConversations200Response.md\napps/mobile/lib/mo
+dels/generated/im/doc/ListConversations200ResponseAllOfData.md\napps/mobile/lib/
+models/generated/im/doc/MarkAsRead200Response.md\napps/mobile/lib/models/generat
+ed/im/doc/MarkAsRead200ResponseAllOfData.md\napps/mobile/lib/models/generated/im
+/doc/MarkAsReadRequest.md\napps/mobile/lib/models/generated/im/doc/MatchedUserDt
+o.md\napps/mobile/lib/models/generated/im/doc/MessageDto.md\napps/mobile/lib/mod
+els/generated/im/doc/SendMessage200Response.md\napps/mobile/lib/models/generated
+/im/doc/SendMessageRequest.md\napps/mobile/lib/models/generated/im/lib/api.dart\
+napps/mobile/lib/models/generated/im/lib/api/default_api.dart\napps/mobile/lib/m
+odels/generated/im/lib/api_client.dart\napps/mobile/lib/models/generated/im/lib/
+model/conversation_dto.dart\napps/mobile/lib/models/generated/im/lib/model/get_m
+essages200_response.dart\napps/mobile/lib/models/generated/im/lib/model/get_mess
+ages200_response_all_of_data.dart\napps/mobile/lib/models/generated/im/lib/model
+/last_message_dto.dart\napps/mobile/lib/models/generated/im/lib/model/list_conve
+rsations200_response.dart\napps/mobile/lib/models/generated/im/lib/model/list_co
+nversations200_response_all_of_data.dart\napps/mobile/lib/models/generated/im/li
+b/model/mark_as_read200_response.dart\napps/mobile/lib/models/generated/im/lib/m
+odel/mark_as_read200_response_all_of_data.dart\napps/mobile/lib/models/generated
+/im/lib/model/mark_as_read_request.dart\napps/mobile/lib/models/generated/im/lib
+/model/matched_user_dto.dart\napps/mobile/lib/models/generated/im/lib/model/mess
+age_dto.dart\napps/mobile/lib/models/generated/im/lib/model/send_message200_resp
+onse.dart\napps/mobile/lib/models/generated/im/lib/model/send_message_request.da
+rt\napps/mobile/lib/models/generated/im/test/conversation_dto_test.dart\napps/mo
+bile/lib/models/generated/im/test/default_api_test.dart\napps/mobile/lib/models/
+generated/im/test/get_messages200_response_all_of_data_test.dart\napps/mobile/li
+b/models/generated/im/test/get_messages200_response_test.dart\napps/mobile/lib/m
+odels/generated/im/test/last_message_dto_test.dart\napps/mobile/lib/models/gener
+ated/im/test/list_conversations200_response_all_of_data_test.dart\napps/mobile/l
+ib/models/generated/im/test/list_conversations200_response_test.dart\napps/mobil
+e/lib/models/generated/im/test/mark_as_read200_response_all_of_data_test.dart\na
+pps/mobile/lib/models/generated/im/test/mark_as_read200_response_test.dart\napps
+/mobile/lib/models/generated/im/test/mark_as_read_request_test.dart\napps/mobile
+/lib/models/generated/im/test/matched_user_dto_test.dart\napps/mobile/lib/models
+/generated/im/test/message_dto_test.dart\napps/mobile/lib/models/generated/im/te
+st/send_message200_response_test.dart\napps/mobile/lib/models/generated/im/test/
+send_message_request_test.dart\napps/mobile/lib/presentation/blocs/im/conversati
+on_list_cubit.dart\napps/mobile/lib/presentation/blocs/im/conversation_list_stat
+e.dart\napps/mobile/lib/presentation/blocs/im/im_bloc.dart\napps/mobile/lib/pres
+entation/blocs/im/im_event.dart\napps/mobile/lib/presentation/blocs/im/im_state.
+dart\napps/mobile/lib/presentation/blocs/profile/profile_bloc.dart\napps/mobile/
+lib/presentation/pages/chat_page.dart\napps/mobile/lib/presentation/pages/conver
+sation_list_page.dart\napps/mobile/lib/presentation/pages/match_list_page.dart\n
+apps/mobile/pubspec.lock\napps/mobile/pubspec.yaml\napps/mobile/test/goldens/sw_
+chat_bubble_variants.png\napps/mobile/test/goldens/sw_chat_input_bar_variants.pn
+g\napps/mobile/test/goldens/sw_chat_message_list_empty.png\napps/mobile/test/gol
+dens/sw_chat_message_list_with_messages.png\napps/mobile/test/goldens/sw_convers
+ation_list_item_variants.png\napps/mobile/test/im_components_golden_test.dart\na
+pps/mobile/test/presentation/blocs/im_bloc_test.dart\ndocker-compose.yml\ndocs/a
+pi-contracts/im.yaml\ndocs/api/INDEX.md\ndocs/api/im.md\ndocs/api/socket-events.
+md\ndocs/design-docs/db.md\ndocs/design-docs/nestjs.md\ndocs/exec-plans/tech-deb
+t-tracker.md\ndocs/modules/im.md\npackage-lock.json\npackage.json\npackages/desi
+gn-system/lib/social_world_design_system.dart\npackages/design-system/lib/src/mo
+lecules/sw_chat_bubble.dart\npackages/design-system/lib/src/molecules/sw_chat_in
+put_bar.dart\npackages/design-system/lib/src/molecules/sw_conversation_list_item
+.dart\npackages/design-system/lib/src/organisms/sw_chat_message_list.dart\npacka
+ges/design-system/lib/widgetbook/main.dart\npackages/design-system/widgetbook/ma
+in.dart\npackages/shared-types/src/generated/im/.openapi-generator/FILES\npackag
+es/shared-types/src/generated/im/README.md\npackages/shared-types/src/generated/
+im/docs/ConversationDto.md\npackages/shared-types/src/generated/im/docs/DefaultA
+pi.md\npackages/shared-types/src/generated/im/docs/GetMessages200Response.md\npa
+ckages/shared-types/src/generated/im/docs/GetMessages200ResponseAllOfData.md\npa
+ckages/shared-types/src/generated/im/docs/LastMessageDto.md\npackages/shared-typ
+es/src/generated/im/docs/ListConversations200Response.md\npackages/shared-types/
+src/generated/im/docs/ListConversations200ResponseAllOfData.md\npackages/shared-
+types/src/generated/im/docs/MarkAsRead200Response.md\npackages/shared-types/src/
+generated/im/docs/MarkAsRead200ResponseAllOfData.md\npackages/shared-types/src/g
+enerated/im/docs/MarkAsReadRequest.md\npackages/shared-types/src/generated/im/do
+cs/MatchedUserDto.md\npackages/shared-types/src/generated/im/docs/MessageDto.md\
+npackages/shared-types/src/generated/im/docs/SendMessage200Response.md\npackages
+/shared-types/src/generated/im/docs/SendMessageRequest.md\npackages/shared-types
+/src/generated/im/src/apis/DefaultApi.ts\npackages/shared-types/src/generated/im
+/src/models/ConversationDto.ts\npackages/shared-types/src/generated/im/src/model
+s/GetMessages200Response.ts\npackages/shared-types/src/generated/im/src/models/G
+etMessages200ResponseAllOfData.ts\npackages/shared-types/src/generated/im/src/mo
+dels/LastMessageDto.ts\npackages/shared-types/src/generated/im/src/models/ListCo
+nversations200Response.ts\npackages/shared-types/src/generated/im/src/models/Lis
+tConversations200ResponseAllOfData.ts\npackages/shared-types/src/generated/im/sr
+c/models/MarkAsRead200Response.ts\npackages/shared-types/src/generated/im/src/mo
+dels/MarkAsRead200ResponseAllOfData.ts\npackages/shared-types/src/generated/im/s
+rc/models/MarkAsReadRequest.ts\npackages/shared-types/src/generated/im/src/model
+s/MatchedUserDto.ts\npackages/shared-types/src/generated/im/src/models/MessageDt
+o.ts\npackages/shared-types/src/generated/im/src/models/Pagination.ts\npackages/
+shared-types/src/generated/im/src/models/SendMessage200Response.ts\npackages/sha
+red-types/src/generated/im/src/models/SendMessageRequest.ts\npackages/shared-typ
+es/src/generated/im/src/models/index.ts\npnpm-lock.yaml\ntests/bdd/jest.config.b
+dd.js\ntests/bdd/step-definitions/auth_login_phone_number_registration.steps.js\
+ntests/bdd/step-definitions/bdd-setup.js\ntests/bdd/step-definitions/im_conversa
+tion_list.steps.js\ntests/bdd/step-definitions/im_message_history.steps.js\ntest
+s/bdd/step-definitions/im_message_idempotency_and_ordering.steps.js\ntests/bdd/s
+tep-definitions/im_read_receipts.steps.js\ntests/bdd/step-definitions/im_real_ti
+me_message_delivery.steps.js\ntests/bdd/step-definitions/im_start_chatting_after
+_match.steps.js\ntests/structure/test_docker_compose.py\n\n【必须执行的操作】\n1
+. 分析上述变更，检查对应文档是否已补充\n2. 对遗漏项，直接创建或修改对应的 .md 文
+档文件\n3. 检查 CHANGELOG.md：\n   - 如果 PR 包含用户可见的功能变更或接口变更，
+而 CHANGELOG.md 中尚未记录，必须在最新版本区块下追加条目 `- #64`\n4. 如果 PR 包
+含接口破坏性变更，必须创建或更新迁移指南 docs/migration/README.md\n5. 输出结构化
+报告到日志\n6. 将文档变更提交：git add -A && git commit -m 'docs: 补充 PR #64 文
+档 (by PR Doc Gardener)'\n7. push 到当前分支：git push origin feat/issue-5\n\n注
+意：只修改文档文件（.md），不要修改业务代码。"
+)
+StatusUpdate(
+    context_usage=None,
+    context_tokens=None,
+    max_context_tokens=None,
+    token_usage=None,
+    message_id=None,
+    plan_mode=None,
+    mcp_status=MCPStatusSnapshot(
+        loading=True,
+        connected=0,
+        total=1,
+        tools=0,
+        servers=(
+            MCPServerSnapshot(name='games', status='connecting', tools=()),
+        )
+    )
+)
+MCPLoadingBegin()
+StatusUpdate(
+    context_usage=None,
+    context_tokens=None,
+    max_context_tokens=None,
+    token_usage=None,
+    message_id=None,
+    plan_mode=None,
+    mcp_status=MCPStatusSnapshot(
+        loading=False,
+        connected=1,
+        total=1,
+        tools=8,
+        servers=(
+            MCPServerSnapshot(
+                name='games',
+                status='connected',
+                tools=(
+                    'ListPanels',
+                    'ScreenshotPanel',
+                    'ComparePanel',
+                    'QueryGameData',
+                    'SearchCode',
+                    'AnalyzePanel',
+                    'RunChecks',
+                    'ScreenshotScene'
+                )
+            ),
+        )
+    )
+)
+MCPLoadingEnd()
+StepBegin(n=1)
+ThinkPart(
+    type='think',
+    think='这是一个 PR 文档园丁的任务，我需要：\n\n1. 首先读取项目导航文档 AGENT
+S.md\n2. 读取上一轮 review report，验证 Blocking/Major 问题是否已修复\n3. 分析 g
+it diff，检查文档是否同步\n4. 补充遗漏的文档\n5. 检查 CHANGELOG.md\n6. 检查是否
+有接口破坏性变更需要创建/更新迁移指南\n7. 输出结构化报告\n8. 提交并 push 文档变
+更\n\n让我先读取必要的文件。',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_goGGlaxcApTlv2o3WRB7B7gK',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "/Users/insulate/Desktop/social-world/AGENTS.md"}'
+    ),
+    extras=None
+)
+ToolCall(
+    type='function',
+    id='tool_ZnDqD0yJbWeMuxnLP0Jdsnr9',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "/Users/insulate/Desktop/new-world/new-world-ops/log
+s/social-world/review-report-64-20260507-082452.md'
+    ),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_goGGlaxcApTlv2o3WRB7B7gK',
+    return_value=ToolOk(
+        is_error=False,
+        output='     1\t# Social World 智能体导航地图\n     2\t\n     3\t> 仓库
+即唯一真实来源。不在仓库里的知识等于不存在。\n     4\t\n     5\t## 文档地图\n   
+ 6\t\n     7\t| 你要找什么         | 去哪里                                     
+                                         |\n     8\t| ------------------ | -----
+------------------------------------------------------------------------------- 
+|\n     9\t| 项目背景           | [README.md](README.md)                        
+                                      |\n    10\t| 编码与架构规范     | [docs/de
+sign-docs/INDEX.md](docs/design-docs/INDEX.md)                               |\n
+   11\t| Issue 处理工作流   | [docs/design-docs/issue-workflow.md](docs/design-d
+ocs/issue-workflow.md)             |\n    12\t| UI 风格规范        | [docs/desig
+n-docs/ui-style-guide/INDEX.md](docs/design-docs/ui-style-guide/INDEX.md) |\n   
+13\t| 业务术语           | [docs/product-specs/glossary.md](docs/product-specs/g
+lossary.md)                     |\n    14\t| 当前需求           | [prd/v1-mvp.md
+](prd/v1-mvp.md)                                                       |\n    15
+\t| 模块实现           | [docs/modules/INDEX.md](docs/modules/INDEX.md)（含 prof
+ile）                         |\n    16\t| **执行计划与模板** | **[docs/exec-pla
+ns/INDEX.md](docs/exec-plans/INDEX.md)** ⬅️ **开发前必读**           |\n    17\t|
+技术债务           | [docs/exec-plans/tech-debt-tracker.md](docs/exec-plans/tech
+-debt-tracker.md)         |\n    18\t| Maestro E2E 规范   | [.maestro/README.md]
+(.maestro/README.md)                                             |\n    19\t\n  
+ 20\t## 目录结构\n    21\t\n    22\t```\n    23\tdocs/design-docs/    # 架构规范
+、编码约定、数据库/API 规范\n    24\tdocs/product-specs/  # 业务术语、领域规则\n
+   25\tdocs/modules/        # 模块实现文档（跨代码层级）\n    26\tdocs/exec-plan
+s/     # 执行计划 + 按任务类型拆分的专用模板 + 技术债务\n    27\tprd/           
+     # 产品需求文档\n    28\tapps/                # mobile (Flutter), api (NestJ
+S), admin (Next.js)\n    29\tpackages/            # shared-types, design-system\
+n    30\t```\n    31\t\n    32\t## 按任务类型的必读文档速查\n    33\t\n    34\t|
+任务类型                             | 强制第 1 步                              
+      | 强制第 2 步                   | 产出位置约定                            
+                                                          |\n    35\t| ---------
+--------------------------- | ----------------------------------------------- | 
+----------------------------- | ------------------------------------------------
+-------------------------------------------------- |\n    36\t| 新功能开发 (`fea
+t`)                  | `docs/exec-plans/TEMPLATE-fullstack-feature.md` | `docs/d
+esign-docs/flutter.md` | 代码直接写入 `apps/` / `packages/`                     
+                                           |\n    37\t| **设计与 Design-Only PR 
+(`design`)** | `docs/exec-plans/TEMPLATE-design.md`            | `docs/design-do
+cs/flutter.md` | **`.dart` 资产必须放在 `designs/issue-XXX/flutter-widgets/`，禁
+止直接写入 `packages/` 或 `apps/`** |\n    38\t| Bug 修复 (`fix`)               
+     | `docs/exec-plans/TEMPLATE-fullstack-bugfix.md`  | —                      
+      | 代码直接写入对应模块                                                    
+                          |\n    39\t| 文档任务 (`docs`)                    | `d
+ocs/exec-plans/TEMPLATE-documentation.md`     | —                             | 
+`docs/` / `prd/`                                                                
+                  |\n    40\t\n    41\t> 设计任务 ≠ 美术任务。Design-Only PR 必
+须产出 `.dart` 纯 UI Widget + `MANIFEST.md` 迁移清单 + Widgetbook 用例代码 + Gol
+den Test 代码。\n    42\t\n    43\t## 黄金原则\n    44\t\n    45\t1. **计划先行*
+*：复杂任务（多模块协调、架构变更、新用户旅程）必须先写 `docs/exec-plans/PLAN-XX
+X.md`，按模板执行\n    46\t2. **全链路交付**：一个需求必须同时包含 DB + API + Mo
+bile 的实现\n    47\t3. **契约同步**：`packages/shared-types/` 是前后端的唯一真
+实来源\n    48\t4. **约束即代码**：linter、hooks、CI 会强制执行规则，不在规则里
+的约束等于不存在\n    49\t5. **效果优先**：先跑通端到端，再考虑优雅性\n    50\t\
+n    51\t## 常见任务\n    52\t\n    53\t| 任务                  | 命令          
+                                      |\n    54\t| --------------------- | -----
+----------------------------------------------- |\n    55\t| 查看执行计划模板   
+  | [docs/exec-plans/INDEX.md](docs/exec-plans/INDEX.md) |\n    56\t| 启动开发环
+境          | `make dev`                                           |\n    57\t| 
+检查文档健康          | `make check-docs`                                    |\n
+   58\t| 运行测试              | `make test`                                    
+     |\n    59\t| Mobile E2E (login)    | `make test-mobile-e2e-login`          
+              |\n    60\t| Mobile E2E (devtools) | `make test-mobile-e2e-devtool
+s`                      |\n    61\t| Mobile E2E (完整)     | `make test-mobile-e
+2e`                               |\n    62\t| 启动 E2E 后端环境     | `make e2e
+-env-up`                                    |\n    63\t| 安装 hooks            |
+`make hooks`                                         |\n    64\t| 架构约束检查  
+       | `make arch-check`                                    |\n    65\t| Agent
+配置检查        | `make agent-check`                                   |\n',
+        message='65 lines read from file starting from line 1. Total lines in fi
+le: 65. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(arguments_part='"}')
+StatusUpdate(
+    context_usage=0.02803802490234375,
+    context_tokens=7350,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=5558,
+        output=175,
+        input_cache_read=1792,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-t7ojBsffssziAtimHIosd1rV',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_ZnDqD0yJbWeMuxnLP0Jdsnr9',
+    return_value=ToolOk(
+        is_error=False,
+        output='     1\t## 审查结论\n     2\t\n     3\t审查结论: NEEDS_MAJOR_FIX
+\n     4\t\n     5\t## 阻塞问题（Blocking）\n     6\t\n     7\t无。\n     8\t\n 
+   9\t## 严重问题（Major）\n    10\t\n    11\t### 1. BDD 离线推送测试断言了未与
+实际代码集成的 Mock，测试必然失败\n    12\t- **位置**: `tests/bdd/step-definitio
+ns/im_real_time_message_delivery.steps.js:129-138`\n    13\t- **问题**: Scenario
+"Offline user receives push notification" 中断言 `pushService.send.mock.calls.le
+ngth > 0`，但：\n    14\t  1. 实际 `ImService`/`ImGateway` 代码从未调用任何推送
+服务；\n    15\t  2. `tests/bdd/step-definitions/bdd-setup.js:257-273` 的 NestJS
+测试模块 `providers` 数组中 **未注册 `PushService`**，`mockPushService` 仅作为局
+部变量赋值，实际被测代码无法感知该 Mock。\n    16\t- **影响**: 若运行 `make test
+-bdd`，该 scenario 必然失败，CI 无法通过。\n    17\t- **修复**: \n    18\t  1. 
+在 `apps/api/src/modules/push/push.service.ts` 创建推送服务骨架（MVP 仅打印日志
+即可）；\n    19\t  2. 在 `ImService.sendMessage` 中，当接收方离线时调用 `pushSe
+rvice.send(...)`；\n    20\t  3. 在 `bdd-setup.js` 的 NestJS 测试模块 `providers
+` 中注入 `PushService`，并将 `mockPushService` 作为其 `useValue`。\n    21\t- **
+依据**: PRD `prd/v1-im.md` US-IM-2 明确要求"离线推送：接收方不在线时，调用 Push 
+Service 发送通知（MVP 骨架）"；`docs/exec-plans/templates/TEMPLATE-fullstack-fea
+ture.md` 要求 `make test-bdd` 通过。\n    22\t- **上一轮状态**: ❌ 未修复\n    2
+3\t\n    24\t### 2. 模板交付前检查清单未完整执行：`make test` 与 `make lint` 未
+运行\n    25\t- **位置**: PR #64 Body「自检清单」\n    26\t- **问题**: 开发者明
+确标注：\n    27\t  - `[ ] make test - ⚠️ 后端测试因环境缺失 ts-jest 无法运行`\n 
+  28\t  - `[ ] make lint - ⚠️ ESLint v9 与项目 .eslintrc.js 不兼容`\n    29\t- **
+影响**: 无法确认后端单元测试、BDD 测试和静态代码检查是否通过，存在未暴露的回归风
+险。\n    30\t- **修复**: 在开发环境完成依赖安装（`npm install` / `pnpm install`
+）后，逐条运行：\n    31\t  ```bash\n    32\t  make test\n    33\t  make test-bd
+d\n    34\t  make lint\n    35\t  make check-contract-sync\n    36\t  ```\n    3
+7\t修复所有报错后更新 PR 自检清单。\n    38\t- **依据**: `docs/exec-plans/templa
+tes/TEMPLATE-fullstack-feature.md` 第 75-84 行「交付前检查清单」明确将 `make tes
+t`、`make test-bdd`、`make lint`、`make check-contract-sync` 列为强制项。\n    3
+9\t- **上一轮状态**: ❌ 未修复\n    40\t\n    41\t### 3. 系统消息创建后未通过 So
+cket.io 实时通知会话参与者\n    42\t- **位置**: `apps/api/src/modules/im/im.serv
+ice.ts:196-223`\n    43\t- **问题**: `createSystemMessage`（由 `match:created` 
+事件触发）仅将系统消息写入 DB，既未向双方 Socket Room emit `message:receive`，也
+未 emit `conversation:updated`。\n    44\t- **影响**: 用户 A 与用户 B 匹配成功后
+，双方不会实时收到"你们已匹配成功，开始聊天吧"的系统消息；只有主动进入聊天页调用
+`GET /messages` 时才能看到。\n    45\t- **修复**: 在 `createSystemMessage` 保存
+成功后，通过 `ImGateway` 或 NestJS `EventEmitter` 向该会话的双方 Room 广播 `mess
+age:receive` 事件，并附带 `conversation:updated` 事件以刷新会话列表。\n    46\t-
+**依据**: `docs/modules/im.md` 发送消息流程图显示系统消息后应有实时推送；PRD `pr
+d/v1-im.md` US-IM-1 要求"打开会话后看到系统提示"。\n    47\t- **上一轮状态**: ❌
+未修复\n    48\t\n    49\t### 4. Widgetbook 未注册新 IM 组件用例，与执行计划要求
+不符\n    50\t- **位置**: `packages/design-system/widgetbook/main.dart`\n    51\
+t- **问题**: 该文件中未包含 `SwChatBubble`、`SwChatInputBar`、`SwConversationLis
+tItem`、`SwChatMessageList` 的 `WidgetbookComponent` 注册。PR Body 声称"更新 wid
+getbook/main.dart - 注册新组件用例"，但实际 diff 中无相关变更。\n    52\t- **影
+响**: 新设计系统组件无法在 Widgetbook 中独立预览和验收，违反 Design-Only PR 前置
+规范。\n    53\t- **修复**: 在 `widgetbook/main.dart` 的 `Molecules` 目录下新增 
+`SwChatBubble`、`SwChatInputBar`、`SwConversationListItem` 的 `WidgetbookCompone
+nt` 与 `WidgetbookUseCase`；在 `Organisms` 目录下新增 `SwChatMessageList` 的用例
+。\n    54\t- **依据**: `docs/exec-plans/TASK-im.md` Step 0.2 明确要求"所有新组
+件必须在 `packages/design-system/widgetbook/main.dart` 中注册展示用例"。\n    55
+\t- **上一轮状态**: ❌ 未修复\n    56\t\n    57\t### 5. 文档与代码实现不一致：`c
+onversation_participants.updated_at` 更新缺失\n    58\t- **位置**: `docs/modules
+/im.md:77` vs `apps/api/src/modules/im/im.service.ts:119-122`\n    59\t- **问题*
+*: 模块文档明确规定"发送消息后必须更新 conversation_participants.updated_at，确
+保新消息会话在列表中置顶"；但 `sendMessage` 的事务内仅执行了 `conversationRepo.u
+pdate({ id: dto.conversation_id }, { updated_at: new Date() })`，即只更新了 `con
+versations` 表，未更新 `conversation_participants` 表。\n    60\t- **影响**: 文
+档作为规范与实现不一致，可能误导后续维护者。当前 `getConversations` 通过 `c.upda
+ted_at` 排序已能实现置顶，但规范描述与代码路径不符。\n    61\t- **修复**: 二选一
+：\n    62\t  - 方案 A（改代码）：在 `sendMessage` 事务中同时更新 `conversation_
+participants` 的 `updated_at`；\n    63\t  - 方案 B（改文档）：将 `docs/modules/
+im.md` 边界情况 #7 的描述更新为"更新 `conversations.updated_at`"，与代码保持一致
+。\n    64\t- **依据**: `docs/modules/im.md` 边界情况 #7。\n    65\t- **上一轮状
+态**: ❌ 未修复\n    66\t\n    67\t## 轻微问题（Minor）\n    68\t\n    69\t1. **
+`apps/api/src/modules/im/im.service.ts:49` 类型绕过**\n    70\t   - `where: { us
+er_id: Not(userId) as unknown as string }` 使用 `as unknown as string` 绕过 Type
+ORM 类型检查，建议改用 TypeORM 提供的正确类型写法或添加注释说明。\n    71\t\n   
+72\t2. **`ImBloc` 注册为 `LazySingleton` 而非 Factory**\n    73\t   - `apps/mobi
+le/lib/core/di/di.dart:54` 将 `ImBloc` 注册为 `LazySingleton`。虽然 IM 状态全局
+管理有其合理性，但 BLoC 通常应为 Factory 作用域，以避免状态在页面间意外残留。\n 
+  74\t\n    75\t3. **`ImSocketClient.connect()` 未释放旧 Socket**\n    76\t   - 
+`apps/mobile/lib/core/network/im_socket_client.dart:37-49` 每次调用 `connect()` 
+都会创建新的 `io.Socket`，但未先 `disconnect()` 或销毁旧的 `_socket`，可能导致旧
+连接的事件监听器泄漏。\n    77\t\n    78\t4. **`ImBloc._onSendMessage` 离线发送
+时丢失分页状态**\n    79\t   - `apps/mobile/lib/presentation/blocs/im/im_bloc.da
+rt:284-298` 当 Socket 未连接时，从 `MessageSending` 状态回退到 `MessagesLoaded` 
+时，`hasMore` 和 `nextCursor` 会从 `null` 重置，导致已加载的分页状态丢失。\n    
+80\t\n    81\t## 上一轮问题修复状态\n    82\t\n    83\t| # | 问题标题 | 上一轮级
+别 | 修复状态 | 说明 |\n    84\t|---|---------|-----------|---------|------|\n  
+ 85\t| 1 | BDD 离线推送测试断言了未与实际代码集成的 Mock | Major | ❌ 未修复 | `
+bdd-setup.js` 虽新增 `mockPushService` 但未在 providers 中注册；`ImService` 仍不
+调用任何推送服务 |\n    86\t| 2 | 模板交付前检查清单未完整执行 | Major | ❌ 未修
+复 | PR Body 自检清单仍标记 `[ ] make test` 和 `[ ] make lint` |\n    87\t| 3 | 
+系统消息创建后未通过 Socket.io 实时通知 | Major | ❌ 未修复 | `createSystemMessa
+ge` 仍仅写入 DB，无 Socket 广播 |\n    88\t| 4 | Widgetbook 未注册新 IM 组件用例
+| Major | ❌ 未修复 | `widgetbook/main.dart` 仍无 IM 组件注册 |\n    89\t| 5 | 
+文档与代码实现不一致 | Major | ❌ 未修复 | `sendMessage` 仍只更新 `conversations
+` 表，文档未同步修改 |\n    90\t\n    91\t## 修复引入的新问题\n    92\t\n    93\
+t无（本轮 diff 中未见对上一轮问题的修复尝试）。\n    94\t\n    95\t## 验证结果\n
+   96\t\n    97\t| 维度 | 状态 | 说明 |\n    98\t|------|------|------|\n    99\
+t| 功能完整性 | ⚠️ | 核心 IM（发送/接收/已读/会话列表）已实现，但离线推送骨架缺失
+、系统消息未实时广播、多设备自消息同步被 `sender_id != :userId` 过滤 |\n   100\t
+| 代码规范性 | ✅ | 基本符合规范；原生 SQL 使用 `?` 占位符合规；Entity 已在 `ImM
+odule` 注册；事务内提交后网关再发射 Socket 事件 |\n   101\t| 全链路完整性 | ✅ |
+DB（Migration + Entity）→ API（Controller/Gateway/Service）→ Mobile（Page/BLoC/R
+epository/Socket）链路已贯通；`data-source.ts` 通过 glob 覆盖新 Entity |\n   102
+\t| 规范符合性 | ⚠️ | Widgetbook 未按执行计划注册新组件用例；`docs/modules/im.md`
+与代码实现存在不一致 |\n   103\t| 模板检查清单执行 | ❌ | `make test`、`make lin
+t` 未执行；`make test-bdd` 中的推送 scenario 会失败 |\n   104\t| 测试覆盖 | ⚠️ | 
+后端单元测试、Flutter BLoC 测试、Golden 测试均存在且覆盖核心路径；BDD 步骤非空实
+现；但离线推送测试与代码脱节 |\n   105\t| 文档同步 | ⚠️ | `docs/api/im.md`、`docs
+/api/socket-events.md`、`docs/api/INDEX.md`、`docs/api-contracts/im.yaml` 已更新
+，但模块文档存在与代码不一致的描述 |\n   106\t\n   107\t## 自检结果\n   108\t\n 
+ 109\t- State 不可变性：✅ 通过（`Message.copyWith` 正确使用 `?? this.field` 回
+退）\n   110\t- 生命周期：✅ 通过（`ImBloc.close()` 正确断开 Socket；`ImSocketCl
+ient.disconnect()` 置空 `_socket`）\n   111\t- 边界路径：⚠️ 未充分验证（`ImBloc._
+onSendMessage` 离线场景会丢失 `hasMore`/`nextCursor`；`getMessagesSince` 过滤自
+身消息导致多设备同步受限）\n   112\t- 回归：✅ 通过（未发现影响未修改文件预期行
+为的变更）\n   113\t- 测试真实性：✅ 通过（BLoC 测试 assert 了具体状态转换值，非
+空实现）\n   114\t\n   115\t## 风险与建议\n   116\t\n   117\t1. **本 PR 涉及状态
+管理与 Socket 生命周期变更，建议合并前人工确认边界场景**：特别是 `ImBloc` 在页面
+重建时作为 `LazySingleton` 可能导致旧状态残留；以及 `ImSocketClient` 重复 `conne
+ct()` 的 Socket 泄漏风险。\n   118\t\n   119\t2. **Redis 故障导致数据不一致**: `
+ImService.sendMessage` 中 Redis `incr` 位于数据库事务之外，且无独立的 try-catch
+。若 Redis 在事务提交后故障，`incr` 会抛出异常，发送方收到 `message:error`，但消
+息已持久化且接收方下次加载时仍能看到该消息（只是未读数未增加）。建议将 Redis 操
+作纳入错误降级逻辑，而非直接抛异常。\n   120\t\n   121\t3. **消息同步过滤自身消
+息**: `ImService.getMessagesSince` 通过 `.andWhere("m.sender_id != :userId", { u
+serId })` 过滤了用户自己发送的消息。若用户从另一设备发送消息，当前设备重连后无法
+通过 `message:sync` 补拉到这些自消息。MVP 阶段可接受，但建议在 `docs/modules/im.
+md` 中明确记录此限制。\n   122\t\n   123\t4. **未读数无过期/上限策略**: Redis 中
+`unread_count:{user_id}:{conversation_id}` 只增不减（除已读时重置为 0），长期运
+行可能导致 Redis 中存在大量冷 key。建议后续增加过期策略或定期清理。\n',
+        message='123 lines read from file starting from line 1. Total lines in f
+ile: 123. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+StepBegin(n=2)
+ThinkPart(
+    type='think',
+    think='根据上一轮 review report，有 5 个 Major 问题：\n1. BDD 离线推送测试断
+言了未与实际代码集成的 Mock\n2. 模板交付前检查清单未完整执行\n3. 系统消息创建后
+未通过 Socket.io 实时通知\n4. Widgetbook 未注册新 IM 组件用例\n5. 文档与代码实现
+不一致：conversation_participants.updated_at 更新缺失\n\n这一轮是后续审查，但我
+作为文档园丁，主要职责是检查文档同步。业务代码修复不在我的职责范围内，但第 5 个
+问题是文档与代码不一致，这正是我需要关注的。\n\n让我先分析变更文件列表和读取相关
+文档，然后进行 diff 分析。\n\n变更涉及的主要领域：\n- IM 模块（前后端完整实现）\
+n- Matching 模块（匹配相关）\n- Maestro E2E 测试（IM 和 Matching）\n- Design Sys
+tem（IM 组件）\n- BDD 测试（IM 场景）\n- API 文档（im.yaml, im.md, socket-events
+.md）\n- 模块文档（docs/modules/im.md）\n\n需要读取的关键文档：\n1. docs/modules
+/im.md\n2. docs/api/im.md\n3. docs/api/socket-events.md\n4. docs/api/INDEX.md\n5
+. docs/design-docs/db.md\n6. CHANGELOG.md\n7. docs/exec-plans/tech-debt-tracker.
+md\n8. docs/migration/README.md（如果不存在需要检查）\n\n让我先读取这些文件以及 
+diff 内容。',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_jYWGyOfwQFsqSjDAp0ZtTO3J',
+    function=FunctionBody(
+        name='Shell',
+        arguments='{"command": "cd /var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000g
+n/T/doc-gardener-64-886526752 && git diff --name-only origin/main...HEAD"}'
+    ),
+    extras=None
+)
+StatusUpdate(
+    context_usage=0.046535491943359375,
+    context_tokens=12199,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=5031,
+        output=379,
+        input_cache_read=7168,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-tXNMI1DgMliDcGNV4UarWZvw',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_jYWGyOfwQFsqSjDAp0ZtTO3J',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='.maestro/README.md\n.maestro/flows/devtools/edit_server_url.yaml
+\n.maestro/flows/devtools/empty_server_url.yaml\n.maestro/flows/devtools/invalid
+_server_url.yaml\n.maestro/flows/devtools/save_persists_after_reopen.yaml\n.maes
+tro/flows/im/_conversation_list_assertions.yaml\n.maestro/flows/im/_enter_chat_a
+ctions.yaml\n.maestro/flows/im/enter_chat.yaml\n.maestro/flows/im/includes\n.mae
+stro/flows/im/send_message.yaml\n.maestro/flows/im/view_conversation_list.yaml\n
+.maestro/flows/matching/swipe_recommendations.yaml\n.maestro/flows/matching/view
+_match_list.yaml\n.maestro/flows/profile/setup.yaml\n.maestro/includes/profile-s
+etup-actions.yaml\n.maestro/includes/send_message_actions.yaml\n.maestro/scripts
+/maestro-check.sh\n.maestro/scripts/run-e2e.sh\nMakefile\napps/admin/package-loc
+k.json\napps/admin/package.json\napps/api/package-lock.json\napps/api/package.js
+on\napps/api/src/app.module.ts\napps/api/src/common/utils/snowflake.ts\napps/api
+/src/common/validators/message-content.validator.ts\napps/api/src/config/jwt.con
+fig.ts\napps/api/src/database/entities/message.entity.ts\napps/api/src/database/
+migrations/20250426000000-CreateImTables.ts\napps/api/src/database/migrations/20
+250426000001-AddLastLoginAtToUsers.ts\napps/api/src/database/migrations/20250426
+000002-AddMessagesConvSeqIndex.ts\napps/api/src/modules/auth/auth.service.ts\nap
+ps/api/src/modules/auth/tests/auth.service.spec.ts\napps/api/src/modules/im/dto/
+conversation-response.dto.ts\napps/api/src/modules/im/dto/get-conversations-quer
+y.dto.ts\napps/api/src/modules/im/dto/get-messages-query.dto.ts\napps/api/src/mo
+dules/im/dto/mark-as-read.dto.ts\napps/api/src/modules/im/dto/message-response.d
+to.ts\napps/api/src/modules/im/dto/send-message.dto.ts\napps/api/src/modules/im/
+im.controller.ts\napps/api/src/modules/im/im.gateway.ts\napps/api/src/modules/im
+/im.module.ts\napps/api/src/modules/im/im.service.ts\napps/api/src/modules/im/te
+sts/im.service.spec.ts\napps/api/src/modules/matching/matching.gateway.ts\napps/
+api/src/modules/matching/matching.module.ts\napps/api/src/modules/matching/match
+ing.service.ts\napps/api/src/modules/matching/tests/matching.service.spec.ts\nap
+ps/api/src/modules/push/push.module.ts\napps/api/src/modules/push/push.service.t
+s\napps/api/src/modules/redis/redis.module.ts\napps/api/src/scripts/seed-dev.ts\
+napps/mobile/lib/app.dart\napps/mobile/lib/core/di/di.dart\napps/mobile/lib/core
+/network/im_socket_client.dart\napps/mobile/lib/data/models/conversation.dart\na
+pps/mobile/lib/data/models/message.dart\napps/mobile/lib/data/repositories/im_re
+pository_impl.dart\napps/mobile/lib/domain/repositories/im_repository.dart\napps
+/mobile/lib/models/generated/im/.openapi-generator/FILES\napps/mobile/lib/models
+/generated/im/README.md\napps/mobile/lib/models/generated/im/doc/ConversationDto
+.md\napps/mobile/lib/models/generated/im/doc/DefaultApi.md\napps/mobile/lib/mode
+ls/generated/im/doc/GetMessages200Response.md\napps/mobile/lib/models/generated/
+im/doc/GetMessages200ResponseAllOfData.md\napps/mobile/lib/models/generated/im/d
+oc/LastMessageDto.md\napps/mobile/lib/models/generated/im/doc/ListConversations2
+00Response.md\napps/mobile/lib/models/generated/im/doc/ListConversations200Respo
+nseAllOfData.md\napps/mobile/lib/models/generated/im/doc/MarkAsRead200Response.m
+d\napps/mobile/lib/models/generated/im/doc/MarkAsRead200ResponseAllOfData.md\nap
+ps/mobile/lib/models/generated/im/doc/MarkAsReadRequest.md\napps/mobile/lib/mode
+ls/generated/im/doc/MatchedUserDto.md\napps/mobile/lib/models/generated/im/doc/M
+essageDto.md\napps/mobile/lib/models/generated/im/doc/SendMessage200Response.md\
+napps/mobile/lib/models/generated/im/doc/SendMessageRequest.md\napps/mobile/lib/
+models/generated/im/lib/api.dart\napps/mobile/lib/models/generated/im/lib/api/de
+fault_api.dart\napps/mobile/lib/models/generated/im/lib/api_client.dart\napps/mo
+bile/lib/models/generated/im/lib/model/conversation_dto.dart\napps/mobile/lib/mo
+dels/generated/im/lib/model/get_messages200_response.dart\napps/mobile/lib/model
+s/generated/im/lib/model/get_messages200_response_all_of_data.dart\napps/mobile/
+lib/models/generated/im/lib/model/last_message_dto.dart\napps/mobile/lib/models/
+generated/im/lib/model/list_conversations200_response.dart\napps/mobile/lib/mode
+ls/generated/im/lib/model/list_conversations200_response_all_of_data.dart\napps/
+mobile/lib/models/generated/im/lib/model/mark_as_read200_response.dart\napps/mob
+ile/lib/models/generated/im/lib/model/mark_as_read200_response_all_of_data.dart\
+napps/mobile/lib/models/generated/im/lib/model/mark_as_read_request.dart\napps/m
+obile/lib/models/generated/im/lib/model/matched_user_dto.dart\napps/mobile/lib/m
+odels/generated/im/lib/model/message_dto.dart\napps/mobile/lib/models/generated/
+im/lib/model/send_message200_response.dart\napps/mobile/lib/models/generated/im/
+lib/model/send_message_request.dart\napps/mobile/lib/models/generated/im/test/co
+nversation_dto_test.dart\napps/mobile/lib/models/generated/im/test/default_api_t
+est.dart\napps/mobile/lib/models/generated/im/test/get_messages200_response_all_
+of_data_test.dart\napps/mobile/lib/models/generated/im/test/get_messages200_resp
+onse_test.dart\napps/mobile/lib/models/generated/im/test/last_message_dto_test.d
+art\napps/mobile/lib/models/generated/im/test/list_conversations200_response_all
+_of_data_test.dart\napps/mobile/lib/models/generated/im/test/list_conversations2
+00_response_test.dart\napps/mobile/lib/models/generated/im/test/mark_as_read200_
+response_all_of_data_test.dart\napps/mobile/lib/models/generated/im/test/mark_as
+_read200_response_test.dart\napps/mobile/lib/models/generated/im/test/mark_as_re
+ad_request_test.dart\napps/mobile/lib/models/generated/im/test/matched_user_dto_
+test.dart\napps/mobile/lib/models/generated/im/test/message_dto_test.dart\napps/
+mobile/lib/models/generated/im/test/send_message200_response_test.dart\napps/mob
+ile/lib/models/generated/im/test/send_message_request_test.dart\napps/mobile/lib
+/presentation/blocs/im/conversation_list_cubit.dart\napps/mobile/lib/presentatio
+n/blocs/im/conversation_list_state.dart\napps/mobile/lib/presentation/blocs/im/i
+m_bloc.dart\napps/mobile/lib/presentation/blocs/im/im_event.dart\napps/mobile/li
+b/presentation/blocs/im/im_state.dart\napps/mobile/lib/presentation/blocs/profil
+e/profile_bloc.dart\napps/mobile/lib/presentation/pages/chat_page.dart\napps/mob
+ile/lib/presentation/pages/conversation_list_page.dart\napps/mobile/lib/presenta
+tion/pages/match_list_page.dart\napps/mobile/pubspec.lock\napps/mobile/pubspec.y
+aml\napps/mobile/test/goldens/sw_chat_bubble_variants.png\napps/mobile/test/gold
+ens/sw_chat_input_bar_variants.png\napps/mobile/test/goldens/sw_chat_message_lis
+t_empty.png\napps/mobile/test/goldens/sw_chat_message_list_with_messages.png\nap
+ps/mobile/test/goldens/sw_conversation_list_item_variants.png\napps/mobile/test/
+im_components_golden_test.dart\napps/mobile/test/presentation/blocs/im_bloc_test
+.dart\ndocker-compose.yml\ndocs/api-contracts/im.yaml\ndocs/api/INDEX.md\ndocs/a
+pi/im.md\ndocs/api/socket-events.md\ndocs/design-docs/db.md\ndocs/design-docs/ne
+stjs.md\ndocs/exec-plans/tech-debt-tracker.md\ndocs/modules/im.md\npackage-lock.
+json\npackage.json\npackages/design-system/lib/social_world_design_system.dart\n
+packages/design-system/lib/src/molecules/sw_chat_bubble.dart\npackages/design-sy
+stem/lib/src/molecules/sw_chat_input_bar.dart\npackages/design-system/lib/src/mo
+lecules/sw_conversation_list_item.dart\npackages/design-system/lib/src/organisms
+/sw_chat_message_list.dart\npackages/design-system/lib/widgetbook/main.dart\npac
+kages/design-system/widgetbook/main.dart\npackages/shared-types/src/generated/im
+/.openapi-generator/FILES\npackages/shared-types/src/generated/im/README.md\npac
+kages/shared-types/src/generated/im/docs/ConversationDto.md\npackages/shared-typ
+es/src/generated/im/docs/DefaultApi.md\npackages/shared-types/src/generated/im/d
+ocs/GetMessages200Response.md\npackages/shared-types/src/generated/im/docs/GetMe
+ssages200ResponseAllOfData.md\npackages/shared-types/src/generated/im/docs/LastM
+essageDto.md\npackages/shared-types/src/generated/im/docs/ListConversations200Re
+sponse.md\npackages/shared-types/src/generated/im/docs/ListConversations200Respo
+nseAllOfData.md\npackages/shared-types/src/generated/im/docs/MarkAsRead200Respon
+se.md\npackages/shared-types/src/generated/im/docs/MarkAsRead200ResponseAllOfDat
+a.md\npackages/shared-types/src/generated/im/docs/MarkAsReadRequest.md\npackages
+/shared-types/src/generated/im/docs/MatchedUserDto.md\npackages/shared-types/src
+/generated/im/docs/MessageDto.md\npackages/shared-types/src/generated/im/docs/Se
+ndMessage200Response.md\npackages/shared-types/src/generated/im/docs/SendMessage
+Request.md\npackages/shared-types/src/generated/im/src/apis/DefaultApi.ts\npacka
+ges/shared-types/src/generated/im/src/models/ConversationDto.ts\npackages/shared
+-types/src/generated/im/src/models/GetMessages200Response.ts\npackages/shared-ty
+pes/src/generated/im/src/models/GetMessages200ResponseAllOfData.ts\npackages/sha
+red-types/src/generated/im/src/models/LastMessageDto.ts\npackages/shared-types/s
+rc/generated/im/src/models/ListConversations200Response.ts\npackages/shared-type
+s/src/generated/im/src/models/ListConversations200ResponseAllOfData.ts\npackages
+/shared-types/src/generated/im/src/models/MarkAsRead200Response.ts\npackages/sha
+red-types/src/generated/im/src/models/MarkAsRead200ResponseAllOfData.ts\npackage
+s/shared-types/src/generated/im/src/models/MarkAsReadRequest.ts\npackages/shared
+-types/src/generated/im/src/models/MatchedUserDto.ts\npackages/shared-types/src/
+generated/im/src/models/MessageDto.ts\npackages/shared-types/src/generated/im/sr
+c/models/Pagination.ts\npackages/shared-types/src/generated/im/src/models/SendMe
+ssage200Response.ts\npackages/shared-types/src/generated/im/src/models/SendMessa
+geRequest.ts\npackages/shared-types/src/generated/im/src/models/index.ts\npnpm-l
+ock.yaml\ntests/bdd/jest.config.bdd.js\ntests/bdd/step-definitions/auth_login_ph
+one_number_registration.steps.js\ntests/bdd/step-definitions/bdd-setup.js\ntests
+/bdd/step-definitions/im_conversation_list.steps.js\ntests/bdd/step-definitions/
+im_message_history.steps.js\ntests/bdd/step-definitions/im_message_idempotency_a
+nd_ordering.steps.js\ntests/bdd/step-definitions/im_read_receipts.steps.js\ntest
+s/bdd/step-definitions/im_real_time_message_delivery.steps.js\ntests/bdd/step-de
+finitions/im_start_chatting_after_match.steps.js\ntests/structure/test_docker_co
+mpose.py\n',
+        message='Command executed successfully.',
+        display=[],
+        extras=None
+    )
+)
+StepBegin(n=3)
+ThinkPart(
+    type='think',
+    think='我需要先读取关键文档文件，了解当前状态。上一轮 review report 提到了 M
+ajor 问题 #5：文档与代码实现不一致，具体是 `docs/modules/im.md` 中描述"发送消息
+后必须更新 conversation_participants.updated_at"，但代码只更新了 `conversations`
+表。\n\n让我读取以下文档：\n1. docs/modules/im.md\n2. docs/api/im.md\n3. docs/ap
+i/socket-events.md\n4. docs/api/INDEX.md\n5. docs/design-docs/db.md\n6. CHANGELO
+G.md\n7. docs/exec-plans/tech-debt-tracker.md\n8. docs/modules/INDEX.md\n9. READ
+ME.md\n\n以及 diff 中涉及到的一些关键代码，了解最新的实现状态。\n\n先批量读取文
+档。',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_OZjBNJsmkTwpO9YK1CNgRPmO',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/do
+c-gardener-64-886526752/docs/modules/im.md"}'
+    ),
+    extras=None
+)
+ToolCall(
+    type='function',
+    id='tool_411Gu2EifotEsUP0igKsH2Yz',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n000'
+    ),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_OZjBNJsmkTwpO9YK1CNgRPmO',
+    return_value=ToolOk(
+        is_error=False,
+        output='     1\t# IM 模块实现\n     2\t\n     3\t## 职责\n     4\t\n    
+5\t负责一对一实时聊天：消息收发、会话管理、已读回执、离线推送。\n     6\t\n     
+7\t## 流程图\n     8\t\n     9\t### 发送消息\n    10\t\n    11\t```mermaid\n    
+12\tsequenceDiagram\n    13\t    participant C1 as User A (Flutter)\n    14\t   
+participant WS as Socket.io Gateway\n    15\t    participant S as ImService\n   
+16\t    participant DB as MySQL\n    17\t    participant R as Redis\n    18\t   
+participant C2 as User B (Flutter)\n    19\t\n    20\t    C1->>WS: event: messag
+e:send\n    21\t    WS->>S: handleSendMessage\n    22\t    S->>DB: verify conver
+sation membership\n    23\t    S->>DB: insert message\n    24\t    S->>R: incr u
+nread_count:B:convId\n    25\t    WS->>C2: event: message:receive\n    26\t    a
+lt B offline\n    27\t        S->>Push: send push notification\n    28\t    end\
+n    29\t```\n    30\t\n    31\t### 已读回执\n    32\t\n    33\t```mermaid\n    
+34\tsequenceDiagram\n    35\t    participant C2 as User B\n    36\t    participa
+nt WS as Socket.io Gateway\n    37\t    participant S as ImService\n    38\t    
+participant DB as MySQL\n    39\t    participant R as Redis\n    40\t    partici
+pant C1 as User A\n    41\t\n    42\t    C2->>WS: event: message:read (last_mess
+age_id)\n    43\t    WS->>S: handleReadReceipt\n    44\t    S->>DB: update parti
+cipant last_read_message_id\n    45\t    S->>R: reset unread_count:B:convId\n   
+46\t    WS->>C1: event: message:read_receipt\n    47\t```\n    48\t\n    49\t## 
+关键文件\n    50\t\n    51\t| 文件                                 | 路径       
+                                                              |\n    52\t| -----
+------------------------------- | ----------------------------------------------
+--------------------------- |\n    53\t| Gateway                              | 
+`apps/api/src/modules/im/im.gateway.ts`                                   |\n   
+54\t| Service                              | `apps/api/src/modules/im/im.service
+.ts`                                   |\n    55\t| Controller                  
+        | `apps/api/src/modules/im/im.controller.ts`                            
+   |\n    56\t| DTOs                                 | `apps/api/src/modules/im/
+dto/*.ts`                                        |\n    57\t| Push Service      
+                  | `apps/api/src/modules/push/push.service.ts`                 
+             |\n    58\t| Flutter IM BLoC                      | `apps/mobile/li
+b/presentation/blocs/im/im_bloc.dart`                      |\n    59\t| Flutter 
+Conversation Cubit           | `apps/mobile/lib/presentation/blocs/im/conversati
+on_list_cubit.dart`      |\n    60\t| Chat Page                            | `ap
+ps/mobile/lib/presentation/pages/chat_page.dart`                       |\n    61
+\t| Conversation List Page               | `apps/mobile/lib/presentation/pages/c
+onversation_list_page.dart`          |\n    62\t| IM Repository                 
+      | `apps/mobile/lib/domain/repositories/im_repository.dart`                
+ |\n    63\t| IM Socket Client                     | `apps/mobile/lib/core/netwo
+rk/im_socket_client.dart`                      |\n    64\t| Design System - Chat
+Bubble           | `packages/design-system/lib/src/molecules/sw_chat_bubble.dart
+`            |\n    65\t| Design System - ChatInputBar         | `packages/desig
+n-system/lib/src/molecules/sw_chat_input_bar.dart`         |\n    66\t| Design S
+ystem - ConversationListItem | `packages/design-system/lib/src/molecules/sw_conv
+ersation_list_item.dart` |\n    67\t\n    68\t## 边界情况\n    69\t\n    70\t1. 
+**重复发送**：客户端生成 `client_message_id`，服务端幂等去重\n    71\t2. **会话
+权限校验**：非会话成员发送消息时，直接断开 Socket 连接或返回错误\n    72\t3. **
+消息顺序**：使用数据库自增 `bigserial` 作为 `sequence_id`，客户端按序排列\n    7
+3\t4. **离线补推**：用户重连后，拉取 `last_ack_sequence_id` 之后的所有消息\n    
+74\t5. **消息发送断线降级**：Socket 未连接时，消息状态应从 `"sending"` 降级为 `"
+failed"`，并支持用户点击重试（复用原 `client_message_id`）\n    75\t6. **已读回
+执批量标记**：收到 `last_read_message_id` 时，应将所有 `sequence_id <= last_read
+_sequence_id` 的己方消息标记为 `"read"`，而非仅标记单条\n    76\t7. **会话列表排
+序刷新**：发送消息后必须更新 `conversations.updated_at`，确保新消息会话在列表中
+置顶\n    77\t8. **原生 SQL 数组参数**：`getConversations` 中使用 `IN (...)` 查
+询多条会话的最后消息时，禁止用单个 `?` 传入数组，必须展开为等长占位符或使用 Quer
+yBuilder\n    78\t\n    79\t## 消息状态机\n    80\t\n    81\tIM 消息在客户端的完
+整生命周期状态定义如下。后端事件与前端状态必须一一对应，禁止在契约中声明无法实现
+的状态。\n    82\t\n    83\t```\n    84\tsending ──→ sent ──→ delivered ──→ read
+\n    85\t   ↑           │\n    86\t   └───────────┘ (重试时回到 sending，复用原
+client_message_id)\n    87\t   │\n    88\t   └──→ failed (Socket 断连或发送超时)
+\n    89\t```\n    90\t\n    91\t| 状态        | 触发条件                       
+     | 对应后端事件           | 前端 UI 表现                   |\n    92\t| ----
+------- | ------------------------------------ | ---------------------- | ------
+------------------------ |\n    93\t| `sending`   | 用户点击发送，等待服务端 ACK
+        | —                      | 显示发送中 loading             |\n    94\t| `
+sent`      | 收到服务端 `message:ack`             | `message:ack`          | 移
+除 loading，显示单钩         |\n    95\t| `delivered` | 消息已送达对方设备（对方
+在线且收到） | `message:delivered`    | 显示双钩（未读）               |\n    96
+\t| `read`      | 对方打开会话并触发已读               | `message:read_receipt` 
+| 显示双钩（已读）或 "已读" 文案 |\n    97\t| `failed`    | Socket 断连、发送超
+时或网关返回错误  | `message:error`        | 显示红色感叹号 + 点击重试      |\n 
+  98\t\n    99\t> **注意**：MVP 阶段若未实现 `message:delivered` 事件，必须将状
+态机简化为 `sending → sent → read`，并同步修改 `docs/api-contracts/im.yaml` 和 `
+packages/shared-types/` 中的枚举定义，禁止保留前端永远接收不到的中间状态。\n',
+        message='99 lines read from file starting from line 1. Total lines in fi
+le: 99. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(arguments_part='00gn/T/doc-gardener-64-886526752/docs/api/im.md"}')
+ToolCall(
+    type='function',
+    id='tool_r08Fe4kwT8YWsDzMySgvK9L8',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "/var/folders/lt/w3sl6z8j5'
+    ),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_411Gu2EifotEsUP0igKsH2Yz',
+    return_value=ToolOk(
+        is_error=False,
+        output='     1\t# IM API 文档\n     2\t\n     3\t## HTTP API\n     4\t\n
+    5\t### GET /conversations\n     6\t\n     7\t获取当前用户的会话列表（游标分
+页）。\n     8\t\n     9\t#### Query Parameters\n    10\t\n    11\t| 参数   | 类
+型   | 必填 | 说明           |\n    12\t| ------ | ------ | ---- | -------------
+- |\n    13\t| limit  | number | 否   | 默认 20，最大 50 |\n    14\t| cursor | s
+tring | 否   | 上一页返回的 next_cursor |\n    15\t\n    16\t#### Response\n    
+17\t\n    18\t```json\n    19\t{\n    20\t  "code": 0,\n    21\t  "message": "su
+ccess",\n    22\t  "data": {\n    23\t    "items": [\n    24\t      {\n    25\t 
+      "conversation_id": "uuid",\n    26\t        "matched_user": {\n    27\t   
+      "user_id": "uuid",\n    28\t          "nickname": "Alice",\n    29\t      
+   "avatar_url": "https://example.com/avatar.jpg"\n    30\t        },\n    31\t 
+      "last_message": {\n    32\t          "content": "Hello",\n    33\t        
+ "type": "text",\n    34\t          "created_at": "2024-06-01T00:00:00.000Z"\n  
+ 35\t        },\n    36\t        "unread_count": 3,\n    37\t        "updated_at
+": "2024-06-01T00:00:00.000Z"\n    38\t      }\n    39\t    ],\n    40\t    "nex
+t_cursor": "2024-06-01T00:00:00.000Z",\n    41\t    "has_more": false\n    42\t 
+}\n    43\t}\n    44\t```\n    45\t\n    46\t### GET /messages\n    47\t\n    48
+\t获取会话的历史消息（游标分页）。\n    49\t\n    50\t#### Query Parameters\n   
+51\t\n    52\t| 参数            | 类型   | 必填 | 说明                          
+   |\n    53\t| --------------- | ------ | ---- | ------------------------------
+--- |\n    54\t| conversation_id | string | 是   | 会话 ID                      
+    |\n    55\t| limit           | number | 否   | 默认 20，最大 50             
+    |\n    56\t| cursor          | string | 否   | 上一页返回的 next_cursor (seq
+uence_id) |\n    57\t\n    58\t#### Response\n    59\t\n    60\t```json\n    61\
+t{\n    62\t  "code": 0,\n    63\t  "message": "success",\n    64\t  "data": {\n
+   65\t    "items": [\n    66\t      {\n    67\t        "id": "uuid",\n    68\t 
+      "conversation_id": "uuid",\n    69\t        "sender_id": "uuid",\n    70\t
+       "type": "text",\n    71\t        "content": "Hello",\n    72\t        "cl
+ient_message_id": "client-uuid",\n    73\t        "sequence_id": 1,\n    74\t   
+    "status": "sent",\n    75\t        "created_at": "2024-06-01T00:00:00.000Z"\
+n    76\t      }\n    77\t    ],\n    78\t    "next_cursor": "1",\n    79\t    "
+has_more": false\n    80\t  }\n    81\t}\n    82\t```\n    83\t\n    84\t## Sock
+et.io Events\n    85\t\n    86\t### 命名空间\n    87\t\n    88\t`im`\n    89\t\n
+   90\t### 连接参数\n    91\t\n    92\t```javascript\n    93\tio("ws://host/im",
+{ auth: { token: "jwt_access_token" } });\n    94\t```\n    95\t\n    96\t### Cl
+ient → Server\n    97\t\n    98\t#### message:send\n    99\t\n   100\t发送消息。
+\n   101\t\n   102\t```json\n   103\t{\n   104\t  "conversation_id": "uuid",\n  
+105\t  "content": "Hello",\n   106\t  "type": "text",\n   107\t  "client_message
+_id": "client-uuid"\n   108\t}\n   109\t```\n   110\t\n   111\t#### message:read
+\n   112\t\n   113\t标记消息已读。\n   114\t\n   115\t```json\n   116\t{\n   117
+\t  "conversation_id": "uuid",\n   118\t  "last_message_id": "uuid"\n   119\t}\n
+  120\t```\n   121\t\n   122\t#### message:sync\n   123\t\n   124\t客户端断线重
+连后，补拉离线期间的消息。\n   125\t\n   126\t```json\n   127\t{\n   128\t  "las
+t_ack_sequence_id": 42\n   129\t}\n   130\t```\n   131\t\n   132\t服务器会逐条广
+播 `message:receive` 事件返回 missed messages。\n   133\t\n   134\t### Server → 
+Client\n   135\t\n   136\t#### message:receive\n   137\t\n   138\t收到新消息。\n
+  139\t\n   140\t```json\n   141\t{\n   142\t  "id": "uuid",\n   143\t  "convers
+ation_id": "uuid",\n   144\t  "sender_id": "uuid",\n   145\t  "type": "text",\n 
+ 146\t  "content": "Hello",\n   147\t  "client_message_id": "client-uuid",\n   1
+48\t  "sequence_id": 1,\n   149\t  "status": "sent",\n   150\t  "created_at": "2
+024-06-01T00:00:00.000Z"\n   151\t}\n   152\t```\n   153\t\n   154\t#### message
+:ack\n   155\t\n   156\t消息发送确认。\n   157\t\n   158\t```json\n   159\t{\n  
+160\t  "id": "uuid",\n   161\t  "client_message_id": "client-uuid",\n   162\t  "
+sequence_id": 1\n   163\t}\n   164\t```\n   165\t\n   166\t#### message:delivere
+d\n   167\t\n   168\t消息已送达（当接收方在线时，向发送方推送）。\n   169\t\n   
+170\t```json\n   171\t{\n   172\t  "client_message_id": "client-uuid",\n   173\t
+ "sequence_id": 1\n   174\t}\n   175\t```\n   176\t\n   177\t#### message:read_r
+eceipt\n   178\t\n   179\t已读回执。\n   180\t\n   181\t```json\n   182\t{\n   1
+83\t  "conversation_id": "uuid",\n   184\t  "last_read_message_id": "uuid"\n   1
+85\t}\n   186\t```\n   187\t\n   188\t#### conversation:updated\n   189\t\n   19
+0\t会话更新（新消息时）。\n   191\t\n   192\t```json\n   193\t{\n   194\t  "conv
+ersation_id": "uuid",\n   195\t  "last_message": {\n   196\t    "content": "Hell
+o",\n   197\t    "type": "text",\n   198\t    "created_at": "2024-06-01T00:00:00
+.000Z"\n   199\t  }\n   200\t}\n   201\t```\n   202\t\n   203\t#### message:erro
+r\n   204\t\n   205\t发送错误。\n   206\t\n   207\t```json\n   208\t{\n   209\t 
+"code": 1000,\n   210\t  "message": "Error description"\n   211\t}\n   212\t```\
+n',
+        message='212 lines read from file starting from line 1. Total lines in f
+ile: 212. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(
+    arguments_part='v50vt2s6knvf5n00000gn/T/doc-gardener-64-886526752/docs/api/s
+ocket-events.md"}'
+)
+ToolCall(
+    type='function',
+    id='tool_H5KVnMwsNTlCIAympogaUQ6X',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T'
+    ),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_r08Fe4kwT8YWsDzMySgvK9L8',
+    return_value=ToolOk(
+        is_error=False,
+        output='     1\t# Socket.io Events\n     2\t\n     3\t## 命名空间\n     
+4\t\n     5\t### `matching`\n     6\t\n     7\t## 连接参数\n     8\t\n     9\t连
+接时需通过 `auth` 传入 JWT `token`：\n    10\t\n    11\t```javascript\n    12\ti
+o("ws://host/matching", { auth: { token: "jwt_access_token" } });\n    13\t```\n
+   14\t\n    15\t## 事件\n    16\t\n    17\t### match:created\n    18\t\n    19\
+t当两个用户互相喜欢并创建 Match 后，服务器向双方推送此事件。\n    20\t\n    21\t
+#### Payload\n    22\t\n    23\t```json\n    24\t{\n    25\t  "match_id": "uuid"
+,\n    26\t  "conversation_id": "uuid",\n    27\t  "matched_user": {\n    28\t  
+ "user_id": "uuid",\n    29\t    "nickname": "Alice",\n    30\t    "avatar_url":
+"https://example.com/avatar.jpg"\n    31\t  },\n    32\t  "created_at": "2024-06
+-01T00:00:00.000Z"\n    33\t}\n    34\t```\n    35\t\n    36\t#### 行为\n    37\
+t\n    38\t- 用户 A Like 用户 B\n    39\t- 用户 B Like 用户 A\n    40\t- 服务器
+创建 `matches` + `conversations` + `conversation_participants`\n    41\t- 向 `us
+er:A` 和 `user:B` 的 Socket Room 广播 `match:created`\n    42\t\n    43\t### `im
+`\n    44\t\n    45\tIM 实时聊天命名空间。\n    46\t\n    47\t连接参数：\n    48
+\t\n    49\t```javascript\n    50\tio("ws://host/im", { auth: { token: "jwt_acce
+ss_token" } });\n    51\t```\n    52\t\n    53\t#### 事件\n    54\t\n    55\t###
+## message:send (Client → Server)\n    56\t\n    57\t发送消息。\n    58\t\n    5
+9\t```json\n    60\t{\n    61\t  "conversation_id": "uuid",\n    62\t  "content"
+: "Hello",\n    63\t  "type": "text",\n    64\t  "client_message_id": "client-uu
+id"\n    65\t}\n    66\t```\n    67\t\n    68\t##### message:read (Client → Serv
+er)\n    69\t\n    70\t标记消息已读。\n    71\t\n    72\t```json\n    73\t{\n   
+74\t  "conversation_id": "uuid",\n    75\t  "last_message_id": "uuid"\n    76\t}
+\n    77\t```\n    78\t\n    79\t##### message:receive (Server → Client)\n    80
+\t\n    81\t收到新消息（广播给接收方）。\n    82\t\n    83\t```json\n    84\t{\n
+   85\t  "id": "uuid",\n    86\t  "conversation_id": "uuid",\n    87\t  "sender_
+id": "uuid",\n    88\t  "type": "text",\n    89\t  "content": "Hello",\n    90\t
+ "client_message_id": "client-uuid",\n    91\t  "sequence_id": 1,\n    92\t  "st
+atus": "sent",\n    93\t  "created_at": "2024-06-01T00:00:00.000Z"\n    94\t}\n 
+  95\t```\n    96\t\n    97\t##### message:ack (Server → Client)\n    98\t\n    
+99\t消息发送确认（返回给发送方）。\n   100\t\n   101\t```json\n   102\t{\n   103
+\t  "id": "uuid",\n   104\t  "client_message_id": "client-uuid",\n   105\t  "seq
+uence_id": 1\n   106\t}\n   107\t```\n   108\t\n   109\t##### message:delivered 
+(Server → Client)\n   110\t\n   111\t消息已送达（当接收方在线时，向发送方推送）
+。\n   112\t\n   113\t```json\n   114\t{\n   115\t  "client_message_id": "client
+-uuid",\n   116\t  "sequence_id": 1\n   117\t}\n   118\t```\n   119\t\n   120\t#
+#### message:read_receipt (Server → Client)\n   121\t\n   122\t已读回执（广播给
+对方）。\n   123\t\n   124\t```json\n   125\t{\n   126\t  "conversation_id": "uu
+id",\n   127\t  "last_read_message_id": "uuid"\n   128\t}\n   129\t```\n   130\t
+\n   131\t##### message:sync (Client → Server)\n   132\t\n   133\t客户端断线重连
+后，补拉离线期间的消息。\n   134\t\n   135\t```json\n   136\t{\n   137\t  "last_
+ack_sequence_id": 42\n   138\t}\n   139\t```\n   140\t\n   141\t服务器会逐条广播
+`message:receive` 事件返回 missed messages。\n   142\t\n   143\t##### conversati
+on:updated (Server → Client)\n   144\t\n   145\t会话更新（新消息时广播给双方）。
+\n   146\t\n   147\t```json\n   148\t{\n   149\t  "conversation_id": "uuid",\n  
+150\t  "last_message": {\n   151\t    "content": "Hello",\n   152\t    "type": "
+text",\n   153\t    "created_at": "2024-06-01T00:00:00.000Z"\n   154\t  }\n   15
+5\t}\n   156\t```\n   157\t\n   158\t##### message:error (Server → Client)\n   1
+59\t\n   160\t发送错误。\n   161\t\n   162\t```json\n   163\t{\n   164\t  "code"
+: 1000,\n   165\t  "message": "Error description"\n   166\t}\n   167\t```\n',
+        message='167 lines read from file starting from line 1. Total lines in f
+ile: 167. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(arguments_part='/doc-gardener-64-886526752/docs/api/INDEX.md"}')
+ToolCall(
+    type='function',
+    id='tool_lPzWyDZYPPUBjIwVguzaYh68',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "/var/folders/lt/w3sl6z8j5v50'
+    ),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_H5KVnMwsNTlCIAympogaUQ6X',
+    return_value=ToolOk(
+        is_error=False,
+        output='     1\t# API 文档索引\n     2\t\n     3\t| 文档 | 说明 |\n     
+4\t|------|------|\n     5\t| [matching.md](matching.md) | Matching 模块接口契约
+与错误码 |\n     6\t| [im.md](im.md) | IM 模块接口契约与 Socket 事件 |\n     7\t
+| [socket-events.md](socket-events.md) | Socket.io 事件定义 |\n',
+        message='7 lines read from file starting from line 1. Total lines in fil
+e: 7. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(
+    arguments_part='vt2s6knvf5n00000gn/T/doc-gardener-64-886526752/docs/design-d
+ocs/db.md"}'
+)
+ToolCall(
+    type='function',
+    id='tool_bLmWUc9zUqY4rlGzxpR7jLLQ',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "/var/folders/lt/w3sl6z8j5v50vt2s'
+    ),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_lPzWyDZYPPUBjIwVguzaYh68',
+    return_value=ToolOk(
+        is_error=False,
+        output='     1\t# 数据库规范\n     2\t\n     3\t## 技术选型\n     4\t\n 
+   5\t- **主数据库**：MySQL 8.0\n     6\t- **缓存/会话**：Redis 7\n     7\t- **O
+RM**：NestJS 端使用 TypeORM；Flutter 端通过 API 消费，不直连数据库\n     8\t\n  
+  9\t## 核心实体关系\n    10\t\n    11\t```mermaid\n    12\terDiagram\n    13\t 
+  USER ||--o{ USER_PROFILE : has\n    14\t    USER ||--o{ USER_PHOTO : owns\n   
+15\t    USER ||--o{ MATCH_ACTION : performs\n    16\t    USER ||--o{ MESSAGE : s
+ends\n    17\t    USER ||--o{ CONVERSATION_PARTICIPANT : participates_in\n    18
+\t    USER ||--o{ BLOCK : "blocker/blocked"\n    19\t    USER ||--o{ REPORT : "r
+eporter/target"\n    20\t    CONVERSATION ||--o{ MESSAGE : contains\n    21\t   
+CONVERSATION ||--o{ CONVERSATION_PARTICIPANT : has\n    22\t    MATCH ||--o| CON
+VERSATION : creates\n    23\t    MATCH_ACTION }o--o{ MATCH_ACTION : "mutual_like
+"\n    24\t```\n    25\t\n    26\t## 核心实体说明\n    27\t\n    28\t| 实体     
+              | 表名                        | 说明                              
+        |\n    29\t| ----------------------- | --------------------------- | ---
+--------------------------------------- |\n    30\t| User                    | `
+users`                     | 用户基础信息，手机号唯一                   |\n    3
+1\t| UserProfile             | `user_profiles`             | 用户资料（昵称、性
+别、生日、坐标、偏好等） |\n    32\t| UserPhoto               | `user_photos`   
+           | 用户照片，支持排序、头像标记、审核状态     |\n    33\t| MatchAction
+            | `match_actions`             | 滑动操作记录（like/nope），幂等设计 
+      |\n    34\t| Match                   | `matches`                   | 双向
+匹配成功后生成的匹配关系               |\n    35\t| Conversation            | `c
+onversations`             | 会话基础信息，可选关联 match               |\n    36
+\t| ConversationParticipant | `conversation_participants` | 会话参与者，记录最后
+已读消息 ID            |\n    37\t| Message                 | `messages`        
+         | 消息内容，含 client_message_id 幂等去重    |\n    38\t| Block        
+          | `blocks`                    | 用户拉黑记录                          
+    |\n    39\t| Report                  | `reports`                   | 用户举
+报记录                               |\n    40\t\n    41\t## 命名规范\n    42\t\
+n    43\t1. **表名**：`snake_case`，复数形式（如 `users`, `match_actions`）\n   
+44\t2. **列名**：`snake_case`（如 `created_at`, `profile_photo_url`）\n    45\t3
+. **主键**：统一使用 `char(36)` 存储 UUID，应用层生成 UUID v7（时间有序），不使
+用自增 ID\n    46\t4. **非主键自增列（谨慎使用）**：除主键外，禁止为其他列使用 `
+AUTO_INCREMENT`（包括 TypeORM 的 `@Generated("increment")`）。MySQL 要求 `AUTO_I
+NCREMENT` 列必须有索引，且 TypeORM 对非主键自增列的支持在不同版本中行为不稳定，
+可能出现同步异常或 "ER_WRONG_AUTO_KEY" 错误。此外，数据库侧自增不利于后续分库分
+表迁移。\n    47\t\n    48\t   若业务需要单调递增序列号（如消息排序 `sequence_id
+`），应改用**应用层发号器**（如雪花算法、UUID v7 的时间戳部分），而非数据库自增
+：\n    49\t\n    50\t   ```typescript\n    51\t   // ❌ 错误：非主键 AUTO_INCRE
+MENT，存在兼容性和扩展性风险\n    52\t   @Generated("increment")\n    53\t   @Co
+lumn({ type: "bigint" })\n    54\t   sequence_id: number;\n    55\t\n    56\t   
+// ✅ 正确：应用层生成有序 ID（如雪花算法或 UUID v7 时间戳）\n    57\t   @Column
+({ type: "bigint" })\n    58\t   sequence_id: number; // 由 Service 层调用 Snowf
+lake.nextId() 生成\n    59\t   ```\n    60\t\n    61\t5. **时间戳**：每张表必须
+包含 `created_at` 和 `updated_at`\n    62\t6. **软删除**：使用 `deleted_at`（nul
+lable datetime），不直接物理删除\n    63\t7. **外键**：显式定义外键约束，命名格
+式 `fk_表名_列名`\n    64\t8. **索引**：查询条件中高频使用的字段必须建索引，命名
+格式 `idx_表名_列名`\n    65\t\n    66\t## 字段类型约定\n    67\t\n    68\t| 业
+务类型      | MySQL 类型                               | 说明                   
+                                                         |\n    69\t| ----------
+--- | ---------------------------------------- | -------------------------------
+------------------------------------------------- |\n    70\t| UUID          | `
+char(36)`                               | 主键、外键，应用层生成 UUID v7        
+                                          |\n    71\t| 时间          | `datetime
+(3)`                            | 带毫秒精度，应用层统一使用 UTC                
+                                  |\n    72\t| 枚举          | `varchar(32)` + 
+应用层约束               | 不使用 MySQL ENUM，便于扩展                          
+                           |\n    73\t| JSON 半结构化 | `json`                  
+                | 用户标签、设备信息等（MySQL 8.0+ 原生支持）                   
+                  |\n    74\t| 地理位置      | `point` / `decimal(10,8), decimal
+(11,8)` | 用户坐标。MVP 阶段使用 `decimal` 存经纬度，通过 Haversine 公式计算距离
+，简化运维 |\n    75\t| 大文本        | `text`                                  
+| 聊天记录、动态内容                                                            
+  |\n    76\t| 货币          | `decimal(19,4)`                          | 虚拟货
+币、订单金额                                                               |\n  
+ 77\t\n    78\t## 关键索引与约束\n    79\t\n    80\t- `match_actions`：`(actor_i
+d, target_id)` 唯一索引，保证滑动操作幂等性\n    81\t- `messages`：`client_messa
+ge_id` 唯一索引，保证消息发送幂等性\n    82\t- `conversation_participants`：`(co
+nversation_id, user_id)` 唯一索引，防止重复加入会话\n    83\t- `blocks`：`(block
+er_id, blocked_id)` 唯一索引，防止重复拉黑\n    84\t- `matches`：`(user_a_id, us
+er_b_id)` 唯一索引，防止重复匹配\n    85\t\n    86\t## 分区与性能\n    87\t\n   
+88\t- MVP 阶段（<100万用户）不分区。\n    89\t- `messages` 表在数据量达到 5000 
+万行后，按 `created_at` 按月分区（MySQL 8.0 支持 RANGE 分区）。\n    90\t- 用户
+坐标查询 MVP 阶段使用 `decimal` + Haversine 公式，不引入 MySQL Spatial 扩展，降
+低部署复杂度。\n    91\t- `match_actions` 表必须对 `(actor_id, target_id)` 建立
+唯一索引，保证滑动操作幂等性。\n    92\t\n    93\t## Migration 规范\n    94\t\n 
+  95\t### 必须遵守的原则\n    96\t\n    97\t1. **禁止 `synchronize: true`**：`ap
+p.module.ts` 中 TypeORM 配置必须为 `synchronize: false`。数据库 Schema 变更**必
+须**通过 Migration 管理，不允许依赖 TypeORM 自动建表。\n    98\t2. **新增 Entity
+必须同时提交 Migration**：任何 PR 若包含新增或修改的 Entity 文件（`apps/api/src/
+database/entities/*.entity.ts`），**必须**同时包含对应的 Migration 文件（`apps/a
+pi/src/database/migrations/*.ts`）。\n    99\t3. **Migration 命名规范**：`YYYYMM
+DDHHMMSS-语义化描述.ts`（如 `20250413000000-AddMatchActionsAndMatches.ts`）\n   
+100\t4. **Migration 生成命令**：\n   101\t   ```bash\n   102\t   cd apps/api && 
+npm run migration:generate -- -n MigrationName\n   103\t   ```\n   104\t5. **Mig
+ration 必须可回滚**：每个 Migration 的 `down()` 方法必须正确实现，能够撤销 `up()
+` 的变更。\n   105\t6. **`down()` 必须处理 nullable 数据冲突**：若 `up()` 将某列
+改为 `NULLABLE` 并产生了 `NULL` 数据，则 `down()` 在将该列改回 `NOT NULL` 前，必
+须先清理或填充 `NULL` 记录。否则 `down()` 会因数据冲突而失败。\n   106\t\n   107
+\t```typescript\n   108\t// ❌ 错误：直接改回 NOT NULL，存在 NULL 数据时失败\n  
+109\tdown(): Promise<void> {\n   110\t  await queryRunner.query(`ALTER TABLE mes
+sages MODIFY sender_id CHAR(36) NOT NULL`);\n   111\t}\n   112\t\n   113\t// ✅ 
+正确：先处理 NULL 数据，再改约束\n   114\tdown(): Promise<void> {\n   115\t  // 
+1. 为 system 消息填充占位值，或删除不符合条件的记录\n   116\t  await queryRunner
+.query(`UPDATE messages SET sender_id = \'SYSTEM\' WHERE sender_id IS NULL`);\n 
+ 117\t  // 2. 重建外键（如有）\n   118\t  await queryRunner.query(`ALTER TABLE m
+essages ADD CONSTRAINT ... FOREIGN KEY ...`);\n   119\t  // 3. 最后修改约束\n   
+120\t  await queryRunner.query(`ALTER TABLE messages MODIFY sender_id CHAR(36) N
+OT NULL`);\n   121\t}\n   122\t```\n   123\t\n   124\t> **原则**：`down()` 不仅
+要语法正确，还必须考虑 `up()` 运行后可能产生的数据状态，确保在任意数据量下都能安
+全回滚。\n   125\t\n   126\t### `up()` 必须在全新数据库上可运行\n   127\t\n   12
+8\t`up()` 方法不仅要能在已存在旧 Schema 的数据库上升级，还必须能在**全新数据库**
+（如 CI 环境、新开发者本地、新部署）上从基线开始顺序执行。常见问题：\n   129\t\n
+  130\t**修复性迁移中的 `DROP INDEX` 陷阱**：MySQL 8.0 的 `DROP INDEX` **不支持 
+`IF EXISTS`**。若某迁移的 `up()` 试图删除一个在前置迁移中从未创建过的索引（如该
+索引仅存在于某些历史分支或已被手动修复的环境），全新数据库执行时会直接报错。\n  
+131\t\n   132\t```typescript\n   133\t// ❌ 错误：在全新数据库上，idx_messages_c
+lient_message_id 从未被创建，DROP INDEX 直接失败\n   134\tpublic async up(queryR
+unner: QueryRunner): Promise<void> {\n   135\t  await queryRunner.query(`DROP IN
+DEX idx_messages_client_message_id ON messages`);\n   136\t  await queryRunner.q
+uery(`CREATE UNIQUE INDEX idx_messages_conv_client_msg_id ON messages (conversat
+ion_id, client_message_id)`);\n   137\t}\n   138\t```\n   139\t\n   140\t**修复
+方案**：\n   141\t\n   142\t- **方案 A（推荐）**：对于尚未部署到生产的新功能 PR
+，若发现创建迁移的约束/索引有误，**直接将修正合并到原始创建迁移中**，而非单独生
+成一个"修复迁移"。因为 Migration 一旦执行即不可修改，但在未部署前合并修正可以避
+免冗余的 `DROP INDEX` + `CREATE INDEX` 步骤。\n   143\t  \n   144\t- **方案 B**
+：若必须保留修复迁移，先查询 `information_schema` 判断索引是否存在再执行 DROP：\
+n   145\t  ```typescript\n   146\t  const [indexExists] = await queryRunner.quer
+y(\n   147\t    `SELECT 1 FROM information_schema.STATISTICS WHERE TABLE_SCHEMA 
+= DATABASE() AND TABLE_NAME = \'messages\' AND INDEX_NAME = \'idx_messages_clien
+t_message_id\'`\n   148\t  );\n   149\t  if (indexExists) {\n   150\t    await q
+ueryRunner.query(`DROP INDEX idx_messages_client_message_id ON messages`);\n   1
+51\t  }\n   152\t  ```\n   153\t\n   154\t> **原则**：Migration 是顺序执行的，任
+何一步在干净环境失败都会阻塞整个初始化流程。生成修复迁移前，先在全新数据库（`npm
+run migration:run` 从 0 开始）验证一遍。\n   155\t\n   156\t## 原生 SQL 查询规范
+\n   157\t\n   158\t> **核心原则**：优先使用 TypeORM QueryBuilder；必须写原生 SQ
+L 时，必须遵守本规范。mysql2 驱动的语法约束与 PostgreSQL/SQLite 不同，**在本地用
+SQLite 验证通过的 SQL 在生产环境的 MySQL 下可能直接报错**。\n   159\t\n   160\t#
+## 1. 占位符风格（强制不变量）\n   161\t\n   162\t本项目使用 **MySQL 8.0 + mysql
+2 驱动**，其原生查询 API 对占位符有严格限制：\n   163\t\n   164\t| 驱动         
+       | 支持的占位符          | 示例                        |\n   165\t| ------
+-------------- | --------------------- | --------------------------- |\n   166\t
+| **mysql2（本项目）** | `?`（位置参数）       | `WHERE lat = ? AND lng = ?` |\n
+  167\t| PostgreSQL           | `$1`, `$2` 或 `:name` | `WHERE lat = $1`        
+   |\n   168\t| SQLite               | `:name` 或 `?`        | `WHERE lat = :lat
+`          |\n   169\t\n   170\t**强制规则**：\n   171\t\n   172\t1. **禁止在 `r
+epository.query()`、`queryRunner.query()`、`getRawMany()` 等原生 SQL 中使用 `:pa
+ramName` 命名参数**。mysql2 默认不识别这种语法，会报参数绑定错误。\n   173\t2. *
+*统一使用 `?` 位置参数**，参数按顺序传入数组：\n   174\t\n   175\t   ```typescri
+pt\n   176\t   // ✅ 正确：mysql2 兼容\n   177\t   await this.repo.query(\n   17
+8\t     `SELECT * FROM user_profiles WHERE latitude = ? AND longitude = ?`,\n   
+179\t     [lat, lng],\n   180\t   );\n   181\t\n   182\t   // ❌ 错误：mysql2 不
+识别 :lat :lng，运行时报错\n   183\t   await this.repo.query(\n   184\t     `SEL
+ECT * FROM user_profiles WHERE latitude = :lat AND longitude = :lng`,\n   185\t 
+   { lat, lng },\n   186\t   );\n   187\t   ```\n   188\t\n   189\t3. **TypeORM 
+QueryBuilder 不受此限制**（QueryBuilder 内部会处理参数绑定），优先使用 QueryBuil
+der：\n   190\t   ```typescript\n   191\t   // ✅ 推荐：QueryBuilder 自动处理参
+数绑定\n   192\t   await this.repo\n   193\t     .createQueryBuilder("up")\n   1
+94\t     .where("up.latitude = :lat", { lat })\n   195\t     .getMany();\n   196
+\t   ```\n   197\t\n   198\t### 2. 何时允许原生 SQL\n   199\t\n   200\t| 场景   
+                        | 推荐方案                      | 允许原生 SQL？     |\n
+  201\t| ------------------------------- | ----------------------------- | -----
+------------- |\n   202\t| 单表 CRUD                       | TypeORM Repository 
+API        | 否                 |\n   203\t| 多表 JOIN + 过滤                | T
+ypeORM QueryBuilder          | 否                 |\n   204\t| 复杂聚合 / 窗口函
+数             | TypeORM QueryBuilder          | 否                 |\n   205\t|
+地理空间计算（Haversine）       | QueryBuilder + `getRawMany()` | 是，但必须用 `
+?`   |\n   206\t| Migration 中的 DDL              | `queryRunner.query()`       
+ | 是，但不含动态参数 |\n   207\t| 性能优化（强制索引、特定 HINT） | 原生 SQL + 
+`?`                | 是                 |\n   208\t\n   209\t### 3. 验证与检测\n
+  210\t\n   211\t- `precommit-checks.sh` 会自动扫描 `apps/api/src/` 中的原生 SQL
+字符串，检测 `:paramName` 模式并阻断提交。\n   212\t- 单元测试必须在 **真实 MySQ
+L 连接** 下运行（`make test` 使用 docker-compose 中的 MySQL），而非 SQLite 内存
+库。\n   213\t\n   214\t### 常见陷阱\n   215\t\n   216\t- **陷阱 1**：以为 `sync
+hronize: false` 时 TypeORM 会自动创建新表。**不会。** 没有 Migration，新 Entity 
+对应的表不存在，服务启动后查询直接报错。\n   217\t- **陷阱 2**：本地开发时临时把
+`synchronize` 改为 `true` 测试，提交前忘记改回 `false` 且忘记生成 Migration。**
+禁止这样做。**\n   218\t- **陷阱 3**：多个开发者各自生成 Migration，导致 Migrati
+on 文件名时间戳冲突。**解决**：在提交前检查是否有冲突，必要时重新生成。\n   219\
+t- **陷阱 4**：从 PostgreSQL/SQLite 代码库复制 SQL，使用 `:paramName` 命名参数。
+**mysql2 不支持**，必须通过 `precommit-checks.sh` 检测。\n   220\t- **陷阱 5**：
+Seed 脚本中的枚举值与 PRD 不一致。`seed-dev.ts` 等脚本写入的枚举字段（如 `prefer
+red_gender`）必须与 `prd/` 中定义的枚举完全一致，否则会导致测试数据与生产逻辑偏
+差。\n   221\t\n   222\t  ```typescript\n   223\t  // ❌ 错误：seed 中使用 "all"
+，但 PRD 定义为 [male, female, both]\n   224\t  await queryRunner.query(`UPDATE 
+user_profiles SET preferred_gender = \'all\'`);\n   225\t\n   226\t  // ✅ 正确
+：严格对齐 PRD 枚举\n   227\t  await queryRunner.query(`UPDATE user_profiles SET
+preferred_gender = \'both\'`);\n   228\t  ```\n   229\t\n   230\t  > **检测方式*
+*：在 `seed-dev.ts` 变更后，运行 `make test` 确保 BDD / 单元测试中涉及枚举判断的
+路径全部通过。\n   231\t\n   232\t- **陷阱 6**：**`IN (?)` 传入数组时 mysql2 不
+会自动展开为 `IN (?, ?, ?)`**。若将 JavaScript 数组直接作为单个 `?` 的参数，mysq
+l2 会将其序列化为逗号分隔的字符串（如 `\'id1,id2,id3\'`），导致查询结果为空或仅
+匹配第一条记录。\n   233\t\n   234\t  ```typescript\n   235\t  // ❌ 错误：数组
+被当成单字符串\n   236\t  await this.repo.query(`SELECT * FROM messages WHERE co
+nversation_id IN (?)`, [\n   237\t    conversationIds,\n   238\t  ]);\n   239\t\
+n   240\t  // ✅ 正确：手动展开占位符（数组长度不定）\n   241\t  const placehold
+ers = conversationIds.map(() => "?").join(",");\n   242\t  await this.repo.query
+(\n   243\t    `SELECT * FROM messages WHERE conversation_id IN (${placeholders}
+)`,\n   244\t    conversationIds,\n   245\t  );\n   246\t\n   247\t  // ✅ 更推
+荐：使用 QueryBuilder，TypeORM 自动处理数组参数绑定\n   248\t  await this.repo\n
+  249\t    .createQueryBuilder("m")\n   250\t    .where("m.conversation_id IN (:
+...ids)", { ids: conversationIds })\n   251\t    .getMany();\n   252\t  ```\n   
+253\t\n   254\t- **陷阱 7**：**唯一索引与幂等去重查询语义不一致**。若数据库唯一
+索引建立在 `client_message_id` 单列上，但 Service 层的幂等查询使用 `(conversatio
+n_id, client_message_id)` 组合条件，则同一 `client_message_id` 在不同会话中会触
+发数据库唯一约束冲突（`ER_DUP_ENTRY`），而代码层面的去重查询因限定了 `conversati
+on_id` 又找不到已有记录，导致返回 500 而非幂等成功。\n   255\t\n   256\t  ```typ
+escript\n   257\t  // ❌ 错误：唯一索引与去重查询不一致\n   258\t  // entity.ts\
+n   259\t  @Index("idx_messages_client_message_id", ["client_message_id"], { uni
+que: true })\n   260\t  // service.ts\n   261\t  const existing = await this.mes
+sageRepo.findOne({\n   262\t    where: { conversation_id: dto.conversation_id, c
+lient_message_id: dto.client_message_id },\n   263\t  });\n   264\t\n   265\t  /
+/ ✅ 正确：复合唯一索引匹配去重查询条件\n   266\t  // entity.ts\n   267\t  @Inde
+x("idx_messages_conv_client_msg_id", ["conversation_id", "client_message_id"], {
+unique: true })\n   268\t  // service.ts\n   269\t  const existing = await this.
+messageRepo.findOne({\n   270\t    where: { conversation_id: dto.conversation_id
+, client_message_id: dto.client_message_id },\n   271\t  });\n   272\t  ```\n   
+273\t\n   274\t  > **原则**：唯一索引的列组合必须与代码中幂等查询的 `where` 条件
+完全一致，否则事务回滚时会产生孤儿数据或 500 错误。\n   275\t\n   276\t## Auth 
+模块字段详情（PR #11）\n   277\t\n   278\t### users\n   279\t\n   280\t| 字段   
+        | 类型          | 说明                 |\n   281\t| --------------- | --
+----------- | -------------------- |\n   282\t| `id`            | `char(36)`    
+| UUID v7 主键         |\n   283\t| `phone`         | `varchar(20)` | 手机号，唯
+一索引     |\n   284\t| `last_login_at` | `datetime(3)` | 最后登录时间，可为空 |
+\n   285\t| `created_at`    | `datetime(3)` | 创建时间             |\n   286\t| 
+`updated_at`    | `datetime(3)` | 更新时间             |\n   287\t\n   288\t### 
+user_profiles\n   289\t\n   290\t| 字段                | 类型            | 说明 
+                                  |\n   291\t| ------------------- | -----------
+---- | --------------------------------------- |\n   292\t| `id`                
+| `char(36)`      | UUID v7 主键                            |\n   293\t| `user_i
+d`           | `char(36)`      | 外键关联 `users.id`，级联删除，唯一索引 |\n   2
+94\t| `nickname`          | `varchar(100)`  | 昵称                              
+     |\n   295\t| `avatar_url`        | `varchar(500)`  | 头像 URL              
+                 |\n   296\t| `gender`            | `varchar(10)`   | 性别      
+                             |\n   297\t| `birth_date`        | `date`          
+| 出生日期                                |\n   298\t| `latitude`          | `de
+cimal(11,8)` | 纬度                                    |\n   299\t| `longitude` 
+       | `decimal(10,8)` | 经度                                    |\n   300\t| 
+`bio`               | `varchar(500)`  | 个人简介                                
+|\n   301\t| `tags`              | `json`          | 用户标签数组               
+            |\n   302\t| `photo_urls`        | `json`          | 照片 URL 数组  
+                        |\n   303\t| `preferred_gender`  | `varchar(20)`   | 偏
+好性别                                |\n   304\t| `preferred_min_age` | `int`  
+        | 偏好最小年龄                            |\n   305\t| `preferred_max_ag
+e` | `int`           | 偏好最大年龄                            |\n   306\t| `is_
+complete`       | `boolean`       | 资料是否完整，默认 `false`              |\n 
+ 307\t| `created_at`        | `datetime(3)`   | 创建时间                        
+       |\n   308\t| `updated_at`        | `datetime(3)`   | 更新时间            
+                   |\n',
+        message='308 lines read from file starting from line 1. Total lines in f
+ile: 308. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(
+    arguments_part='6knvf5n00000gn/T/doc-gardener-64-886526752/CHANGELOG.md"}'
+)
+StatusUpdate(
+    context_usage=0.05649566650390625,
+    context_tokens=14810,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=2778,
+        output=492,
+        input_cache_read=12032,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-gGPCOfECziIWiJprvZvxPpWu',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_bLmWUc9zUqY4rlGzxpR7jLLQ',
+    return_value=ToolOk(
+        is_error=False,
+        output='     1\t# Changelog\n     2\t\n     3\tAll notable changes to th
+is project will be documented in this file.\n     4\t\n     5\tThe format is bas
+ed on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),\n     6\tand thi
+s project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+\n     7\t\n     8\t## [Unreleased]\n     9\t\n    10\t### Added\n    11\t- #30\
+n    12\t- #31\n    13\t- #33\n    14\t\n    15\t### Fixed\n    16\t- #38\n    1
+7\t- #34\n',
+        message='17 lines read from file starting from line 1. Total lines in fi
+le: 17. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+StepBegin(n=4)
+ThinkPart(
+    type='think',
+    think='好的，我已经读取了一些关键文档。现在让我继续读取更多需要检查的文件，
+并进行 diff 分析。\n\n上一轮 review report 指出的 Major 问题 #5：文档与代码实现
+不一致，`docs/modules/im.md:77` 描述"发送消息后必须更新 conversation_participant
+s.updated_at"，但代码只更新了 `conversations` 表。\n\n当前文档 `docs/modules/im.
+md` 第 76 行写的是：\n"7. **会话列表排序刷新**：发送消息后必须更新 `conversation
+s.updated_at`，确保新消息会话在列表中置顶"\n\n看起来这一轮已经修改过了！从 "conv
+ersation_participants.updated_at" 改为了 "conversations.updated_at"。这说明上一
+轮的问题 #5 可能已经被修复了。\n\n但我还需要确认其他文档是否也需要同步。让我继续
+读取更多相关文档。\n\n需要读取：\n1. docs/modules/INDEX.md\n2. docs/design-docs/
+nestjs.md\n3. docs/exec-plans/tech-debt-tracker.md\n4. docs/api-contracts/im.yam
+l（部分读取）\n5. .maestro/README.md\n6. 查看是否有 docs/migration/README.md\n\n
+还需要查看本轮的 git diff 具体内容，特别是文档文件和 Makefile 的变更。\n\n让我先
+读取这些文件，然后分析 diff。',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_lJZJosF9yE8j7NE50IhjO9wu',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/do
+c-gardener-64-886526752/docs/modules/INDEX.md"}'
+    ),
+    extras=None
+)
+ToolCall(
+    type='function',
+    id='tool_OQwwbGQqwAwwoKzz0sCkCe5p',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "/var/folders/lt/w3sl6z8j5v50vt'
+    ),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_lJZJosF9yE8j7NE50IhjO9wu',
+    return_value=ToolOk(
+        is_error=False,
+        output='     1\t# 模块实现文档索引\n     2\t\n     3\t> 本目录按业务模块
+组织实现文档，跨越代码层级（DB / API / Mobile / BLoC / Widget）描述模块全貌。\n 
+   4\t> \n     5\t> **注意**：本仓库采用单一全栈 Agent 模式，一个模块的文档应覆
+盖后端到前端的完整链路。\n     6\t\n     7\t## 模块清单\n     8\t\n     9\t| 模
+块 | 说明 | 关联 PRD |\n    10\t|------|------|----------|\n    11\t| [auth.md](
+auth.md) | 注册、登录、Token 刷新、登出（DB → API → Mobile） | [prd/v1-mvp.md](.
+./../prd/v1-mvp.md) |\n    12\t| [profile.md](profile.md) | 个人资料、头像相册、
+年龄校验（DB → API → Mobile） | [prd/v1-profile.md](../../prd/v1-profile.md) |\n
+   13\t| [matching.md](matching.md) | 推荐、滑动、匹配成功（DB → API → Mobile） 
+| [docs/product-specs/matching.md](../product-specs/matching.md) |\n    14\t| [d
+ev-tools.md](dev-tools.md) | Debug 专用工具模块（Dev Tools Drawer） | [prd/v1-de
+v-tools-drawer.md](../../prd/v1-dev-tools-drawer.md) |\n    15\t| [im.md](im.md)
+| 会话、消息、已读回执、推送（DB → API → Mobile） | [docs/product-specs/im.md](.
+./product-specs/im.md) |\n    16\t| [admin.md](admin.md) | Admin Dashboard、用户
+列表管理 | [prd/v1-infrastructure-bootstrap.md](../../prd/v1-infrastructure-boot
+strap.md) |\n    17\t| [blocks-reports.md](blocks-reports.md) | 拉黑、举报基础 A
+PI | [prd/v1-infrastructure-bootstrap.md](../../prd/v1-infrastructure-bootstrap.
+md) |\n    18\t| [content-moderation.md](content-moderation.md) | 内容审核 Webho
+ok、照片状态管理 | [prd/v1-infrastructure-bootstrap.md](../../prd/v1-infrastruct
+ure-bootstrap.md) |\n    19\t\n    20\t## 写作规范\n    21\t\n    22\t每个模块文
+档应包含：\n    23\t1. **时序图/流程图**：Mermaid 描述核心流程（覆盖 API 和 Mobi
+le 的交互）\n    24\t2. **关键文件索引**：代码仓库中的关键文件路径（DB / API / M
+obile 三层）\n    25\t3. **状态机/数据结构**：核心实体状态转换\n    26\t4. **边
+界情况**：异常流程、权限校验、幂等性设计\n    27\t5. **全链路变更清单**：修改该
+模块时，Agent 需要同时改哪些文件\n',
+        message='27 lines read from file starting from line 1. Total lines in fi
+le: 27. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(
+    arguments_part='2s6knvf5n00000gn/T/doc-gardener-64-886526752/docs/exec-plans
+/tech-debt-tracker.md"}'
+)
+ToolCall(
+    type='function',
+    id='tool_Tv0HtSGUrDOiicwaTZZtaQ0V',
+    function=FunctionBody(name='ReadFile', arguments='{"path":'),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_OQwwbGQqwAwwoKzz0sCkCe5p',
+    return_value=ToolOk(
+        is_error=False,
+        output='     1\t# 技术债务追踪\n     2\t\n     3\t> 持续小额清理优于大规
+模爆发。\n     4\t\n     5\t## 当前债务\n     6\t\n     7\t| 发现时间   | 问题  
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                           | 责任人            | 状态 | 预计清理时间    |\n     
+8\t| ---------- | --------------------------------------------------------------
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-------------------------------------------------------- | ----------------- | -
+--- | --------------- |\n     9\t| 2026-04-13 | **Issue #2 (Auth Login) 跳过原型
+图 review 与 Design-Only PR 流程**。`login_page.dart` 使用原生 Material 组件（`T
+extField`、`ElevatedButton`）而非 `packages/design-system` 中的 `SwTextField`、`
+SwButton`；`packages/design-system/widgetbook/main.dart` 缺失，组件未注册 Widget
+book 用例；无低保真原型图评审记录。                                             
+                                                                                
+     | Full-Stack Agent  | open | Issue #3 开始前 |\n    10\t| 2026-04-09 | **PR
+#36/#38 修复 ServerUrlTool 时遗漏 Maestro E2E 验证，导致 Widget Test 通过但真机 
+Bug 仍存在**。流程断裂点：① TASK-dev-tools-drawer.md Step 4 未要求 Maestro E2E；
+② Makefile `test-mobile-e2e-login` 不覆盖 devtools flow；③ Issue 描述未精确到"Sh
+aredPreferences 中保存的是旧值/拼接值"。已修复代码（controller.addListener + 自
+动全选 + SwTextField.identifier），已补充 `.maestro/flows/devtools/edit_server_u
+rl.yaml`，需更新流程规范防止复发。 | Full-Stack Agent  | open | 本次迭代        
+|\n    11\t| 2026-04-20 | **Design-Only PR 缺乏 CI 路径拦截，可误操作写入 `packa
+ges/` 或 `apps/`**。根因：`flutter.md` 与 `AGENTS.md`/`TEMPLATE-design.md` 对 De
+sign-Only PR 变更边界描述冲突（已修复文档）；但尚无自动化 enforcement，执行 Agen
+t 仍可能误操作。需在 CI 或 pre-commit hook 中为 `design` 标签的 PR 增加路径检查
+：若 diff 中包含 `packages/` 或 `apps/` 路径则阻断。                            
+                                                                 | DevOps / CI O
+wner | open | 后续迭代        |\n    12\t| 2026-04-22 | **`users.last_login_at` 
+应重命名为 `last_active_at` 以匹配 PRD，并在用户发生除登录外的关键行为（如滑动、
+发消息）时更新该字段**。PRD `v1-matching.md` 排序规则要求根据 `last_active_at` 
+计算活跃度，但实体和 SQL 实际使用 `last_login_at`。功能上可近似代替，但属于契约
+偏差。                                                                          
+                                     | Full-Stack Agent  | open | 后续迭代      
+ |\n    13\t| 2026-04-22 | **Issue #43 (Matching V1) 中 `user_profiles` 偏好年龄
+字段名与 `db.md` 不一致**。`docs/design-docs/db.md` 中规定字段名为 `preferred_mi
+n_age` / `preferred_max_age`，但实体和 Migration 中实际为 `age_range_min` / `age
+_range_max`。本 PR 未涉及这些字段的读写，但属于已知的 Schema 契约偏差。 |\n    1
+4\t| 2026-04-22 | **Issue #43 (Matching V1) 中 `city` 模式未按行政区划实现**。PR
+D 要求 `city` 模式为"同城市，根据用户当前位置行政边界"，但当前实现简化为固定 15k
+m 半径。MVP 阶段可接受，后续需接入高德/百度地理编码 API 按行政区划查询。 |\n    
+15\t| 2026-04-22 | **Matching 候选池查询需增加复合索引并监控 P95 响应时间**。`qu
+eryCandidatesFromDb` 包含 Haversine 计算和多个 UNION 子查询，高并发下可能成为瓶
+颈。建议在 `user_profiles` 表增加复合索引 `(`is_complete`, `gender`, `latitude`,
+`longitude`)` 并持续监控。                                                      
+                                                                                
+                   | Full-Stack Agent  | open | 后续迭代        |\n    16\t| 202
+6-04-27 | **IM V1 BDD 中 "离线推送" 步骤为空实现**。`tests/bdd/step-definitions/
+im_real_time_message_delivery.steps.js:127-134` 直接 `assert.ok(true)`，未验证任
+何推送行为。Push Service 骨架尚未实现，需在基础设施就绪后补充真实断言。         
+                                                                                
+                                                                                
+                    | Full-Stack Agent  | open | Push Service 迭代 |\n    17\t| 
+2026-04-27 | **`MessageEntity.sequence_id` 使用 TypeORM `@Generated("increment")
+` 与 MySQL 非主键 AUTO_INCREMENT 存在兼容性风险**。当前 Migration 已正确建立普通
+索引满足 MySQL 要求，但未来 TypeORM 升级或启用 `synchronize: true` 时可能报错；
+长期建议改为应用层雪花算法/UUID 生成 `sequence_id`，解除对 MySQL AUTO_INCREMENT 
+非主键的依赖。                                                                  
+                                                                                
+                                            | Full-Stack Agent  | open | M3 后评
+估       |\n    18\t| 2026-04-27 | **IM V1 缺失 PRD 要求的客户端本地消息缓存（sq
+flite）**。`prd/v1-im.md` US-IM-5 与 `TASK-im.md` Step 4.4 要求使用 sqflite 缓存
+最近 N 条消息以减少重复拉取。当前实现仅依赖内存 `_pendingMessages` 与 `_messageI
+dToSequenceId`，应用杀进程后缓存丢失。弱网/离线场景体验不达标，需排期 V1.1 实现
+。 | Full-Stack Agent  | open | V1.1 |\n    19\t\n    20\t## 已清理债务\n    21\
+t\n    22\t| 清理时间 | 问题 | 修复方式 |\n    23\t| -------- | ---- | -------- 
+|\n    24\t| -        | -    | -        |\n    25\t\n    26\t## 已清理债务\n    
+27\t\n    28\t| 清理时间 | 问题 | 修复方式 |\n    29\t| -------- | ---- | ------
+-- |\n    30\t| -        | -    | -        |\n',
+        message='30 lines read from file starting from line 1. Total lines in fi
+le: 30. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(
+    arguments_part=' "/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/doc-garde
+ner-64-886526752/.maestro/README.md"}'
+)
+ToolCall(
+    type='function',
+    id='tool_dog7Jhfm1EAzH4DeFuawy9Rc',
+    function=FunctionBody(name='Shell', arguments='{"command": "'),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_Tv0HtSGUrDOiicwaTZZtaQ0V',
+    return_value=ToolOk(
+        is_error=False,
+        output='     1\t# Mobile E2E 测试（Maestro + ADB Fallback）\n     2\t\n 
+   3\t本目录包含 Social World Mobile 端的端到端 UI 自动化测试。\n     4\t\n     
+5\t## 目录结构\n     6\t\n     7\t```\n     8\t.maestro/\n     9\t├── flows/    
+         # Maestro 标准测试流（推荐）\n    10\t│   ├── login.yaml      # 登录 UI
+流（无需后端，可独立运行）\n    11\t│   └── profile_setup.yaml  # 完善资料完整流
+（需要后端服务）\n    12\t├── adb_flows/          # ADB fallback 测试流（当 Maes
+tro 不可用时）\n    13\t│   ├── login.yaml\n    14\t│   ├── onboarding.yaml\n   
+15\t│   └── profile_setup.yaml\n    16\t└── scripts/\n    17\t    ├── run-e2e.sh
+     # 统一 E2E 入口脚本（自动处理 emulator / build / install / 端口检查）\n    
+18\t    ├── adb_runner.py   # ADB fallback runner（uiautomator dump + adb input
+）\n    19\t    └── adb_flow.py     # 旧版 adb runner（已弃用，请使用 adb_runner
+.py）\n    20\t```\n    21\t\n    22\t## 快速开始\n    23\t\n    24\t### 前置要
+求\n    25\t\n    26\t- Android Emulator 已启动（推荐 API 34，如 `Pixel_8_Pro`）
+\n    27\t- Maestro 1.39.13+ 已安装\n    28\t- **端口 7001 必须空闲**（Maestro 
+硬编码端口，会与 Dashboard `new_world_ws` 冲突）\n    29\t\n    30\t### 常用命令
+\n    31\t\n    32\t```bash\n    33\t# 仅跑 login 流（纯 UI，无需后端）\n    34\
+tmake test-mobile-e2e-login\n    35\t\n    36\t# 跑所有 flows（需要后端 + emulat
+or）\n    37\tmake test-mobile-e2e\n    38\t\n    39\t# CI 模式：自动构建 APK、
+启动后端、运行测试\n    40\tmake test-mobile-e2e-ci\n    41\t\n    42\t# ADB fal
+lback（当 Maestro 不可用时）\n    43\tmake test-mobile-e2e-adb\n    44\t```\n   
+45\t\n    46\t### 手动运行\n    47\t\n    48\t```bash\n    49\t# 使用统一脚本\n 
+  50\tbash .maestro/scripts/run-e2e.sh --flow login\n    51\tbash .maestro/scrip
+ts/run-e2e.sh --flow login --build\n    52\tbash .maestro/scripts/run-e2e.sh --c
+i\n    53\t\n    54\t# 直接使用 maestro\n    55\tmaestro --device emulator-5556 
+test .maestro/flows/login.yaml\n    56\t```\n    57\t\n    58\t## 环境说明\n    
+59\t\n    60\t### login.yaml\n    61\t\n    62\t- **依赖后端**：登录流程需要调用
+`/auth/login` API 完成用户认证并获取 token。\n    63\t- 适合作为日常开发和 CI 的
+快速回归测试。\n    64\t\n    65\t### profile_setup.yaml\n    66\t\n    67\t- **
+依赖后端**：登录后会调用 `/auth/login` 和 `/auth/me`，需要后端返回 `isNewUser=tr
+ue` 或 `profileComplete=false` 才能跳转到完善资料页。\n    68\t- 运行前请确保后
+端已启动：\n    69\t  ```bash\n    70\t  make e2e-env-up   # 启动 mysql + redis 
++ api\n    71\t  make test-mobile-e2e\n    72\t  make e2e-env-down # 测试结束后
+关闭\n    73\t  ```\n    74\t\n    75\t## 故障排查\n    76\t\n    77\t### `io.gr
+pc.StatusRuntimeException: INTERNAL: http2 exception`\n    78\t\n    79\t**原因*
+*：端口 7001 被其他进程占用（通常是 `new_world_ws` Dashboard）。  \n    80\t**解
+决**：终止占用进程后再运行测试。\n    81\t\n    82\t```bash\n    83\tlsof -ti :7
+001 | xargs kill\n    84\t```\n    85\t\n    86\t### `adb shell input text` 无法
+输入到 Flutter 自定义输入框\n    87\t\n    88\t**原因**：ADB 的 `input text` 依
+赖系统 IME，某些自定义 `TextField` 不响应。  \n    89\t**解决**：Maestro 的 `inp
+utText` 可以正常工作；如果只能用 ADB fallback，目前只能绕过文字输入步骤，仅做 ta
+p / assert。\n    90\t\n    91\t### Emulator 未找到\n    92\t\n    93\t**原因**
+：脚本通过 `adb devices` 查找 emulator，没有检测到已启动的设备。  \n    94\t**解
+决**：先启动模拟器，例如：\n    95\t\n    96\t```bash\n    97\temulator -avd Pix
+el_8_Pro\n    98\t```\n',
+        message='98 lines read from file starting from line 1. Total lines in fi
+le: 98. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(
+    arguments_part='cd /var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/doc-gard
+ener-64-886526752 && ls -la docs/migration/ 2>/dev/null || echo \\"NO_MIGRATION_
+DIR\\""}'
+)
+StatusUpdate(
+    context_usage=0.09971237182617188,
+    context_tokens=26139,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=11547,
+        output=512,
+        input_cache_read=14592,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-neMqoZpK5YodXt67leleNIms',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_dog7Jhfm1EAzH4DeFuawy9Rc',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='NO_MIGRATION_DIR\n',
+        message='Command executed successfully.',
+        display=[],
+        extras=None
+    )
+)
+StepBegin(n=5)
+ThinkPart(
+    type='think',
+    think='好的，现在我已经读取了一些关键文档。让我继续进行 diff 分析，看看本轮
+变更中文档文件的具体变更内容。\n\n我需要：\n1. 检查文档 diff（docs/ 目录的变更）
+\n2. 检查 .maestro/README.md 的 diff（有变更）\n3. 检查 Makefile 的 diff\n4. 检
+查 CHANGELOG.md 是否需要更新\n5. 检查上一轮 Major 问题 #5 是否已修复（看起来 doc
+s/modules/im.md 第 76 行已经改成了 `conversations.updated_at`）\n\n让我先查看所
+有 docs/ 和 .maestro/README.md 的 diff。',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_VrKOmHCRCu2SmDjuOJIxdtj8',
+    function=FunctionBody(
+        name='Shell',
+        arguments='{"command": "cd /var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000g
+n/T/doc-gardener-64-886526752 && git diff origin/main...HEAD -- docs/ .maestro/R
+EADME.md Makefile"}'
+    ),
+    extras=None
+)
+StatusUpdate(
+    context_usage=0.11449050903320312,
+    context_tokens=30013,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=3901,
+        output=202,
+        input_cache_read=26112,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-6fGbqVvheqIunMFRb337NOsz',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_VrKOmHCRCu2SmDjuOJIxdtj8',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='diff --git a/.maestro/README.md b/.maestro/README.md\nindex 823e
+a01..5093f4b 100644\n--- a/.maestro/README.md\n+++ b/.maestro/README.md\n@@ -59,
+7 +59,7 @@ maestro --device emulator-5556 test .maestro/flows/login.yaml\n \n ##
+# login.yaml\n \n-- **不依赖后端**：仅验证登录页面的 UI 交互（输入手机号、验证码
+、点击按钮）。\n+- **依赖后端**：登录流程需要调用 `/auth/login` API 完成用户认证
+并获取 token。\n - 适合作为日常开发和 CI 的快速回归测试。\n \n ### profile_setup
+.yaml\ndiff --git a/Makefile b/Makefile\nindex 386fc8c..3b8a315 100644\n--- a/Ma
+kefile\n+++ b/Makefile\n@@ -80,18 +80,19 @@ e2e-env-up:\n \t\tfi; \\\n \t\techo 
+"   等待中... ($$i/30)"; sleep 2; \\\n \tdone\n+\t@echo "🚀 运行数据库迁移..."\n
++\t@cd apps/api && npm run migration:run 2>/dev/null || true\n \t@echo "🚀 启动 
+API (pm2)..."\n \t@mkdir -p logs\n-\t@npx pm2 start ecosystem.config.js || npx p
+m2 reload ecosystem.config.js\n+\t@npx pm2 delete sw-api 2>/dev/null || true\n+\
+t@npx pm2 start ecosystem.config.js\n \t@echo "⏳ 等待 API 就绪..."\n-\t@for i i
+n {1..30}; do \\\n-\t\tif curl -sf http://localhost:3001 >/dev/null 2>&1; then \
+\\n+\t@bash -c \'for i in {1..30}; do \\\n+\t\tif curl -sf http://localhost:3001
+/api/v1/health >/dev/null 2>&1; then \\\n \t\t\techo "✅ E2E 环境已就绪"; exit 0
+; \\\n \t\tfi; \\\n \t\techo "   等待中... ($$i/30)"; sleep 2; \\\n-\tdone\n-\t@
+echo "❌ API 未在预期时间内启动，请检查 pm2 logs"\n-\t@exit 1\n+\tdone; echo "❌
+API 未在预期时间内启动，请检查 pm2 logs"; exit 1\'\n \n # 停止 E2E 环境\n e2e-en
+v-down:\n@@ -171,14 +172,16 @@ e2e-emulator-up:\n \t@echo "❌ Emulator 启动超时"
+\n \t@exit 1\n \n-# 运行 Mobile E2E —— login 流（无需后端，纯 UI 交互验证）\n+# 
+运行 Mobile E2E —— login 流（需要后端支持登录 API）\n test-mobile-e2e-login:\n-\
+tbash .maestro/scripts/run-e2e.sh --flow auth/login\n+\tbash .maestro/scripts/ru
+n-e2e.sh --ci --flow auth/login\n \n # 运行 Mobile E2E —— devtools 流（无需后端
+，纯 UI 交互验证）\n test-mobile-e2e-devtools:\n \tbash .maestro/scripts/run-e2e
+.sh --flow devtools/open_drawer\n \tbash .maestro/scripts/run-e2e.sh --flow devt
+ools/edit_server_url\n+\tbash .maestro/scripts/run-e2e.sh --flow devtools/invali
+d_server_url\n+\tbash .maestro/scripts/run-e2e.sh --flow devtools/save_persists_
+after_reopen\n \n # 运行 Mobile E2E —— 所有 flows（需要后端 + emulator）\n test-
+mobile-e2e:\n@@ -268,4 +271,3 @@ pm2-restart:\n \n pm2-logs:\n \tnpx pm2 logs sw
+-api\n-\ndiff --git a/docs/api-contracts/im.yaml b/docs/api-contracts/im.yaml\ni
+ndex 42248e1..273dcea 100644\n--- a/docs/api-contracts/im.yaml\n+++ b/docs/api-c
+ontracts/im.yaml\n@@ -8,6 +8,16 @@ paths:\n     get:\n       summary: List conve
+rsations\n       operationId: listConversations\n+      parameters:\n+        - 
+name: limit\n+          in: query\n+          schema:\n+            type: intege
+r\n+            default: 20\n+        - name: cursor\n+          in: query\n+   
+      schema:\n+            type: string\n       responses:\n         \'200\':\n
+          description: Conversations retrieved\n@@ -18,9 +28,17 @@ paths:\n     
+             - $ref: \'./common.yaml#/components/schemas/ApiResponse\'\n        
+        properties:\n                   data:\n-                    type: array\
+n-                    items:\n-                      $ref: \'#/components/schema
+s/ConversationDto\'\n+                    type: object\n+                    pro
+perties:\n+                      items:\n+                        type: array\n+
+                       items:\n+                          $ref: \'#/components/s
+chemas/ConversationDto\'\n+                      next_cursor:\n+                
+       type: string\n+                        nullable: true\n+                 
+    has_more:\n+                        type: boolean\n \n   /api/v1/messages:\n
+    get:\n@@ -51,33 +69,95 @@ paths:\n                   - $ref: \'./common.yaml
+#/components/schemas/ApiResponse\'\n                 properties:\n              
+    data:\n-                    $ref: \'./common.yaml#/components/schemas/Pagina
+tion\'\n+                    type: object\n+                    properties:\n+  
+                   items:\n+                        type: array\n+              
+         items:\n+                          $ref: \'#/components/schemas/Message
+Dto\'\n+                      next_cursor:\n+                        type: strin
+g\n+                        nullable: true\n+                      has_more:\n+ 
+                      type: boolean\n+    post:\n+      summary: Send a message\
+n+      operationId: sendMessage\n+      requestBody:\n+        required: true\n
++        content:\n+          application/json:\n+            schema:\n+        
+     $ref: \'#/components/schemas/SendMessageRequest\'\n+      responses:\n+    
+   \'200\':\n+          description: Message sent\n+          content:\n+       
+    application/json:\n+              schema:\n+                allOf:\n+       
+          - $ref: \'./common.yaml#/components/schemas/ApiResponse\'\n+          
+     properties:\n+                  data:\n+                    $ref: \'#/compo
+nents/schemas/MessageDto\'\n+\n+  /api/v1/messages/read:\n+    post:\n+      sum
+mary: Mark messages as read\n+      operationId: markAsRead\n+      requestBody:
+\n+        required: true\n+        content:\n+          application/json:\n+   
+        schema:\n+              $ref: \'#/components/schemas/MarkAsReadRequest\'
+\n+      responses:\n+        \'200\':\n+          description: Messages marked 
+as read\n+          content:\n+            application/json:\n+              sch
+ema:\n+                allOf:\n+                  - $ref: \'./common.yaml#/compo
+nents/schemas/ApiResponse\'\n+                properties:\n+                  da
+ta:\n+                    type: object\n+                    properties:\n+     
+                conversation_id:\n+                        type: string\n+      
+               last_message_id:\n+                        type: string\n \n comp
+onents:\n   schemas:\n     ConversationDto:\n       type: object\n       require
+d:\n-        - id\n-        - participant\n-        - last_message\n+        - c
+onversation_id\n+        - matched_user\n         - unread_count\n+        - upd
+ated_at\n       properties:\n-        id:\n+        conversation_id:\n          
+type: string\n-        participant:\n-          $ref: \'#/components/schemas/Par
+ticipantDto\'\n+        matched_user:\n+          $ref: \'#/components/schemas/M
+atchedUserDto\'\n         last_message:\n-          $ref: \'#/components/schemas
+/MessageDto\'\n+          $ref: \'#/components/schemas/LastMessageDto\'\n       
+ unread_count:\n           type: integer\n+        updated_at:\n+          type:
+string\n+          format: date-time\n+        last_read_message_id:\n+         
+type: string\n+          nullable: true\n \n-    ParticipantDto:\n+    MatchedUs
+erDto:\n       type: object\n       required:\n         - user_id\n         - ni
+ckname\n-        - avatar_url\n       properties:\n         user_id:\n          
+type: string\n@@ -86,32 +166,85 @@ components:\n         avatar_url:\n          
+type: string\n \n+    LastMessageDto:\n+      type: object\n+      required:\n+ 
+      - content\n+        - type\n+        - created_at\n+      properties:\n+  
+     content:\n+          type: string\n+        type:\n+          type: string\
+n+          enum: [text, image, system]\n+        created_at:\n+          type: 
+string\n+          format: date-time\n+\n     MessageDto:\n       type: object\n
+      required:\n         - id\n-        - sender_id\n+        - conversation_id
+\n         - type\n         - content\n+        - sequence_id\n         - status
+\n         - created_at\n       properties:\n         id:\n           type: stri
+ng\n+        conversation_id:\n+          type: string\n         sender_id:\n   
+       type: string\n+          nullable: true\n         type:\n           type:
+string\n-          enum: [text, image]\n+          enum: [text, image, system]\n
+        content:\n           type: string\n         status:\n           type: st
+ring\n-          enum: [sending, sent, delivered, read]\n+          enum: [sent,
+delivered, read]\n         client_message_id:\n           type: string\n+       
+  nullable: true\n         sequence_id:\n           type: integer\n         crea
+ted_at:\n           type: string\n           format: date-time\n+\n+    SendMess
+ageRequest:\n+      type: object\n+      required:\n+        - conversation_id\n
++        - type\n+      properties:\n+        conversation_id:\n+          type:
+string\n+          format: uuid\n+        content:\n+          type: string\n+  
+       maxLength: 500\n+        type:\n+          type: string\n+          enum:
+[text, image]\n+        client_message_id:\n+          type: string\n+          
+maxLength: 64\n+\n+    MarkAsReadRequest:\n+      type: object\n+      required:
+\n+        - conversation_id\n+        - last_message_id\n+      properties:\n+ 
+      conversation_id:\n+          type: string\n+          format: uuid\n+     
+  last_message_id:\n+          type: string\n+          format: uuid\ndiff --git
+a/docs/api/INDEX.md b/docs/api/INDEX.md\nindex d77e2a5..8e2d70d 100644\n--- a/do
+cs/api/INDEX.md\n+++ b/docs/api/INDEX.md\n@@ -3,4 +3,5 @@\n | 文档 | 说明 |\n |-
+-----|------|\n | [matching.md](matching.md) | Matching 模块接口契约与错误码 |\n
++| [im.md](im.md) | IM 模块接口契约与 Socket 事件 |\n | [socket-events.md](socke
+t-events.md) | Socket.io 事件定义 |\ndiff --git a/docs/api/im.md b/docs/api/im.m
+d\nnew file mode 100644\nindex 0000000..eb75dcb\n--- /dev/null\n+++ b/docs/api/i
+m.md\n@@ -0,0 +1,212 @@\n+# IM API 文档\n+\n+## HTTP API\n+\n+### GET /conversat
+ions\n+\n+获取当前用户的会话列表（游标分页）。\n+\n+#### Query Parameters\n+\n+|
+参数   | 类型   | 必填 | 说明           |\n+| ------ | ------ | ---- | ---------
+----- |\n+| limit  | number | 否   | 默认 20，最大 50 |\n+| cursor | string | 否
+  | 上一页返回的 next_cursor |\n+\n+#### Response\n+\n+```json\n+{\n+  "code": 0
+,\n+  "message": "success",\n+  "data": {\n+    "items": [\n+      {\n+        "
+conversation_id": "uuid",\n+        "matched_user": {\n+          "user_id": "uu
+id",\n+          "nickname": "Alice",\n+          "avatar_url": "https://example
+.com/avatar.jpg"\n+        },\n+        "last_message": {\n+          "content":
+"Hello",\n+          "type": "text",\n+          "created_at": "2024-06-01T00:00
+:00.000Z"\n+        },\n+        "unread_count": 3,\n+        "updated_at": "202
+4-06-01T00:00:00.000Z"\n+      }\n+    ],\n+    "next_cursor": "2024-06-01T00:00
+:00.000Z",\n+    "has_more": false\n+  }\n+}\n+```\n+\n+### GET /messages\n+\n+
+获取会话的历史消息（游标分页）。\n+\n+#### Query Parameters\n+\n+| 参数         
+  | 类型   | 必填 | 说明                              |\n+| --------------- | --
+---- | ---- | --------------------------------- |\n+| conversation_id | string |
+是   | 会话 ID                           |\n+| limit           | number | 否   |
+默认 20，最大 50                  |\n+| cursor          | string | 否   | 上一页
+返回的 next_cursor (sequence_id) |\n+\n+#### Response\n+\n+```json\n+{\n+  "code
+": 0,\n+  "message": "success",\n+  "data": {\n+    "items": [\n+      {\n+     
+  "id": "uuid",\n+        "conversation_id": "uuid",\n+        "sender_id": "uui
+d",\n+        "type": "text",\n+        "content": "Hello",\n+        "client_me
+ssage_id": "client-uuid",\n+        "sequence_id": 1,\n+        "status": "sent"
+,\n+        "created_at": "2024-06-01T00:00:00.000Z"\n+      }\n+    ],\n+    "n
+ext_cursor": "1",\n+    "has_more": false\n+  }\n+}\n+```\n+\n+## Socket.io Even
+ts\n+\n+### 命名空间\n+\n+`im`\n+\n+### 连接参数\n+\n+```javascript\n+io("ws://h
+ost/im", { auth: { token: "jwt_access_token" } });\n+```\n+\n+### Client → Serve
+r\n+\n+#### message:send\n+\n+发送消息。\n+\n+```json\n+{\n+  "conversation_id":
+"uuid",\n+  "content": "Hello",\n+  "type": "text",\n+  "client_message_id": "cl
+ient-uuid"\n+}\n+```\n+\n+#### message:read\n+\n+标记消息已读。\n+\n+```json\n+{
+\n+  "conversation_id": "uuid",\n+  "last_message_id": "uuid"\n+}\n+```\n+\n+###
+# message:sync\n+\n+客户端断线重连后，补拉离线期间的消息。\n+\n+```json\n+{\n+  
+"last_ack_sequence_id": 42\n+}\n+```\n+\n+服务器会逐条广播 `message:receive` 事
+件返回 missed messages。\n+\n+### Server → Client\n+\n+#### message:receive\n+\n
++收到新消息。\n+\n+```json\n+{\n+  "id": "uuid",\n+  "conversation_id": "uuid",\
+n+  "sender_id": "uuid",\n+  "type": "text",\n+  "content": "Hello",\n+  "client
+_message_id": "client-uuid",\n+  "sequence_id": 1,\n+  "status": "sent",\n+  "cr
+eated_at": "2024-06-01T00:00:00.000Z"\n+}\n+```\n+\n+#### message:ack\n+\n+消息
+发送确认。\n+\n+```json\n+{\n+  "id": "uuid",\n+  "client_message_id": "client-u
+uid",\n+  "sequence_id": 1\n+}\n+```\n+\n+#### message:delivered\n+\n+消息已送达
+（当接收方在线时，向发送方推送）。\n+\n+```json\n+{\n+  "client_message_id": "cl
+ient-uuid",\n+  "sequence_id": 1\n+}\n+```\n+\n+#### message:read_receipt\n+\n+
+已读回执。\n+\n+```json\n+{\n+  "conversation_id": "uuid",\n+  "last_read_messag
+e_id": "uuid"\n+}\n+```\n+\n+#### conversation:updated\n+\n+会话更新（新消息时）
+。\n+\n+```json\n+{\n+  "conversation_id": "uuid",\n+  "last_message": {\n+    "
+content": "Hello",\n+    "type": "text",\n+    "created_at": "2024-06-01T00:00:0
+0.000Z"\n+  }\n+}\n+```\n+\n+#### message:error\n+\n+发送错误。\n+\n+```json\n+{
+\n+  "code": 1000,\n+  "message": "Error description"\n+}\n+```\ndiff --git a/do
+cs/api/socket-events.md b/docs/api/socket-events.md\nindex 15f6a93..5709412 1006
+44\n--- a/docs/api/socket-events.md\n+++ b/docs/api/socket-events.md\n@@ -2,7 +2
+,7 @@\n \n ## 命名空间\n \n-`matching`\n+### `matching`\n \n ## 连接参数\n \n@@ 
+-39,3 +39,129 @@ io("ws://host/matching", { auth: { token: "jwt_access_token" } 
+});\n - 用户 B Like 用户 A\n - 服务器创建 `matches` + `conversations` + `convers
+ation_participants`\n - 向 `user:A` 和 `user:B` 的 Socket Room 广播 `match:creat
+ed`\n+\n+### `im`\n+\n+IM 实时聊天命名空间。\n+\n+连接参数：\n+\n+```javascript\
+n+io("ws://host/im", { auth: { token: "jwt_access_token" } });\n+```\n+\n+#### 
+事件\n+\n+##### message:send (Client → Server)\n+\n+发送消息。\n+\n+```json\n+{\
+n+  "conversation_id": "uuid",\n+  "content": "Hello",\n+  "type": "text",\n+  "
+client_message_id": "client-uuid"\n+}\n+```\n+\n+##### message:read (Client → Se
+rver)\n+\n+标记消息已读。\n+\n+```json\n+{\n+  "conversation_id": "uuid",\n+  "l
+ast_message_id": "uuid"\n+}\n+```\n+\n+##### message:receive (Server → Client)\n
++\n+收到新消息（广播给接收方）。\n+\n+```json\n+{\n+  "id": "uuid",\n+  "convers
+ation_id": "uuid",\n+  "sender_id": "uuid",\n+  "type": "text",\n+  "content": "
+Hello",\n+  "client_message_id": "client-uuid",\n+  "sequence_id": 1,\n+  "statu
+s": "sent",\n+  "created_at": "2024-06-01T00:00:00.000Z"\n+}\n+```\n+\n+##### me
+ssage:ack (Server → Client)\n+\n+消息发送确认（返回给发送方）。\n+\n+```json\n+{
+\n+  "id": "uuid",\n+  "client_message_id": "client-uuid",\n+  "sequence_id": 1\
+n+}\n+```\n+\n+##### message:delivered (Server → Client)\n+\n+消息已送达（当接收
+方在线时，向发送方推送）。\n+\n+```json\n+{\n+  "client_message_id": "client-uui
+d",\n+  "sequence_id": 1\n+}\n+```\n+\n+##### message:read_receipt (Server → Cli
+ent)\n+\n+已读回执（广播给对方）。\n+\n+```json\n+{\n+  "conversation_id": "uuid
+",\n+  "last_read_message_id": "uuid"\n+}\n+```\n+\n+##### message:sync (Client 
+→ Server)\n+\n+客户端断线重连后，补拉离线期间的消息。\n+\n+```json\n+{\n+  "last
+_ack_sequence_id": 42\n+}\n+```\n+\n+服务器会逐条广播 `message:receive` 事件返回
+missed messages。\n+\n+##### conversation:updated (Server → Client)\n+\n+会话更
+新（新消息时广播给双方）。\n+\n+```json\n+{\n+  "conversation_id": "uuid",\n+  "
+last_message": {\n+    "content": "Hello",\n+    "type": "text",\n+    "created_
+at": "2024-06-01T00:00:00.000Z"\n+  }\n+}\n+```\n+\n+##### message:error (Server
+→ Client)\n+\n+发送错误。\n+\n+```json\n+{\n+  "code": 1000,\n+  "message": "Err
+or description"\n+}\n+```\ndiff --git a/docs/design-docs/db.md b/docs/design-doc
+s/db.md\nindex 8a0542c..b771144 100644\n--- a/docs/design-docs/db.md\n+++ b/docs
+/design-docs/db.md\n@@ -43,10 +43,25 @@ erDiagram\n 1. **表名**：`snake_case`，
+复数形式（如 `users`, `match_actions`）\n 2. **列名**：`snake_case`（如 `created
+_at`, `profile_photo_url`）\n 3. **主键**：统一使用 `char(36)` 存储 UUID，应用层
+生成 UUID v7（时间有序），不使用自增 ID\n-4. **时间戳**：每张表必须包含 `created
+_at` 和 `updated_at`\n-5. **软删除**：使用 `deleted_at`（nullable datetime），不
+直接物理删除\n-6. **外键**：显式定义外键约束，命名格式 `fk_表名_列名`\n-7. **索
+引**：查询条件中高频使用的字段必须建索引，命名格式 `idx_表名_列名`\n+4. **非主键
+自增列（谨慎使用）**：除主键外，禁止为其他列使用 `AUTO_INCREMENT`（包括 TypeORM 
+的 `@Generated("increment")`）。MySQL 要求 `AUTO_INCREMENT` 列必须有索引，且 Typ
+eORM 对非主键自增列的支持在不同版本中行为不稳定，可能出现同步异常或 "ER_WRONG_AU
+TO_KEY" 错误。此外，数据库侧自增不利于后续分库分表迁移。\n+\n+   若业务需要单调
+递增序列号（如消息排序 `sequence_id`），应改用**应用层发号器**（如雪花算法、UUID
+v7 的时间戳部分），而非数据库自增：\n+\n+   ```typescript\n+   // ❌ 错误：非主
+键 AUTO_INCREMENT，存在兼容性和扩展性风险\n+   @Generated("increment")\n+   @Col
+umn({ type: "bigint" })\n+   sequence_id: number;\n+\n+   // ✅ 正确：应用层生成
+有序 ID（如雪花算法或 UUID v7 时间戳）\n+   @Column({ type: "bigint" })\n+   seq
+uence_id: number; // 由 Service 层调用 Snowflake.nextId() 生成\n+   ```\n+\n+5. 
+**时间戳**：每张表必须包含 `created_at` 和 `updated_at`\n+6. **软删除**：使用 `d
+eleted_at`（nullable datetime），不直接物理删除\n+7. **外键**：显式定义外键约束
+，命名格式 `fk_表名_列名`\n+8. **索引**：查询条件中高频使用的字段必须建索引，命
+名格式 `idx_表名_列名`\n \n ## 字段类型约定\n \n@@ -108,6 +123,36 @@ down(): Pro
+mise<void> {\n \n > **原则**：`down()` 不仅要语法正确，还必须考虑 `up()` 运行后
+可能产生的数据状态，确保在任意数据量下都能安全回滚。\n \n+### `up()` 必须在全新
+数据库上可运行\n+\n+`up()` 方法不仅要能在已存在旧 Schema 的数据库上升级，还必须
+能在**全新数据库**（如 CI 环境、新开发者本地、新部署）上从基线开始顺序执行。常见
+问题：\n+\n+**修复性迁移中的 `DROP INDEX` 陷阱**：MySQL 8.0 的 `DROP INDEX` **不
+支持 `IF EXISTS`**。若某迁移的 `up()` 试图删除一个在前置迁移中从未创建过的索引（
+如该索引仅存在于某些历史分支或已被手动修复的环境），全新数据库执行时会直接报错。
+\n+\n+```typescript\n+// ❌ 错误：在全新数据库上，idx_messages_client_message_id
+从未被创建，DROP INDEX 直接失败\n+public async up(queryRunner: QueryRunner): Pro
+mise<void> {\n+  await queryRunner.query(`DROP INDEX idx_messages_client_message
+_id ON messages`);\n+  await queryRunner.query(`CREATE UNIQUE INDEX idx_messages
+_conv_client_msg_id ON messages (conversation_id, client_message_id)`);\n+}\n+``
+`\n+\n+**修复方案**：\n+\n+- **方案 A（推荐）**：对于尚未部署到生产的新功能 PR，
+若发现创建迁移的约束/索引有误，**直接将修正合并到原始创建迁移中**，而非单独生成
+一个"修复迁移"。因为 Migration 一旦执行即不可修改，但在未部署前合并修正可以避免
+冗余的 `DROP INDEX` + `CREATE INDEX` 步骤。\n+  \n+- **方案 B**：若必须保留修复
+迁移，先查询 `information_schema` 判断索引是否存在再执行 DROP：\n+  ```typescrip
+t\n+  const [indexExists] = await queryRunner.query(\n+    `SELECT 1 FROM inform
+ation_schema.STATISTICS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = \'messa
+ges\' AND INDEX_NAME = \'idx_messages_client_message_id\'`\n+  );\n+  if (indexE
+xists) {\n+    await queryRunner.query(`DROP INDEX idx_messages_client_message_i
+d ON messages`);\n+  }\n+  ```\n+\n+> **原则**：Migration 是顺序执行的，任何一步
+在干净环境失败都会阻塞整个初始化流程。生成修复迁移前，先在全新数据库（`npm run m
+igration:run` 从 0 开始）验证一遍。\n+\n ## 原生 SQL 查询规范\n \n > **核心原则*
+*：优先使用 TypeORM QueryBuilder；必须写原生 SQL 时，必须遵守本规范。mysql2 驱动
+的语法约束与 PostgreSQL/SQLite 不同，**在本地用 SQLite 验证通过的 SQL 在生产环境
+的 MySQL 下可能直接报错**。\ndiff --git a/docs/design-docs/nestjs.md b/docs/desi
+gn-docs/nestjs.md\nindex 66ecaf5..62a44ca 100644\n--- a/docs/design-docs/nestjs.
+md\n+++ b/docs/design-docs/nestjs.md\n@@ -197,6 +197,82 @@ export class SendMess
+ageDto {\n \n > **原则**：校验规则必须与业务语义一致。对图片 URL、音频链接等可能
+超过常规长度的字段，禁止直接使用文本消息的字符限制。\n \n+### @ValidateIf 的条件
+作用域陷阱\n+\n+`class-validator` 中，`@ValidateIf` 作用于**整个属性**，当条件返
+回 `false` 时，该属性上的**所有校验器**（包括 `@IsString()`、`@IsNotEmpty()` 等
+）都会被跳过，而非仅跳过其后的装饰器。\n+\n+```typescript\n+// ❌ 错误：@IsStrin
+g() 也会被 @ValidateIf 跳过，导致 type === "image" 时 content 可为任意类型\n+exp
+ort class SendMessageDto {\n+  @IsIn(["text", "image"])\n+  type: string;\n+\n+ 
+@IsString()\n+  @ValidateIf((o) => o.type === "text")\n+  @MaxLength(500)\n+  co
+ntent?: string;\n+}\n+```\n+\n+当需要**基础类型校验对所有场景生效**、仅**额外限
+制对特定场景生效**时，应使用以下方案：\n+\n+**方案 A（推荐）—— 自定义 Validator*
+*：\n+\n+```typescript\n+@ValidatorConstraint({ name: "messageContent", async: f
+alse })\n+class MessageContentValidator implements ValidatorConstraintInterface 
+{\n+  validate(value: any, args: ValidationArguments) {\n+    const obj = args.o
+bject as SendMessageDto;\n+    if (typeof value !== "string") return false;\n+  
+ if (obj.type === "text" && value.length > 500) return false;\n+    return true;
+\n+  }\n+\n+  defaultMessage(args: ValidationArguments) {\n+    const obj = args
+.object as SendMessageDto;\n+    if (obj.type === "text") return "文本消息长度不
+能超过 500 字符";\n+    return "content 必须是字符串";\n+  }\n+}\n+\n+export cla
+ss SendMessageDto {\n+  @IsIn(["text", "image"])\n+  type: string;\n+\n+  @Valid
+ate(MessageContentValidator)\n+  content: string;\n+}\n+```\n+\n+**方案 B（简单
+场景）—— 将通用校验置于 @ValidateIf 之外，通过分组或拆分字段实现**。但需注意 `cl
+ass-validator` 的装饰器执行顺序由 metadata 存储顺序决定，不推荐依赖装饰器书写顺
+序做精确控制。\n+\n+> **原则**：当条件校验与通用类型校验共存时，优先使用自定义 V
+alidator，避免 `@ValidateIf` 跳过基础类型校验导致非法类型穿透到 Service 层。\n+\
+n+### DTO 枚举值安全收紧\n+\n+DTO 中的 `type`、`role`、`status` 等枚举字段，**不
+得包含用户不可创建的敏感类型**。若某类型仅由系统内部自动产生（如系统消息 `system
+`、系统通知 `notification`），则必须从 DTO 枚举中剔除，并在 Service 层做兜底拦截
+。\n+\n+```typescript\n+// ❌ 错误：用户可通过伪造请求发送 system 消息\n+export 
+class SendMessageDto {\n+  @IsIn(["text", "image", "system"])\n+  type: string;\
+n+}\n+\n+// ✅ 正确：DTO 枚举仅包含用户可创建的类型\n+export class SendMessageDt
+o {\n+  @IsIn(["text", "image"])\n+  type: string;\n+}\n+\n+// Service 层兜底（
+防御式编程）\n+if (dto.type === "system") {\n+  throw new BusinessException(1003
+, "无权发送系统消息");\n+}\n+```\n+\n+> **原则**：DTO 是安全边界的第一道防线。对
+"仅系统可写" 的枚举值，应在 DTO 层即拒绝，而非依赖 Service 层兜底。\n+\n ## 数据
+库与迁移\n \n - 本地开发使用 TypeORM `synchronize: false`，强制使用 Migration\n@
+@ -410,6 +486,32 @@ async handleMatchCreated(payload: MatchCreatedEvent) {\n \n 
+> **原则**：优先使用方案 B 降低模块耦合；只有强一致性要求（如原子性必须包含 mess
+age 创建）时才使用方案 A。\n \n+### 数据库事务与 Redis 的边界\n+\n+Redis 等非数
+据库操作**不得**放在数据库事务（`dataSource.transaction`）内部执行。原因：\n+\n+
+1. Redis 不支持参与数据库的两阶段提交，事务回滚时 Redis 操作无法回滚，导致数据不
+一致\n+2. Redis 操作可能因网络延迟拖长数据库事务持有时间，增加锁竞争和连接池压力
+\n+\n+```typescript\n+// ❌ 错误：Redis incr 在事务内执行，DB 回滚后 Redis 未读
+数无法回滚\n+await this.dataSource.transaction(async (manager) => {\n+  await ma
+nager.save(message);\n+  await this.redisClient.incr(`unread_count:${userId}:${c
+onversationId}`); // 无法回滚\n+  await manager.save(conversation);\n+});\n+\n+/
+/ ✅ 正确：Redis 操作在事务提交成功后执行\n+await this.dataSource.transaction(as
+ync (manager) => {\n+  await manager.save(message);\n+  await manager.save(conve
+rsation);\n+});\n+// 事务已提交，再更新 Redis\n+await this.redisClient.incr(`unr
+ead_count:${userId}:${conversationId}`);\n+```\n+\n+> **原则**：事务内只做数据库
+操作；事务提交成功后，再执行 Redis、消息队列、事件发射等副作用。若 Redis 失败，
+应记录降级日志并预留后台补偿机制（如定时任务重新计算未读数）。\n+\n ### 跨模块共
+享资源（Redis、数据库连接池）\n \n 各业务模块禁止自行 `new Redis()` 创建独立的 R
+edis 客户端。重复创建会导致连接数翻倍、资源浪费，且配置分散难以维护。\ndiff --gi
+t a/docs/exec-plans/tech-debt-tracker.md b/docs/exec-plans/tech-debt-tracker.md\
+nindex 397939a..5f540c7 100644\n--- a/docs/exec-plans/tech-debt-tracker.md\n+++ 
+b/docs/exec-plans/tech-debt-tracker.md\n@@ -13,6 +13,9 @@\n | 2026-04-22 | **Iss
+ue #43 (Matching V1) 中 `user_profiles` 偏好年龄字段名与 `db.md` 不一致**。`docs
+/design-docs/db.md` 中规定字段名为 `preferred_min_age` / `preferred_max_age`，但
+实体和 Migration 中实际为 `age_range_min` / `age_range_max`。本 PR 未涉及这些字
+段的读写，但属于已知的 Schema 契约偏差。 |\n | 2026-04-22 | **Issue #43 (Matchin
+g V1) 中 `city` 模式未按行政区划实现**。PRD 要求 `city` 模式为"同城市，根据用户
+当前位置行政边界"，但当前实现简化为固定 15km 半径。MVP 阶段可接受，后续需接入高
+德/百度地理编码 API 按行政区划查询。 |\n | 2026-04-22 | **Matching 候选池查询需
+增加复合索引并监控 P95 响应时间**。`queryCandidatesFromDb` 包含 Haversine 计算和
+多个 UNION 子查询，高并发下可能成为瓶颈。建议在 `user_profiles` 表增加复合索引 `
+(`is_complete`, `gender`, `latitude`, `longitude`)` 并持续监控。                
+                                                                                
+                                                         | Full-Stack Agent  | o
+pen | 后续迭代        |\n+| 2026-04-27 | **IM V1 BDD 中 "离线推送" 步骤为空实现*
+*。`tests/bdd/step-definitions/im_real_time_message_delivery.steps.js:127-134` 
+直接 `assert.ok(true)`，未验证任何推送行为。Push Service 骨架尚未实现，需在基础
+设施就绪后补充真实断言。                                                        
+                                                                                
+                                                      | Full-Stack Agent  | open
+| Push Service 迭代 |\n+| 2026-04-27 | **`MessageEntity.sequence_id` 使用 TypeOR
+M `@Generated("increment")` 与 MySQL 非主键 AUTO_INCREMENT 存在兼容性风险**。当
+前 Migration 已正确建立普通索引满足 MySQL 要求，但未来 TypeORM 升级或启用 `synch
+ronize: true` 时可能报错；长期建议改为应用层雪花算法/UUID 生成 `sequence_id`，解
+除对 MySQL AUTO_INCREMENT 非主键的依赖。                                        
+                                                                                
+                                                                      | Full-Sta
+ck Agent  | open | M3 后评估       |\n+| 2026-04-27 | **IM V1 缺失 PRD 要求的客
+户端本地消息缓存（sqflite）**。`prd/v1-im.md` US-IM-5 与 `TASK-im.md` Step 4.4 
+要求使用 sqflite 缓存最近 N 条消息以减少重复拉取。当前实现仅依赖内存 `_pendingMe
+ssages` 与 `_messageIdToSequenceId`，应用杀进程后缓存丢失。弱网/离线场景体验不达
+标，需排期 V1.1 实现。 | Full-Stack Agent  | open | V1.1 |\n \n ## 已清理债务\n 
+\ndiff --git a/docs/modules/im.md b/docs/modules/im.md\nindex d62c4e8..ea2aaf8 1
+00644\n--- a/docs/modules/im.md\n+++ b/docs/modules/im.md\n@@ -48,22 +48,22 @@ s
+equenceDiagram\n \n ## 关键文件\n \n-| 文件                                 | 路
+径                                                                              
+               |\n-| ------------------------------------ | --------------------
+----------------------------------------------------------------------------- |\
+n-| Gateway                              | `apps/api/src/modules/im/im.gateway.t
+s`                                                           |\n-| Service      
+                       | `apps/api/src/modules/im/im.service.ts`                
+                                          |\n-| Controller                      
+    | `apps/api/src/modules/im/im.controller.ts`                                
+                       |\n-| DTOs                                 | `apps/api/sr
+c/modules/im/dto/*.ts`                                                          
+     |\n-| Push Service                         | `apps/api/src/modules/push/pus
+h.service.ts`                                                       |\n-| Flutte
+r IM BLoC                      | `apps/mobile/lib/presentation/blocs/im/im_bloc.
+dart`                                              |\n-| Flutter Conversation Cu
+bit           | `apps/mobile/lib/presentation/blocs/im/conversation_list_cubit.d
+art`                              |\n-| Chat Page                            | `
+apps/mobile/lib/presentation/pages/chat_page.dart`                              
+                |\n-| Conversation List Page               | `apps/mobile/lib/pr
+esentation/pages/match_list_page.dart`（文件名为历史遗留，实际职责为会话列表） |
+\n-| IM Repository                        | `apps/mobile/lib/domain/repositories
+/im_repository.dart`                                          |\n-| IM Socket Cl
+ient                     | `apps/mobile/lib/core/network/im_socket_client.dart` 
+                                            |\n-| Design System - ChatBubble    
+      | `packages/design-system/lib/src/molecules/chat_bubble.dart`             
+                         |\n-| Design System - ChatInputBar         | `packages/
+design-system/lib/src/molecules/chat_input_bar.dart`                            
+       |\n-| Design System - ConversationListItem | `packages/design-system/lib/
+src/molecules/conversation_list_item.dart`                            |\n+| 文件
+                                | 路径                                          
+                           |\n+| ------------------------------------ | --------
+----------------------------------------------------------------- |\n+| Gateway 
+                            | `apps/api/src/modules/im/im.gateway.ts`           
+                       |\n+| Service                              | `apps/api/sr
+c/modules/im/im.service.ts`                                   |\n+| Controller  
+                        | `apps/api/src/modules/im/im.controller.ts`            
+                   |\n+| DTOs                                 | `apps/api/src/mo
+dules/im/dto/*.ts`                                        |\n+| Push Service    
+                    | `apps/api/src/modules/push/push.service.ts`               
+               |\n+| Flutter IM BLoC                      | `apps/mobile/lib/pre
+sentation/blocs/im/im_bloc.dart`                      |\n+| Flutter Conversation
+Cubit           | `apps/mobile/lib/presentation/blocs/im/conversation_list_cubit
+.dart`      |\n+| Chat Page                            | `apps/mobile/lib/presen
+tation/pages/chat_page.dart`                       |\n+| Conversation List Page 
+             | `apps/mobile/lib/presentation/pages/conversation_list_page.dart` 
+        |\n+| IM Repository                        | `apps/mobile/lib/domain/rep
+ositories/im_repository.dart`                  |\n+| IM Socket Client           
+         | `apps/mobile/lib/core/network/im_socket_client.dart`                 
+    |\n+| Design System - ChatBubble           | `packages/design-system/lib/src
+/molecules/sw_chat_bubble.dart`            |\n+| Design System - ChatInputBar   
+     | `packages/design-system/lib/src/molecules/sw_chat_input_bar.dart`        
+|\n+| Design System - ConversationListItem | `packages/design-system/lib/src/mol
+ecules/sw_conversation_list_item.dart` |\n \n ## 边界情况\n \n@@ -73,7 +73,7 @@ 
+sequenceDiagram\n 4. **离线补推**：用户重连后，拉取 `last_ack_sequence_id` 之后
+的所有消息\n 5. **消息发送断线降级**：Socket 未连接时，消息状态应从 `"sending"` 
+降级为 `"failed"`，并支持用户点击重试（复用原 `client_message_id`）\n 6. **已读
+回执批量标记**：收到 `last_read_message_id` 时，应将所有 `sequence_id <= last_re
+ad_sequence_id` 的己方消息标记为 `"read"`，而非仅标记单条\n-7. **会话列表排序刷
+新**：发送消息后必须更新 `conversation_participants.updated_at`，确保新消息会话
+在列表中置顶\n+7. **会话列表排序刷新**：发送消息后必须更新 `conversations.update
+d_at`，确保新消息会话在列表中置顶\n 8. **原生 SQL 数组参数**：`getConversations`
+中使用 `IN (...)` 查询多条会话的最后消息时，禁止用单个 `?` 传入数组，必须展开为
+等长占位符或使用 QueryBuilder\n \n ## 消息状态机\n',
+        message='Command executed successfully.',
+        display=[],
+        extras=None
+    )
+)
+StepBegin(n=6)
+ThinkPart(
+    type='think',
+    think='现在我已经看到了文档 diff 的详细内容。让我分析一下：\n\n1. **上一轮 M
+ajor 问题 #5** (`docs/modules/im.md` 与代码不一致): 已经修复！从 `conversation_p
+articipants.updated_at` 改为了 `conversations.updated_at`。✅\n\n2. **其他文档变
+更**：\n   - `docs/api-contracts/im.yaml`：已更新，添加了分页参数、POST /message
+s、POST /messages/read、新的 schema 定义。✅\n   - `docs/api/im.md`：新创建，包
+含 HTTP API 和 Socket.io Events 文档。✅\n   - `docs/api/socket-events.md`：已更
+新，添加了 IM 命名空间事件。✅\n   - `docs/api/INDEX.md`：已更新，添加了 im.md 
+链接。✅\n   - `docs/design-docs/db.md`：已更新，添加了非主键自增列警告、Migrati
+on 陷阱、原生 SQL 规范。✅\n   - `docs/design-docs/nestjs.md`：已更新，添加了 `@
+ValidateIf` 陷阱、DTO 枚举安全收紧、数据库事务与 Redis 边界。✅\n   - `docs/exec
+-plans/tech-debt-tracker.md`：已更新，添加了 3 条 IM V1 相关技术债务。✅\n   - `
+docs/modules/im.md`：已更新，关键文件路径修正、边界情况 #7 修正。✅\n   - `.maes
+tro/README.md`：已更新，修正了 login.yaml 的依赖描述。✅\n\n3. **需要检查的遗漏
+项**：\n   - **CHANGELOG.md**：需要检查是否需要添加 `#64` 条目。这个 PR 包含了用
+户可见的功能变更（IM 模块完整实现），所以 CHANGELOG.md 应该更新。\n   - **docs/m
+odules/INDEX.md**：已经包含 im.md 的引用，看起来没问题。但我注意到 `matching.md`
+的关联 PRD 是 `docs/product-specs/matching.md`，而 `im.md` 的关联 PRD 是 `docs/p
+roduct-specs/im.md`。需要确认这个文件是否存在。\n   - **Maestro README**：已经更
+新了 login.yaml 的描述，但新添加了很多 IM 和 devtools 的 flow 文件，README 中却
+没有提到这些新 flow。需要补充。\n   - **docs/migration/README.md**：没有迁移目录
+，不需要创建。\n\n4. **接口破坏性变更**：需要检查是否有接口破坏性变更需要迁移指
+南。\n   - 从 diff 看，`docs/api-contracts/im.yaml` 中 ConversationDto 的字段从 
+`id` 改为 `conversation_id`，`participant` 改为 `matched_user`，`last_message` 
+类型从 `MessageDto` 改为 `LastMessageDto`。这些是接口变更，但看起来是全新的 IM A
+PI（之前没有），而不是对已有 API 的破坏性变更。所以这个 PR 是新增功能，不是破坏
+性变更。\n\n5. **需要补充的文档**：\n   - CHANGELOG.md：添加 `#64`\n   - .maestr
+o/README.md：补充新添加的 flows（im/*, devtools/*, matching/*）的说明\n   - 检查
+`docs/product-specs/im.md` 是否存在（因为 docs/modules/INDEX.md 引用了它）\n\n让
+我继续检查这些遗漏项。',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_zPV3bvBeEjWJ5WxWsEjiOmlN',
+    function=FunctionBody(
+        name='Shell',
+        arguments='{"command": "cd /var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000g
+n/T/doc-gardener-64-886526752 && ls -la docs/product-specs/im.md 2>/dev/null || 
+echo \\"NOT_FOUND\\""}'
+    ),
+    extras=None
+)
+ToolCall(
+    type='function',
+    id='tool_4KktzDmweGyuDz2EbN2dLVfC',
+    function=FunctionBody(name='Shell', arguments=''),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_zPV3bvBeEjWJ5WxWsEjiOmlN',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='-rw-r--r--@ 1 insulate  staff  1307 May  7 10:11 docs/product-sp
+ecs/im.md\n',
+        message='Command executed successfully.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(
+    arguments_part='{"command": "cd /var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000
+gn/T/doc-gardener-64-886526752 && ls -la .maestro/flows/"}'
+)
+ToolCall(
+    type='function',
+    id='tool_SbaJXCShA2BNzAWLkHfyxVBa',
+    function=FunctionBody(name='Shell', arguments=''),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_4KktzDmweGyuDz2EbN2dLVfC',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='total 0\ndrwxr-xr-x@  7 insulate  staff  224 May  7 10:11 .\ndrw
+xr-xr-x@ 10 insulate  staff  320 May  7 10:11 ..\ndrwxr-xr-x@  4 insulate  staff
+ 128 May  7 10:11 auth\ndrwxr-xr-x@  8 insulate  staff  256 May  7 10:11 devtool
+s\ndrwxr-xr-x@  8 insulate  staff  256 May  7 10:11 im\ndrwxr-xr-x@  5 insulate 
+staff  160 May  7 10:11 matching\ndrwxr-xr-x@  4 insulate  staff  128 May  7 10:
+11 profile\n',
+        message='Command executed successfully.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(
+    arguments_part='{"command": "cd /var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000
+gn/T/doc-gardener-64-886526752 && ls -la .maestro/includes/"}'
+)
+StatusUpdate(
+    context_usage=0.14812469482421875,
+    context_tokens=38830,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=8878,
+        output=896,
+        input_cache_read=29952,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-jV0Jjnwpsqvti9ABWGJQLQFQ',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_SbaJXCShA2BNzAWLkHfyxVBa',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='total 24\ndrwxr-xr-x@  5 insulate  staff  160 May  7 10:11 .\ndr
+wxr-xr-x@ 10 insulate  staff  320 May  7 10:11 ..\n-rw-r--r--@  1 insulate  staf
+f  836 May  7 10:11 login-as-test-user.yaml\n-rw-r--r--@  1 insulate  staff  887
+May  7 10:11 profile-setup-actions.yaml\n-rw-r--r--@  1 insulate  staff  649 May
+ 7 10:11 send_message_actions.yaml\n',
+        message='Command executed successfully.',
+        display=[],
+        extras=None
+    )
+)
+StepBegin(n=7)
+ThinkPart(
+    type='think',
+    think='好的，现在让我继续检查需要补充的文档。\n\n1. `.maestro/README.md` 需
+要补充新 flows 的说明。新添加的 flows 包括：\n   - devtools/edit_server_url.yaml
+\n   - devtools/empty_server_url.yaml\n   - devtools/invalid_server_url.yaml\n  
+- devtools/save_persists_after_reopen.yaml\n   - im/enter_chat.yaml\n   - im/sen
+d_message.yaml\n   - im/view_conversation_list.yaml\n   - matching/swipe_recomme
+ndations.yaml\n   - matching/view_match_list.yaml\n\n   README 中目录结构部分只
+列出了 `login.yaml` 和 `profile_setup.yaml`，需要更新。\n\n2. `CHANGELOG.md` 需
+要添加 `#64` 条目。PR 包含用户可见的功能变更：IM 模块（聊天、会话列表、已读回执
+）、匹配列表、Maestro E2E 测试等。\n\n3. `docs/modules/INDEX.md` 引用了 `docs/pr
+oduct-specs/im.md`，这个文件存在。\n\n4. 检查 `docs/product-specs/im.md` 是否需
+要更新（因为 PR 涉及 IM 功能）。\n\n让我先读取 `docs/product-specs/im.md`，确认
+它是否已经反映了当前实现。',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_56xIG2PMr8EwkOSwXddKmini',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/do
+c-gardener-64-886526752/docs/product-specs/im.md"}'
+    ),
+    extras=None
+)
+ToolCall(
+    type='function',
+    id='tool_zz1Uw25IndktIC6IgHgSCMvK',
+    function=FunctionBody(
+        name='Shell',
+        arguments='{"command": "cd /var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000g
+n/T/doc-gardener-64-886526752 &&'
+    ),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_56xIG2PMr8EwkOSwXddKmini',
+    return_value=ToolOk(
+        is_error=False,
+        output='     1\t# 即时通讯领域规则\n     2\t\n     3\t## 核心流程\n     
+4\t\n     5\t### 1. 会话创建\n     6\t\n     7\t会话（Conversation）在以下场景自
+动创建：\n     8\t- 双方首次形成双向匹配时\n     9\t- 会话包含两个参与者（Partic
+ipant）\n    10\t\n    11\t### 2. 消息发送\n    12\t\n    13\t用户发送消息时：\n
+   14\t1. 客户端通过 Socket.io 发送事件 `message:send`\n    15\t2. 服务端校验会
+话权限（发送者是否属于该会话）\n    16\t3. 消息持久化到 `messages` 表\n    17\t4
+. 服务端向接收者推送 `message:receive` 事件\n    18\t5. 若接收者不在线，累加 Red
+is 未读数，并触发第三方推送（极光/Firebase）\n    19\t\n    20\t### 3. 消息类型\
+n    21\t\n    22\tMVP 阶段支持：\n    23\t- `text`：纯文本\n    24\t- `image`：
+图片（上传后返回 URL）\n    25\t- `system`：系统消息（如 "你们已匹配成功，开始聊
+天吧"）\n    26\t\n    27\t### 4. 已读回执\n    28\t\n    29\t- 用户进入聊天页时
+，客户端发送 `message:read` 事件，带上最后已读消息 ID\n    30\t- 服务端更新 `con
+versation_participants` 中的 `last_read_message_id`\n    31\t- 未读数清零，并向
+对方广播已读状态\n    32\t\n    33\t## 业务约束\n    34\t\n    35\t- 只有匹配成
+功的双方才能互相发送消息\n    36\t- 一方拉黑另一方后，会话冻结，不能再发送新消息
+\n    37\t- 消息支持软删除（仅删除自己的视图），不删除对方视图\n    38\t- 单条文
+本消息长度限制 500 字\n    39\t- 图片大小限制 10MB，格式仅限 JPG / PNG\n',
+        message='39 lines read from file starting from line 1. Total lines in fi
+le: 39. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(
+    arguments_part=' git diff origin/main...HEAD -- docs/product-specs/"}'
+)
+StatusUpdate(
+    context_usage=0.1532135009765625,
+    context_tokens=40164,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=1508,
+        output=385,
+        input_cache_read=38656,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-VyzUHJNvBV7BdLg4ISPM90Um',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_zz1Uw25IndktIC6IgHgSCMvK',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='',
+        message='Command executed successfully.',
+        display=[],
+        extras=None
+    )
+)
+StepBegin(n=8)
+ThinkPart(
+    type='think',
+    think='`docs/product-specs/im.md` 没有在本轮 PR 中被修改，但它的内容看起来是
+合理的，与当前实现一致。不需要修改。\n\n现在让我检查是否还有其他文档遗漏。\n\n让
+我再看一下 `.maestro/README.md` 的具体内容，确认需要补充哪些 flow 说明。\n\n另外
+，我还需要检查：\n1. `docs/design-docs/flutter.md` 是否需要更新（因为新增了很多 
+Flutter IM 组件和页面）\n2. `docs/design-docs/INDEX.md` 是否需要更新\n\n让我继续
+检查。',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_mwuvpn0xabCSHqWweOYrmKjN',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/do
+c-gardener-64-886526752/docs/design-docs/INDEX.md"}'
+    ),
+    extras=None
+)
+ToolCall(
+    type='function',
+    id='tool_WvTDKL7HFReC2081QUWkf9OH',
+    function=FunctionBody(
+        name='Shell',
+        arguments='{"command": "cd /var/folders/lt/w3sl6z8j5v50vt2s6knv'
+    ),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_mwuvpn0xabCSHqWweOYrmKjN',
+    return_value=ToolOk(
+        is_error=False,
+        output='     1\t# 设计文档索引\n     2\t\n     3\t> 本目录存放编码规范、
+架构决策与技术约束。Agent 在写代码前应先查阅对应规范。\n     4\t\n     5\t## 文
+档清单与验证状态\n     6\t\n     7\t| 文档                                      
+        | 状态         | 说明                                        |\n     8\t
+| -------------------------------------------------- | ------------ | ----------
+--------------------------------- |\n     9\t| [core-beliefs.md](core-beliefs.md
+)                 | ✅ Validated | Agent-First 工程理念                        |
+\n    10\t| [db.md](db.md)                                     | ⚠️ WIP       | 
+数据库规范与核心 ER 设计                    |\n    11\t| [api.md](api.md)       
+                           | ⚠️ WIP       | API 设计规范与 OpenAPI 约定          
+      |\n    12\t| [testing.md](testing.md)                           | ✅ Valid
+ated | 测试策略与验收标准规范                      |\n    13\t| [flutter.md](flu
+tter.md)                           | ⚠️ WIP       | Flutter 编码规范与目录约定   
+              |\n    14\t| [nestjs.md](nestjs.md)                             | 
+⚠️ WIP       | NestJS 编码规范与分层约定                   |\n    15\t| [observab
+ility.md](observability.md)               | ⚠️ WIP       | 可观测性规范（日志、指
+标）                  |\n    16\t| [readability.md](readability.md)             
+     | ✅ Validated | 代码可读性与命名规范                        |\n    17\t| [
+ADR-001-monorepo.md](ADR-001-monorepo.md)         | ✅ Validated | 为什么选择 Mo
+norepo                         |\n    18\t| [issue-workflow.md](issue-workflow.m
+d)             | ✅ Validated | Issue 创建与验收工作流                      |\n 
+  19\t| [ui-style-guide/INDEX.md](ui-style-guide/INDEX.md) | ✅ Validated | UI 
+风格规范、Design Token、原子组件使用规则 |\n    20\t\n    21\t## 状态定义\n    2
+2\t\n    23\t- ✅ **Validated**：文档已审阅，与代码一致\n    24\t- ⚠️ **WIP**：骨
+架已建立，存在已知差距（允许在演进中逐步补全）\n    25\t- ❌ **Outdated**：文档
+与代码不一致，需优先更新\n',
+        message='25 lines read from file starting from line 1. Total lines in fi
+le: 25. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(
+    arguments_part='f5n00000gn/T/doc-gardener-64-886526752 && git diff origin/ma
+in...HEAD -- docs/design-docs/INDEX.md docs/design-docs/flutter.md"}'
+)
+ToolCall(
+    type='function',
+    id='tool_AIL079B4wmTLI9XoRh8BH3P4',
+    function=FunctionBody(name='Shell', arguments='{"command":'),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_WvTDKL7HFReC2081QUWkf9OH',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='',
+        message='Command executed successfully.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(
+    arguments_part=' "cd /var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/doc-ga
+rdener-64-886526752 && git diff origin/main...HEAD -- README.md"}'
+)
+StatusUpdate(
+    context_usage=0.15684127807617188,
+    context_tokens=41115,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=1179,
+        output=303,
+        input_cache_read=39936,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-o13lmYOIi0a7NORgAgASbXIL',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_AIL079B4wmTLI9XoRh8BH3P4',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='',
+        message='Command executed successfully.',
+        display=[],
+        extras=None
+    )
+)
+StepBegin(n=9)
+ThinkPart(
+    type='think',
+    think='好的，现在我已经掌握了足够的信息来做出判断。让我整理一下需要补充的文
+档：\n\n## 已同步的文档（无需修改）\n1. `docs/api-contracts/im.yaml` - 已更新 ✅
+\n2. `docs/api/im.md` - 新创建 ✅\n3. `docs/api/socket-events.md` - 已更新 ✅\n4
+. `docs/api/INDEX.md` - 已更新 ✅\n5. `docs/design-docs/db.md` - 已更新 ✅\n6. `
+docs/design-docs/nestjs.md` - 已更新 ✅\n7. `docs/exec-plans/tech-debt-tracker.m
+d` - 已更新 ✅\n8. `docs/modules/im.md` - 已更新，上一轮 Major 问题 #5 已修复 ✅
+\n9. `.maestro/README.md` - 已部分更新（login.yaml 描述修正）✅\n\n## 需要补充的
+文档\n1. **CHANGELOG.md** - 需要添加 `#64` 条目（IM 模块是用户可见的大功能）\n2.
+**.maestro/README.md** - 需要补充新 flows 的目录结构说明和新增 flow 的文档（im/*
+, devtools/*, matching/*）\n\n## 不需要创建的文档\n1. `docs/migration/README.md`
+- 没有接口破坏性变更，不需要迁移指南\n\n## 关于上一轮 Major 问题的验证\n- Major 
+#5（文档与代码不一致）: ✅ 已修复，`docs/modules/im.md` 第 76 行已改为 `conversa
+tions.updated_at`\n- Major #1-4: 这些是代码问题，不在文档园丁职责范围内，但我在
+报告中可以提及\n\n让我现在创建具体的修改。\n\n对于 `.maestro/README.md`，我需要
+：\n1. 更新目录结构部分，包含新的 flows\n2. 补充新 flow 的环境说明\n\n让我先看一
+下新 flow 文件的内容，以便准确描述它们。',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_KVCgX6POEYW1cY2VhYKE50WJ',
+    function=FunctionBody(
+        name='Shell',
+        arguments='{"command": "cd /var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000g
+n/T/doc-gardener-64-886526752 && for f in .maestro/flows/devtools/*.yaml .maestr
+o/flows/im/*.yaml .maestro/flows/matching/*.yaml; do echo \\"=== $(basename $f) 
+===\\"; head -5 \\"$f\\"; done"}'
+    ),
+    extras=None
+)
+StatusUpdate(
+    context_usage=0.16035079956054688,
+    context_tokens=42035,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=1075,
+        output=509,
+        input_cache_read=40960,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-GeTcGfoaUCiwCFZf4mrsFX88',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_KVCgX6POEYW1cY2VhYKE50WJ',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='=== edit_server_url.yaml ===\n# @flow\n# @name: devtools/edit_se
+rver_url\n# @displayName: 编辑服务器 Base URL\n# @module: devtools\n# @dependenc
+ies: [devtools/open_drawer]\n=== empty_server_url.yaml ===\n# @flow\n# @name: de
+vtools/empty_server_url\n# @displayName: 空服务器地址验证\n# @module: devtools\n
+# @dependencies: [devtools/open_drawer]\n=== invalid_server_url.yaml ===\n# @flo
+w\n# @name: devtools/invalid_server_url\n# @displayName: 无效服务器地址验证\n# @
+module: devtools\n# @dependencies: [devtools/open_drawer]\n=== open_drawer.yaml 
+===\n# @flow\n# @name: devtools/open_drawer\n# @displayName: 开发工具抽屉定位\n#
+@module: devtools\n# @dependencies: []\n=== save_persists_after_reopen.yaml ===\
+n# @flow\n# @name: devtools/save_persists_after_reopen\n# @displayName: 保存配置
+在抽屉关闭后持久化\n# @module: devtools\n# @dependencies: [devtools/open_drawer]
+\n=== _conversation_list_assertions.yaml ===\n# @include\n# @name: im/conversati
+on-list-assertions\n# @description: 会话列表非空态时的断言步骤（conditional flow
+用）\n# @lastUpdated: 2026-04-26\n\n=== _enter_chat_actions.yaml ===\n# @include
+\n# @name: im/enter-chat-actions\n# @description: 进入聊天页的核心交互步骤（cond
+itional flow 用）\n# @lastUpdated: 2026-04-26\n\n=== enter_chat.yaml ===\n# @flo
+w\n# @name: im/enter-chat\n# @displayName: 进入聊天页\n# @module: im\n# @depende
+ncies: [auth/login, e2e-backend]\n=== send_message.yaml ===\n# @flow\n# @name: i
+m/send-message\n# @displayName: 发送文本消息\n# @module: im\n# @dependencies: [a
+uth/login, e2e-backend]\n=== view_conversation_list.yaml ===\n# @flow\n# @name: 
+im/view-conversation-list\n# @displayName: 查看会话列表\n# @module: im\n# @depen
+dencies: [auth/login, e2e-backend]\n=== swipe_recommendations.yaml ===\n# @flow\
+n# @name: matching/swipe-recommendations\n# @displayName: 推荐卡片滑动\n# @modul
+e: matching\n# @dependencies: [auth/login, e2e-backend]\n=== view_match_list.yam
+l ===\n# @flow\n# @name: matching/view-match-list\n# @displayName: 查看匹配列表\
+n# @module: matching\n# @dependencies: [auth/login, e2e-backend]\n',
+        message='Command executed successfully.',
+        display=[],
+        extras=None
+    )
+)
+StepBegin(n=10)
+ThinkPart(
+    type='think',
+    think='现在我已经有了足够的信息。让我开始进行文档补充。\n\n需要修改的文件：\
+n1. `CHANGELOG.md` - 添加 `#64` 条目\n2. `.maestro/README.md` - 补充新 flows 的
+目录结构和说明\n\n让我先看一下 `.maestro/README.md` 的完整内容，以便准确编辑。',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_lZPganVleKU815d20qj2HRsR',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/do
+c-gardener-64-886526752/.maestro/README.md"}'
+    ),
+    extras=None
+)
+StatusUpdate(
+    context_usage=0.16472244262695312,
+    context_tokens=43181,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=1197,
+        output=127,
+        input_cache_read=41984,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-XCrAckqOqVP8ew0MJqMQNBwR',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_lZPganVleKU815d20qj2HRsR',
+    return_value=ToolOk(
+        is_error=False,
+        output='     1\t# Mobile E2E 测试（Maestro + ADB Fallback）\n     2\t\n 
+   3\t本目录包含 Social World Mobile 端的端到端 UI 自动化测试。\n     4\t\n     
+5\t## 目录结构\n     6\t\n     7\t```\n     8\t.maestro/\n     9\t├── flows/    
+         # Maestro 标准测试流（推荐）\n    10\t│   ├── login.yaml      # 登录 UI
+流（无需后端，可独立运行）\n    11\t│   └── profile_setup.yaml  # 完善资料完整流
+（需要后端服务）\n    12\t├── adb_flows/          # ADB fallback 测试流（当 Maes
+tro 不可用时）\n    13\t│   ├── login.yaml\n    14\t│   ├── onboarding.yaml\n   
+15\t│   └── profile_setup.yaml\n    16\t└── scripts/\n    17\t    ├── run-e2e.sh
+     # 统一 E2E 入口脚本（自动处理 emulator / build / install / 端口检查）\n    
+18\t    ├── adb_runner.py   # ADB fallback runner（uiautomator dump + adb input
+）\n    19\t    └── adb_flow.py     # 旧版 adb runner（已弃用，请使用 adb_runner
+.py）\n    20\t```\n    21\t\n    22\t## 快速开始\n    23\t\n    24\t### 前置要
+求\n    25\t\n    26\t- Android Emulator 已启动（推荐 API 34，如 `Pixel_8_Pro`）
+\n    27\t- Maestro 1.39.13+ 已安装\n    28\t- **端口 7001 必须空闲**（Maestro 
+硬编码端口，会与 Dashboard `new_world_ws` 冲突）\n    29\t\n    30\t### 常用命令
+\n    31\t\n    32\t```bash\n    33\t# 仅跑 login 流（纯 UI，无需后端）\n    34\
+tmake test-mobile-e2e-login\n    35\t\n    36\t# 跑所有 flows（需要后端 + emulat
+or）\n    37\tmake test-mobile-e2e\n    38\t\n    39\t# CI 模式：自动构建 APK、
+启动后端、运行测试\n    40\tmake test-mobile-e2e-ci\n    41\t\n    42\t# ADB fal
+lback（当 Maestro 不可用时）\n    43\tmake test-mobile-e2e-adb\n    44\t```\n   
+45\t\n    46\t### 手动运行\n    47\t\n    48\t```bash\n    49\t# 使用统一脚本\n 
+  50\tbash .maestro/scripts/run-e2e.sh --flow login\n    51\tbash .maestro/scrip
+ts/run-e2e.sh --flow login --build\n    52\tbash .maestro/scripts/run-e2e.sh --c
+i\n    53\t\n    54\t# 直接使用 maestro\n    55\tmaestro --device emulator-5556 
+test .maestro/flows/login.yaml\n    56\t```\n    57\t\n    58\t## 环境说明\n    
+59\t\n    60\t### login.yaml\n    61\t\n    62\t- **依赖后端**：登录流程需要调用
+`/auth/login` API 完成用户认证并获取 token。\n    63\t- 适合作为日常开发和 CI 的
+快速回归测试。\n    64\t\n    65\t### profile_setup.yaml\n    66\t\n    67\t- **
+依赖后端**：登录后会调用 `/auth/login` 和 `/auth/me`，需要后端返回 `isNewUser=tr
+ue` 或 `profileComplete=false` 才能跳转到完善资料页。\n    68\t- 运行前请确保后
+端已启动：\n    69\t  ```bash\n    70\t  make e2e-env-up   # 启动 mysql + redis 
++ api\n    71\t  make test-mobile-e2e\n    72\t  make e2e-env-down # 测试结束后
+关闭\n    73\t  ```\n    74\t\n    75\t## 故障排查\n    76\t\n    77\t### `io.gr
+pc.StatusRuntimeException: INTERNAL: http2 exception`\n    78\t\n    79\t**原因*
+*：端口 7001 被其他进程占用（通常是 `new_world_ws` Dashboard）。  \n    80\t**解
+决**：终止占用进程后再运行测试。\n    81\t\n    82\t```bash\n    83\tlsof -ti :7
+001 | xargs kill\n    84\t```\n    85\t\n    86\t### `adb shell input text` 无法
+输入到 Flutter 自定义输入框\n    87\t\n    88\t**原因**：ADB 的 `input text` 依
+赖系统 IME，某些自定义 `TextField` 不响应。  \n    89\t**解决**：Maestro 的 `inp
+utText` 可以正常工作；如果只能用 ADB fallback，目前只能绕过文字输入步骤，仅做 ta
+p / assert。\n    90\t\n    91\t### Emulator 未找到\n    92\t\n    93\t**原因**
+：脚本通过 `adb devices` 查找 emulator，没有检测到已启动的设备。  \n    94\t**解
+决**：先启动模拟器，例如：\n    95\t\n    96\t```bash\n    97\temulator -avd Pix
+el_8_Pro\n    98\t```\n',
+        message='98 lines read from file starting from line 1. Total lines in fi
+le: 98. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+StepBegin(n=11)
+ThinkPart(
+    type='think',
+    think='现在我可以开始修改文档了。让我准备具体的修改内容：\n\n## 1. CHANGELOG
+.md 修改\n当前内容：\n```\n## [Unreleased]\n\n### Added\n- #30\n- #31\n- #33\n\n
+### Fixed\n- #38\n- #34\n```\n\n需要添加 `#64`，因为这是一个大的功能变更（IM 模
+块）。应该在 Added 下添加。\n\n## 2. .maestro/README.md 修改\n需要：\n1. 更新目
+录结构，包含新的 flows（auth, devtools, im, matching, profile）和 includes\n2. 
+补充新 flow 的环境说明\n\n让我编写具体的修改。\n\n目录结构部分：\n```\n.maestro/
+\n├── flows/              # Maestro 标准测试流（推荐）\n│   ├── auth/\n│   │   └
+── login.yaml           # 登录 UI 流\n│   ├── devtools/\n│   │   ├── open_drawer
+.yaml\n│   │   ├── edit_server_url.yaml\n│   │   ├── empty_server_url.yaml\n│   
+│   ├── invalid_server_url.yaml\n│   │   └── save_persists_after_reopen.yaml\n│ 
+ ├── im/\n│   │   ├── enter_chat.yaml\n│   │   ├── send_message.yaml\n│   │   └─
+─ view_conversation_list.yaml\n│   ├── matching/\n│   │   ├── swipe_recommendati
+ons.yaml\n│   │   └── view_match_list.yaml\n│   └── profile/\n│       └── setup.
+yaml\n├── includes/           # 可复用的动作片段\n│   ├── login-as-test-user.yam
+l\n│   ├── profile-setup-actions.yaml\n│   └── send_message_actions.yaml\n├── ad
+b_flows/          # ADB fallback 测试流（当 Maestro 不可用时）\n│   ├── login.ya
+ml\n│   ├── onboarding.yaml\n│   └── profile_setup.yaml\n└── scripts/\n    ├── r
+un-e2e.sh      # 统一 E2E 入口脚本\n    ├── maestro-check.sh # Maestro 环境检查
+脚本\n    ├── adb_runner.py   # ADB fallback runner\n    └── adb_flow.py     # 
+旧版 adb runner（已弃用）\n```\n\n环境说明部分需要补充：\n- devtools flows\n- im
+flows\n- matching flows\n\n让我现在执行修改。',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_f52hS8ebhtb3bGoIGTtSriTp',
+    function=FunctionBody(
+        name='SetTodoList',
+        arguments='{"todos": [{"title":"验证上一轮 Major 问题 #5 修复状态","stat
+us":"done"},{"title":"分析文档 diff 与代码变更，识别遗漏项","status":"done"},{"t
+itle":"修改 CHANGELOG.md 补充 #64 条目","status":"in_progress"},{"title":"修改 .
+maestro/README.md 补充新 flows 说明","status":"pending"},{"title":"输出结构化报
+告并提交文档变更","status":"pending"}]}'
+    ),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_f52hS8ebhtb3bGoIGTtSriTp',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='Todo list updated',
+        message='Todo list updated',
+        display=[
+            TodoDisplayBlock(
+                type='todo',
+                items=[
+                    TodoDisplayItem(
+                        title='验证上一轮 Major 问题 #5 修复状态',
+                        status='done'
+                    ),
+                    TodoDisplayItem(
+                        title='分析文档 diff 与代码变更，识别遗漏项',
+                        status='done'
+                    ),
+                    TodoDisplayItem(
+                        title='修改 CHANGELOG.md 补充 #64 条目',
+                        status='in_progress'
+                    ),
+                    TodoDisplayItem(
+                        title='修改 .maestro/README.md 补充新 flows 说明',
+                        status='pending'
+                    ),
+                    TodoDisplayItem(
+                        title='输出结构化报告并提交文档变更',
+                        status='pending'
+                    )
+                ]
+            )
+        ],
+        extras=None
+    )
+)
+StatusUpdate(
+    context_usage=0.16986465454101562,
+    context_tokens=44529,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=1521,
+        output=579,
+        input_cache_read=43008,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-NhQ2nJs6RfOKNSftLLhnFajR',
+    plan_mode=False,
+    mcp_status=None
+)
+StepBegin(n=12)
+ThinkPart(
+    type='think',
+    think='现在让我执行具体的文档修改。先修改 CHANGELOG.md，然后修改 .maestro/RE
+ADME.md。',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_43M3jV5xdFbaOJL2MXCRotWM',
+    function=FunctionBody(
+        name='Shell',
+        arguments='{"command": "cd /var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000g
+n/T/doc-gardener-64-886526752 && sed -i \'\' \'s/- #33/- #33\\\\n- #64/\' CHANGE
+LOG.md"}'
+    ),
+    extras=None
+)
+StatusUpdate(
+    context_usage=0.17218780517578125,
+    context_tokens=45138,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=850,
+        output=100,
+        input_cache_read=44288,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-3rPfjEZ1cXFzeqeCQc588n97',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_43M3jV5xdFbaOJL2MXCRotWM',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='',
+        message='Command executed successfully.',
+        display=[],
+        extras=None
+    )
+)
+StepBegin(n=13)
+ThinkPart(
+    type='think',
+    think='现在让我修改 .maestro/README.md。我需要更新目录结构和环境说明部分。',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_9kviIp8G1WvKNwud2jm8p11e',
+    function=FunctionBody(
+        name='Shell',
+        arguments='{"command": "cat > /tmp/maestro_readme_patch.py << \'EOF\'\\n
+import re\\n\\nwith open(\'/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/doc-
+gardener-64-886526752/.maestro/README.md\', \'r\') as f:\\n    content = f.read(
+)\\n\\n# Replace directory structure\\nold_dir = \'\'\'```\\n.maestro/\\n├── flo
+ws/              # Maestro 标准测试流（推荐）\\n│   ├── login.yaml      # 登录 U
+I 流（无需后端，可独立运行）\\n│   └── profile_setup.yaml  # 完善资料完整流（需
+要后端服务）\\n├── adb_flows/          # ADB fallback 测试流（当 Maestro 不可用
+时）\\n│   ├── login.yaml\\n│   ├── onboarding.yaml\\n│   └── profile_setup.yaml
+\\n└── scripts/\\n    ├── run-e2e.sh      # 统一 E2E 入口脚本（自动处理 emulator
+/ build / install / 端口检查）\\n    ├── adb_runner.py   # ADB fallback runner（
+uiautomator dump + adb input）\\n    └── adb_flow.py     # 旧版 adb runner（已弃
+用，请使用 adb_runner.py）\\n```\'\'\'\\n\\nnew_dir = \'\'\'```\\n.maestro/\\n├─
+─ flows/              # Maestro 标准测试流（推荐）\\n│   ├── auth/\\n│   │   └──
+login.yaml              # 登录 UI 流（需要后端 API）\\n│   ├── devtools/\\n│   │
+  ├── open_drawer.yaml        # 打开 DevTools 抽屉\\n│   │   ├── edit_server_url
+.yaml    # 编辑服务器 Base URL\\n│   │   ├── empty_server_url.yaml   # 空服务器
+地址校验\\n│   │   ├── invalid_server_url.yaml # 无效服务器地址校验\\n│   │   └─
+─ save_persists_after_reopen.yaml  # 配置持久化验证\\n│   ├── im/\\n│   │   ├── 
+enter_chat.yaml         # 进入聊天页\\n│   │   ├── send_message.yaml       # 发
+送文本消息\\n│   │   └── view_conversation_list.yaml  # 查看会话列表\\n│   ├── m
+atching/\\n│   │   ├── swipe_recommendations.yaml  # 推荐卡片滑动\\n│   │   └── 
+view_match_list.yaml    # 查看匹配列表\\n│   └── profile/\\n│       └── setup.ya
+ml              # 完善资料完整流\\n├── includes/           # 可复用的动作片段（
+被 flows 引用）\\n│   ├── login-as-test-user.yaml\\n│   ├── profile-setup-action
+s.yaml\\n│   └── send_message_actions.yaml\\n├── adb_flows/          # ADB fallb
+ack 测试流（当 Maestro 不可用时）\\n│   ├── login.yaml\\n│   ├── onboarding.yaml
+\\n│   └── profile_setup.yaml\\n└── scripts/\\n    ├── run-e2e.sh        # 统一 
+E2E 入口脚本（自动处理 emulator / build / install / 端口检查）\\n    ├── maestro
+-check.sh  # Maestro 环境检查脚本\\n    ├── adb_runner.py     # ADB fallback run
+ner（uiautomator dump + adb input）\\n    └── adb_flow.py       # 旧版 adb runne
+r（已弃用，请使用 adb_runner.py）\\n```\'\'\'\\n\\ncontent = content.replace(old
+_dir, new_dir)\\n\\n# Replace environment section\\nold_env = \'\'\'## 环境说明\
+\n\\n### login.yaml\\n\\n- **依赖后端**：登录流程需要调用 `/auth/login` API 完成
+用户认证并获取 token。\\n- 适合作为日常开发和 CI 的快速回归测试。\\n\\n### profi
+le_setup.yaml\\n\\n- **依赖后端**：登录后会调用 `/auth/login` 和 `/auth/me`，需
+要后端返回 `isNewUser=true` 或 `profileComplete=false` 才能跳转到完善资料页。\\n
+- 运行前请确保后端已启动：\\n  ```bash\\n  make e2e-env-up   # 启动 mysql + redi
+s + api\\n  make test-mobile-e2e\\n  make e2e-env-down # 测试结束后关闭\\n  ```\
+'\'\'\\n\\nnew_env = \'\'\'## 环境说明\\n\\n### auth/login.yaml\\n\\n- **依赖后
+端**：登录流程需要调用 `/auth/login` API 完成用户认证并获取 token。\\n- 适合作为
+日常开发和 CI 的快速回归测试。\\n\\n### devtools/*\\n\\n- **不依赖后端**：仅验证
+DevTools Drawer 的 UI 交互（打开抽屉、编辑服务器地址、输入校验、配置持久化）。\\
+n- 可直接运行：`make test-mobile-e2e-devtools`\\n\\n### im/*\\n\\n- **依赖后端**
+：需要 E2E 后端环境提供已登录用户、匹配关系和会话数据。\\n- `enter_chat.yaml`：
+从会话列表进入指定聊天页。\\n- `send_message.yaml`：在聊天页发送文本消息并断言消
+息气泡显示。\\n- `view_conversation_list.yaml`：验证会话列表空态/非空态渲染。\\n
+- 运行前请确保后端已启动：\\n  ```bash\\n  make e2e-env-up   # 启动 mysql + redi
+s + api\\n  make test-mobile-e2e\\n  make e2e-env-down # 测试结束后关闭\\n  ```\
+\n\\n### matching/*\\n\\n- **依赖后端**：需要 E2E 后端环境提供推荐候选池和匹配数
+据。\\n- `swipe_recommendations.yaml`：验证推荐卡片展示与滑动交互。\\n- `view_ma
+tch_list.yaml`：验证匹配列表展示与点击进入聊天。\\n\\n### profile/setup.yaml\\n\
+\n- **依赖后端**：登录后会调用 `/auth/login` 和 `/auth/me`，需要后端返回 `isNewU
+ser=true` 或 `profileComplete=false` 才能跳转到完善资料页。\\n- 运行前请确保后端
+已启动：\\n  ```bash\\n  make e2e-env-up   # 启动 mysql + redis + api\\n  make t
+est-mobile-e2e\\n  make e2e-env-down # 测试结束后关闭\\n  ```\'\'\'\\n\\ncontent
+= content.replace(old_env, new_env)\\n\\nwith open(\'/var/folders/lt/w3sl6z8j5v5
+0vt2s6knvf5n00000gn/T/doc-gardener-64-886526752/.maestro/README.md\', \'w\') as 
+f:\\n    f.write(content)\\n\\nprint(\'Done\')\\nEOF\\npython3 /tmp/maestro_read
+me_patch.py"}'
+    ),
+    extras=None
+)
+StatusUpdate(
+    context_usage=0.17266845703125,
+    context_tokens=45264,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=208,
+        output=1472,
+        input_cache_read=45056,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-WfxXBX76cT4Bp9ccGIQJRSX3',
+    plan_mode=False,
+    mcp_status=None
+)
+StepInterrupted()
+Unknown error: [Errno 2] No such file or directory
+
+To resume this session: kimi -r e6fcd223-b4d0-4853-b450-c65aacdaa97d
+[Errno 2] No such file or directory: '/private/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/doc-gardener-64-886526752'
+See logs: /Users/insulate/.kimi/logs/kimi.log
+Run with --debug for full traceback, or run kimi export to share diagnostics.

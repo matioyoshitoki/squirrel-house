@@ -1,0 +1,106 @@
+name: pr-rework
+steps:
+  - id: fetchOrigin
+    label: 同步远程分支
+    type: shell
+    command: git fetch origin
+    ignoreError: true
+
+  - id: installDeps
+    label: 安装项目依赖
+    type: shell
+    dir: '{{ .Vars.tmpDir }}'
+    command: |
+      if [ -f "pnpm-lock.yaml" ] && [ ! -d "node_modules" ]; then
+        pnpm install || npm install || true
+      elif [ -f "package-lock.json" ] && [ ! -d "node_modules" ]; then
+        npm install || true
+      fi
+      if [ -f "apps/mobile/pubspec.yaml" ]; then
+        (cd apps/mobile && flutter pub get) || true
+      fi
+      if [ -f "packages/design-system/pubspec.yaml" ]; then
+        (cd packages/design-system && flutter pub get) || true
+      fi
+    ignoreError: true
+
+  - id: checkEmulator
+    label: 检查模拟器可用性
+    type: shell
+    command: |
+      echo "=== Emulator Check ==="
+      export ANDROID_HOME=/Users/insulate/Library/Android/sdk
+      export PATH="$ANDROID_HOME/platform-tools:$PATH"
+
+      ANDROID_EMU=$(adb devices 2>/dev/null | grep "emulator" | head -1 | awk '{print $1}')
+      if [ -n "$ANDROID_EMU" ]; then
+        echo "✅ Android emulator: $ANDROID_EMU"
+        exit 0
+      fi
+
+      IOS_SIM=$(xcrun simctl list devices available 2>/dev/null | grep -E "iPhone|iPad" | head -1 | sed 's/.*(\([A-Z0-9-]*\)).*/\1/')
+      if [ -n "$IOS_SIM" ]; then
+        echo "✅ iOS simulator: $IOS_SIM"
+        exit 0
+      fi
+
+      echo "⚠️ 未找到可用模拟器。Maestro E2E 测试将无法运行。"
+      echo "如需运行 E2E，请先启动模拟器："
+      echo "  Android: emulator -avd <avd_name>"
+      echo "  iOS: open -a Simulator"
+    ignoreError: true
+
+  - id: flutterDoctor
+    label: Flutter 环境检查
+    type: shell
+    command: |
+      echo "=== Flutter Doctor ==="
+      flutter doctor -v | head -30
+    ignoreError: true
+
+  - id: runAgent
+    label: 运行 rework agent
+    type: shell
+    tmux: true
+    dir: '{{ .Vars.tmpDir }}'
+    command: |
+      kimi --agent-file {{ .Vars.agentFile | shellquote }} \
+           --max-steps-per-turn 10000 \
+           --print \
+           -p {{ .Vars.prompt | shellquote }}
+    env:
+      AGENT_ISSUE_NUMBER: '{{ .Vars.issueNumber }}'
+      AGENT_ISSUE_TITLE: '{{ .Vars.issueTitle }}'
+      AGENT_LOG_FILE: '{{ .Vars.logFileName }}'
+      AGENT_MODE: 'rework'
+      AGENT_REVIEW_REPORT: '{{ .Vars.reviewReport }}'
+    outputKey: agentOutput
+    logFile: '{{ .Vars.logFileName }}'
+
+  - id: preCommitChecks
+    label: 提交前强制检查
+    type: shell
+    dir: '{{ .Vars.tmpDir }}'
+    command: make pre-commit-checks
+    ignoreError: false
+
+  - id: ensureCommitAndPush
+    label: 强制提交并推送
+    type: shell
+    dir: '{{ .Vars.tmpDir }}'
+    isCleanup: true
+    command: |
+      git add -A && \
+      (git diff --cached --quiet || git commit -m "fix: auto-commit by agent") && \
+      git push origin {{ .Vars.branch }} || true
+    ignoreError: true
+
+  # 保留 worktree 供 E2E 复用，不在此清理
+  # - id: cleanupWorktree
+  #   label: 清理 worktree
+  #   type: shell
+  #   isCleanup: true
+  #   command: |
+  #     git worktree remove --force {{ .Vars.tmpDir }} || true
+  #     rm -rf {{ .Vars.tmpDir }}
+  #   ignoreError: true

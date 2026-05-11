@@ -1,0 +1,51 @@
+21:59:58.463 [ INFO] MAESTRO.logSystemInfo: ---- System Info ----
+21:59:58.463 [ INFO] MAESTRO.logSystemInfo: Maestro Version: 1.39.13
+21:59:58.464 [ INFO] MAESTRO.logSystemInfo: CI: Undefined
+21:59:58.464 [ INFO] MAESTRO.logSystemInfo: OS Name: Mac OS X
+21:59:58.464 [ INFO] MAESTRO.logSystemInfo: OS Version: 26.1
+21:59:58.464 [ INFO] MAESTRO.logSystemInfo: Architecture: aarch64
+21:59:58.464 [ INFO] MAESTRO.logSystemInfo: Java Version: 21
+21:59:58.470 [ INFO] MAESTRO.logSystemInfo: Xcode Version: null
+21:59:59.104 [ INFO] MAESTRO.logSystemInfo: Flutter Version: 3.24.5
+21:59:59.752 [ INFO] MAESTRO.logSystemInfo: Flutter Channel: stable
+21:59:59.752 [ INFO] MAESTRO.logSystemInfo: ---------------------
+22:00:00.029 [ INFO] maestro.orchestra.workspace.WorkspaceExecutionPlanner.plan: Created execution plan: ExecutionPlan(flowsToRun=[/Users/insulate/Desktop/social-world/.maestro/flows/auth/login.yaml, /Users/insulate/Desktop/social-world/.maestro/flows/profile/setup.yaml, /Users/insulate/Desktop/social-world/.maestro/flows/devtools/open_drawer.yaml, /Users/insulate/Desktop/social-world/.maestro/flows/devtools/edit_server_url.yaml], sequence=FlowSequence(flows=[], continueOnFailure=null))
+22:00:00.086 [ INFO] maestro.cli.command.TestCommand.runShardSuite: [shard 1] Selected device emulator-5556 using port 7001
+22:00:00.210 [ INFO] maestro.Maestro.invoke: Getting device info
+22:00:00.333 [ INFO] maestro.Maestro.invoke: Got device info: DeviceInfo(platform=ANDROID, widthPixels=1080, heightPixels=2400, widthGrid=1080, heightGrid=2400)
+22:00:00.399 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Define variables RUNNING
+22:00:00.401 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Define variables COMPLETED
+22:00:00.401 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Apply configuration RUNNING
+22:00:00.401 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Apply configuration COMPLETED
+22:00:00.401 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Launch app "com.example.mobile" RUNNING
+22:00:01.630 [ INFO] maestro.Maestro.launchApp: Launching app com.example.mobile
+22:00:06.837 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Launch app "com.example.mobile" FAILED
+22:00:06.838 [ INFO] maestro.Maestro.takeScreenshot: Taking screenshot
+22:00:06.838 [TRACE] maestro.utils.ScreenshotUtils.takeScreenshot: Taking screenshot to output sink
+22:00:07.282 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Define variables RUNNING
+22:00:07.282 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Define variables COMPLETED
+22:00:07.282 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Apply configuration RUNNING
+22:00:07.282 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Apply configuration COMPLETED
+22:00:07.282 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Launch app "com.example.mobile" RUNNING
+22:00:07.631 [ INFO] maestro.Maestro.launchApp: Launching app com.example.mobile
+22:00:12.645 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Launch app "com.example.mobile" FAILED
+22:00:12.645 [ INFO] maestro.Maestro.takeScreenshot: Taking screenshot
+22:00:12.645 [TRACE] maestro.utils.ScreenshotUtils.takeScreenshot: Taking screenshot to output sink
+22:00:12.868 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Define variables RUNNING
+22:00:12.869 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Define variables COMPLETED
+22:00:12.869 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Apply configuration RUNNING
+22:00:12.869 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Apply configuration COMPLETED
+22:00:12.869 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Launch app "com.example.mobile" RUNNING
+22:00:13.218 [ INFO] maestro.Maestro.launchApp: Launching app com.example.mobile
+22:00:18.231 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Launch app "com.example.mobile" FAILED
+22:00:18.232 [ INFO] maestro.Maestro.takeScreenshot: Taking screenshot
+22:00:18.232 [TRACE] maestro.utils.ScreenshotUtils.takeScreenshot: Taking screenshot to output sink
+22:00:18.654 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Define variables RUNNING
+22:00:18.655 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Define variables COMPLETED
+22:00:18.655 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Apply configuration RUNNING
+22:00:18.655 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Apply configuration COMPLETED
+22:00:18.655 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Launch app "com.example.mobile" RUNNING
+22:00:19.033 [ INFO] maestro.Maestro.launchApp: Launching app com.example.mobile
+22:00:24.051 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Launch app "com.example.mobile" FAILED
+22:00:24.051 [ INFO] maestro.Maestro.takeScreenshot: Taking screenshot
+22:00:24.051 [TRACE] maestro.utils.ScreenshotUtils.takeScreenshot: Taking screenshot to output sink

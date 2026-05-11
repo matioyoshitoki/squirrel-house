@@ -1,0 +1,12 @@
+[2026-04-11 17:30:24] PR #6 Review 启动
+分支: feat/issue-1
+项目路径: ../../social-world
+日志文件: logs/social-world/review-pr-6-20260411-173024.log
+⏳ 正在准备评审环境，创建 worktree 分支 review/pr-6 (基于 feat/issue-1): /var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/review-pr-6-419055088
+
+❌ worktree 创建失败: exit status 255
+Preparing worktree (new branch 'review/pr-6')
+fatal: a branch named 'review/pr-6' already exists
+
+
+任务已终止，请检查分支 review/pr-6 或 feat/issue-1 是否已被其他 worktree 占用。

@@ -1,0 +1,1980 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent Control Center</title>
+    <script src="/static/marked.min.js"></script>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="min-h-screen bg-slate-900 text-slate-100 leading-normal font-sans">
+    <div class="sticky top-0 z-[100] flex items-center justify-between border-b border-slate-700 bg-gradient-to-br from-slate-800 to-slate-900 px-8 py-5">
+        <div>
+            <h1 class="bg-gradient-to-r from-blue-400 to-violet-400 bg-clip-text text-2xl font-bold text-transparent">🤖 Agent Control Center</h1>
+            <p class="mt-1 text-sm text-slate-400">一键评审 PLAN 并触发开发 - 支持断点续传</p>
+        </div>
+        <div class="flex items-center gap-3">
+            <select id="" class="cursor-pointer rounded-[10px] border border-slate-700 bg-slate-800 px-[0.9rem] py-[0.45rem] text-[0.9375rem] text-slate-100 outline-none transition-all duration-200 hover:border-slate-600 focus:border-blue-500">
+                <option>加载中...</option>
+            </select>
+            <button class="flex h-10 w-10 items-center justify-center rounded-[10px] border border-slate-700 bg-slate-800 text-lg text-slate-100 transition-all duration-200 hover:rotate-180 hover:bg-slate-700" onclick="loadAll()" title="刷新">🔄</button>
+        </div>
+    </div>
+
+    <div class="mx-auto grid max-w-[1600px] grid-cols-4 gap-4 px-8 py-6 max-[900px]:grid-cols-2">
+        <div class="flex items-center gap-4 rounded-xl border border-slate-700 bg-slate-800 p-4 shadow-[0_4px_6px_-1px_rgba(0,0,0,0.3),0_2px_4px_-2px_rgba(0,0,0,0.3)]">
+            <div class="flex h-11 w-11 items-center justify-center rounded-[10px] bg-emerald-500/15 text-xl">🚀</div>
+            <div>
+                <div class="text-2xl font-bold" id="">0</div>
+                <div class="text-sm text-slate-400">运行中任务</div>
+            </div>
+        </div>
+        <div class="flex items-center gap-4 rounded-xl border border-slate-700 bg-slate-800 p-4 shadow-[0_4px_6px_-1px_rgba(0,0,0,0.3),0_2px_4px_-2px_rgba(0,0,0,0.3)]">
+            <div class="flex h-11 w-11 items-center justify-center rounded-[10px] bg-blue-500/15 text-xl">🔍</div>
+            <div>
+                <div class="text-2xl font-bold" id="stat-review">0</div>
+                <div class="text-sm text-slate-400">待 Review PR</div>
+            </div>
+        </div>
+        <div class="flex items-center gap-4 rounded-xl border border-slate-700 bg-slate-800 p-4 shadow-[0_4px_6px_-1px_rgba(0,0,0,0.3),0_2px_4px_-2px_rgba(0,0,0,0.3)]">
+            <div class="flex h-11 w-11 items-center justify-center rounded-[10px] bg-violet-500/15 text-xl">🎉</div>
+            <div>
+                <div class="text-2xl font-bold" id="stat-merged">0</div>
+                <div class="text-sm text-slate-400">最近合并</div>
+            </div>
+        </div>
+        <div class="flex items-center gap-4 rounded-xl border border-slate-700 bg-slate-800 p-4 shadow-[0_4px_6px_-1px_rgba(0,0,0,0.3),0_2px_4px_-2px_rgba(0,0,0,0.3)]">
+            <div class="flex h-11 w-11 items-center justify-center rounded-[10px] bg-orange-500/15 text-xl">📋</div>
+            <div>
+                <div class="text-2xl font-bold" id="">0</div>
+                <div class="text-sm text-slate-400">待处理 Issue</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mx-auto max-w-[1600px] px-8 pb-8">
+        <div class="mb-6 flex gap-2 overflow-x-auto border-b border-slate-700">
+            <button class="tab active group flex cursor-pointer items-center gap-2 whitespace-nowrap border-b-2 border-blue-500 bg-none px-5 py-3 text-[0.9375rem] font-medium text-blue-500 hover:text-slate-100" onclick="switchTab('tab-tasks')" id="tab-btn-tasks">
+                🚀 任务 <span class="rounded-full bg-slate-700 px-2 py-0.5 text-xs font-semibold text-slate-400 group-[.active]:bg-blue-500/20 group-[.active]:text-blue-300" id="">0</span>
+            </button>
+            <button class="tab group flex cursor-pointer items-center gap-2 whitespace-nowrap border-b-2 border-transparent bg-none px-5 py-3 text-[0.9375rem] font-medium text-slate-400 hover:text-slate-100" onclick="switchTab('tab-prs')" id="tab-btn-prs">
+                🔍 Pull Requests <span class="rounded-full bg-slate-700 px-2 py-0.5 text-xs font-semibold text-slate-400 group-[.active]:bg-blue-500/20 group-[.active]:text-blue-300" id="">0</span>
+            </button>
+            <button class="tab group flex cursor-pointer items-center gap-2 whitespace-nowrap border-b-2 border-transparent bg-none px-5 py-3 text-[0.9375rem] font-medium text-slate-400 hover:text-slate-100" onclick="switchTab('tab-issues')" id="tab-btn-issues">
+                📋 Issues <span class="rounded-full bg-slate-700 px-2 py-0.5 text-xs font-semibold text-slate-400 group-[.active]:bg-blue-500/20 group-[.active]:text-blue-300" id="">0</span>
+            </button>
+            <button class="tab group flex cursor-pointer items-center gap-2 whitespace-nowrap border-b-2 border-transparent bg-none px-5 py-3 text-[0.9375rem] font-medium text-slate-400 hover:text-slate-100" onclick="switchTab('tab-logs')" id="tab-btn-logs">
+                📄 日志
+            </button>
+        </div>
+
+        <div id="tab-tasks" class="tab-panel hidden active">
+            <div class="grid grid-cols-2 gap-6 max-[1100px]:grid-cols-1">
+                <div>
+                    <div class="mb-4 flex items-center gap-2 text-lg font-semibold">🟢 正在运行</div>
+                    <div id="running-tasks" class="flex flex-col gap-3"><div class="px-4 py-12 text-center text-sm text-slate-400">暂无运行中的任务</div></div>
+                    <div class="my-6 h-px bg-slate-700"></div>
+                    <div class="mb-4 flex items-center gap-2 text-lg font-semibold">📚 文档检查中</div>
+                    <div id="doc-gardener-tasks" class="flex flex-col gap-3"><div class="px-4 py-12 text-center text-sm text-slate-400">暂无文档检查任务</div></div>
+                    <div class="my-6 h-px bg-slate-700"></div>
+                    <div class="mb-4 flex items-center gap-2 text-lg font-semibold">⚠️ 可恢复任务</div>
+                    <div id="interrupted-tasks" class="flex flex-col gap-3"><div class="px-4 py-12 text-center text-sm text-slate-400">暂无中断的任务</div></div>
+                </div>
+                <div>
+                    <div class="mb-4 flex items-center gap-2 text-lg font-semibold">📄 最近日志</div>
+                    <div id="recent-logs" class="flex flex-col gap-3"><div class="px-4 py-12 text-center text-sm text-slate-400">暂无日志</div></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-prs" class="tab-panel hidden">
+            <div class="grid grid-cols-2 gap-6 max-[1100px]:grid-cols-1">
+                <div>
+                    <div class="mb-4 flex items-center gap-2 text-lg font-semibold">🔍 等待 Review</div>
+                    <div id="pending-prs" class="flex flex-col gap-3"><div class="px-4 py-12 text-center text-sm text-slate-400">暂无等待 Review 的 PR</div></div>
+                </div>
+                <div>
+                    <div class="mb-4 flex items-center gap-2 text-lg font-semibold">🎉 最近合并 <span class="rounded-full bg-slate-700 px-2 py-0.5 text-xs font-semibold text-slate-400" id="merged-pr-count">0</span></div>
+                    <div id="merged-prs" class="flex flex-col gap-3"><div class="px-4 py-12 text-center text-sm text-slate-400">暂无最近合并的 PR</div></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-issues" class="tab-panel hidden">
+            <div class="mb-4 flex justify-end">
+                <button class="primary cursor-pointer rounded-lg border border-slate-700 bg-slate-800/80 px-3.5 py-1.5 text-sm font-medium text-slate-200 transition-all duration-150" onclick="openPMModal()">✨ 新建需求</button>
+            </div>
+            <div class="grid grid-cols-2 gap-6 max-[1100px]:grid-cols-1">
+                <div>
+                    <div class="mb-4 flex items-center gap-2 text-lg font-semibold">📋 待评审 PLAN</div>
+                    <div id="plan-issues" class="flex flex-col gap-3"><div class="px-4 py-12 text-center text-sm text-slate-400">加载中...</div></div>
+                    <div class="my-6 h-px bg-slate-700"></div>
+                    <div class="mb-4 flex items-center gap-2 text-lg font-semibold">🟡 PRD 就绪</div>
+                    <div id="prd-issues" class="flex flex-col gap-3"><div class="px-4 py-12 text-center text-sm text-slate-400">加载中...</div></div>
+                </div>
+                <div>
+                    <div class="mb-4 flex items-center gap-2 text-lg font-semibold">🔍 待分类</div>
+                    <div id="triage-issues" class="flex flex-col gap-3"><div class="px-4 py-12 text-center text-sm text-slate-400">加载中...</div></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-logs" class="tab-panel hidden">
+            <div class="mb-4 flex items-center gap-2 text-lg font-semibold">📄 全部日志</div>
+            <div id="all-logs" class="flex flex-col gap-3"><div class="px-4 py-12 text-center text-sm text-slate-400">加载中...</div></div>
+        </div>
+    </div>
+
+    <div id="" class="fixed bottom-6 right-6 z-[2000] hidden rounded-[10px] bg-emerald-500 px-5 py-3.5 font-medium text-white shadow-[0_4px_6px_-1px_rgba(0,0,0,0.3),0_2px_4px_-2px_rgba(0,0,0,0.3)]"></div>
+
+    <div id="" class="fixed inset-0 z-[3000] hidden flex-col items-center justify-center gap-4 bg-slate-900/70 backdrop-blur-sm">
+        <div class="h-12 w-12 animate-spin rounded-full border-4 border-blue-500/20 border-t-blue-500"></div>
+        <div class="loading-text text-base font-medium text-slate-100">执行中...</div>
+    </div>
+
+    <!-- Terminal -->
+    <div id="" class="fixed inset-0 z-[1500] hidden items-center justify-center bg-slate-900/85 p-4 backdrop-blur-sm">
+        <div class="flex h-[85vh] w-full max-w-[1200px] flex-col overflow-hidden rounded-xl border border-slate-700 bg-[#020617] shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)]">
+            <div class="flex items-center justify-between border-b border-slate-700 bg-slate-800 px-4 py-3.5">
+                <div class="flex items-center gap-3 font-medium">
+                    <div class="flex gap-1.5">
+                        <span class="h-3 w-3 rounded-full bg-[#ff5f56]"></span>
+                        <span class="h-3 w-3 rounded-full bg-[#ffbd2e]"></span>
+                        <span class="h-3 w-3 rounded-full bg-[#27c93f]"></span>
+                    </div>
+                    <span id="terminal-filename">tail -f dev-issue-xxx.log</span>
+                </div>
+                <div class="flex gap-2">
+                    <button id="-btn" class="cursor-pointer rounded-md border border-blue-500 bg-blue-500 px-2.5 py-1 text-xs text-white hover:bg-slate-700 hover:text-slate-100" onclick="toggleRenderMode()" title="切换原始/渲染视图">渲染</button>
+                    <button class="cursor-pointer rounded-md border border-slate-700 bg-transparent px-2.5 py-1 text-xs text-slate-400 hover:bg-slate-700 hover:text-slate-100" onclick="clearTerminal()" title="清屏">清屏</button>
+                    <button class="cursor-pointer rounded-md border border-slate-700 bg-transparent px-2.5 py-1 text-xs text-slate-400 hover:bg-slate-700 hover:text-slate-100" onclick="closeTerminal()" title="关闭 (ESC)">✕</button>
+                </div>
+            </div>
+            <div id="" class="flex-1 overflow-y-auto p-4 font-mono text-[0.8125rem] leading-relaxed text-slate-200"></div>
+            <div class="flex items-center justify-between border-t border-slate-700 bg-slate-800 px-4 py-2.5 text-[0.8125rem] text-slate-400">
+                <span id="" class="inline-flex items-center gap-2">
+                    <span class="inline-flex items-center gap-1.5 text-emerald-500 after:content-[''] after:inline-block after:h-1.5 after:w-1.5 after:rounded-full after:bg-emerald-500 after:animate-[blink_1.2s_infinite]">LIVE</span>
+                    <span id="line-count">0 lines</span>
+                </span>
+                <span id="terminal-info">按 ESC 关闭 | 自动跟随</span>
+            </div>
+            <button class="absolute bottom-14 right-6 z-10 hidden h-9 w-9 items-center justify-center rounded-full border border-slate-700 bg-slate-800 text-base text-slate-100 shadow-[0_4px_6px_-1px_rgba(0,0,0,0.3),0_2px_4px_-2px_rgba(0,0,0,0.3)]" id="" onclick="scrollToBottom()" title="滚动到底部">↓</button>
+        </div>
+    </div>
+
+    <script>
+        let eventSource = null;
+        let lineCount = 0;
+        let isAutoScroll = true;
+        let currentLogFile = null;
+        let runningTasksData = [];
+        let allLogsData = [];
+        let designAssetsCache = {}; // issueNumber -> assets[]
+        let renderMode = 'rendered'; // 'rendered' | 'raw'
+        let rawLogLines = []; // 保留原始行用于切换回原始视图
+
+        const terminalBody = document.getElementById('');
+        const terminalOverlay = document.getElementById('');
+
+        terminalBody.addEventListener('scroll', () => {
+            const { scrollTop, scrollHeight, clientHeight } = terminalBody;
+            const atBottom = scrollHeight - scrollTop - clientHeight < 50;
+            isAutoScroll = atBottom;
+            document.getElementById('').classList.toggle('flex', !atBottom);
+        });
+
+        function scrollToBottom() {
+            terminalBody.scrollTop = terminalBody.scrollHeight;
+            isAutoScroll = true;
+        }
+
+        function showToast(message, isError = false) {
+            const  = document.getElementById('');
+            .textContent = message;
+            .classList.remove('hidden', 'bg-red-500');
+            .classList.add('block');
+            .style.animation = 'slideIn 0.25s ease';
+            if (isError) {
+                .classList.remove('bg-emerald-500');
+                .classList.add('bg-red-500');
+            } else {
+                .classList.remove('bg-red-500');
+                .classList.add('bg-emerald-500');
+            }
+            setTimeout(() => {
+                .classList.remove('block', 'bg-red-500');
+                .style.animation = '';
+                .classList.add('hidden', 'bg-emerald-500');
+            }, 3000);
+        }
+
+        let globalLoadingCount = 0;
+        function showGlobalLoading(text) {
+            const el = document.getElementById('');
+            if (el) {
+                el.querySelector('.loading-text').textContent = text || '执行中...';
+                el.classList.remove('hidden');
+                el.classList.add('flex');
+            }
+            globalLoadingCount++;
+        }
+        function hideGlobalLoading() {
+            globalLoadingCount = Math.max(0, globalLoadingCount - 1);
+            if (globalLoadingCount === 0) {
+                const el = document.getElementById('');
+                if (el) {
+                    el.classList.remove('flex');
+                    el.classList.add('hidden');
+                }
+            }
+        }
+
+        function setButtonLoading(btn, loading) {
+            if (!btn) return;
+            if (loading) {
+                btn.disabled = true;
+                btn.classList.add('loading');
+                btn.dataset.originalText = btn.textContent;
+            } else {
+                btn.disabled = false;
+                btn.classList.remove('loading');
+            }
+        }
+
+        async function loadProjects() {
+            try {
+                const response = await fetch('/api/projects');
+                const data = await response.json();
+                currentProject = data.currentProject;
+                const select = document.getElementById('');
+                select.innerHTML = '';
+                data.projects.forEach((p, idx) => {
+                    const opt = document.createElement('option');
+                    opt.value = p.name;
+                    opt.textContent = p.name;
+                    if (idx === data.currentIndex) opt.selected = true;
+                    select.appendChild(opt);
+                });
+                select.onchange = async (e) => {
+                    const name = e.target.value;
+                    setButtonLoading(select, true);
+                    try {
+                        const res = await fetch('/api/switch-project', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ projectName: name })
+                        });
+                        const result = await res.json();
+                        if (!res.ok) throw new Error(result.error || 'Switch failed');
+                        showToast(result.message);
+                        currentProject = data.projects.find(p => p.name === name);
+                        await loadAll();
+                    } catch (err) {
+                        showToast(err.message, true);
+                    } finally {
+                        setButtonLoading(select, false);
+                    }
+                };
+                return data;
+            } catch (error) {
+                console.error('Error loading projects:', error);
+                return { projects: [], currentProject: null };
+            }
+        }
+
+        function formatDuration(ms) {
+            const seconds = Math.floor(ms / 1000);
+            const minutes = Math.floor(seconds / 60);
+            const hours = Math.floor(minutes / 60);
+            if (hours > 0) return hours + 'h ' + (minutes % 60) + 'm';
+            if (minutes > 0) return minutes + 'm ' + (seconds % 60) + 's';
+            return seconds + 's';
+        }
+
+        async function loadAll() {
+            const btn = document.querySelector('.btn-icon');
+            if (btn) btn.classList.add('spinning', 'animate-spin');
+            
+            await Promise.all([
+                loadRunningTasks(),
+                loadReviewTasks(),
+                loadDocGardenerTasks(),
+                loadIssues(),
+                loadRecentLogs(),
+                loadPullRequests(),
+                loadMergedPRs()
+            ]);
+            updateStats();
+            
+            if (btn) btn.classList.remove('spinning', 'animate-spin');
+        }
+
+        async function loadTasks() {
+            await Promise.all([
+                loadRunningTasks(),
+                loadReviewTasks(),
+                loadDocGardenerTasks(),
+                loadRecentLogs()
+            ]);
+            updateStats();
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab').forEach(t => {
+                t.classList.remove('active', 'text-blue-500', 'border-blue-500');
+            });
+            document.querySelectorAll('.tab-panel').forEach(p => {
+                p.classList.remove('active', 'block');
+                p.classList.add('hidden');
+            });
+            document.getElementById('tab-btn-' + tabId.replace('tab-', '')).classList.add('active', 'text-blue-500', 'border-blue-500');
+            const panel = document.getElementById(tabId);
+            if (panel) {
+                panel.classList.remove('hidden');
+                panel.classList.add('block', 'active');
+            }
+        }
+
+        function updateStats() {
+            if (!runningTasksData) runningTasksData = [];
+            if (!pullRequestsData) pullRequestsData = [];
+            if (!issuesData) issuesData = [];
+            const running = runningTasksData.filter(t => t.status === 'running').length;
+            const interrupted = runningTasksData.filter(t => t.status === 'interrupted').length;
+            const pendingPR = pullRequestsData.length;
+            const totalIssues = issuesData.length;
+            
+            document.getElementById('').textContent = running;
+            document.getElementById('stat-review').textContent = pendingPR;
+            document.getElementById('stat-merged').textContent = document.getElementById('merged-pr-count')?.textContent || 0;
+            document.getElementById('').textContent = totalIssues;
+            
+            document.getElementById('').textContent = running + interrupted;
+            document.getElementById('').textContent = pendingPR;
+            document.getElementById('').textContent = totalIssues;
+        }
+
+        async function loadIssues() {
+            try {
+                const response = await fetch('/api/issues');
+                if (!response.ok) {
+                    const err = await response.json().catch(() => ({ error: 'Unknown error' }));
+                    throw new Error(err.error || 'HTTP ' + response.status);
+                }
+                const issues = await response.json();
+                issuesData = issues;
+                
+                // 并行预加载设计资产，确保 issue 列表初始渲染时按钮已就位
+                const uniqueIssues = [...new Set(issues.map(i => i.number))];
+                await Promise.all(uniqueIssues.map(n => {
+                    if (designAssetsCache[n] === undefined) {
+                        return loadDesignAssets(n);
+                    }
+                    return Promise.resolve();
+                }));
+                
+                const plans = issues.filter(i => i.labels.some(l => l.name === 'plan-ready')).sort((a, b) => b.number - a.number);
+                const prds = issues.filter(i => i.labels.some(l => l.name === 'prd-ready')).sort((a, b) => b.number - a.number);
+                const triages = issues.filter(i => !i.labels.some(l => l.name === 'plan-ready' || l.name === 'prd-ready')).sort((a, b) => b.number - a.number);
+                
+                renderIssues('plan-issues', plans, 'plan-ready');
+                renderIssues('prd-issues', prds, 'prd-ready');
+                renderIssues('triage-issues', triages, 'triage');
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('加载失败: ' + error.message, true);
+            }
+        }
+
+        async function loadRunningTasks() {
+            try {
+                const response = await fetch('/api/running-tasks');
+                if (!response.ok) {
+                    const err = await response.json().catch(() => ({ error: 'Unknown error' }));
+                    throw new Error(err.error || 'HTTP ' + response.status);
+                }
+                runningTasksData = await response.json();
+                runningTasksData.sort((a, b) => new Date(b.startTime || 0) - new Date(a.startTime || 0));
+                renderRunningTasks();
+                await renderInterruptedTasks();
+            } catch (error) {
+                console.error('Error loading running tasks:', error);
+            }
+        }
+
+        async function loadRecentLogs() {
+            try {
+                const response = await fetch('/api/logs');
+                if (!response.ok) {
+                    const err = await response.json().catch(() => ({ error: 'Unknown error' }));
+                    throw new Error(err.error || 'HTTP ' + response.status);
+                }
+                allLogsData = await response.json();
+                allLogsData.sort((a, b) => new Date(b.modifiedAt) - new Date(a.modifiedAt));
+                renderLogs(allLogsData.slice(0, 5));
+                await renderInterruptedTasks();
+            } catch (error) {
+                console.error('Error loading logs:', error);
+            }
+        }
+
+        function renderRunningTasks() {
+            const container = document.getElementById('running-tasks');
+            if (!runningTasksData) runningTasksData = [];
+            const running = runningTasksData.filter(t => t.status === 'running');
+            
+            if (running.length === 0) {
+                container.innerHTML = '<div class="px-4 py-10 text-center text-[0.9375rem] text-slate-400">暂无运行中的任务</div>';
+                return;
+            }
+            
+            container.innerHTML = running.map(task => {
+                const startTime = new Date(task.startTime);
+                const duration = Date.now() - startTime.getTime();
+                const isRework = task.type === 'rework';
+                let taskLabel = '🚀 开发中';
+                if (task.type === 'rework') taskLabel = '🔧 返工修复中';
+                else if (task.type === 'design') taskLabel = '🎨 设计中';
+                else if (task.type === 'pm') taskLabel = '📋 PRD 产出中';
+                else if (task.type === 'doc-gardener') taskLabel = '📝 Doc Gardener';
+                const statusClass = isRework ? 'rework' : 'running';
+                return '<div class="issue-card rounded-xl border border-slate-700 bg-slate-800 p-4 shadow-[0_4px_6px_-1px_rgba(0,0,0,0.3),0_2px_4px_-2px_rgba(0,0,0,0.3)] transition-all duration-200 hover:border-slate-600 hover:-translate-y-px ' + statusClass + '" data-issue="' + task.targetId + '">' +
+                    '<div class="issue-header flex items-start justify-between gap-4 mb-2">' +
+                        '<a href="' + (currentProject && currentProject.repo ? 'https://github.com/' + currentProject.repo + '/issues/' : '#') + '' + task.targetId + '" ' +
+                           'class="text-base font-medium leading-snug text-blue-300 no-underline hover:underline" target="_blank">' +
+                            '#' + task.targetId + ': ' + escapeHtml(task.targetTitle) +
+                        '</a>' +
+                        '<span class="running-time text-sm font-medium text-emerald-500" data-start="' + task.startTime + '" data-label="' + taskLabel + '">' +
+                            taskLabel + ' · ⏱️ ' + formatDuration(duration) +
+                        '</span>' +
+                    '</div>' +
+                    '<div class="mb-3 text-sm text-slate-400">' + startTime.toLocaleString() + ' 开始</div>' +
+                    '<div class="actions flex flex-wrap gap-2">' +
+                        '<button class="bg-blue-500 border-blue-500 text-white hover:bg-blue-600" onclick="openLogTerminalByFile(\'' + task.logFile + '\')">🖥️ 监控</button>' +
+                        '<button class="bg-red-500 border-red-500 text-white hover:bg-red-600" onclick="stopTask(event, ' + task.targetId + ', \'' + task.type + '\')">⏹️ 停止</button>' +
+                    '</div>' +
+                '</div>';
+            }).join('');
+        }
+
+        // 检测并显示可恢复的任务
+        async function renderInterruptedTasks() {
+            const container = document.getElementById('interrupted-tasks');
+            
+            // 直接从 runningTasksData 获取 interrupted 状态的任务
+            const interrupted = runningTasksData.filter(t => t.status === 'interrupted');
+            
+            if (interrupted.length === 0) {
+                container.innerHTML = '<div class="px-4 py-10 text-center text-[0.9375rem] text-slate-400">暂无中断的任务</div>';
+                return;
+            }
+            
+            container.innerHTML = interrupted.map(task => {
+                const logFile = task.logFile.replace(/^logs\//, '');
+                const typeLabel = task.type === 'rework' ? '返工修复' : 
+                                  task.type === 'doc-gardener' ? '文档检查' : '开发';
+                const btnText = task.type === 'rework' ? '🔄 恢复返工' : 
+                                task.type === 'doc-gardener' ? '🔄 恢复文档检查' : '🔄 恢复开发';
+                const resumeFn = task.type === 'rework' ? 'resumeRework' : 
+                                 task.type === 'doc-gardener' ? 'resumeDocGardener' : 'resumeDev';
+                const targetLabel = task.type === 'rework' || task.type === 'doc-gardener' ? 
+                    'PR #' + task.targetId : 'Issue #' + task.targetId;
+                return '<div class="issue-card rounded-xl border border-slate-700 bg-slate-800 p-4 shadow-[0_4px_6px_-1px_rgba(0,0,0,0.3),0_2px_4px_-2px_rgba(0,0,0,0.3)] transition-all duration-200 hover:border-slate-600 hover:-translate-y-px border-l-4 border-l-orange-500" data-issue="' + task.targetId + '" data-type="' + task.type + '">' +
+                    '<div class="issue-header flex items-start justify-between gap-4 mb-2">' +
+                        '<span class="text-base font-medium leading-snug text-blue-300 no-underline hover:underline">' + targetLabel + '</span>' +
+                        '<span class="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-semibold bg-orange-500/15 text-orange-400">⏸️ 已中断 (' + typeLabel + ')</span>' +
+                    '</div>' +
+                    '<div class="mb-2 text-sm text-amber-500">⚠️ 任务因步骤限制中断，点击按钮继续完成</div>' +
+                    '<div class="mb-3 text-sm text-slate-400">' + new Date(task.startTime).toLocaleString() + '</div>' +
+                    '<div class="actions flex flex-wrap gap-2">' +
+                        '<button class="bg-amber-500 border-amber-500 text-slate-900 hover:bg-amber-600" onclick="' + resumeFn + '(event, ' + task.targetId + ', \'' + logFile + '\')">' + btnText + '</button>' +
+                        '<button onclick="openLogTerminalByFile(\'' + logFile + '\')">📄 查看日志</button>' +
+                    '</div>' +
+                '</div>';
+            }).join('');
+        }
+
+        function renderIssues(containerId, issues, type) {
+            const container = document.getElementById(containerId);
+            if (!issues) issues = [];
+            if (!runningTasksData) runningTasksData = [];
+            
+            if (issues.length === 0) {
+                container.innerHTML = '<div class="px-4 py-10 text-center text-[0.9375rem] text-slate-400">暂无数据</div>';
+                return;
+            }
+            
+            const runningIds = new Set(runningTasksData.filter(t => t.status === 'running').map(t => t.targetId));
+            
+            container.innerHTML = issues.map(issue => {
+                const isRunning = runningIds.has(issue.number);
+                const labelsHtml = issue.labels.map(l => '<span class="label rounded-full bg-slate-400/10 border border-slate-400/20 px-2.5 py-0.5 text-xs text-slate-300">' + l.name + '</span>').join('');
+                const classification = issue.classification || 'full-stack';
+                const designTask = runningTasksData.find(t => t.type === 'design' && t.targetId === issue.number);
+                const isDesigning = designTask && designTask.status === 'running';
+                const issueType = getIssueType(issue.labels, issue.title, issue.body);
+                const display = getIssueTypeDisplay(issueType);
+                
+                let actionsHtml = '<button onclick="viewIssue(' + issue.number + ')">查看</button>';
+                
+                if (isRunning) {
+                    actionsHtml = '<button disabled>运行中...</button>' + actionsHtml;
+                } else {
+                    const designAssets = designAssetsCache[issue.number];
+                    let viewDesignBtn = '';
+                    if (designAssets && designAssets.length > 0) {
+                        viewDesignBtn = '<button class="bg-blue-500 border-blue-500 text-white hover:bg-blue-600" onclick="openDesignViewer(' + issue.number + ')">🖼️ 查看设计</button>';
+                    }
+                    let designBtn = '';
+                    if (classification !== 'backend-only') {
+                        designBtn = '<button class="bg-blue-500 border-blue-500 text-white hover:bg-blue-600" onclick="startDesign(event, ' + issue.number + ', \'' +
+                            escapeHtml(issue.title) + '\')">🎨 开始设计</button>';
+                    }
+
+                    if (issueType === 'ui-feedback') {
+                        // UI 反馈类优先设计调整，不显示开发按钮
+                        actionsHtml = designBtn + viewDesignBtn + actionsHtml;
+                    } else {
+                        let devBtnClass = display.className || 'primary';
+                        let devBtn = '<button class="' + devBtnClass + '" onclick="startDev(event, ' + issue.number + ', \'' +
+                            escapeHtml(issue.title) + '\', \'' + issueType + '\')">' + display.text + '</button>';
+                        if (isDesigning) {
+                            devBtn = '<button class="bg-emerald-500 border-emerald-500 text-white hover:bg-emerald-600" disabled title="设计任务进行中，建议等待完成后再开发">' + display.text + '（等待设计）</button>';
+                        }
+                        if (classification === 'backend-only') {
+                            actionsHtml = devBtn + actionsHtml;
+                        } else {
+                            actionsHtml = devBtn + viewDesignBtn + designBtn + actionsHtml;
+                        }
+                    }
+                }
+                
+                return '<div class="issue-card rounded-xl border border-slate-700 bg-slate-800 p-4 shadow-[0_4px_6px_-1px_rgba(0,0,0,0.3),0_2px_4px_-2px_rgba(0,0,0,0.3)] transition-all duration-200 hover:border-slate-600 hover:-translate-y-px" data-issue="' + issue.number + '">' +
+                    '<div class="issue-header flex items-start justify-between gap-4 mb-2">' +
+                        '<a href="' + (currentProject && currentProject.repo ? 'https://github.com/' + currentProject.repo + '/issues/' : '#') + '' + issue.number + '" ' +
+                           'class="text-base font-medium leading-snug text-blue-300 no-underline hover:underline" target="_blank">' +
+                            '#' + issue.number + ': ' + escapeHtml(issue.title) +
+                        '</a>' +
+                    '</div>' +
+                    '<div class="mb-3 text-sm text-slate-400">' + new Date(issue.updatedAt).toLocaleString() + '</div>' +
+                    '<div class="labels flex flex-wrap gap-1.5 mb-3">' + labelsHtml + '</div>' +
+                    '<div class="actions flex flex-wrap gap-2">' + actionsHtml + '</div>' +
+                '</div>';
+            }).join('');
+
+            // 异步加载设计资产信息（null 表示之前加载过但为空，也需要刷新）
+            issues.forEach(issue => {
+                if (designAssetsCache[issue.number] === undefined) {
+                    loadDesignAssets(issue.number);
+                }
+            });
+        }
+
+        function renderLogs(logs) {
+            const container = document.getElementById('recent-logs');
+            
+            if (logs.length === 0) {
+                container.innerHTML = '<div class="px-4 py-10 text-center text-[0.9375rem] text-slate-400">暂无日志</div>';
+                return;
+            }
+            
+            container.innerHTML = logs.map(log => {
+                const time = log.modifiedAt ? new Date(log.modifiedAt).toLocaleString() : '未知';
+                const size = formatBytes(log.size);
+                let title = 'File';
+                if (log.filename.startsWith('dev-issue-')) {
+                    title = 'Issue #' + log.issueNumber;
+                } else if (log.filename.startsWith('review-pr-')) {
+                    title = 'PR #' + log.issueNumber + ' Review';
+                } else if (log.filename.startsWith('review-report-')) {
+                    title = 'PR #' + log.issueNumber + ' Report';
+                } else if (log.filename.startsWith('review-state-')) {
+                    title = 'PR #' + log.issueNumber + ' State';
+                } else if (log.filename.startsWith('pm-issue-')) {
+                    title = 'Issue #' + log.issueNumber + ' PRD';
+                } else if (log.filename.startsWith('doc-gardener-pr-')) {
+                    title = 'PR #' + log.issueNumber + ' Doc Gardener';
+                }
+                return '<div class="issue-card rounded-xl border border-slate-700 bg-slate-800 shadow-[0_4px_6px_-1px_rgba(0,0,0,0.3),0_2px_4px_-2px_rgba(0,0,0,0.3)] transition-all duration-200 hover:border-slate-600 hover:-translate-y-px" class="mb-2 p-3">' +
+                    '<div class="flex items-center justify-between">' +
+                        '<div>' +
+                            '<div class="text-sm text-blue-400">' + title + '</div>' +
+                            '<div class="text-xs text-slate-500">' + time + ' · ' + size + '</div>' +
+                        '</div>' +
+                        '<button class="bg-blue-500 border-blue-500 text-white hover:bg-blue-600" onclick="openLogTerminalByFile(\'' + log.filename + '\')">🖥️ 查看</button>' +
+                    '</div>' +
+                '</div>';
+            }).join('');
+        }
+
+        // PR 相关函数
+        async function loadPullRequests() {
+            try {
+                const response = await fetch('/api/pull-requests');
+                if (!response.ok) {
+                    const err = await response.json().catch(() => ({ error: 'Unknown error' }));
+                    throw new Error(err.error || 'HTTP ' + response.status);
+                }
+                const prs = await response.json();
+                pullRequestsData = prs.sort((a, b) => b.number - a.number);
+                renderPullRequests(prs);
+            } catch (error) {
+                console.error('Error loading PRs:', error);
+                showToast('加载 PR 失败: ' + error.message, true);
+                pullRequestsData = [];
+                renderPullRequests([]);
+            }
+        }
+
+        async function loadMergedPRs() {
+            try {
+                const response = await fetch('/api/pull-requests?state=merged');
+                if (!response.ok) {
+                    const err = await response.json().catch(() => ({ error: 'Unknown error' }));
+                    throw new Error(err.error || 'HTTP ' + response.status);
+                }
+                const prs = await response.json();
+                renderMergedPRs(prs.sort((a, b) => b.number - a.number));
+            } catch (error) {
+                console.error('Error loading merged PRs:', error);
+                renderMergedPRs([]);
+            }
+        }
+
+        let reviewTasksData = [];
+        let pullRequestsData = [];
+        let issuesData = [];
+        let currentProject = null;
+
+        function renderPullRequests(prs) {
+            const container = document.getElementById('pending-prs');
+            
+            if (prs.length === 0) {
+                container.innerHTML = '<div class="px-4 py-10 text-center text-[0.9375rem] text-slate-400">暂无等待 Review 的 PR</div>';
+                return;
+            }
+            
+            // 获取 review 任务状态
+            const reviewingIds = new Set(reviewTasksData.filter(t => t.status === 'running').map(t => t.targetId));
+            const knownReviews = new Map(reviewTasksData.filter(t => ['success','failed','stopped','interrupted'].includes(t.status)).map(t => [t.targetId, t]));
+            
+            container.innerHTML = prs.map(pr => {
+                const time = pr.createdAt ? new Date(pr.createdAt).toLocaleString() : '未知';
+                const isReviewing = reviewingIds.has(pr.number);
+                const reviewTask = knownReviews.get(pr.number);
+                
+                // 检查返工任务状态（running / failed / interrupted 都需要显示）
+                const relatedReworkTask = runningTasksData.find(t =>
+                    ['running', 'failed', 'interrupted'].includes(t.status) &&
+                    t.type === 'rework' &&
+                    t.prNumber === pr.number
+                );
+                const isReworkRunning = relatedReworkTask && relatedReworkTask.status === 'running';
+                const isReworkFailed = relatedReworkTask && (relatedReworkTask.status === 'failed' || relatedReworkTask.status === 'interrupted');
+
+                let statusHtml = '';
+                let buttonsHtml = '';
+                let extraClass = '';
+
+                // 检测是否为 design PR
+                let designIssueNumber = null;
+                const designMatch = pr.title.match(/design:\\s+assets\\s+for\\s+issue\\s+#(\\d+)/i);
+                if (designMatch) {
+                    designIssueNumber = parseInt(designMatch[1], 10);
+                    if (designAssetsCache[designIssueNumber] === undefined) {
+                        loadDesignAssets(designIssueNumber);
+                    }
+                }
+
+                if (isReworkRunning) {
+                    // 返工修复中
+                    statusHtml = '<span class="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-semibold bg-amber-500/15 text-amber-400 ml-2">🔧 返工修复中...</span>';
+                    extraClass = ' rework';
+                    buttonsHtml = '<button disabled>🔧 返工修复中...</button>' +
+                        '<button class="bg-blue-500 border-blue-500 text-white hover:bg-blue-600" onclick="openLogTerminalByFile(\'' + relatedReworkTask.logFile + '\')">📄 查看日志</button>' +
+                        '<button onclick="window.open(\'' + pr.url + '\', \'_blank\')">👁️ 查看 PR</button>';
+                } else if (isReworkFailed) {
+                    // 返工失败/中断，可恢复
+                    statusHtml = '<span class="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-semibold bg-red-500/15 text-red-400 ml-2">❌ 返工失败</span>';
+                    extraClass = ' border-l-4 border-l-orange-500';
+                    const logFile = relatedReworkTask.logFile.replace(/^logs\//, '');
+                    buttonsHtml = '<button class="bg-amber-500 border-amber-500 text-slate-900 hover:bg-amber-600" onclick="resumeRework(event, ' + pr.number + ', \'' + logFile + '\')">🔄 恢复返工</button>' +
+                        '<button class="bg-blue-500 border-blue-500 text-white hover:bg-blue-600" onclick="viewReviewReport(' + pr.number + ')">📋 查看报告</button>' +
+                        '<button onclick="window.open(\'' + pr.url + '\', \'_blank\')">👁️ 查看 PR</button>';
+                } else if (isReviewing) {
+                    // Review 进行中
+                    statusHtml = '<span class="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-semibold bg-emerald-500/15 text-emerald-400 ml-2">🔍 Review 中...</span>';
+                    extraClass = ' running';
+                    const logFile = reviewTasksData.find(t => t.targetId === pr.number)?.logFile?.replace(/^logs\//, '') || '';
+                    buttonsHtml = '<button class="bg-red-500 border-red-500 text-white hover:bg-red-600" onclick="stopReviewTask(event, ' + pr.number + ')">⏹️ 停止 Review</button>' +
+                        '<button class="bg-blue-500 border-blue-500 text-white hover:bg-blue-600" onclick="openLogTerminalByFile(\'' + logFile + '\')">📄 查看日志</button>' +
+                        '<button onclick="window.open(\'' + pr.url + '\', \'_blank\')">👁️ 查看 PR</button>';
+                } else if (reviewTask) {
+                    if (reviewTask.status === 'stopped' || reviewTask.status === 'interrupted') {
+                        // Review 被手动停止或中断
+                        const statusText = reviewTask.status === 'stopped' ? '⏹️ 已停止' : '⏸️ 已中断';
+                        statusHtml = '<span class="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-semibold bg-orange-500/15 text-orange-400 ml-2">' + statusText + '</span>';
+                        extraClass = ' border-l-4 border-l-orange-500';
+                        buttonsHtml = '<button class="bg-emerald-500 border-emerald-500 text-white hover:bg-emerald-600" onclick="agentReviewPR(event, ' + pr.number + ', \'' + pr.branch + '\')">🔄 重新 Review</button>' +
+                            '<button onclick="window.open(\'' + pr.url + '\', \'_blank\')">👁️ 查看 PR</button>';
+                    } else {
+                        // Review 已完成
+                        const isPassed = reviewTask.result === 'passed';
+                        const statusClass = isPassed ? 'bg-blue-500/15 text-blue-300' : 'bg-red-500/15 text-red-400';
+                        const statusText = isPassed ? '✅ 通过' : '❌ 需修改';
+                        let docSyncHint = '';
+                        const report = reviewTask.report || '';
+                        if (report.includes('文档同步') && (report.includes('❌') || report.includes('文档缺失') || report.includes('缺少文档'))) {
+                            docSyncHint = ' <span title="文档同步未通过" class="cursor-help">📚</span>';
+                        }
+                        statusHtml = '<span class="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-semibold ' + statusClass + ' ml-2">' + statusText + '</span>' + docSyncHint;
+                        extraClass = isPassed ? '' : ' interrupted';
+                        
+                        if (isPassed) {
+                            // 审查通过，可以合并
+                            buttonsHtml = '<button class="bg-blue-500 border-blue-500 text-white hover:bg-blue-600" onclick="viewReviewReport(' + pr.number + ')">📋 查看报告</button>' +
+                                '<button class="bg-blue-500 border-blue-500 text-white hover:bg-blue-600" onclick="runDocGardener(event, ' + pr.number + ', \'' + (pr.baseRefName || '') + '\')">📚 文档检查</button>' +
+                                '<button class="bg-emerald-500 border-emerald-500 text-white hover:bg-emerald-600" onclick="mergePR(event, ' + pr.number + ')">✅ 合并 PR</button>' +
+                                '<button onclick="window.open(\'' + pr.url + '\', \'_blank\')">👁️ 查看 PR</button>';
+                        } else {
+                            // 需要返工
+                            buttonsHtml = '<button class="bg-blue-500 border-blue-500 text-white hover:bg-blue-600" onclick="viewReviewReport(' + pr.number + ')">📋 查看报告</button>' +
+                                '<button class="bg-amber-500 border-amber-500 text-slate-900 hover:bg-amber-600" onclick="reworkPR(event, ' + pr.number + ')">🔧 标记返工</button>' +
+                                '<button class="bg-emerald-500 border-emerald-500 text-white hover:bg-emerald-600" onclick="agentReviewPR(event, ' + pr.number + ', \'' + pr.branch + '\')">🔄 重新 Review</button>';
+                        }
+                    }
+                } else {
+                    // 尚未 Review
+                    buttonsHtml = '<button class="bg-emerald-500 border-emerald-500 text-white hover:bg-emerald-600" onclick="agentReviewPR(event, ' + pr.number + ', \'' + pr.branch + '\')">🤖 Agent Review</button>' +
+                        '<button class="bg-blue-500 border-blue-500 text-white hover:bg-blue-600" onclick="mergePR(event, ' + pr.number + ')">✅ 直接通过</button>' +
+                        '<button onclick="window.open(\'' + pr.url + '\', \'_blank\')">👁️ 查看 PR</button>';
+                }
+                
+                // 如为 design PR 且设计资产已缓存，追加查看设计按钮
+                let designBtnHtml = '';
+                if (designIssueNumber && designAssetsCache[designIssueNumber]) {
+                    designBtnHtml = '<button class="bg-blue-500 border-blue-500 text-white hover:bg-blue-600" onclick="openDesignViewer(' + designIssueNumber + ')">🖼️ 查看设计</button>';
+                }
+                
+                return '<div class="issue-card rounded-xl border border-slate-700 bg-slate-800 p-4 shadow-[0_4px_6px_-1px_rgba(0,0,0,0.3),0_2px_4px_-2px_rgba(0,0,0,0.3)] transition-all duration-200 hover:border-slate-600 hover:-translate-y-px' + extraClass + '" data-pr="' + pr.number + '"' + (designIssueNumber ? ' data-design-issue="' + designIssueNumber + '"' : '') + '>' +
+                    '<div class="issue-header flex items-start justify-between gap-4 mb-2">' +
+                        '<a href="' + pr.url + '" class="text-base font-medium leading-snug text-blue-300 no-underline hover:underline" target="_blank">' +
+                            '#' + pr.number + ': ' + escapeHtml(pr.title) +
+                        '</a>' +
+                        statusHtml +
+                    '</div>' +
+                    '<div class="mb-3 text-sm text-slate-400">' + time + ' · 分支: ' + pr.branch + '</div>' +
+                    '<div class="actions flex flex-wrap gap-2">' + designBtnHtml + buttonsHtml + '</div>' +
+                '</div>';
+            }).join('');
+        }
+
+        function renderMergedPRs(prs) {
+            const container = document.getElementById('merged-prs');
+            const countEl = document.getElementById('merged-pr-count');
+            if (countEl) countEl.textContent = prs.length;
+
+            if (prs.length === 0) {
+                container.innerHTML = '<div class="px-4 py-10 text-center text-[0.9375rem] text-slate-400">暂无最近合并的 PR</div>';
+                return;
+            }
+
+            container.innerHTML = prs.map(pr => {
+                const time = pr.createdAt ? new Date(pr.createdAt).toLocaleString() : '未知';
+                return '<div class="issue-card rounded-xl border border-slate-700 bg-slate-800 p-4 shadow-[0_4px_6px_-1px_rgba(0,0,0,0.3),0_2px_4px_-2px_rgba(0,0,0,0.3)] transition-all duration-200 hover:border-slate-600 hover:-translate-y-px" class="opacity-85" data-pr="' + pr.number + '">' +
+                    '<div class="issue-header flex items-start justify-between gap-4 mb-2">' +
+                        '<a href="' + pr.url + '" class="text-base font-medium leading-snug text-blue-300 no-underline hover:underline" target="_blank">' +
+                            '#' + pr.number + ': ' + escapeHtml(pr.title) +
+                        '</a>' +
+                        '<span class="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-semibold bg-blue-500/15 text-blue-300">🎉 已合并</span>' +
+                    '</div>' +
+                    '<div class="mb-3 text-sm text-slate-400">' + time + ' · 分支: ' + pr.branch + '</div>' +
+                    '<div class="actions flex flex-wrap gap-2">' +
+                        '<button class="bg-blue-500 border-blue-500 text-white hover:bg-blue-600" onclick="runMergedDocGardener(event, ' + pr.number + ')">📚 文档检查</button>' +
+                        '<button onclick="window.open(\'' + pr.url + '\', \'_blank\')">👁️ 查看 PR</button>' +
+                    '</div>' +
+                '</div>';
+            }).join('');
+        }
+
+        async function runMergedDocGardener(event, number) {
+            const btn = event && event.target;
+            setButtonLoading(btn, true);
+            showGlobalLoading('Merged Doc Gardener 启动中...');
+            try {
+                const response = await fetch('/api/merged-doc-gardener', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prNumber: number })
+                });
+                if (!response.ok) {
+                    const err = await response.json().catch(() => ({ error: 'Unknown error' }));
+                    throw new Error(err.error || 'HTTP ' + response.status);
+                }
+                const result = await response.json();
+                showToast(result.message);
+                openLogTerminalByFile(result.logFile);
+            } catch (error) {
+                showToast('文档检查启动失败: ' + error.message, true);
+            } finally {
+                setButtonLoading(btn, false);
+                hideGlobalLoading();
+            }
+        }
+
+        async function loadReviewTasks() {
+            try {
+                const response = await fetch('/api/review-tasks');
+                if (!response.ok) {
+                    const err = await response.json().catch(() => ({ error: 'Unknown error' }));
+                    throw new Error(err.error || 'HTTP ' + response.status);
+                }
+                reviewTasksData = await response.json();
+                reviewTasksData.sort((a, b) => new Date(b.startTime || 0) - new Date(a.startTime || 0));
+            } catch (error) {
+                console.error('Error loading review tasks:', error);
+                reviewTasksData = [];
+            }
+        }
+
+        let docGardenerTasksData = [];
+
+        async function loadDocGardenerTasks() {
+            try {
+                const response = await fetch('/api/doc-gardener-tasks');
+                if (!response.ok) {
+                    const err = await response.json().catch(() => ({ error: 'Unknown error' }));
+                    throw new Error(err.error || 'HTTP ' + response.status);
+                }
+                docGardenerTasksData = await response.json();
+                docGardenerTasksData.sort((a, b) => new Date(b.startTime || 0) - new Date(a.startTime || 0));
+                renderDocGardenerTasks();
+            } catch (error) {
+                console.error('Error loading doc gardener tasks:', error);
+                docGardenerTasksData = [];
+                renderDocGardenerTasks();
+            }
+        }
+
+        function renderDocGardenerTasks() {
+            const container = document.getElementById('doc-gardener-tasks');
+            if (!docGardenerTasksData) docGardenerTasksData = [];
+            const running = docGardenerTasksData.filter(t => t.status === 'running');
+            
+            if (running.length === 0) {
+                container.innerHTML = '<div class="px-4 py-10 text-center text-[0.9375rem] text-slate-400">暂无文档检查任务</div>';
+                return;
+            }
+            
+            container.innerHTML = running.map(task => {
+                const startTime = new Date(task.startTime);
+                const duration = Date.now() - startTime.getTime();
+                const label = task.merged ? '已合并 PR 文档补全' : 'PR 文档检查';
+                return '<div class="issue-card rounded-xl border border-slate-700 bg-slate-800 p-4 shadow-[0_4px_6px_-1px_rgba(0,0,0,0.3),0_2px_4px_-2px_rgba(0,0,0,0.3)] transition-all duration-200 hover:border-slate-600 hover:-translate-y-px border-l-4 border-l-emerald-500" data-pr="' + task.prNumber + '">' +
+                    '<div class="issue-header flex items-start justify-between gap-4 mb-2">' +
+                        '<span class="text-base font-medium leading-snug text-blue-300 no-underline hover:underline">' + label + ' · PR #' + task.prNumber + '</span>' +
+                        '<span class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold bg-emerald-500/15 text-emerald-400">📚 检查中</span>' +
+                    '</div>' +
+                    '<div class="mb-3 text-sm text-slate-400">⏱️ ' + formatDuration(duration) + ' · ' + startTime.toLocaleString() + ' 开始</div>' +
+                    '<div class="actions flex flex-wrap gap-2">' +
+                        '<button class="bg-blue-500 border-blue-500 text-white hover:bg-blue-600" onclick="openLogTerminalByFile(\'' + task.logFile + '\')">🖥️ 监控</button>' +
+                    '</div>' +
+                '</div>';
+            }).join('');
+        }
+
+        async function agentReviewPR(event, number, branch) {
+            if (!confirm('确认使用 Agent Review PR #' + number + '?')) {
+                return;
+            }
+            const btn = event && event.target;
+            setButtonLoading(btn, true);
+            showGlobalLoading('Agent Review 启动中...');
+            
+            try {
+                const response = await fetch('/api/review-pr', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prNumber: number, branch: branch })
+                });
+                const result = await response.json();
+                showToast(result.message);
+                
+                // 立即刷新显示 Review 状态
+                if (result.status === 'started' || result.status === 'already_running') {
+                    await loadReviewTasks();
+                    await loadPullRequests();
+                }
+            } catch (error) {
+                showToast('Review 启动失败: ' + error.message, true);
+            } finally {
+                setButtonLoading(btn, false);
+                hideGlobalLoading();
+            }
+        }
+
+        async function runDocGardener(event, number, baseBranch) {
+            const btn = event && event.target;
+            setButtonLoading(btn, true);
+            showGlobalLoading('Doc Gardener 启动中...');
+            try {
+                const response = await fetch('/api/doc-gardener', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prNumber: number, baseBranch: baseBranch })
+                });
+                if (!response.ok) {
+                    const err = await response.json().catch(() => ({ error: 'Unknown error' }));
+                    throw new Error(err.error || 'HTTP ' + response.status);
+                }
+                const result = await response.json();
+                showToast(result.message);
+                openLogTerminalByFile(result.logFile);
+            } catch (error) {
+                showToast('文档检查启动失败: ' + error.message, true);
+            } finally {
+                setButtonLoading(btn, false);
+                hideGlobalLoading();
+            }
+        }
+
+        async function mergePR(event, number) {
+            if (!confirm('确认直接通过并合并 PR #' + number + '?\n\n⚠️ 这将使用 squash 合并并删除分支')) {
+                return;
+            }
+            const btn = event && event.target;
+            setButtonLoading(btn, true);
+            showGlobalLoading('合并 PR 中...');
+            
+            try {
+                const response = await fetch('/api/merge-pr', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prNumber: number })
+                });
+                const result = await response.json();
+                showToast(result.message);
+                setTimeout(loadPullRequests, 3000);
+            } catch (error) {
+                showToast('合并失败: ' + error.message, true);
+            } finally {
+                setButtonLoading(btn, false);
+                hideGlobalLoading();
+            }
+        }
+
+        function getIssueType(labels, title, body) {
+            if (!labels || labels.length === 0) {
+                // 无标签时，通过标题和正文关键词推断类型
+                const text = ((title || '') + ' ' + (body || '')).toLowerCase();
+                if (text.includes('bug') || text.includes('fix') || text.includes('修复') || text.includes('崩溃') || text.includes('crash')) return 'bug';
+                if (text.includes('perf') || text.includes('性能') || text.includes('优化') || text.includes('slow') || text.includes('memory')) return 'performance';
+                if (text.includes('tech debt') || text.includes('refactor') || text.includes('重构') || text.includes('债务')) return 'tech-debt';
+                if (text.includes('ui') || text.includes('design') || text.includes('样式') || text.includes('颜色') || text.includes('布局') || text.includes('font') || text.includes('icon')) return 'ui-feedback';
+                // 默认推断为 feature（大多数新功能开发无特定标签）
+                return 'feature';
+            }
+            const names = labels.map(l => l.name.toLowerCase());
+            const priority = ['bug', 'feature', 'performance', 'tech-debt', 'ui-feedback'];
+            for (const t of priority) {
+                if (names.includes(t)) return t;
+            }
+            return 'default';
+        }
+
+        function getIssueTypeDisplay(type) {
+            switch (type) {
+                case 'bug': return { text: '🐛 Bug Fix', className: 'danger' };
+                case 'feature': return { text: '🚀 开发', className: 'primary' };
+                case 'performance': return { text: '⚡ 性能优化', className: 'warning' };
+                case 'tech-debt': return { text: '🔧 技术债务', className: '' };
+                case 'ui-feedback': return { text: '🎨 UI 调整', className: 'secondary' };
+                default: return { text: '🚀 开发', className: 'primary' };
+            }
+        }
+
+        async function startDev(event, number, title, issueType) {
+            const display = getIssueTypeDisplay(issueType || 'default');
+            if (!confirm('确认「' + display.text + '」Issue #' + number + '?\n\n' + title)) {
+                return;
+            }
+            const btn = event && event.target;
+            setButtonLoading(btn, true);
+            showGlobalLoading('启动开发中...');
+            
+            try {
+                const response = await fetch('/api/start-dev', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ issueNumber: number, issueTitle: title, issueType: issueType || 'default' })
+                });
+                const result = await response.json();
+                showToast(result.message);
+                
+                await loadRunningTasks();
+                
+                setTimeout(() => {
+                    const task = runningTasksData.find(t => t.targetId === number);
+                    if (task) {
+                        openLogTerminalByFile(task.logFile);
+                    }
+                }, 2000);
+                
+            } catch (error) {
+                showToast('启动失败: ' + error.message, true);
+            } finally {
+                setButtonLoading(btn, false);
+                hideGlobalLoading();
+            }
+        }
+
+        async function startDesign(event, number, title) {
+            if (!confirm('确认为 Issue #' + number + ' 生成 UI 设计图?\n\n' + title)) {
+                return;
+            }
+            const btn = event && event.target;
+            setButtonLoading(btn, true);
+            showGlobalLoading('生成设计图中...');
+            
+            try {
+                const response = await fetch('/api/start-design', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ issueNumber: number, issueTitle: title })
+                });
+                const result = await response.json();
+                showToast(result.message);
+                
+                await loadRunningTasks();
+                
+                setTimeout(() => {
+                    const task = runningTasksData.find(t => t.targetId === number);
+                    if (task) {
+                        openLogTerminalByFile(task.logFile);
+                    }
+                }, 2000);
+                
+            } catch (error) {
+                showToast('启动失败: ' + error.message, true);
+            } finally {
+                setButtonLoading(btn, false);
+                hideGlobalLoading();
+            }
+        }
+
+        function openPMModal() {
+            document.getElementById('pm-modal').classList.remove('hidden');
+            document.getElementById('pm-modal').classList.add('flex');
+            document.getElementById('pm-title').focus();
+        }
+        function closePMModal() {
+            document.getElementById('pm-modal').classList.add('hidden');
+            document.getElementById('pm-modal').classList.remove('flex');
+            document.getElementById('pm-title').value = '';
+            document.getElementById('pm-desc').value = '';
+        }
+        async function startPM() {
+            const titleInput = document.getElementById('pm-title');
+            const descInput = document.getElementById('pm-desc');
+            const title = titleInput.value.trim();
+            const desc = descInput.value.trim();
+            if (!title) {
+                showToast('请输入需求标题', true);
+                return;
+            }
+            const btn = document.querySelector('#pm-modal button.primary');
+            setButtonLoading(btn, true);
+            showGlobalLoading('创建 Issue 并启动 PRD 产出...');
+            try {
+                const response = await fetch('/api/start-pm', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title: title, description: desc })
+                });
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.error || 'Unknown error');
+                showToast(result.message);
+                closePMModal();
+                await loadRunningTasks();
+                setTimeout(() => {
+                    const task = runningTasksData.find(t => t.targetId === result.issueNumber);
+                    if (task) {
+                        openLogTerminalByFile(task.logFile);
+                    }
+                }, 2000);
+            } catch (error) {
+                showToast('启动失败: ' + error.message, true);
+            } finally {
+                setButtonLoading(btn, false);
+                hideGlobalLoading();
+            }
+        }
+
+        // 恢复开发/返工/文档检查的通用函数
+        async function resumeTask(event, targetId, title, apiPath, logFile) {
+            const btn = event && event.target;
+            setButtonLoading(btn, true);
+            showGlobalLoading('恢复任务中...');
+            
+            try {
+                const response = await fetch(apiPath, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        issueNumber: targetId, 
+                        issueTitle: title
+                    })
+                });
+                const result = await response.json();
+                if (!response.ok) {
+                    showToast(result.error || '恢复失败', true);
+                    return;
+                }
+                showToast(result.message);
+                
+                await loadRunningTasks();
+                renderAllPanels();
+                
+                setTimeout(() => {
+                    const task = runningTasksData.find(t => t.targetId === targetId && t.status === 'running');
+                    if (task) {
+                        openLogTerminalByFile(task.logFile);
+                    }
+                }, 2000);
+                
+            } catch (error) {
+                showToast('恢复失败: ' + error.message, true);
+            } finally {
+                setButtonLoading(btn, false);
+                hideGlobalLoading();
+            }
+        }
+
+        async function resumeDev(event, issueNumber, logFile) {
+            if (!confirm('确认恢复 Issue #' + issueNumber + ' 的开发?\n\nAgent 将基于之前的进度继续。')) {
+                return;
+            }
+            await resumeTask(event, issueNumber, 'Issue #' + issueNumber, '/api/resume-dev', logFile);
+        }
+
+        async function resumeRework(event, prNumber, logFile) {
+            if (!confirm('确认恢复 PR #' + prNumber + ' 的返工修复?\n\nAgent 将基于之前的进度继续。')) {
+                return;
+            }
+            await resumeTask(event, prNumber, 'PR #' + prNumber, '/api/resume-dev', logFile);
+        }
+
+        async function resumeDocGardener(event, prNumber, logFile) {
+            if (!confirm('确认恢复 PR #' + prNumber + ' 的文档检查?\n\nAgent 将基于之前的进度继续。')) {
+                return;
+            }
+            await resumeTask(event, prNumber, 'PR #' + prNumber, '/api/resume-dev', logFile);
+        }
+
+        async function stopTask(event, number, taskType) {
+            const typeLabel = taskType === 'design' ? '设计' : taskType === 'pm' ? 'PRD 产出' : '开发';
+            if (!confirm('确认停止 Issue #' + number + ' 的' + typeLabel + '?')) {
+                return;
+            }
+            const btn = event && event.target;
+            setButtonLoading(btn, true);
+            showGlobalLoading('停止任务中...');
+            
+            try {
+                const response = await fetch('/api/stop-task', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ issueNumber: number, taskType: taskType || 'dev' })
+                });
+                const result = await response.json();
+                showToast(result.message);
+                await loadRunningTasks();
+            } catch (error) {
+                showToast('停止失败: ' + error.message, true);
+            } finally {
+                setButtonLoading(btn, false);
+                hideGlobalLoading();
+            }
+        }
+
+        async function stopReviewTask(event, prNumber) {
+            if (!confirm('确认停止 PR #' + prNumber + ' 的 Review?')) {
+                return;
+            }
+            const btn = event && event.target;
+            setButtonLoading(btn, true);
+            showGlobalLoading('停止 Review 中...');
+            
+            try {
+                const response = await fetch('/api/stop-task', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prNumber: prNumber, taskType: 'review' })
+                });
+                const result = await response.json();
+                showToast(result.message);
+                await loadReviewTasks();
+                await loadPullRequests();
+            } catch (error) {
+                showToast('停止失败: ' + error.message, true);
+            } finally {
+                setButtonLoading(btn, false);
+                hideGlobalLoading();
+            }
+        }
+
+        function openLogTerminalByFile(filename) {
+            currentLogFile = filename;
+            document.getElementById('terminal-filename').textContent = 'tail -f ' + filename;
+            terminalOverlay.classList.remove('hidden');
+            terminalOverlay.classList.add('flex');
+            
+            terminalBody.innerHTML = '';
+            lineCount = 0;
+            isAutoScroll = true;
+            rawLogLines = [];
+            parsedBlockPending = null;
+            logBuffer = [];
+            
+            if (eventSource) {
+                eventSource.close();
+            }
+            
+            eventSource = new EventSource('/api/log-tail?file=' + encodeURIComponent(filename));
+            
+            eventSource.onmessage = (e) => {
+                logBuffer.push(e.data);
+                if (!logFlushPending) {
+                    logFlushPending = true;
+                    requestAnimationFrame(() => {
+                        flushLogBuffer();
+                        logFlushPending = false;
+                    });
+                }
+            };
+            
+            eventSource.onerror = (e) => {
+                console.log('SSE error, reconnecting...');
+                eventSource.close();
+                setTimeout(() => {
+                    if (terminalOverlay.classList.contains('flex')) {
+                        openLogTerminalByFile(filename);
+                    }
+                }, 3000);
+            };
+            
+            document.addEventListener('keydown', handleEscKey);
+        }
+
+        function createLogLine(text) {
+            lineCount++;
+            
+            const lineDiv = document.createElement('div');
+            lineDiv.className = 'log-line py-0.5 whitespace-pre-wrap break-all hover:bg-slate-700/40';
+            
+            let contentClass = '';
+            const lower = text.toLowerCase();
+            if (lower.includes('error') || lower.includes('❌') || lower.includes('fail')) {
+                contentClass = 'text-red-400';
+            } else if (lower.includes('success') || lower.includes('✅') || lower.includes('done')) {
+                contentClass = 'text-emerald-400';
+            } else if (lower.includes('warn') || lower.includes('⚠️')) {
+                contentClass = 'text-amber-400';
+            } else if (lower.includes('toolcall') || lower.includes('toolresult')) {
+                contentClass = 'text-violet-400';
+            } else if (lower.includes('thinkpart')) {
+                contentClass = 'text-slate-400 italic';
+            } else if (text.startsWith('>') || text.startsWith('$')) {
+                contentClass = 'text-blue-400 font-medium';
+            }
+            
+            const escaped = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            
+            lineDiv.innerHTML = 
+                '<span class="inline-block w-14 select-none pr-3 text-right text-slate-500">' + lineCount + '</span>' +
+                '<span class="text-slate-200 ' + contentClass + '">' + escaped + '</span>';
+            
+            return lineDiv;
+        }
+
+        let logBuffer = [];
+        let logFlushPending = false;
+
+        function toggleRenderMode() {
+            renderMode = renderMode === 'rendered' ? 'raw' : 'rendered';
+            const btn = document.getElementById('-btn');
+            btn.textContent = renderMode === 'rendered' ? '渲染' : '原始';
+            btn.classList.toggle('bg-blue-500', renderMode === 'rendered');
+            btn.classList.toggle('text-white', renderMode === 'rendered');
+            btn.classList.toggle('border-blue-500', renderMode === 'rendered');
+            btn.classList.toggle('bg-slate-900', renderMode !== 'rendered');
+            btn.classList.toggle('text-slate-400', renderMode !== 'rendered');
+            btn.classList.toggle('border-slate-700', renderMode !== 'rendered');
+            // 重新渲染当前内容
+            terminalBody.innerHTML = '';
+            lineCount = 0;
+            parsedBlockPending = null;
+            if (rawLogLines.length > 0) {
+                const toRender = rawLogLines.slice();
+                rawLogLines = [];
+                logBuffer = toRender;
+                flushLogBuffer();
+            }
+        }
+
+        // 解析 kimi 结构化日志为块数组
+        function parseKimiBlocks(rawTexts) {
+            const allLines = [];
+            for (const text of rawTexts) {
+                if (text) allLines.push(...text.split('\n'));
+            }
+            const blocks = [];
+            let current = parsedBlockPending;
+            const topLevelPattern = /^(TurnBegin|TurnEnd|StepBegin|ThinkPart|ToolCall|ToolResult|ToolCallPart|StatusUpdate|TextPart|ToolResultPart)\(/;
+
+            for (const line of allLines) {
+                const trimmed = line.trimStart();
+                const match = trimmed.match(topLevelPattern);
+
+                if (match) {
+                    // 新的顶层对象开始，结束当前块
+                    if (current) blocks.push(current);
+                    current = { type: match[1], lines: [line] };
+                } else {
+                    // 累积到当前块（对象内部或 plain 文本）
+                    if (!current) current = { type: 'plain', lines: [] };
+                    current.lines.push(line);
+                }
+            }
+            parsedBlockPending = current;
+            return blocks;
+        }
+
+        // 从对象文本中提取 key=value 格式的值
+        function extractValue(text, key) {
+            const regex = new RegExp(key + "='([^']*?)'(?:,|\\))");
+            const m = text.match(regex);
+            if (m) return m[1];
+            const regex2 = new RegExp(key + '="([^"]*?)"(?:,|\\))');
+            const m2 = text.match(regex2);
+            if (m2) return m2[1];
+            return '';
+        }
+
+        // 为多行对象提取指定字段（跨行）
+        function extractField(lines, fieldName) {
+            const text = lines.join('\n');
+            // 先尝试匹配引号包裹的值（支持多行）
+            const regex = new RegExp(fieldName + "=['\"]([\\s\\S]*?)['\"](?:,\\s*\\n|\\))");
+            const m = text.match(regex);
+            if (m) {
+                return m[1]
+                    .replace(/\\n/g, '\n')
+                    .replace(/\\t/g, '\t')
+                    .replace(/\\r/g, '\r');
+            }
+            // 再尝试匹配无引号的简单值（数字、标识符等）
+            const regex2 = new RegExp(fieldName + '=([^,\\n\\)]+)');
+            const m2 = text.match(regex2);
+            if (m2) return m2[1].trim();
+            return '';
+        }
+
+        function createRenderedBlock(block, isPending) {
+            const div = document.createElement('div');
+            div.className = 'rendered-block my-1.5';
+            if (isPending) div.setAttribute('data-pending', 'true');
+            const rawText = block.lines.join('\n');
+
+            switch (block.type.toLowerCase()) {
+                case 'turnbegin': {
+                    div.className += '  my-2 border-l-[3px] border-l-blue-500 pl-3';
+                    const hasPrompt = rawText.includes('user_input=');
+                    div.innerHTML = '<div class="font-semibold text-blue-500 cursor-pointer select-none hover:opacity-80" onclick="this.nextElementSibling.classList.toggle(\'hidden\')">🔄 Turn 开始 ' + (hasPrompt ? '(点击展开 prompt)' : '') + '</div>' +
+                        '<div class="hidden"><pre class="mt-2 text-xs whitespace-pre-wrap text-slate-400">' + escapeHtml(rawText.substring(0, 500)) + (rawText.length > 500 ? '... (' + rawText.length + ' chars)' : '') + '</pre></div>';
+                    break;
+                }
+                case 'turnend': {
+                    div.className += '  text-slate-500 text-xs py-1 border-t border-dashed border-slate-700 mt-2';
+                    div.innerHTML = '✓ Turn 结束';
+                    break;
+                }
+                case 'stepbegin': {
+                    div.className += '  my-2 rounded-md border border-blue-500/25 bg-blue-500/10 px-3 py-1.5 font-semibold text-blue-400';
+                    const n = rawText.match(/n=(\d+)/);
+                    div.innerHTML = '▶ Step ' + (n ? n[1] : '?');
+                    break;
+                }
+                case 'thinkpart': {
+                    div.className += '  my-1.5 rounded-r-md border-l-[3px] border-l-slate-500 bg-slate-400/5 px-3 py-2';
+                    let think = extractField(block.lines, 'think');
+                    think = unwrapHardBreaks(think);
+                    const thinkHtml = typeof marked !== 'undefined' ? marked.parse(think) : escapeHtml(think);
+                    div.innerHTML = '<div class="-header text-xs font-semibold text-slate-400 mb-1">💭 思考</div>' +
+                        '<div class="kimi-markdown -body text-slate-300 italic whitespace-pre-wrap">' + thinkHtml + '</div>';
+                    break;
+                }
+                case 'toolcall': {
+                    div.className += '  my-1.5 rounded-md border border-violet-500/20 bg-violet-500/5 px-3 py-1.5';
+                    const name = extractField(block.lines, 'name');
+                    const args = extractField(block.lines, 'arguments');
+                    let summary = name || 'Tool';
+                    let body = rawText;
+                    if (args && args.length > 0) {
+                        try {
+                            const parsed = JSON.parse(args);
+                            if (parsed.command) {
+                                summary += ': ' + parsed.command.substring(0, 120);
+                            } else if (parsed.path) {
+                                summary += ': ' + parsed.path;
+                            } else if (parsed.query) {
+                                summary += ': ' + parsed.query.substring(0, 120);
+                            } else {
+                                summary += ': ' + JSON.stringify(parsed).substring(0, 120);
+                            }
+                            body = JSON.stringify(parsed, null, 2);
+                        } catch (e) {
+                            summary += ': ' + args.substring(0, 120);
+                        }
+                    }
+                    div.innerHTML = '<div class="text-xs font-semibold text-violet-400 cursor-pointer select-none" onclick="const b=this.nextElementSibling;b.classList.toggle(\'hidden\');b.classList.toggle(\'block\')">🔧 ' + escapeHtml(summary) + '</div>' +
+                        '<div class="hidden text-slate-300 mt-1 whitespace-pre-wrap"><pre class="m-0 text-xs leading-relaxed">' + escapeHtml(body) + '</pre></div>';
+                    break;
+                }
+                case 'toolresult': {
+                    div.className += '  my-1.5 rounded-r-md border-l-[3px] border-l-emerald-400 bg-emerald-400/5 px-3 py-1.5';
+                    const result = extractField(block.lines, 'result') || extractField(block.lines, 'output') || extractField(block.lines, 'content') || rawText;
+                    const lines = result.split('\n');
+                    const summary = (lines[0] || 'Result').substring(0, 100);
+                    const isMd = /^(#{1,6}\s|^\|.+\||^[-*+]\s|^\d+\.\s|\*\*[^*]+\*\*|```|^\[.+\]\(.+\)|^>\s)/m.test(result);
+                    let bodyHtml;
+                    if (isMd && typeof marked !== 'undefined') {
+                        bodyHtml = marked.parse(result);
+                    } else {
+                        bodyHtml = '<pre class="m-0">' + escapeHtml(result) + '</pre>';
+                    }
+                    div.innerHTML = '<div class="text-xs font-semibold text-emerald-400 cursor-pointer select-none" onclick="const b=this.nextElementSibling;b.classList.toggle(\'hidden\');b.classList.toggle(\'block\')">📤 ' + escapeHtml(summary) + '</div>' +
+                        '<div class="-body hidden text-slate-300 whitespace-pre-wrap text-xs font-mono leading-relaxed mt-1">' + bodyHtml + '</div>';
+                    break;
+                }
+                case 'toolcallpart': {
+                    div.className += '  my-1.5 rounded-md border border-violet-500/20 bg-violet-500/5 px-3 py-1.5';
+                    const args = extractField(block.lines, 'arguments_part');
+                    let summary = 'Tool片段';
+                    let body = rawText;
+                    if (args && args.length > 0) {
+                        try {
+                            const parsed = JSON.parse(args);
+                            if (parsed.command) summary += ': ' + parsed.command.substring(0, 120);
+                            else if (parsed.path) summary += ': ' + parsed.path;
+                            else if (parsed.query) summary += ': ' + parsed.query.substring(0, 120);
+                            else summary += ': ' + JSON.stringify(parsed).substring(0, 120);
+                            body = JSON.stringify(parsed, null, 2);
+                        } catch (e) {
+                            summary += ': ' + args.substring(0, 120);
+                        }
+                    }
+                    div.innerHTML = '<div class="text-xs font-semibold text-violet-400 cursor-pointer select-none" onclick="this.parentElement.classList.toggle(\'expanded\')">📝 ' + escapeHtml(summary) + '</div>' +
+                        '<div class=""><pre class="m-0 text-xs leading-normal">' + escapeHtml(body) + '</pre></div>';
+                    break;
+                }
+                case 'statusupdate': {
+                    div.className += '  text-slate-500 text-xs py-0.5 px-2';
+                    const usage = extractField(block.lines, 'token_usage');
+                    const ctx = extractField(block.lines, 'context_tokens');
+                    const maxCtx = extractField(block.lines, 'max_context_tokens');
+                    let status = '';
+                    if (ctx && maxCtx) {
+                        const pct = Math.round((parseInt(ctx) / parseInt(maxCtx)) * 100);
+                        status = '📊 Context: ' + ctx + ' / ' + maxCtx + ' (' + pct + '%)';
+                    } else if (usage) {
+                        status = '📊 Tokens: ' + usage.substring(0, 100);
+                    } else {
+                        status = '📊 Status Update';
+                    }
+                    div.textContent = status;
+                    break;
+                }
+                case 'textpart': {
+                    div.className += '  my-1.5 rounded-r-md border-l-[3px] border-l-slate-500 bg-slate-400/5 px-3 py-2';
+                    let text = extractField(block.lines, 'text');
+                    text = unwrapHardBreaks(text);
+                    const textHtml = typeof marked !== 'undefined' ? marked.parse(text) : escapeHtml(text);
+                    div.innerHTML = '<div class="-header text-xs font-semibold text-slate-400 mb-1">📝 文本</div>' +
+                        '<div class="kimi-markdown -body text-slate-300 italic whitespace-pre-wrap">' + textHtml + '</div>';
+                    break;
+                }
+                default: {
+                    div.className += '  text-slate-200 whitespace-pre-wrap py-0.5';
+                    div.textContent = rawText;
+                    break;
+                }
+            }
+            return div;
+        }
+
+        function escapeHtml(text) {
+            return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+        // 去掉 kimi 日志中对长字符串的硬折行（单词中间被截断的换行）
+        // 保留 Markdown 列表、空行分隔、缩进段落等自然换行
+        function unwrapHardBreaks(text) {
+            return text.replace(/(\w)\n(?=\w|-\w)/g, '$1');
+        }
+
+        function flushLogBuffer() {
+            if (logBuffer.length === 0) return;
+            const lines = logBuffer.splice(0, logBuffer.length);
+            rawLogLines.push(...lines);
+            const frag = document.createDocumentFragment();
+
+            if (renderMode === 'rendered') {
+                const blocks = parseKimiBlocks(lines);
+                // 移除旧的 pending 块避免重复
+                const oldPending = terminalBody.querySelector('[data-pending="true"]');
+                if (oldPending) oldPending.remove();
+                for (const block of blocks) {
+                    frag.appendChild(createRenderedBlock(block));
+                    lineCount += block.lines.length || 1;
+                }
+                // 如果还有未完成的对象，实时渲染（带 pending 标记）
+                if (parsedBlockPending) {
+                    frag.appendChild(createRenderedBlock(parsedBlockPending, true));
+                    lineCount += parsedBlockPending.lines.length || 1;
+                }
+            } else {
+                for (const text of lines) {
+                    frag.appendChild(createLogLine(text));
+                }
+            }
+            terminalBody.appendChild(frag);
+
+            while (terminalBody.childElementCount > 5000) {
+                terminalBody.removeChild(terminalBody.firstElementChild);
+            }
+
+            document.getElementById('line-count').textContent = lineCount + ' lines';
+
+            if (isAutoScroll) {
+                scrollToBottom();
+            }
+        }
+
+        function closeTerminal() {
+            terminalOverlay.classList.add('hidden');
+            terminalOverlay.classList.remove('flex');
+            if (eventSource) {
+                eventSource.close();
+                eventSource = null;
+            }
+            logBuffer = [];
+            logFlushPending = false;
+            document.removeEventListener('keydown', handleEscKey);
+        }
+
+        async function loadDesignAssets(issueNumber) {
+            try {
+                const res = await fetch('/api/design-assets?issueNumber=' + issueNumber);
+                const data = await res.json();
+                const assets = data.assets || [];
+                designAssetsCache[issueNumber] = assets.length > 0 ? assets : null;
+                // 局部更新对应 issue 卡片和 design PR 卡片上的按钮与状态标签
+                const issueCard = document.querySelector('.issue-card[data-issue="' + issueNumber + '"]');
+                const prCard = document.querySelector('.issue-card[data-design-issue="' + issueNumber + '"]');
+                [issueCard, prCard].forEach(card => {
+                    if (card && assets.length > 0) {
+                        // 插入/更新状态标签
+                        const header = card.querySelector('.issue-header');
+                        if (header && !header.querySelector('.design-ready-badge')) {
+                            const badge = document.createElement('span');
+                            badge.className = ' inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-semibold bg-blue-500/15 text-blue-300 design-ready-badge';
+                            badge.style.marginLeft = '0.5rem';
+                            badge.innerHTML = '🎨 设计资产已就绪';
+                            header.appendChild(badge);
+                        }
+                        // 插入查看设计按钮
+                        const actions = card.querySelector('.actions');
+                        if (actions && !actions.querySelector('[onclick^="openDesignViewer"]')) {
+                            const btn = document.createElement('button');
+                            btn.className = 'secondary';
+                            btn.innerHTML = '🖼️ 查看设计';
+                            btn.onclick = () => openDesignViewer(issueNumber);
+                            const startDesignBtn = Array.from(actions.children).find(el => el.innerHTML.includes('开始设计'));
+                            if (startDesignBtn) {
+                                actions.insertBefore(btn, startDesignBtn);
+                            } else {
+                                actions.insertBefore(btn, actions.firstChild);
+                            }
+                        }
+                    }
+                });
+                return designAssetsCache[issueNumber];
+            } catch (e) {
+                designAssetsCache[issueNumber] = null;
+                return null;
+            }
+        }
+
+        function toggleDesignGroup(el) {
+            el.parentElement.classList.toggle('collapsed');
+            const content = el.parentElement.querySelector('.design-file-group-content');
+            if (content) content.classList.toggle('hidden');
+            const isCollapsed = el.parentElement.classList.contains('collapsed');
+            el.classList.toggle('after:content-[\'_▶\']', isCollapsed);
+            el.classList.toggle('after:content-[\'_▼\']', !isCollapsed);
+        }
+
+        function openDesignViewer(issueNumber) {
+            const assets = designAssetsCache[issueNumber] || [];
+            const overlay = document.getElementById('');
+            const fileList = document.getElementById('');
+
+            if (assets.length === 0) {
+                showToast('暂无设计资产', true);
+                return;
+            }
+
+            const groups = [
+                { key: 'preview', title: '🔥 交互预览', types: ['flutter-web'] },
+                { key: 'docs', title: '🌐 原型与文档', types: ['html', 'markdown'] },
+                { key: 'visual', title: '🖼️ 设计图', types: ['image'] },
+                { key: 'code', title: '💻 组件代码', types: ['code'], collapsed: true },
+                { key: 'other', title: '📎 其他', types: ['file'] },
+            ];
+
+            let firstIdx = -1;
+            let html = '';
+            groups.forEach(group => {
+                const items = [];
+                assets.forEach((asset, idx) => {
+                    if (group.types.includes(asset.type)) {
+                        items.push({ ...asset, _idx: idx });
+                    }
+                });
+                if (items.length === 0) return;
+                if (firstIdx === -1) firstIdx = items[0]._idx;
+
+                const isCollapsed = group.collapsed ? ' collapsed' : '';
+                html += '<div class="design-file-group mb-1' + isCollapsed + '">';
+                html += '<div class="flex cursor-pointer select-none items-center justify-between rounded-md px-3 py-2 text-[0.7rem] font-semibold uppercase tracking-wider text-slate-400 transition-colors duration-150 hover:bg-slate-700 after:content-[\'_▼\'] after:text-[0.6rem] after:ml-1" onclick="toggleDesignGroup(this)">' + group.title + ' <span class="text-[0.7rem] opacity-50">(' + items.length + ')</span></div>';
+                html += '<div class="design-file-group-content' + (group.collapsed ? ' hidden' : '') + '">';
+                items.forEach(asset => {
+                    let icon = '📝';
+                    if (asset.type === 'image') icon = '🖼️';
+                    else if (asset.type === 'html') icon = '🌐';
+                    else if (asset.type === 'flutter-web') icon = '🔥';
+                    else if (asset.type === 'code') icon = '💻';
+                    html += '<div class="design-file-item flex cursor-pointer items-center gap-2 overflow-hidden text-ellipsis whitespace-nowrap rounded-lg border-l-transparent px-3 py-2.5 text-sm text-slate-400 transition-all duration-150 hover:bg-slate-700 hover:text-slate-100' + (asset._idx === 0 ? ' border-l-[3px] border-l-violet-500' : '') + '" data-idx="' + asset._idx + '" title="' + escapeHtml(asset.name) + '" onclick="selectDesignAsset(' + issueNumber + ', ' + asset._idx + ')">' +
+                        '<span>' + icon + '</span>' + escapeHtml(asset.name) + '</div>';
+                });
+                html += '</div></div>';
+            });
+
+            fileList.innerHTML = html;
+            overlay.classList.remove('hidden');
+            overlay.classList.add('flex');
+            selectDesignAsset(issueNumber, firstIdx >= 0 ? firstIdx : 0);
+        }
+
+        function closeDesignViewer() {
+            document.getElementById('').classList.add('hidden');
+            document.getElementById('').classList.remove('flex');
+        }
+
+        function highlightCode(text, filename) {
+            const ext = filename.split('.').pop().toLowerCase();
+            const isDart = ext === 'dart';
+            const isJsLike = ['js','ts','tsx','jsx','css','scss','less'].includes(ext);
+            if (!isDart && !isJsLike) return escapeHtml(text);
+
+            const keywords = new Set(['class','extends','implements','with','mixin','abstract','interface','factory','static','final','const','late','required','void','return','if','else','for','while','do','switch','case','break','continue','default','try','catch','finally','throw','assert','async','await','yield','sync','new','this','super','get','set','operator','external','native','covariant','var','dynamic','typedef','enum','part','library','export','import','show','hide','as','is','in','true','false','null','function','let','const','var','typeof','instanceof']);
+            const typeKeywords = new Set(['int','double','String','bool','List','Map','Set','Future','Stream','Widget','BuildContext','State','StatefulWidget','StatelessWidget','Element','Key','Object','dynamic','num']);
+
+            let html = '';
+            let i = 0;
+            while (i < text.length) {
+                // 多行注释 /* */
+                if (text.substr(i, 2) === '/*') {
+                    let end = text.indexOf('*/', i + 2);
+                    if (end === -1) { end = text.length; } else { end += 2; }
+                    html += '<span style="color:#6a9955;">' + escapeHtml(text.slice(i, end)) + '</span>';
+                    i = end; continue;
+                }
+                // 单行注释 //
+                if (text.substr(i, 2) === '//') {
+                    let end = text.indexOf('\n', i);
+                    if (end === -1) end = text.length;
+                    html += '<span style="color:#6a9955;">' + escapeHtml(text.slice(i, end)) + '</span>';
+                    i = end; continue;
+                }
+                // 字符串（单引号，含转义）
+                if (text[i] === "'") {
+                    let end = i + 1;
+                    while (end < text.length && text[end] !== "'") {
+                        if (text[end] === '\\' && end + 1 < text.length) end++;
+                        end++;
+                    }
+                    if (end < text.length) end++;
+                    html += '<span style="color:#ce9178;">' + escapeHtml(text.slice(i, end)) + '</span>';
+                    i = end; continue;
+                }
+                // 字符串（双引号，含转义）
+                if (text[i] === '"') {
+                    let end = i + 1;
+                    while (end < text.length && text[end] !== '"') {
+                        if (text[end] === '\\' && end + 1 < text.length) end++;
+                        end++;
+                    }
+                    if (end < text.length) end++;
+                    html += '<span style="color:#ce9178;">' + escapeHtml(text.slice(i, end)) + '</span>';
+                    i = end; continue;
+                }
+                // 字符串（三引号 ''' 或 """)
+                if (text.substr(i, 3) === "'''") {
+                    let end = text.indexOf("'''", i + 3);
+                    if (end === -1) end = text.length; else end += 3;
+                    html += '<span style="color:#ce9178;">' + escapeHtml(text.slice(i, end)) + '</span>';
+                    i = end; continue;
+                }
+                if (text.substr(i, 3) === '"""') {
+                    let end = text.indexOf('"""', i + 3);
+                    if (end === -1) end = text.length; else end += 3;
+                    html += '<span style="color:#ce9178;">' + escapeHtml(text.slice(i, end)) + '</span>';
+                    i = end; continue;
+                }
+                // 注解 @
+                if (text[i] === '@') {
+                    let end = i + 1;
+                    while (end < text.length && /[a-zA-Z0-9_]/.test(text[end])) end++;
+                    html += '<span style="color:#4ec9b0;">' + escapeHtml(text.slice(i, end)) + '</span>';
+                    i = end; continue;
+                }
+                // 标识符 / 关键字
+                if (/[a-zA-Z_]/.test(text[i])) {
+                    let end = i + 1;
+                    while (end < text.length && /[a-zA-Z0-9_]/.test(text[end])) end++;
+                    const word = text.slice(i, end);
+                    const esc = escapeHtml(word);
+                    if (keywords.has(word)) {
+                        html += '<span style="color:#569cd6;">' + esc + '</span>';
+                    } else if (typeKeywords.has(word) || /^[A-Z]/.test(word)) {
+                        html += '<span style="color:#4ec9b0;">' + esc + '</span>';
+                    } else {
+                        html += esc;
+                    }
+                    i = end; continue;
+                }
+                // 数字
+                if (/\d/.test(text[i])) {
+                    let end = i + 1;
+                    while (end < text.length && /[\d.]/.test(text[end])) end++;
+                    html += '<span style="color:#b5cea8;">' + escapeHtml(text.slice(i, end)) + '</span>';
+                    i = end; continue;
+                }
+                // 其他字符
+                html += escapeHtml(text[i]);
+                i++;
+            }
+            return html;
+        }
+
+        function selectDesignAsset(issueNumber, idx) {
+            const assets = designAssetsCache[issueNumber] || [];
+            const asset = assets[idx];
+            if (!asset) return;
+
+            document.querySelectorAll('.design-file-item').forEach(el => {
+                const isActive = parseInt(el.getAttribute('data-idx')) === idx;
+                el.classList.toggle('border-l-[3px]', isActive);
+                el.classList.toggle('border-l-violet-500', isActive);
+                el.classList.toggle('border-l-transparent', !isActive);
+            });
+
+            document.getElementById('').textContent = asset.name;
+            const body = document.getElementById('');
+
+            if (asset.type === 'image') {
+                body.innerHTML = '<img class="max-h-full max-w-full rounded-lg border border-slate-700 object-contain" src="' + asset.url + '" alt="' + escapeHtml(asset.name) + '">';
+            } else if (asset.type === 'html' || asset.type === 'flutter-web') {
+                body.innerHTML = '<iframe class="h-full w-full rounded-lg border-none bg-white" src="' + asset.url + '"></iframe>';
+            } else if (asset.type === 'code') {
+                fetch(asset.url)
+                    .then(r => r.text())
+                    .then(text => {
+                        body.innerHTML = '<pre class="h-full w-full overflow-auto whitespace-pre-wrap rounded-lg bg-[#0d1117] p-4 font-mono text-sm leading-relaxed text-slate-200"><code>' + highlightCode(text, asset.name) + '</code></pre>';
+                    })
+                    .catch(() => {
+                        body.innerHTML = '<div class="px-4 py-10 text-center text-[0.9375rem] text-slate-400">加载失败</div>';
+                    });
+            } else if (asset.type === 'markdown') {
+                fetch(asset.url)
+                    .then(r => r.text())
+                    .then(text => {
+                        body.innerHTML = '<pre class="h-full w-full overflow-auto whitespace-pre-wrap rounded-lg bg-[#0d1117] p-4 font-mono text-sm leading-relaxed text-slate-200">' + escapeHtml(text) + '</pre>';
+                    })
+                    .catch(() => {
+                        body.innerHTML = '<div class="px-4 py-10 text-center text-[0.9375rem] text-slate-400">加载失败</div>';
+                    });
+            } else {
+                body.innerHTML = '<div class="px-4 py-10 text-center text-[0.9375rem] text-slate-400">该文件类型暂不支持预览</div>';
+            }
+        }
+
+        function clearTerminal() {
+            terminalBody.innerHTML = '';
+            lineCount = 0;
+            logBuffer = [];
+            rawLogLines = [];
+            parsedBlockPending = null;
+            document.getElementById('line-count').textContent = '0 lines';
+        }
+
+        function handleEscKey(e) {
+            if (e.key === 'Escape') {
+                closeTerminal();
+            }
+        }
+
+        function viewIssue(number) {
+            window.open('' + (currentProject && currentProject.repo ? 'https://github.com/' + currentProject.repo + '/issues/' : '#') + '' + number, '_blank');
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 B';
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+        }
+
+        function updateRunningTimes() {
+            document.querySelectorAll('.running-time').forEach(el => {
+                const startTime = new Date(el.dataset.start);
+                const duration = Date.now() - startTime.getTime();
+                const label = el.dataset.label || '';
+                el.textContent = (label ? label + ' · ' : '') + '⏱️ ' + formatDuration(duration);
+            });
+        }
+
+        // 查看 Review 报告
+        async function viewReviewReport(number) {
+            try {
+                const response = await fetch('/api/review-report?pr=' + number);
+                const data = await response.json();
+                
+                if (data.status === 'not_found') {
+                    showToast('未找到该 PR 的 Review 记录', true);
+                    return;
+                }
+                
+                const reportHtml = '<div style="max-height: 60vh; overflow-y: auto; text-align: left; font-family: monospace; font-size: 0.875rem;">' +
+                    '<div style="margin-bottom: 1rem; padding: 0.75rem; background: #21262d; border-radius: 6px;">' +
+                        '<div style="font-weight: bold; margin-bottom: 0.5rem;">📋 Review 报告 - PR #' + number + '</div>' +
+                        '<div style="color: #8b949e;">状态: ' + (data.status === "success" ? "✅ 完成" : "❌ 失败") + '</div>' +
+                        (data.result ? '<div style="color: #8b949e;">结果: ' + (data.result === "passed" ? "✅ 通过" : "❌ 需修改") + '</div>' : '') +
+                        '<div style="color: #8b949e;">开始: ' + new Date(data.startTime).toLocaleString() + '</div>' +
+                        (data.endTime ? '<div style="color: #8b949e;">结束: ' + new Date(data.endTime).toLocaleString() + '</div>' : '') +
+                    '</div>' +
+                    (data.report ? '<div style="margin-bottom: 1rem; padding: 0.75rem; background: #161b22; border-radius: 6px; white-space: pre-wrap;">' + escapeHtml(data.report) + '</div>' : '') +
+                    (data.log ? '<div style="padding: 0.75rem; background: #0d1117; border-radius: 6px; overflow-x: auto;"><pre style="margin: 0; white-space: pre-wrap; word-break: break-all;">' + escapeHtml(data.log.substring(0, 5000)) + (data.log.length > 5000 ? "\n\n... (日志已截断)" : "") + '</pre></div>' : '<div style="color: #8b949e;">暂无详细日志</div>') +
+                '</div>';
+                
+                const win = window.open('', '_blank', 'width=800,height=600');
+                win.document.write('<!DOCTYPE html><html><head><title>Review Report - PR #' + number + '</title></head><body style="background: #0d1117; color: #c9d1d9; padding: 20px; margin: 0;">' + reportHtml + '</body></html>');
+            } catch (error) {
+                showToast('查看报告失败: ' + error.message, true);
+            }
+        }
+
+        // 标记 PR 需要返工
+        async function reworkPR(event, number) {
+            if (!confirm('确认标记 PR #' + number + ' 需要返工?\n\n这将在飞书通知开发者进行修改。')) {
+                return;
+            }
+            const btn = event && event.target;
+            setButtonLoading(btn, true);
+            showGlobalLoading('标记返工中...');
+            
+            try {
+                const response = await fetch('/api/rework-pr', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prNumber: number })
+                });
+                const result = await response.json();
+                showToast(result.message);
+                await loadReviewTasks();
+                await loadPullRequests();
+                await loadRunningTasks();
+            } catch (error) {
+                showToast('标记返工失败: ' + error.message, true);
+            } finally {
+                setButtonLoading(btn, false);
+                hideGlobalLoading();
+            }
+        }
+
+        (async () => {
+            await loadProjects();
+            await loadAll();
+        })();
+        setInterval(loadTasks, 3000);
+        setInterval(loadAll, 30000);
+        setInterval(updateRunningTimes, 1000);
+        
+        window.addEventListener('beforeunload', () => {
+            if (eventSource) eventSource.close();
+        });
+    </script>
+
+    <!-- PM Modal -->
+    <div id="pm-modal" class="hidden" onclick="if(event.target===this)closePMModal()">
+        <div class="w-full max-w-[600px] rounded-xl border border-slate-700 bg-slate-800 p-6 shadow-[0_4px_6px_-1px_rgba(0,0,0,0.3),0_2px_4px_-2px_rgba(0,0,0,0.3)]">
+            <h3 class="mb-4 text-xl">✨ 新建 Feature 需求</h3>
+            <div class="mb-4">
+                <label class="mb-2 block text-sm text-slate-400">标题</label>
+                <input id="pm-title" type="text" placeholder="例如：新增任务系统" class="w-full rounded-lg border border-slate-700 bg-slate-900 p-2 text-[0.9375rem] text-slate-100 outline-none">
+            </div>
+            <div class="mb-6">
+                <label class="mb-2 block text-sm text-slate-400">描述</label>
+                <textarea id="pm-desc" rows="5" placeholder="描述业务背景、目标用户、核心场景..." class="w-full resize-y rounded-lg border border-slate-700 bg-slate-900 p-2 text-[0.9375rem] text-slate-100 outline-none"></textarea>
+            </div>
+            <div class="flex justify-end gap-2">
+                <button onclick="closePMModal()" class="cursor-pointer rounded-lg border border-slate-700 bg-slate-900 px-4 py-2 text-slate-100">取消</button>
+                <button class="primary cursor-pointer rounded-lg px-4 py-2" onclick="startPM()">开始产出 PRD</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Design Preview -->
+    <div id="" class="fixed inset-0 z-[1600] hidden items-center justify-center bg-slate-900/90 p-4 backdrop-blur-sm" onclick="if(event.target===this)closeDesignViewer()">
+        <div class="flex h-[90vh] w-full max-w-[1400px] overflow-hidden rounded-xl border border-slate-700 bg-slate-800 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)]">
+            <div class="flex w-80 flex-col border-r border-slate-700 bg-slate-900">
+                <div class="-header border-b border-slate-700 p-4 font-semibold">🎨 设计资产</div>
+                <div id="" class="flex-1 overflow-y-auto p-2"></div>
+            </div>
+            <div class="flex flex-1 flex-col">
+                <div class="flex items-center justify-between border-b border-slate-700 px-4 py-3.5">
+                    <span id="">选择文件</span>
+                    <div class="flex gap-2">
+                        <button class="cursor-pointer rounded-md border border-slate-700 bg-transparent px-2.5 py-1 text-xs text-slate-400 hover:bg-slate-700 hover:text-slate-100" onclick="closeDesignViewer()">✕</button>
+                    </div>
+                </div>
+                <div id="" class="flex flex-1 items-center justify-center overflow-auto bg-[#0b1120] p-4">
+                    <div class="px-4 py-12 text-center text-sm text-slate-400">选择左侧文件预览</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Tailwind 扫描占位符 -->
+    <div class="hidden after:content-['_▶'] after:content-['_▼'] after:text-[0.6rem]"></div>
+</body>
+</html>
+

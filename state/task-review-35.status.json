@@ -1,0 +1,38 @@
+{
+  "taskID": "review-35",
+  "type": "review",
+  "status": "running",
+  "projectName": "new-world-monorepo",
+  "startedAt": "2026-04-26T14:56:45.83476+08:00",
+  "lastHeartbeat": "2026-04-26T15:06:38.348495+08:00",
+  "stepResults": {
+    "checkCurrentBranch": {
+      "status": "success",
+      "exitCode": 0
+    },
+    "cleanupWorktree": {
+      "status": "success",
+      "exitCode": 0
+    },
+    "copyReport": {
+      "status": "success",
+      "exitCode": 0
+    },
+    "extractDesignAssets": {
+      "status": "success",
+      "exitCode": 0
+    },
+    "extractDocCoverage": {
+      "status": "success",
+      "exitCode": 0
+    },
+    "makeLogsDir": {
+      "status": "success",
+      "exitCode": 0
+    },
+    "runAgent": {
+      "status": "success",
+      "exitCode": 0
+    }
+  }
+}

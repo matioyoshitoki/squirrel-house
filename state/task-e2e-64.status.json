@@ -1,0 +1,26 @@
+{
+  "taskID": "e2e-64",
+  "type": "e2e",
+  "status": "stopped",
+  "projectName": "social-world",
+  "startedAt": "2026-04-27T17:42:57.949335+08:00",
+  "lastHeartbeat": "2026-04-27T17:52:11.17247+08:00",
+  "stepResults": {
+    "checkEnv": {
+      "status": "success",
+      "exitCode": 0
+    },
+    "fixIncludes": {
+      "status": "success",
+      "exitCode": 0
+    },
+    "flutterBuild": {
+      "status": "success",
+      "exitCode": 0
+    },
+    "installApk": {
+      "status": "success",
+      "exitCode": 0
+    }
+  }
+}

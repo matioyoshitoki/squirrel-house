@@ -1,0 +1,22 @@
+{
+  "taskID": "doc-gardener-35",
+  "type": "doc-gardener",
+  "status": "running",
+  "projectName": "new-world-monorepo",
+  "startedAt": "2026-04-26T15:06:41.406964+08:00",
+  "lastHeartbeat": "2026-04-26T15:13:00.572687+08:00",
+  "stepResults": {
+    "cleanupWorktree": {
+      "status": "success",
+      "exitCode": 0
+    },
+    "ensureCommitAndPush": {
+      "status": "success",
+      "exitCode": 0
+    },
+    "runAgent": {
+      "status": "success",
+      "exitCode": 0
+    }
+  }
+}

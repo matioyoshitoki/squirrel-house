@@ -1,0 +1,52 @@
+name: doc-gardener
+steps:
+  - id: runAgent
+    label: 运行 doc-gardener agent
+    type: shell
+    tmux: true
+    dir: '{{ .Vars.tmpDir }}'
+    command: |
+      kimi --agent-file {{ .Vars.agentFile | shellquote }} \
+           --max-steps-per-turn 10000 \
+           --print \
+           -p {{ .Vars.prompt | shellquote }}
+    env:
+      AGENT_LOG_FILE: '{{ .Vars.logFileName }}'
+      AGENT_DOC_REPORT_FILE: '{{ .Vars.tmpDir }}/logs/doc-gardener-report.md'
+      # AGENT_AGENTS_MD 由 dashboard 在 buildAgentContext 中自动设置，无需在此覆盖
+    outputKey: agentOutput
+    logFile: '{{ .Vars.logFileName }}'
+
+  - id: checkOutput
+    label: 检查 agent 是否有产出
+    type: shell
+    dir: '{{ .Vars.tmpDir }}'
+    command: |
+      if git diff --quiet HEAD && git diff --cached --quiet && [ ! -f "logs/doc-gardener-report.md" ]; then
+        echo "❌ doc-gardener 未产生任何文件修改或报告"
+        exit 1
+      fi
+      echo "✅ 检测到产出"
+    ignoreError: false
+
+  - id: ensureCommitAndPush
+    label: 强制提交并推送
+    type: shell
+    dir: '{{ .Vars.tmpDir }}'
+    isCleanup: true
+    command: |
+      # 确保在正确的分支上（agent 可能误切分支）
+      git checkout {{ .Vars.branch }} 2>/dev/null || true && \
+      git add -A && \
+      (git diff --cached --quiet || git commit -m "docs: auto-commit by agent") && \
+      git push origin {{ .Vars.branch }} || true
+    ignoreError: true
+
+  - id: cleanupWorktree
+    label: 清理 worktree
+    type: shell
+    isCleanup: true
+    command: |
+      git worktree remove --force {{ .Vars.tmpDir }} || true
+      rm -rf {{ .Vars.tmpDir }}
+    ignoreError: true

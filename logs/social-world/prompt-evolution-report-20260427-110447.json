@@ -1,0 +1,118 @@
+{
+  "generatedAt": "2026-04-27T11:04:47.554815+08:00",
+  "projectName": "social-world",
+  "since": "2026-04-27T09:31:38.009551+08:00",
+  "totalLogs": 7,
+  "agentStats": {
+    "dev": {
+      "count": 2,
+      "avgSteps": 79,
+      "avgDuration": -1535500000000,
+      "totalToolCalls": {
+        "ReadFile": 56,
+        "Shell": 126,
+        "WriteFile": 3
+      },
+      "totalErrors": 2,
+      "totalWrites": 3,
+      "successRate": 0.5,
+      "topGitOp": "status"
+    },
+    "e2e": {
+      "count": 1,
+      "avgSteps": 0,
+      "avgDuration": 0,
+      "totalToolCalls": {},
+      "totalErrors": 0,
+      "totalWrites": 0,
+      "successRate": 0,
+      "topGitOp": ""
+    },
+    "review": {
+      "count": 2,
+      "avgSteps": 39,
+      "avgDuration": 0,
+      "totalToolCalls": {
+        "ReadFile": 90,
+        "Shell": 41,
+        "WriteFile": 2
+      },
+      "totalErrors": 1,
+      "totalWrites": 2,
+      "successRate": 1,
+      "topGitOp": "diff"
+    },
+    "rework": {
+      "count": 2,
+      "avgSteps": 73,
+      "avgDuration": 0,
+      "totalToolCalls": {
+        "Grep": 3,
+        "ReadFile": 47,
+        "Shell": 89,
+        "StrReplaceFile": 21,
+        "WriteFile": 1
+      },
+      "totalErrors": 2,
+      "totalWrites": 22,
+      "successRate": 1,
+      "topGitOp": "push"
+    }
+  },
+  "topIssues": [
+    {
+      "pattern": "dev_high_error_rate",
+      "count": 1,
+      "description": "dev 任务错误率 50% (1/2)，平均 79.0 步",
+      "rootCause": "agent 在执行工具调用时频繁遇到错误，可能缺少错误处理指引或环境预检查步骤",
+      "suggestion": "在 dev 的 prompt 中增加：1) 执行命令前检查环境状态；2) 遇到错误时的重试策略；3) 常见错误的快速诊断清单",
+      "severity": "warning"
+    },
+    {
+      "pattern": "dev_high_steps",
+      "count": 1,
+      "description": "dev 有 1 个任务超过 50 步（最高 108 步），平均 79.0 步",
+      "rootCause": "agent 过度思考（平均 9.5 次 think），在分析阶段消耗了过多步骤，且缺乏明确的执行路径",
+      "suggestion": "在 dev 的 prompt 中限制 think 的使用：只在需要复杂决策时才 think，常规操作直接执行",
+      "severity": "warning"
+    },
+    {
+      "pattern": "dev_no_output",
+      "count": 1,
+      "description": "dev 有 1 个任务执行了步骤但没有文件修改产出",
+      "rootCause": "agent 没有明确被要求「必须有文件修改产出」，或者任务边界不清晰导致 agent 在空转",
+      "suggestion": "在 dev 的 prompt 中增加强制要求：「本任务必须有至少一次 WriteFile 或 StrReplaceFile 调用，如果没有找到可修改的内容，请明确报告原因并停止」",
+      "severity": "warning"
+    },
+    {
+      "pattern": "review_high_error_rate",
+      "count": 1,
+      "description": "review 任务错误率 50% (1/2)，平均 39.0 步",
+      "rootCause": "agent 在执行工具调用时频繁遇到错误，可能缺少错误处理指引或环境预检查步骤",
+      "suggestion": "在 review 的 prompt 中增加：1) 执行命令前检查环境状态；2) 遇到错误时的重试策略；3) 常见错误的快速诊断清单",
+      "severity": "warning"
+    },
+    {
+      "pattern": "rework_high_error_rate",
+      "count": 1,
+      "description": "rework 任务错误率 50% (1/2)，平均 73.0 步",
+      "rootCause": "agent 在执行工具调用时频繁遇到错误，可能缺少错误处理指引或环境预检查步骤",
+      "suggestion": "在 rework 的 prompt 中增加：1) 执行命令前检查环境状态；2) 遇到错误时的重试策略；3) 常见错误的快速诊断清单",
+      "severity": "warning"
+    },
+    {
+      "pattern": "rework_high_steps",
+      "count": 1,
+      "description": "rework 有 1 个任务超过 50 步（最高 105 步），平均 73.0 步",
+      "rootCause": "agent 过度思考（平均 20.5 次 think），在分析阶段消耗了过多步骤，且缺乏明确的执行路径",
+      "suggestion": "在 rework 的 prompt 中限制 think 的使用：只在需要复杂决策时才 think，常规操作直接执行",
+      "severity": "warning"
+    }
+  ],
+  "trends": {
+    "avgStepsDelta": 23.298701298701296,
+    "avgDurationDelta": 0,
+    "errorRateDelta": -0.3766233766233765,
+    "successRateDelta": -0.012987012987012991
+  }
+}

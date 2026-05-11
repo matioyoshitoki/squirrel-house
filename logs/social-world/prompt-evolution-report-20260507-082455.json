@@ -1,0 +1,113 @@
+{
+  "generatedAt": "2026-05-07T08:24:55.361939+08:00",
+  "projectName": "social-world",
+  "since": "2026-05-06T17:20:37.40839+08:00",
+  "totalLogs": 7,
+  "agentStats": {
+    "dev": {
+      "count": 1,
+      "avgSteps": 108,
+      "avgDuration": -3071000000000,
+      "totalToolCalls": {
+        "ReadFile": 36,
+        "Shell": 76,
+        "WriteFile": 3
+      },
+      "totalErrors": 8,
+      "totalWrites": 3,
+      "successRate": 1,
+      "topGitOp": "status"
+    },
+    "doc": {
+      "count": 1,
+      "avgSteps": 30,
+      "avgDuration": 0,
+      "totalToolCalls": {
+        "Grep": 3,
+        "ReadFile": 29,
+        "Shell": 11
+      },
+      "totalErrors": 5,
+      "totalWrites": 0,
+      "successRate": 0,
+      "topGitOp": "diff"
+    },
+    "review": {
+      "count": 3,
+      "avgSteps": 13.666666666666666,
+      "avgDuration": 0,
+      "totalToolCalls": {
+        "ReadFile": 37,
+        "Shell": 28,
+        "WriteFile": 3
+      },
+      "totalErrors": 3,
+      "totalWrites": 3,
+      "successRate": 1,
+      "topGitOp": "a"
+    },
+    "rework": {
+      "count": 2,
+      "avgSteps": 12,
+      "avgDuration": 0,
+      "totalToolCalls": {
+        "Grep": 2,
+        "ReadFile": 5,
+        "Shell": 9,
+        "StrReplaceFile": 2
+      },
+      "totalErrors": 0,
+      "totalWrites": 2,
+      "successRate": 1,
+      "topGitOp": "add"
+    }
+  },
+  "topIssues": [
+    {
+      "pattern": "dev_high_error_rate",
+      "count": 1,
+      "description": "dev 任务错误率 100% (1/1)，平均 108.0 步",
+      "rootCause": "agent 在执行工具调用时频繁遇到错误，可能缺少错误处理指引或环境预检查步骤",
+      "suggestion": "在 dev 的 prompt 中增加：1) 执行命令前检查环境状态；2) 遇到错误时的重试策略；3) 常见错误的快速诊断清单",
+      "severity": "critical"
+    },
+    {
+      "pattern": "dev_high_steps",
+      "count": 1,
+      "description": "dev 有 1 个任务超过 50 步（最高 108 步），平均 108.0 步",
+      "rootCause": "agent 过度思考（平均 15.0 次 think），在分析阶段消耗了过多步骤，且缺乏明确的执行路径",
+      "suggestion": "在 dev 的 prompt 中限制 think 的使用：只在需要复杂决策时才 think，常规操作直接执行",
+      "severity": "critical"
+    },
+    {
+      "pattern": "doc_high_error_rate",
+      "count": 1,
+      "description": "doc 任务错误率 100% (1/1)，平均 30.0 步",
+      "rootCause": "doc-gardener 任务虽然执行了步骤，但未能成功写入文件，可能是 worktree 路径问题或权限问题",
+      "suggestion": "检查 doc-gardener workflow 的 worktree 创建逻辑，确保 agent 在正确的目录下执行文件写入",
+      "severity": "critical"
+    },
+    {
+      "pattern": "review_high_error_rate",
+      "count": 1,
+      "description": "review 任务错误率 33% (1/3)，平均 13.7 步",
+      "rootCause": "agent 在执行工具调用时频繁遇到错误，可能缺少错误处理指引或环境预检查步骤",
+      "suggestion": "在 review 的 prompt 中增加：1) 执行命令前检查环境状态；2) 遇到错误时的重试策略；3) 常见错误的快速诊断清单",
+      "severity": "warning"
+    },
+    {
+      "pattern": "doc_no_output",
+      "count": 1,
+      "description": "doc 有 1 个任务执行了步骤但没有文件修改产出",
+      "rootCause": "agent 没有明确被要求「必须有文件修改产出」，或者任务边界不清晰导致 agent 在空转",
+      "suggestion": "在 doc 的 prompt 中增加强制要求：「本任务必须有至少一次 WriteFile 或 StrReplaceFile 调用，如果没有找到可修改的内容，请明确报告原因并停止」",
+      "severity": "warning"
+    }
+  ],
+  "trends": {
+    "avgStepsDelta": 9.600000000000001,
+    "avgDurationDelta": 0,
+    "errorRateDelta": 1.2857142857142856,
+    "successRateDelta": 0.3571428571428571
+  }
+}

@@ -1,0 +1,152 @@
+name: design-task
+steps:
+  - id: fetchOrigin
+    label: 同步远程分支
+    type: shell
+    command: git fetch origin
+    ignoreError: true
+
+  - id: makeDesignsDir
+    label: 创建 designs 目录
+    type: shell
+    command: |
+      mkdir -p {{ .Vars.tmpDir }}/designs/issue-{{ .Vars.issueNumber }}
+      # 清理之前任务可能残留的预览目录，防止旧资产被复制到日志
+      rm -rf {{ .Vars.tmpDir }}/designs/issue-{{ .Vars.issueNumber }}/web
+      rm -rf {{ .Vars.tmpDir }}/designs/issue-{{ .Vars.issueNumber }}/preview
+
+  - id: runAgent
+    label: 运行 ui-designer agent
+    type: shell
+    tmux: true
+    dir: '{{ .Vars.tmpDir }}'
+    command: |
+      kimi --agent-file {{ .Vars.agentFile | shellquote }} \
+           --max-steps-per-turn 10000 \
+           --print \
+           -p {{ .Vars.prompt | shellquote }}
+    env:
+      AGENT_ISSUE_NUMBER: '{{ .Vars.issueNumber }}'
+      AGENT_ISSUE_TITLE: '{{ .Vars.issueTitle }}'
+      AGENT_LOG_FILE: '{{ .Vars.logFileName }}'
+    outputKey: agentOutput
+    logFile: '{{ .Vars.logFileName }}'
+
+  - id: buildFlutterPreview
+    label: 编译设计预览
+    type: shell
+    dir: '{{ .Vars.tmpDir }}'
+    command: |
+      export PATH="/Users/insulate/development/flutter/bin:$PATH"
+      TEMPLATE_DIR="/Users/insulate/Desktop/new-world/new-world-ops/.tools/flutter_preview"
+      DESIGNS_DIR="designs/issue-{{ .Vars.issueNumber }}"
+
+      # ========== Flutter 项目预览 ==========
+      # 先判断当前设计任务是否有 Flutter 资产
+      HAS_FLUTTER_ASSETS=false
+      if [ -f "$DESIGNS_DIR/preview.dart" ] || [ -d "$DESIGNS_DIR/flutter-widgets" ]; then
+        HAS_FLUTTER_ASSETS=true
+      fi
+
+      # 如果没有 Flutter 资产，清理模板中可能残留的 main.dart（防止上一个 Flutter 任务的残留触发编译）
+      if [ "$HAS_FLUTTER_ASSETS" = false ]; then
+        rm -f "$TEMPLATE_DIR/lib/main.dart"
+      fi
+
+      # 情况1：有自包含的 preview.dart，直接使用
+      PREVIEW_FILE="$DESIGNS_DIR/preview.dart"
+      if [ -f "$PREVIEW_FILE" ]; then
+        cp "$PREVIEW_FILE" "$TEMPLATE_DIR/lib/main.dart"
+        echo "📄 使用 preview.dart 作为入口"
+      else
+        # 情况2：有 flutter-widgets/ 目录，自动提取 Widget 生成入口
+        WIDGETS_DIR="$DESIGNS_DIR/flutter-widgets"
+        if [ -d "$WIDGETS_DIR" ]; then
+          # 先备份模板中的 _tokens.dart（agent 生成的版本可能缺少 token）
+          cp "$TEMPLATE_DIR/lib/preview/_tokens.dart" "/tmp/nwops_tokens_backup.dart" 2>/dev/null || true
+          rm -rf "$TEMPLATE_DIR/lib/"*
+          mkdir -p "$TEMPLATE_DIR/lib/preview"
+          cp -R "$WIDGETS_DIR/"* "$TEMPLATE_DIR/lib/preview/"
+          # 恢复模板 _tokens.dart（包含所有必要 token 定义）
+          if [ -f "/tmp/nwops_tokens_backup.dart" ]; then
+            cp "/tmp/nwops_tokens_backup.dart" "$TEMPLATE_DIR/lib/preview/_tokens.dart"
+          fi
+          python3 "/Users/insulate/Desktop/new-world/new-world-ops/.tools/generate_preview_main.py" "$WIDGETS_DIR" "$TEMPLATE_DIR/lib/main.dart"
+          echo "🔧 已从 flutter-widgets/ 生成预览入口"
+        fi
+      fi
+
+      # 如果前面触发了 Flutter 编译
+      if [ -f "$TEMPLATE_DIR/lib/main.dart" ]; then
+        cd "$TEMPLATE_DIR"
+        # 强制清理 build 缓存，确保 --base-href 生效
+        rm -rf "$TEMPLATE_DIR/build/web"
+        flutter build web --release --base-href "/logs/{{ .Vars.projectName }}/designs/issue-{{ .Vars.issueNumber }}/web/" 2>&1
+        if [ -d "$TEMPLATE_DIR/build/web" ]; then
+          mkdir -p "{{ .Vars.tmpDir }}/$DESIGNS_DIR/web"
+          cp -R "$TEMPLATE_DIR/build/web/"* "{{ .Vars.tmpDir }}/$DESIGNS_DIR/web/"
+          echo "✅ Flutter Web 预览编译完成"
+        else
+          echo "❌ Flutter Web 编译失败"
+        fi
+      fi
+
+      # 如果没有生成任何预览，记录日志
+      if [ ! -d "{{ .Vars.tmpDir }}/$DESIGNS_DIR/web" ]; then
+        echo "⚠️ 未找到 preview.dart / flutter-widgets，跳过 Flutter 预览编译"
+      fi
+    ignoreError: true
+    logFile: '{{ .Vars.logFileName }}.preview-build'
+
+  - id: createDocPlaceholders
+    label: 创建文档占位文件
+    type: shell
+    dir: '{{ .Vars.tmpDir }}'
+    command: |
+      DOC_FILE="designs/issue-{{ .Vars.issueNumber }}/docs-to-update.txt"
+      if [ -f "$DOC_FILE" ]; then
+        while IFS='|' read -r path desc; do
+          [ -z "$path" ] && continue
+          dir=$(dirname "$path")
+          mkdir -p "$dir"
+          if [ ! -f "$path" ]; then
+            {
+              echo "# $desc"
+              echo ""
+              echo "> TODO: 由设计任务自动生成，待开发阶段补充。"
+              echo ""
+              echo "## 相关设计"
+              echo "- 设计规范: [design-spec.md](../designs/issue-{{ .Vars.issueNumber }}/design-spec.md)"
+            } > "$path"
+          fi
+        done < "$DOC_FILE"
+      fi
+    ignoreError: true
+
+  - id: ensureCommitAndPush
+    label: 提交并推送设计资产
+    type: shell
+    dir: '{{ .Vars.tmpDir }}'
+    command: |
+      git add -A && \
+      (git diff --cached --quiet || git commit -m "design: add assets for issue #{{ .Vars.issueNumber }}") && \
+      git push origin {{ .Vars.branch }} || true
+
+  - id: copyDesignAssets
+    label: 复制设计资产到日志目录
+    type: shell
+    isCleanup: true
+    command: |
+      mkdir -p {{ .Vars.logsDir }}/designs && \
+      rm -rf {{ .Vars.logsDir }}/designs/issue-{{ .Vars.issueNumber }} && \
+      cp -R {{ .Vars.tmpDir }}/designs/issue-{{ .Vars.issueNumber }} {{ .Vars.logsDir }}/designs/issue-{{ .Vars.issueNumber }}
+    ignoreError: true
+
+  - id: cleanupWorktree
+    label: 清理 worktree
+    type: shell
+    isCleanup: true
+    command: |
+      git worktree remove --force {{ .Vars.tmpDir }} || true
+      rm -rf {{ .Vars.tmpDir }}
+    ignoreError: true

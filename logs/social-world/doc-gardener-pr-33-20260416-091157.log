@@ -1,0 +1,1981 @@
+[2026-04-16 09:11:57] PR #33 Doc Gardener 启动
+Merged: false
+Base: main
+Head: design/issue-4
+日志: /Users/insulate/Desktop/new-world/new-world-ops/logs/social-world/doc-gardener-pr-33-20260416-091157.log
+【任务上下文】
+- PR 编号: #33
+- 项目路径: ../../social-world
+- 项目地图: ../../social-world/AGENTS.md
+- 关联 PRD: ../../social-world/prd/v1-dev-tools-drawer.md,../../social-world/prd
+/v1-auth-login.md,../../social-world/prd/v1-matching.md
+- 文档目录: ../../social-world/docs
+
+请对当前 open 的 PR 进行文档协同检查，并直接补充遗漏的文档。
+
+【上下文】
+- 这是一个尚未合并的 open PR
+- PR 编号: #33
+- 当前分支: design/issue-4
+- Base 分支: main
+
+【变更文件列表】
+designs/issue-4/design-spec.md
+designs/issue-4/docs-to-update.txt
+designs/issue-4/mockup.html
+designs/issue-4/wireframe.svg
+docs/api/INDEX.md
+docs/api/matching.md
+docs/api/socket-events.md
+docs/modules/matching.md
+prd/v1-matching.md
+
+【必须执行的操作】
+1. 分析上述变更，检查对应文档是否已补充
+2. 对遗漏项，直接创建或修改对应的 .md 文档文件
+3. 检查 CHANGELOG.md：
+   - 如果 PR 包含用户可见的功能变更或接口变更，而 CHANGELOG.md 中尚未记录，必须
+在最新版本区块下追加条目 `- #33`
+4. 如果 PR 包含接口破坏性变更，必须创建或更新迁移指南 docs/migration/README.md
+5. 输出结构化报告到日志
+6. 将文档变更提交：git add -A && git commit -m 'docs: 补充 PR #33 文档 (by PR Do
+c Gardener)'
+7. push 到当前分支：git push origin design/issue-4
+
+注意：只修改文档文件（.md），不要修改业务代码。
+TurnBegin(
+    user_input="【任务上下文】\n- PR 编号: #33\n- 项目路径: ../../social-world\n
+- 项目地图: ../../social-world/AGENTS.md\n- 关联 PRD: ../../social-world/prd/v1-
+dev-tools-drawer.md,../../social-world/prd/v1-auth-login.md,../../social-world/p
+rd/v1-matching.md\n- 文档目录: ../../social-world/docs\n\n请对当前 open 的 PR 进
+行文档协同检查，并直接补充遗漏的文档。\n\n【上下文】\n- 这是一个尚未合并的 open 
+PR\n- PR 编号: #33\n- 当前分支: design/issue-4\n- Base 分支: main\n\n【变更文件
+列表】\ndesigns/issue-4/design-spec.md\ndesigns/issue-4/docs-to-update.txt\ndesi
+gns/issue-4/mockup.html\ndesigns/issue-4/wireframe.svg\ndocs/api/INDEX.md\ndocs/
+api/matching.md\ndocs/api/socket-events.md\ndocs/modules/matching.md\nprd/v1-mat
+ching.md\n\n【必须执行的操作】\n1. 分析上述变更，检查对应文档是否已补充\n2. 对遗
+漏项，直接创建或修改对应的 .md 文档文件\n3. 检查 CHANGELOG.md：\n   - 如果 PR 包
+含用户可见的功能变更或接口变更，而 CHANGELOG.md 中尚未记录，必须在最新版本区块下
+追加条目 `- #33`\n4. 如果 PR 包含接口破坏性变更，必须创建或更新迁移指南 docs/mig
+ration/README.md\n5. 输出结构化报告到日志\n6. 将文档变更提交：git add -A && git 
+commit -m 'docs: 补充 PR #33 文档 (by PR Doc Gardener)'\n7. push 到当前分支：git
+push origin design/issue-4\n\n注意：只修改文档文件（.md），不要修改业务代码。"
+)
+StepBegin(n=1)
+ThinkPart(
+    type='think',
+    think='Let me analyze the task. I need to:\n\n1. Read the project map (AGENT
+S.md) and understand the project structure\n2. Check the git diff for PR #33\n3.
+Analyze the changed files and check if documentation is synchronized\n4. Create/
+modify missing documentation\n5. Check CHANGELOG.md and update if needed\n6. Che
+ck for breaking changes and update migration guide if needed\n7. Output a struct
+ured report\n8. Commit and push the documentation changes\n\nLet me start by rea
+ding the relevant files and checking the current state of the repository.',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_QKO65En1hl2yqz72yZrZnjAX',
+    function=FunctionBody(
+        name='SetTodoList',
+        arguments='{"todos": [{"title":"读取项目地图 AGENTS.md 和当前 PR 变更","
+status":"in_progress"},{"title":"分析变更文件，推断文档影响范围","status":"pendi
+ng"},{"title":"检查并补充遗漏的文档","status":"pending"},{"title":"检查 CHANGELO
+G.md 和迁移指南","status":"pending"},{"title":"提交并推送文档变更","status":"pen
+ding"},{"title":"输出结构化报告","status":"pending"}]}'
+    ),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_QKO65En1hl2yqz72yZrZnjAX',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='Todo list updated',
+        message='Todo list updated',
+        display=[
+            TodoDisplayBlock(
+                type='todo',
+                items=[
+                    TodoDisplayItem(
+                        title='读取项目地图 AGENTS.md 和当前 PR 变更',
+                        status='in_progress'
+                    ),
+                    TodoDisplayItem(
+                        title='分析变更文件，推断文档影响范围',
+                        status='pending'
+                    ),
+                    TodoDisplayItem(
+                        title='检查并补充遗漏的文档',
+                        status='pending'
+                    ),
+                    TodoDisplayItem(
+                        title='检查 CHANGELOG.md 和迁移指南',
+                        status='pending'
+                    ),
+                    TodoDisplayItem(
+                        title='提交并推送文档变更',
+                        status='pending'
+                    ),
+                    TodoDisplayItem(title='输出结构化报告', status='pending')
+                ]
+            )
+        ],
+        extras=None
+    )
+)
+StatusUpdate(
+    context_usage=0.01557159423828125,
+    context_tokens=4082,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=498,
+        output=220,
+        input_cache_read=3584,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-4wsXGPfYmD8CuTP6GxEvDL86',
+    plan_mode=False,
+    mcp_status=None
+)
+StepBegin(n=2)
+ThinkPart(
+    type='think',
+    think="Let me read the project map and the changed files to understand what 
+this PR is about. I'll read multiple files in parallel.",
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_4fWtprdiyyTO7tq6MZ1oUBbr',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "../../social-world/AGENTS.md"}'
+    ),
+    extras=None
+)
+ToolCall(
+    type='function',
+    id='tool_SbU37VK4fJZlOfF5Zy1Sx6Cb',
+    function=FunctionBody(name='Shell', arguments='{"'),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_4fWtprdiyyTO7tq6MZ1oUBbr',
+    return_value=ToolError(
+        is_error=True,
+        output='',
+        message='`../../social-world/AGENTS.md` is not an absolute path. You mus
+t provide an absolute path to read a file outside the working directory.',
+        display=[BriefDisplayBlock(type='brief', text='Invalid path')],
+        extras=None
+    )
+)
+ToolCallPart(
+    arguments_part='command": "cd ../../social-world && git diff --name-only ori
+gin/main...HEAD && echo \\"---\\" && git log --oneline -5"}'
+)
+ToolCall(
+    type='function',
+    id='tool_4dYKRTa5fXc4m9dRo0PqMfMW',
+    function=FunctionBody(name='ReadFile', arguments='{"path":'),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_SbU37VK4fJZlOfF5Zy1Sx6Cb',
+    return_value=ToolReturnValue(
+        is_error=True,
+        output='/bin/bash: line 0: cd: ../../social-world: No such file or direc
+tory\n',
+        message='Command failed with exit code: 1.',
+        display=[
+            BriefDisplayBlock(type='brief', text='Failed with exit code: 1')
+        ],
+        extras=None
+    )
+)
+ToolCallPart(
+    arguments_part=' "../../social-world/designs/issue-4/design-spec.md"}'
+)
+ToolCall(
+    type='function',
+    id='tool_mohdNWG1XKs7WMicF3ca1L7u',
+    function=FunctionBody(name='ReadFile', arguments='{"path":'),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_4dYKRTa5fXc4m9dRo0PqMfMW',
+    return_value=ToolError(
+        is_error=True,
+        output='',
+        message='`../../social-world/designs/issue-4/design-spec.md` is not an a
+bsolute path. You must provide an absolute path to read a file outside the worki
+ng directory.',
+        display=[BriefDisplayBlock(type='brief', text='Invalid path')],
+        extras=None
+    )
+)
+ToolCallPart(
+    arguments_part=' "../../social-world/designs/issue-4/docs-to-update.txt"}'
+)
+ToolResult(
+    tool_call_id='tool_mohdNWG1XKs7WMicF3ca1L7u',
+    return_value=ToolError(
+        is_error=True,
+        output='',
+        message='`../../social-world/designs/issue-4/docs-to-update.txt` is not 
+an absolute path. You must provide an absolute path to read a file outside the w
+orking directory.',
+        display=[BriefDisplayBlock(type='brief', text='Invalid path')],
+        extras=None
+    )
+)
+StatusUpdate(
+    context_usage=0.0165252685546875,
+    context_tokens=4332,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=492,
+        output=135,
+        input_cache_read=3840,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-tTj6zwno19ocEsmAs8sPJhdK',
+    plan_mode=False,
+    mcp_status=None
+)
+StepBegin(n=3)
+ThinkPart(
+    type='think',
+    think='I need to find the absolute path to the social-world project. Let me 
+check the current working directory and find the project.',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_IYCmQISfpRWXDiPVxq5OnWha',
+    function=FunctionBody(
+        name='Shell',
+        arguments='{"command": "pwd && ls -la && find / -name \\"social-world\\"
+-type d 2>/dev/null | head -20"}'
+    ),
+    extras=None
+)
+StatusUpdate(
+    context_usage=0.01784515380859375,
+    context_tokens=4678,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=582,
+        output=68,
+        input_cache_read=4096,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-KNAiTvLOucK500uRgpbeRIud',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_IYCmQISfpRWXDiPVxq5OnWha',
+    return_value=ToolReturnValue(
+        is_error=True,
+        output='/private/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/doc-gar
+dener-33-1296294217\ntotal 872\ndrwx------@  30 insulate  staff     960 Apr 16 0
+9:11 .\ndrwx------@ 735 insulate  staff   23520 Apr 16 09:11 ..\n-rw-r--r--@   1
+insulate  staff     694 Apr 16 09:11 .env.example\n-rw-r--r--@   1 insulate  sta
+ff      87 Apr 16 09:11 .git\ndrwxr-xr-x@   4 insulate  staff     128 Apr 16 09:
+11 .github\n-rw-r--r--@   1 insulate  staff     779 Apr 16 09:11 .gitignore\ndrw
+xr-xr-x@   3 insulate  staff      96 Apr 16 09:11 .husky\ndrwxr-xr-x@   4 insula
+te  staff     128 Apr 16 09:11 .kimi\n-rw-r--r--@   1 insulate  staff   18066 Ap
+r 16 09:11 AGENT-FIRST-PROJECT-SEED.md\n-rw-r--r--@   1 insulate  staff    2825 
+Apr 16 09:11 AGENTS.md\ndrwxr-xr-x@   5 insulate  staff     160 Apr 16 09:11 app
+s\n-rw-r--r--@   1 insulate  staff     292 Apr 16 09:11 CHANGELOG.md\ndrwxr-xr-x
+@   4 insulate  staff     128 Apr 16 09:11 designs\n-rw-r--r--@   1 insulate  st
+aff    1991 Apr 16 09:11 docker-compose.yml\ndrwxr-xr-x@   9 insulate  staff    
+288 Apr 16 09:11 docs\n-rw-r--r--@   1 insulate  staff      53 Apr 16 09:11 go.m
+od\ndrwxr-xr-x@   3 insulate  staff      96 Apr 16 09:11 internal\n-rw-r--r--@  
+1 insulate  staff    2509 Apr 16 09:11 Makefile\n-rw-r--r--@   1 insulate  staff
+    253 Apr 16 09:11 melos.yaml\n-rw-r--r--@   1 insulate  staff     154 Apr 16 
+09:11 openapitools.json\n-rw-r--r--@   1 insulate  staff     887 Apr 16 09:11 pa
+ckage.json\ndrwxr-xr-x@   4 insulate  staff     128 Apr 16 09:11 packages\n-rw-r
+--r--@   1 insulate  staff  363710 Apr 16 09:11 pnpm-lock.yaml\n-rw-r--r--@   1 
+insulate  staff      40 Apr 16 09:11 pnpm-workspace.yaml\ndrwxr-xr-x@  10 insula
+te  staff     320 Apr 16 09:11 prd\n-rw-r--r--@   1 insulate  staff     206 Apr 
+16 09:11 pubspec.yaml\n-rw-r--r--@   1 insulate  staff    1670 Apr 16 09:11 READ
+ME.md\ndrwxr-xr-x@  10 insulate  staff     320 Apr 16 09:11 scripts\ndrwxr-xr-x@
+  4 insulate  staff     128 Apr 16 09:11 tests\n-rw-r--r--@   1 insulate  staff 
+   456 Apr 16 09:11 turbo.json\n',
+        message='Command killed by timeout (60s)',
+        display=[
+            BriefDisplayBlock(type='brief', text='Killed by timeout (60s)')
+        ],
+        extras=None
+    )
+)
+StepBegin(n=4)
+ThinkPart(
+    type='think',
+    think='The project is actually in the current working directory! The `../../
+social-world` was relative from some other context, but the actual working direc
+tory IS the social-world project. Let me proceed with reading the files from the
+current directory.',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_1Yfxp47taa1SlfFe8TcN4kQu',
+    function=FunctionBody(
+        name='Shell',
+        arguments='{"command": "cd /private/var/folders/lt/w3sl6z8j5v50vt2s6knvf
+5n00000gn/T/doc-gardener-33-1296294217 && git diff --name-only origin/main...HEA
+D && echo \\"---\\" && git log --oneline -5"}'
+    ),
+    extras=None
+)
+ToolCall(
+    type='function',
+    id='tool_hh4Y52tXdVY5V1SDlUB3KGHy',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "/private/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n0000
+0gn/T/doc-gardener-33-1296294217/AGENTS'
+    ),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_1Yfxp47taa1SlfFe8TcN4kQu',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='designs/issue-4/design-spec.md\ndesigns/issue-4/docs-to-update.t
+xt\ndesigns/issue-4/mockup.html\ndesigns/issue-4/wireframe.svg\ndocs/api/INDEX.m
+d\ndocs/api/matching.md\ndocs/api/socket-events.md\ndocs/modules/matching.md\npr
+d/v1-matching.md\n---\n9d551db fix: 修复 PR #33 review 问题\nb45e823 fix: 修复 P
+R #33 review 问题\n305604c design: add assets for issue #4\n7e27c4c feat: resolv
+e #29 - [Mobile] 开发模式悬浮抽屉（Dev Tools Drawer）支持运行时修改 Server IP (#
+31)\n9614895 design: assets for issue #29 (#30)\n',
+        message='Command executed successfully.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(arguments_part='.md"}')
+ToolCall(
+    type='function',
+    id='tool_bJdDJqEG54XrwHAKkCKfM17f',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "/private/var/folders/lt/w3sl6z8j5v50vt'
+    ),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_hh4Y52tXdVY5V1SDlUB3KGHy',
+    return_value=ToolOk(
+        is_error=False,
+        output='     1\t# Social World 智能体导航地图\n     2\t\n     3\t> 仓库
+即唯一真实来源。不在仓库里的知识等于不存在。\n     4\t\n     5\t## 文档地图\n   
+ 6\t\n     7\t| 你要找什么     | 去哪里                                         
+                                     |\n     8\t| -------------- | -------------
+----------------------------------------------------------------------- |\n     
+9\t| 项目背景       | [README.md](README.md)                                    
+                          |\n    10\t| 编码与架构规范 | [docs/design-docs/INDEX.
+md](docs/design-docs/INDEX.md)                               |\n    11\t| UI 风
+格规范    | [docs/design-docs/ui-style-guide/INDEX.md](docs/design-docs/ui-style
+-guide/INDEX.md) |\n    12\t| 业务术语       | [docs/product-specs/glossary.md](
+docs/product-specs/glossary.md)                     |\n    13\t| 当前需求       
+| [prd/v1-mvp.md](prd/v1-mvp.md)                                                
+      |\n    14\t| 模块实现       | [docs/modules/INDEX.md](docs/modules/INDEX.m
+d)（含 profile）                         |\n    15\t| 技术债务       | [docs/exe
+c-plans/tech-debt-tracker.md](docs/exec-plans/tech-debt-tracker.md)         |\n 
+  16\t| Agent 配置     | `.kimi/agents/`                                        
+                             |\n    17\t| 子 Agent       | `.kimi/agents/subagen
+ts/`（explore / plan / coder）                                  |\n    18\t\n   
+19\t## 目录结构\n    20\t\n    21\t```\n    22\tdocs/design-docs/    # 架构规范
+、编码约定、数据库/API 规范\n    23\tdocs/product-specs/  # 业务术语、领域规则\n
+   24\tdocs/modules/        # 模块实现文档（跨代码层级）\n    25\tprd/          
+      # 产品需求文档\n    26\tapps/                # mobile (Flutter), api (Nest
+JS), admin (Next.js)\n    27\tpackages/            # shared-types, design-system
+\n    28\t```\n    29\t\n    30\t## 黄金原则\n    31\t\n    32\t1. **全链路交付*
+*：一个需求必须同时包含 DB + API + Mobile 的实现\n    33\t2. **契约同步**：`pack
+ages/shared-types/` 是前后端的唯一真实来源\n    34\t3. **约束即代码**：linter、h
+ooks、CI 会强制执行规则，不在规则里的约束等于不存在\n    35\t4. **效果优先**：先
+跑通端到端，再考虑优雅性\n    36\t\n    37\t## 常见任务\n    38\t\n    39\t| 任
+务             | 命令                                                  |\n    40
+\t| ---------------- | ----------------------------------------------------- |\n
+   41\t| 启动开发环境     | `make dev`                                          
+ |\n    42\t| 检查文档健康     | `make check-docs`                              
+      |\n    43\t| 运行测试         | `make test`                               
+           |\n    44\t| 安装 hooks       | `make hooks`                         
+                |\n    45\t| 启动开发 Agent   | `.kimi/agents/start-dev-agent.sh
+`                     |\n    46\t| 启动文档园丁     | `.kimi/agents/start-doc-ga
+rdener.sh`                  |\n    47\t| 启动 PR 文档园丁 | `.kimi/agents/start-
+pr-doc-gardener.sh [base-branch]` |\n',
+        message='47 lines read from file starting from line 1. Total lines in fi
+le: 47. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(
+    arguments_part='2s6knvf5n00000gn/T/doc-gardener-33-1296294217/designs/issue-
+4/design-spec.md"}'
+)
+ToolCall(
+    type='function',
+    id='tool_Alit078qVPhhMRK8Y9SfxLRr',
+    function=FunctionBody(name='ReadFile', arguments='{"path":'),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_bJdDJqEG54XrwHAKkCKfM17f',
+    return_value=ToolOk(
+        is_error=False,
+        output="     1\t# Issue #4 Matching 设计规范\n     2\t\n     3\t> 关联 P
+RD：[prd/v1-matching.md](../../prd/v1-matching.md)  \n     4\t> 关联 Issue：#4  
+\n     5\t> 技术栈：Flutter (Mobile) + BLoC/Cubit\n     6\t\n     7\t---\n     8
+\t\n     9\t## 1. 页面/场景清单\n    10\t\n    11\t| 序号 | 页面/场景 | 说明 | 
+关键状态 |\n    12\t|------|-----------|------|----------|\n    13\t| 1 | **首页
+-推荐卡片** | 用户进入 App 后默认页面，展示可滑动的推荐卡片堆叠 | Loading、正常
+态（卡片堆叠）、空数据态 |\n    14\t| 2 | **滑动操作反馈** | 用户左滑 Pass / 右
+滑 Like 时的实时视觉反馈 | 拖动中、释放动画、操作成功 |\n    15\t| 3 | **配对成
+功弹窗** | 双向喜欢时触发的全屏 Modal，引导用户聊天或继续滑动 | 动画进入、可关闭
+|\n    16\t| 4 | **匹配列表页** | 底部导航「消息」入口内的配对成功用户列表 | Loa
+ding、列表态、空态 |\n    17\t\n    18\t### 场景流程图\n    19\t\n    20\t```\n 
+  21\tHomePage\n    22\t  ├── 加载中 → CircularProgressIndicator\n    23\t  ├── 
+有数据 → SwipeCardStack + 操作按钮\n    24\t  │       ├── 左滑/点击 ✕ → Pass\n  
+ 25\t  │       ├── 右滑/点击 ♥ → Like\n    26\t  │       └── 双向 Like → MatchSu
+ccessDialog\n    27\t  └── 无数据 → EmptyRecommendationView\n    28\t\n    29\tM
+atchListPage (Tab: 消息)\n    30\t  ├── 加载中 → CircularProgressIndicator\n    
+31\t  └── 有数据 → MatchListItem 列表\n    32\t```\n    33\t\n    34\t---\n    3
+5\t\n    36\t## 2. 视觉系统\n    37\t\n    38\t视觉系统严格复用项目已有 Design T
+oken，**禁止新增硬编码色值**。\n    39\t\n    40\t### 2.1 色板\n    41\t\n    42
+\t| Token | 色值 | 使用场景 |\n    43\t|-------|------|----------|\n    44\t| `D
+esignTokens.primary` | `#6750A4` | 主按钮、激活 Tab、底部导航选中态、Like 按钮 h
+over 强调 |\n    45\t| `DesignTokens.background` | `#FFFBFE` | 页面背景、Card 背
+景 |\n    46\t| `DesignTokens.textPrimary` | `#1C1B1F` | 标题、正文、图标主色 |\
+n    47\t| `DesignTokens.error` | `#B3261E` | Pass 操作色、错误提示 |\n    48\t|
+`ColorScheme.surface` | `#F3EDF7` | Tab 背景、头像 fallback 背景 |\n    49\t| `C
+olorScheme.outline` | `#79747E` | 辅助文字、分割线、次要按钮边框 |\n    50\t\n  
+ 51\t额外语义色（需在 `tokens.dart` / `app_theme.dart` 中注册）：\n    52\t- `--
+success` / `likeActionColor`: `#2E7D32` — Like 按钮、配对成功状态\n    53\t\n   
+54\t### 2.2 字体\n    55\t\n    56\t| Token | 值 | 使用场景 |\n    57\t|-------|
+-----|----------|\n    58\t| `DesignTokens.fontSizeHeadline` | `28.0` | 空状态大
+标题（暂不适用本 Issue） |\n    59\t| `DesignTokens.fontSizeTitle` | `22.0` | 卡
+片姓名、弹窗标题、页面标题 |\n    60\t| `DesignTokens.fontSizeBody` | `16.0` | 
+按钮文字、列表主文字 |\n    61\t| `DesignTokens.fontSizeCaption` | `12.0` | 距离
+/时间、Bio、底部导航标签 |\n    62\t\n    63\t### 2.3 间距与圆角\n    64\t\n    
+65\t| Token | 值 | 使用场景 |\n    66\t|-------|-----|----------|\n    67\t| `De
+signTokens.spacingMd` | `16.0` | 页面边距、Card 内边距、列表项间距 |\n    68\t| 
+`DesignTokens.spacingSm` | `12.0` | Tab 内间距、操作按钮与卡片间距 |\n    69\t| 
+`DesignTokens.spacingXs` | `8.0` | 行内小间距、文字与图标间距 |\n    70\t| `Desi
+gnTokens.radiusLg` | `16.0` | 推荐卡片圆角、弹窗圆角 |\n    71\t| `DesignTokens.
+radiusMd` | `12.0` | 按钮、列表项、小卡片圆角 |\n    72\t| `DesignTokens.radiusS
+m` | `8.0` | Tag、Badge 圆角 |\n    73\t\n    74\t### 2.4 布局尺寸\n    75\t\n  
+ 76\t- **手机画布**：按 375×812pt（iPhone X 基准）设计\n    77\t- **推荐卡片**：
+水平边距 16pt，圆角 16pt，图片区高度 340pt，信息区高度自适应\n    78\t- **卡片堆
+叠视觉差**：下层卡片 scale(0.95) + translateY(12pt)\n    79\t- **操作按钮**：直
+径 64pt，与卡片底部间距 16pt\n    80\t- **底部导航栏**：高度 80pt（含 Home Indic
+ator 安全区）\n    81\t\n    82\t---\n    83\t\n    84\t## 3. 组件清单\n    85\t
+\n    86\t### 3.1 需新增 design-system 组件\n    87\t\n    88\t| 层级 | 组件名 |
+文件路径 | 说明 | Widgetbook 用例要求 |\n    89\t|------|--------|----------|---
+---|---------------------|\n    90\t| atom | `SwActionButton` | `packages/design
+-system/lib/src/atoms/sw_action_button.dart` | 圆形操作按钮（Pass/Like 两种变体
+） | 默认态、禁用态、按下态 |\n    91\t| molecule | `SwipeCard` | `packages/desi
+gn-system/lib/src/molecules/swipe_card.dart` | 可拖动/可点击的推荐用户卡片 | 默
+认态、拖动中(show like badge)、拖动中(show pass badge) |\n    92\t| organism | `
+SwipeCardStack` | `packages/design-system/lib/src/organisms/swipe_card_stack.dar
+t` | 卡片堆叠容器，管理多层卡片渲染与手势冲突 | 3张卡片堆叠、1张卡片、空态 |\n  
+ 93\t| organism | `MatchSuccessDialog` | `packages/design-system/lib/src/organis
+ms/match_success_dialog.dart` | 配对成功全屏弹窗，含头像组合、CTA 按钮 | 默认态 
+|\n    94\t| molecule | `MatchListItem` | `packages/design-system/lib/src/molecu
+les/match_list_item.dart` | 匹配列表单项，含头像、昵称、时间、聊天入口 | 默认态 
+|\n    95\t\n    96\t### 3.2 页面级 Widget\n    97\t\n    98\t| Widget 名 | 路径
+| 说明 |\n    99\t|-----------|------|------|\n   100\t| `HomePage` | `apps/mobi
+le/lib/presentation/pages/home_page.dart` | 首页，承载模式切换、卡片堆叠、操作按
+钮、底部导航 |\n   101\t| `MatchListPage` | `apps/mobile/lib/presentation/pages/
+match_list_page.dart` | 匹配列表页，底部导航「消息」Tab 内容 |\n   102\t| `Empty
+RecommendationView` | `apps/mobile/lib/presentation/widgets/empty_recommendation
+_view.dart` | 推荐为空时的占位视图（可复用） |\n   103\t\n   104\t### 3.3 禁止直
+接使用原生组件替代\n   105\t\n   106\t- 禁止用 `ElevatedButton` / `IconButton` 
+直接替代 `SwActionButton`\n   107\t- 禁止在 `pages/` 中写死 `Color(0xFF...)` 或 
+`BoxDecoration` 颜色值\n   108\t- 卡片阴影、圆角、间距必须来自 `DesignTokens`\n 
+ 109\t\n   110\t---\n   111\t\n   112\t## 4. 图片/图标资源\n   113\t\n   114\t本
+设计全部使用 Emoji / 矢量图标 / CSS 渐变占位，**无需额外图片资源**。实际开发时：
+\n   115\t\n   116\t| 资源位置 | 说明 |\n   117\t|----------|------|\n   118\t| 
+用户头像 | 网络图 `Image.network(card.avatarUrl)`，fallback 到 `SwAvatar` |\n   
+119\t| 空状态插图 | 使用 `Icons.search_off` 或 Lottie 动画（待产品确认），MVP 阶
+段可用 `Icons.person_off` 替代 |\n   120\t| 操作按钮图标 | Material `Icons.close
+` (Pass) / `Icons.favorite` (Like)，颜色语义化 |\n   121\t| 底部导航图标 | Mater
+ial `Icons.home` / `Icons.chat_bubble` / `Icons.person` |\n   122\t\n   123\t> *
+*待产品确认**：配对成功弹窗是否使用 Lottie 庆祝动画？当前原型使用 CSS confetti 
+演示，Flutter 侧可用 `AnimatedContainer` + `Particle` 简易实现，或引入 `lottie` 
+包。\n   124\t\n   125\t---\n   126\t\n   127\t## 5. 交互说明\n   128\t\n   129\
+t### 5.1 手势与动画\n   130\t\n   131\t| 交互 | 触发 | 动画表现 | 时长 | 曲线 |\
+n   132\t|------|------|----------|------|------|\n   133\t| 卡片拖动 | 手指按住
+并水平移动 | 卡片跟随手指，旋转 angle = dx × 0.05°，Like/Pass badge 透明度渐变 |
+实时 | — |\n   134\t| 释放-Pass | 左滑超过阈值（≈120pt）或点击 ✕ | 卡片向左飞出
+屏幕，下层卡片 scale 恢复 1.0 | 300ms | `easeOutCubic` |\n   135\t| 释放-Like | 
+右滑超过阈值或点击 ♥ | 卡片向右飞出屏幕，触发 API；若双向匹配则弹 MatchSuccessDi
+alog | 300ms | `easeOutCubic` |\n   136\t| 弹窗进入 | 双向匹配成功 | 背景遮罩 fa
+deIn + 内容 scale(0.9→1.0) | 300ms | `easeOutBack`（轻微回弹） |\n   137\t| 弹窗
+关闭 | 点击「继续滑动」或遮罩 | 背景 fadeOut + 内容 scale(0.95) + opacity(0) | 2
+00ms | `easeInCubic` |\n   138\t| 列表加载 | 进入 MatchListPage | 顶部 CircularP
+rogressIndicator，数据返回后列表淡入 | 200ms | `easeIn` |\n   139\t\n   140\t###
+5.2 状态与边界\n   141\t\n   142\t| 状态 | 视觉处理 |\n   143\t|------|---------
+-|\n   144\t| 推荐加载中 | 页面居中 `CircularProgressIndicator(color: DesignToke
+ns.primary)` |\n   145\t| 推荐空数据 | `EmptyRecommendationView`：图标 + 文案「
+附近暂无可推荐用户」+ 切换全国按钮 |\n   146\t| 滑动后缓存刷新 | 卡片飞出后，若
+剩余卡片 < 3 张，自动触发下一页加载（底部小 loading） |\n   147\t| 网络错误 | `S
+nackBar` 提示 + 重试按钮（`SwButton.outlined`） |\n   148\t| 滑动自己（极端边界
+） | 后端返回 code=1000，前端展示 `SnackBar`「操作异常，请稍后再试」 |\n   149\t
+\n   150\t### 5.3 模式切换\n   151\t\n   152\t- 顶部 Tab 切换「附近 / 同城 / 全
+国」时：\n   153\t  1. 当前卡片堆叠淡出（150ms）\n   154\t  2. 触发 `GET /matchi
+ng/recommendations?mode=xxx`\n   155\t  3. 新卡片堆叠淡入（200ms）\n   156\t\n  
+157\t---\n   158\t\n   159\t## 6. BLoC / Event / State 设计\n   160\t\n   161\t#
+## 6.1 MatchingBloc（首页推荐 + 滑动）\n   162\t\n   163\t```dart\n   164\t// ma
+tching_bloc.dart\n   165\tclass MatchingBloc extends Bloc<MatchingEvent, Matchin
+gState> { ... }\n   166\t\n   167\t// matching_event.dart\n   168\tabstract clas
+s MatchingEvent {}\n   169\tclass RecommendationsRequested extends MatchingEvent
+{\n   170\t  final String mode; // 'nearby' | 'city' | 'nationwide'\n   171\t}\n
+  172\tclass SwipeActionSubmitted extends MatchingEvent {\n   173\t  final Strin
+g targetId;\n   174\t  final SwipeAction action; // like | pass\n   175\t}\n   1
+76\tclass MatchModalDismissed extends MatchingEvent {}\n   177\t\n   178\t// mat
+ching_state.dart\n   179\tabstract class MatchingState {}\n   180\tclass Matchin
+gInitial extends MatchingState {}\n   181\tclass MatchingLoadInProgress extends 
+MatchingState {}\n   182\tclass MatchingLoadSuccess extends MatchingState {\n   
+183\t  final List<RecommendationCard> cards;\n   184\t  final String mode;\n   1
+85\t}\n   186\tclass MatchingLoadEmpty extends MatchingState {\n   187\t  final 
+String mode;\n   188\t}\n   189\tclass MatchingSwipeInProgress extends MatchingS
+tate {\n   190\t  final List<RecommendationCard> cards;\n   191\t  final String 
+targetId;\n   192\t  final SwipeAction action;\n   193\t}\n   194\tclass Matchin
+gMatchCreated extends MatchingState {\n   195\t  final MatchSummary match; // 用
+于弹窗展示\n   196\t}\n   197\tclass MatchingFailure extends MatchingState {\n  
+198\t  final String message;\n   199\t}\n   200\t```\n   201\t\n   202\t### 6.2 
+MatchListCubit（匹配列表）\n   203\t\n   204\t```dart\n   205\t// match_list_cub
+it.dart\n   206\tclass MatchListCubit extends Cubit<MatchListState> {\n   207\t 
+Future<void> fetchMatches({String? cursor}) async { ... }\n   208\t}\n   209\t\n
+  210\t// match_list_state.dart\n   211\tabstract class MatchListState {}\n   21
+2\tclass MatchListInitial extends MatchListState {}\n   213\tclass MatchListLoad
+InProgress extends MatchListState {}\n   214\tclass MatchListLoadSuccess extends
+MatchListState {\n   215\t  final List<MatchItem> matches;\n   216\t  final bool
+hasMore;\n   217\t  final String? nextCursor;\n   218\t}\n   219\tclass MatchLis
+tLoadFailure extends MatchListState {\n   220\t  final String message;\n   221\t
+}\n   222\t```\n   223\t\n   224\t### 6.3 Socket.io 事件监听\n   225\t\n   226\t
+- 在 `HomePage` 的 `initState` 中建立 Socket 连接（或通过全局 BLoC）\n   227\t- 
+监听 `match:created` 事件，接收到后向 `MatchingBloc` dispatch `ExternalMatchRece
+ived(matchSummary)`\n   228\t- `MatchingBloc` 状态流转至 `MatchingMatchCreated`
+，触发 `MatchSuccessDialog`\n   229\t\n   230\t---\n   231\t\n   232\t## 7. 需更
+新文档\n   233\t\n   234\t本设计产物完成后，以下文档必须同步新增或更新，以保证后
+续开发 Agent 有唯一真实来源。\n   235\t\n   236\t### 7.1 API 文档\n   237\t\n   
+238\t| 文档路径 | 更新说明 |\n   239\t|----------|----------|\n   240\t| `docs/a
+pi/matching.md` | 新增 Matching 模块 API 文档，包含 `GET /matching/recommendatio
+ns` 与 `POST /matching/actions` 的请求/响应示例、错误码表 |\n   241\t| `docs/api
+/socket-events.md` | 新增 Socket.io 事件文档，记录 `match:created` 的 Payload 结
+构 |\n   242\t\n   243\t### 7.2 架构/流程文档\n   244\t\n   245\t| 文档路径 | 更
+新说明 |\n   246\t|----------|----------|\n   247\t| `docs/modules/matching.md` 
+| 更新 Matching 模块实现文档，补全 Flutter 侧的 BLoC、Widget、路由映射关系 |\n  
+248\t| `docs/design-docs/flutter.md` | 在「Design-Only PR 验收 Checklist」中补充
+Matching 相关组件的 Widgetbook 用例要求（已存在通用规范，本 Issue 执行即可） |\n
+  249\t\n   250\t### 7.3 模块索引\n   251\t\n   252\t| 文档路径 | 更新说明 |\n  
+253\t|----------|----------|\n   254\t| `docs/modules/INDEX.md` | 确认 `matching
+.md` 已在模块清单中注册（已注册，无需修改） |\n   255\t\n   256\t### 7.4 PRD 注
+释\n   257\t\n   258\t- 在 `prd/v1-matching.md` 顶部添加链接注释：`设计资产参见 
+designs/issue-4/`\n   259\t\n   260\t---\n   261\t\n   262\t## 8. 验收 Checklist
+（供 Design-Only PR 使用）\n   263\t\n   264\t- [ ] 低保真/高保真原型图已产出（
+本文件 + wireframe.svg + mockup.html）\n   265\t- [ ] 所有新增组件已在 `widgetbo
+ok/main.dart` 中注册 use-case\n   266\t- [ ] PR 中附带 Golden File 截图或 Widget
+book 运行截图\n   267\t- [ ] `pages/` 中未使用 `Color(0xFF...)`、`TextField`、`E
+levatedButton` 等硬编码或原生 Material 组件替代 design-system\n   268\t- [ ] 页
+面中的状态（加载、空态、错误、配对成功弹窗）在原型图中有明确定义\n",
+        message='268 lines read from file starting from line 1. Total lines in f
+ile: 268. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(
+    arguments_part=' "/private/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/d
+oc-gardener-33-1296294217/designs/issue-4/docs-to-update.txt"}'
+)
+StatusUpdate(
+    context_usage=0.0215301513671875,
+    context_tokens=5644,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=1036,
+        output=308,
+        input_cache_read=4608,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-wVqs2FGF1YCl4ehKXw15l87v',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_Alit078qVPhhMRK8Y9SfxLRr',
+    return_value=ToolOk(
+        is_error=False,
+        output='     1\tdocs/api/matching.md|新增 Matching 模块 API 文档，包含推
+荐和滑动接口的契约定义\n     2\t docs/api/socket-events.md|新增 Socket.io 事件文
+档，记录 match:created 的 Payload 结构\n     3\t docs/modules/matching.md|更新 M
+atching 模块实现文档，补全 Flutter BLoC、Widget、路由映射\n     4\t docs/design-
+docs/flutter.md|补充 Matching 组件的 Widgetbook 用例执行记录（可选）\n     5\t p
+rd/v1-matching.md|顶部添加设计资产链接注释 designs/issue-4/\n',
+        message='5 lines read from file starting from line 1. Total lines in fil
+e: 5. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+StepBegin(n=5)
+ThinkPart(
+    type='think',
+    think="Now let me read the existing documentation files that were changed in
+this PR, plus the CHANGELOG.md and other relevant docs, to understand what's alr
+eady there and what's missing.",
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_myBJajW0z7BsPxsxI7WzgBt2',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "/private/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n0000
+0gn/T/doc-gardener-33-1296294217/docs/api/INDEX.md"}'
+    ),
+    extras=None
+)
+ToolCall(
+    type='function',
+    id='tool_oOEWSs4EaN9nXXT8G1qt6cEf',
+    function=FunctionBody(name='ReadFile', arguments='{"path": "/'),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_myBJajW0z7BsPxsxI7WzgBt2',
+    return_value=ToolOk(
+        is_error=False,
+        output='     1\t# API 文档索引\n     2\t\n     3\t| 文档 | 说明 |\n     
+4\t|------|------|\n     5\t| [matching.md](matching.md) | Matching 模块接口契约
+与错误码 |\n     6\t| [socket-events.md](socket-events.md) | Socket.io 事件定义 
+|\n',
+        message='6 lines read from file starting from line 1. Total lines in fil
+e: 6. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(
+    arguments_part='private/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/doc-
+gardener-33-1296294217/docs/api/matching.md"}'
+)
+ToolCall(
+    type='function',
+    id='tool_nPdQq6icoR0JhNjia5qGTgtq',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "/private/var/folders/lt'
+    ),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_oOEWSs4EaN9nXXT8G1qt6cEf',
+    return_value=ToolOk(
+        is_error=False,
+        output='     1\t# Matching API\n     2\t\n     3\t> 本文档描述 Matching 
+模块的接口契约，包含推荐和滑动接口定义。\n     4\t> TODO: 由设计任务自动生成，待
+开发阶段补充。\n     5\t\n     6\t## 相关设计\n     7\t- 设计规范: [design-spec.
+md](../../designs/issue-4/design-spec.md)\n',
+        message='7 lines read from file starting from line 1. Total lines in fil
+e: 7. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(
+    arguments_part='/w3sl6z8j5v50vt2s6knvf5n00000gn/T/doc-gardener-33-1296294217
+/docs/api/socket-events.md"}'
+)
+ToolCall(
+    type='function',
+    id='tool_e76EfuxWhcGZvl8ooFmzavjg',
+    function=FunctionBody(name='ReadFile', arguments='{"'),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_nPdQq6icoR0JhNjia5qGTgtq',
+    return_value=ToolOk(
+        is_error=False,
+        output='     1\t# Socket.io 事件\n     2\t\n     3\t## `match:created`\n
+    4\t\n     5\t双向匹配成功后，服务端向双方用户推送。\n     6\t\n     7\t### P
+ayload\n     8\t\n     9\t```json\n    10\t{\n    11\t  "match_id": "string",\n 
+  12\t  "conversation_id": "string",\n    13\t  "matched_user": {\n    14\t    "
+user_id": "string",\n    15\t    "nickname": "string",\n    16\t    "avatar_url"
+: "string"\n    17\t  }\n    18\t}\n    19\t```\n',
+        message='19 lines read from file starting from line 1. Total lines in fi
+le: 19. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(
+    arguments_part='path": "/private/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000
+gn/T/doc-gardener-33-1296294217/docs/modules/matching.md"}'
+)
+ToolCall(
+    type='function',
+    id='tool_MxZOEbfhTEzd4ARaUbwxEUp8',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "/private/var/folders/lt/w3sl6z8j5v50vt2s6knv'
+    ),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_e76EfuxWhcGZvl8ooFmzavjg',
+    return_value=ToolOk(
+        is_error=False,
+        output="     1\t# Matching 模块实现\n     2\t\n     3\t## 职责\n     4\t
+\n     5\t负责推荐卡片生成、滑动操作处理、双向匹配判定与通知。\n     6\t\n     7
+\t## 流程图\n     8\t\n     9\t### 推荐卡片\n    10\t\n    11\t```mermaid\n    1
+2\tsequenceDiagram\n    13\t    participant C as Flutter App\n    14\t    partic
+ipant API as MatchingController\n    15\t    participant S as MatchingService\n 
+  16\t    participant DB as MySQL\n    17\t    participant R as Redis\n    18\t\
+n    19\t    C->>API: GET /matching/recommendations\n    20\t    API->>S: getRec
+ommendations(userId, location, filters)\n    21\t    S->>R: get candidate pool\n
+   22\t    alt cache miss\n    23\t        S->>DB: query candidates (Haversine +
+filters)\n    24\t        DB-->>S: user list\n    25\t        S->>R: cache candi
+date pool (TTL 5min)\n    26\t    end\n    27\t    S-->>API: sorted cards\n    2
+8\t    API-->>C: 200 OK\n    29\t```\n    30\t\n    31\t### 滑动与匹配\n    32\t
+\n    33\t```mermaid\n    34\tsequenceDiagram\n    35\t    participant C as Flut
+ter App\n    36\t    participant API as MatchingController\n    37\t    particip
+ant S as MatchingService\n    38\t    participant DB as MySQL\n    39\t    parti
+cipant WS as Socket.io\n    40\t\n    41\t    C->>API: POST /matching/actions (t
+arget_id, action=like)\n    42\t    API->>S: recordAction(userId, targetId, acti
+on)\n    43\t    S->>DB: insert match_actions\n    44\t    S->>DB: checkMutualLi
+ke(targetId, userId)\n    45\t    alt mutual like\n    46\t        S->>DB: creat
+e match + conversation\n    47\t        S->>WS: emit match:created to both users
+\n    48\t    end\n    49\t    S-->>API: result\n    50\t    API-->>C: 200 OK\n 
+  51\t```\n    52\t\n    53\t## Flutter 架构\n    54\t\n    55\t### BLoC / Event
+/ State\n    56\t\n    57\t#### MatchingBloc（首页推荐 + 滑动）\n    58\t\n    5
+9\t```dart\n    60\t// matching_bloc.dart\n    61\tclass MatchingBloc extends Bl
+oc<MatchingEvent, MatchingState> { ... }\n    62\t\n    63\t// matching_event.da
+rt\n    64\tabstract class MatchingEvent {}\n    65\tclass RecommendationsReques
+ted extends MatchingEvent {\n    66\t  final String mode; // 'nearby' | 'city' |
+'nationwide'\n    67\t}\n    68\tclass SwipeActionSubmitted extends MatchingEven
+t {\n    69\t  final String targetId;\n    70\t  final SwipeAction action; // li
+ke | pass\n    71\t}\n    72\tclass MatchModalDismissed extends MatchingEvent {}
+\n    73\t\n    74\t// matching_state.dart\n    75\tabstract class MatchingState
+{}\n    76\tclass MatchingInitial extends MatchingState {}\n    77\tclass Matchi
+ngLoadInProgress extends MatchingState {}\n    78\tclass MatchingLoadSuccess ext
+ends MatchingState {\n    79\t  final List<RecommendationCard> cards;\n    80\t 
+final String mode;\n    81\t}\n    82\tclass MatchingLoadEmpty extends MatchingS
+tate {\n    83\t  final String mode;\n    84\t}\n    85\tclass MatchingSwipeInPr
+ogress extends MatchingState {\n    86\t  final List<RecommendationCard> cards;\
+n    87\t  final String targetId;\n    88\t  final SwipeAction action;\n    89\t
+}\n    90\tclass MatchingMatchCreated extends MatchingState {\n    91\t  final M
+atchSummary match; // 用于弹窗展示\n    92\t}\n    93\tclass MatchingFailure ext
+ends MatchingState {\n    94\t  final String message;\n    95\t}\n    96\t```\n 
+  97\t\n    98\t#### MatchListCubit（匹配列表）\n    99\t\n   100\t```dart\n   1
+01\t// match_list_cubit.dart\n   102\tclass MatchListCubit extends Cubit<MatchLi
+stState> {\n   103\t  Future<void> fetchMatches({String? cursor}) async { ... }\
+n   104\t}\n   105\t\n   106\t// match_list_state.dart\n   107\tabstract class M
+atchListState {}\n   108\tclass MatchListInitial extends MatchListState {}\n   1
+09\tclass MatchListLoadInProgress extends MatchListState {}\n   110\tclass Match
+ListLoadSuccess extends MatchListState {\n   111\t  final List<MatchItem> matche
+s;\n   112\t  final bool hasMore;\n   113\t  final String? nextCursor;\n   114\t
+}\n   115\tclass MatchListLoadFailure extends MatchListState {\n   116\t  final 
+String message;\n   117\t}\n   118\t```\n   119\t\n   120\t### 组件清单\n   121\
+t\n   122\t| 层级 | 组件名 | 文件路径 | 说明 |\n   123\t|------|--------|-------
+---|------|\n   124\t| atom | `SwActionButton` | `packages/design-system/lib/src
+/atoms/sw_action_button.dart` | 圆形操作按钮（Pass/Like 两种变体） |\n   125\t| 
+molecule | `SwipeCard` | `packages/design-system/lib/src/molecules/swipe_card.da
+rt` | 可拖动/可点击的推荐用户卡片 |\n   126\t| organism | `SwipeCardStack` | `pa
+ckages/design-system/lib/src/organisms/swipe_card_stack.dart` | 卡片堆叠容器，管
+理多层卡片渲染与手势冲突 |\n   127\t| organism | `MatchSuccessDialog` | `package
+s/design-system/lib/src/organisms/match_success_dialog.dart` | 配对成功全屏弹窗
+，含头像组合、CTA 按钮 |\n   128\t| molecule | `MatchListItem` | `packages/desig
+n-system/lib/src/molecules/match_list_item.dart` | 匹配列表单项，含头像、昵称、
+时间、聊天入口 |\n   129\t\n   130\t### 页面级 Widget\n   131\t\n   132\t| Widge
+t 名 | 路径 | 说明 |\n   133\t|-----------|------|------|\n   134\t| `HomePage` 
+| `apps/mobile/lib/presentation/pages/home_page.dart` | 首页，承载模式切换、卡片
+堆叠、操作按钮、底部导航 |\n   135\t| `MatchListPage` | `apps/mobile/lib/present
+ation/pages/match_list_page.dart` | 匹配列表页，底部导航「消息」Tab 内容 |\n   1
+36\t| `EmptyRecommendationView` | `apps/mobile/lib/presentation/widgets/empty_re
+commendation_view.dart` | 推荐为空时的占位视图 |\n   137\t\n   138\t### 路由映射
+\n   139\t\n   140\t| 路由名 | 页面 | 参数 |\n   141\t|--------|------|------|\n
+  142\t| `/home` | `HomePage` | 无 |\n   143\t| `/messages` | `MatchListPage` | 
+无（底部导航 Tab） |\n   144\t\n   145\t### Socket.io 事件监听\n   146\t\n   147
+\t- 在 `HomePage` 的 `initState` 中建立 Socket 连接（或通过全局 BLoC）\n   148\t
+- 监听 `match:created` 事件，接收到后向 `MatchingBloc` dispatch `ExternalMatchRe
+ceived(matchSummary)`\n   149\t- `MatchingBloc` 状态流转至 `MatchingMatchCreated
+`，触发 `MatchSuccessDialog`\n   150\t\n   151\t## 关键文件\n   152\t\n   153\t|
+文件 | 路径 |\n   154\t|------|------|\n   155\t| Controller | `apps/api/src/mod
+ules/matching/matching.controller.ts` |\n   156\t| Service | `apps/api/src/modul
+es/matching/matching.service.ts` |\n   157\t| DTO | `apps/api/src/modules/matchi
+ng/dto/` |\n   158\t| Flutter BLoC | `apps/mobile/lib/presentation/blocs/matchin
+g/` |\n   159\t| Card Widget | `apps/mobile/lib/presentation/widgets/swipe_card.
+dart` |\n   160\t\n   161\t## 边界情况\n   162\t\n   163\t1. **重复滑动**：同一
+用户短时间内重复滑动同一人，后端幂等处理（MySQL `INSERT IGNORE` 或唯一索引拦截）
+\n   164\t2. **滑动自己**：返回 `code=1000` 参数错误\n   165\t3. **缓存击穿**：
+推荐池使用 Redis + 本地缓存双层防护，DB 查询加互斥锁\n   166\t4. **新用户冷启动*
+*：注册完成后自动生成首批推荐池\n",
+        message='166 lines read from file starting from line 1. Total lines in f
+ile: 166. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(
+    arguments_part='f5n00000gn/T/doc-gardener-33-1296294217/prd/v1-matching.md"}
+'
+)
+ToolCall(
+    type='function',
+    id='tool_mCcrIKdvF2cnFyyb0jNHKLeS',
+    function=FunctionBody(name='ReadFile', arguments='{"path":'),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_MxZOEbfhTEzd4ARaUbwxEUp8',
+    return_value=ToolOk(
+        is_error=False,
+        output='     1\t# V1 Matching 产品需求文档\n     2\t\n     3\t> 状态：待
+评审  \n     4\t> 版本：1.0  \n     5\t> 日期：2026-04-10  \n     6\t> 关联 PRD
+：[prd/v1-mvp.md](./v1-mvp.md)\n     7\t>\n     8\t> 设计资产参见 [designs/issue
+-4/](../designs/issue-4/)\n     9\t\n    10\t## 1. 背景与目标\n    11\t\n    12\
+t### 背景\n    13\tSocial World 的核心体验是「滑动匹配」。用户在首页看到基于地理
+位置和偏好筛选推荐的卡片，通过左滑（Pass）或右滑（Like）表达喜好。当两个用户互相
+喜欢时，系统创建一次 `Match` 并自动开启 `Conversation`，促成后续的即时通讯。\n  
+ 14\t\n    15\t### 目标\n    16\t1. 为用户推荐附近符合偏好条件的异性/同性用户卡
+片。\n    17\t2. 支持左滑 Pass 和右滑 Like，操作幂等。\n    18\t3. 双向喜欢时自
+动创建 `Match` 和 `Conversation`，并实时推送通知。\n    19\t4. 排除已交互、已匹
+配、已拉黑和资料不完整的用户。\n    20\t5. 推荐结果缓存于 Redis，减少数据库查询
+压力。\n    21\t6. 支持「同城」「全国」两种距离范围切换。\n    22\t\n    23\t---
+\n    24\t\n    25\t## 2. 用户故事与验收标准\n    26\t\n    27\t### US-MATCH-1：
+获取推荐卡片\n    28\t\n    29\t**作为** 已完善资料的用户，  \n    30\t**我希望*
+* 看到附近符合条件的用户卡片，  \n    31\t**以便** 发现感兴趣的社交对象。\n    3
+2\t\n    33\t#### 验收标准\n    34\t> 以上验收标准的完整 Gherkin 用例详见 `tests
+/bdd/matching.feature`。\n    35\t\n    36\t```gherkin\n    37\tFeature: Card Re
+commendations\n    38\t  Scenario: User sees recommendation cards\n    39\t    G
+iven the user is on the home screen with a complete profile\n    40\t    And the
+re are 20 eligible candidates nearby\n    41\t    When the app requests GET /mat
+ching/recommendations\n    42\t    Then the user should receive a stack of up to
+20 profile cards\n    43\t    And each card should contain: user_id, nickname, a
+ge, distance, bio, avatar_url\n    44\t    And the cards should be sorted by com
+posite score\n    45\t\n    46\t  Scenario: Cache hit returns quickly\n    47\t 
+  Given the user has requested recommendations within the last 5 minutes\n    48
+\t    When the app requests GET /matching/recommendations again\n    49\t    The
+n the API should return cached results from Redis within 100ms\n    50\t\n    51
+\t  Scenario: No eligible candidates\n    52\t    Given the user is in a remote 
+area with no other users\n    53\t    When the app requests recommendations\n   
+54\t    Then the API should return an empty list\n    55\t    And the app should
+show an empty state "附近暂无可推荐用户"\n    56\t```\n    57\t\n    58\t#### 技
+术要求\n    59\t- 接口：`GET /matching/recommendations?mode=nearby&limit=20`。\n
+   60\t- `mode` 参数：`nearby`（默认 50km）、`city`（同城市，根据用户当前位置行
+政边界）、`nationwide`（全国）。\n    61\t- 过滤条件：\n    62\t  1. 目标用户资
+料完整。\n    63\t  2. 目标用户性别符合当前用户的 `preferred_gender`（若 `both` 
+则不限制）。\n    64\t  3. 当前用户性别符合目标用户的 `preferred_gender`（双向匹
+配偏好）。\n    65\t  4. 目标用户在设定距离范围内（Haversine 公式计算）。\n    6
+6\t  5. 排除已存在 `match_actions`（Like 或 Pass）的记录。\n    67\t  6. 排除已
+存在 `matches`（无论状态）的记录。\n    68\t  7. 排除 `blocks` 表中的双向屏蔽记
+录（blocker_id 或 blocked_id 为当前用户）。\n    69\t- 排序规则（综合得分）：\n 
+  70\t  - 距离越近越优先（权重 50%）：`score += (1 - distance / max_distance) * 
+0.5`\n    71\t  - 近期活跃用户优先（权重 30%）：根据 `last_active_at` 分档（24h 
+内 1.0，7 天内 0.7，30 天内 0.4，其余 0.1）。\n    72\t  - 新用户曝光加成（权重 
+20%）：注册 7 天内加 0.2。\n    73\t- Redis 缓存：`recommendations:{user_id}`，S
+tring（JSON）存储候选 `user_id` 列表和得分，TTL 5 分钟。\n    74\t- 缓存击穿防护
+：使用互斥锁（Redis `SET recommendations:lock:{user_id} NX EX 10`）。\n    75\t\
+n    76\t---\n    77\t\n    78\t### US-MATCH-2：滑动操作\n    79\t\n    80\t**作
+为** 用户，  \n    81\t**我希望** 通过左滑或右滑表达喜好，  \n    82\t**以便** 
+快速筛选感兴趣的人。\n    83\t\n    84\t#### 验收标准\n    85\t> 以上验收标准的
+完整 Gherkin 用例详见 `tests/bdd/matching.feature`。\n    86\t\n    87\t```gherk
+in\n    88\tFeature: Swipe Actions\n    89\t  Scenario: User likes a profile\n  
+ 90\t    Given the user sees a card for target user "Bob"\n    91\t    When the 
+user swipes right or taps the like button\n    92\t    Then a like action should
+be recorded in match_actions\n    93\t    And the target user should be removed 
+from the user\'s recommendation cache\n    94\t\n    95\t  Scenario: User passes
+a profile\n    96\t    Given the user sees a card for target user "Charlie"\n   
+97\t    When the user swipes left or taps the pass button\n    98\t    Then a pa
+ss action should be recorded in match_actions\n    99\t    And the target user s
+hould be removed from the user\'s recommendation cache\n   100\t\n   101\t  Scen
+ario: Duplicate swipe is idempotent\n   102\t    Given the user has already like
+d target user "Bob"\n   103\t    When the user likes "Bob" again within 1 second
+\n   104\t    Then the API should return success without creating a duplicate ma
+tch_actions record\n   105\t    And no duplicate match should be created\n   106
+\t\n   107\t  Scenario: User cannot swipe themselves\n   108\t    Given the user
+sees their own profile in the candidate list by accident\n   109\t    When the u
+ser tries to like themselves\n   110\t    Then the API should reject with code 1
+000\n   111\t```\n   112\t\n   113\t#### 技术要求\n   114\t- 接口：`POST /matchi
+ng/actions`（`target_id`, `action: \'like\' | \'pass\'`）。\n   115\t- 幂等性：`
+match_actions` 表对 `(actor_id, target_id)` 建立唯一索引，重复插入被数据库拦截，
+后端捕获异常返回成功。\n   116\t- 自身滑动校验：若 `target_id == actor_id`，返回
+`code=1000`。\n   117\t- 滑动后清除 Redis 缓存 `recommendations:{user_id}`，确保
+下次请求不再包含该用户。\n   118\t- `match_actions` 表字段：`id`, `actor_id`, `t
+arget_id`, `action`（`like`/`pass`/`super_like`）, `created_at`。\n   119\t\n   
+120\t---\n   121\t\n   122\t### US-MATCH-3：双向匹配成功\n   123\t\n   124\t**作
+为** 用户，  \n   125\t**我希望** 当我和对方互相喜欢时自动配对成功，  \n   126\t
+**以便** 立即开始聊天。\n   127\t\n   128\t#### 验收标准\n   129\t> 以上验收标准
+的完整 Gherkin 用例详见 `tests/bdd/matching.feature`。\n   130\t\n   131\t```ghe
+rkin\n   132\tFeature: Mutual Like Creates Match\n   133\t  Scenario: Mutual lik
+e triggers match and conversation\n   134\t    Given Alice liked Bob\n   135\t  
+ And Bob has not yet liked Alice\n   136\t    When Bob likes Alice\n   137\t    
+Then a match record should be created with status "matched"\n   138\t    And a c
+onversation should be auto-created for Alice and Bob\n   139\t    And both users
+should receive a match notification via Socket.io\n   140\t    And both users sh
+ould see the new match in their match list\n   141\t\n   142\t  Scenario: One-wa
+y like remains pending\n   143\t    Given Alice liked Bob\n   144\t    And Bob h
+as not liked Alice\n   145\t    When the system checks for mutual like\n   146\t
+   Then no match record should exist\n   147\t    And no conversation should be 
+created\n   148\t```\n   149\t\n   150\t#### 技术要求\n   151\t- 匹配判定：在 `P
+OST /matching/actions` 处理 `like` 时，查询 `match_actions` 是否存在 `actor_id =
+target_id AND target_id = actor_id AND action = \'like\'`。\n   152\t- 若存在双
+向喜欢：\n   153\t  1. 创建 `matches` 记录：`user_a_id`（较小的 UUID）、`user_b_
+id`（较大的 UUID），`status = \'matched\'`。\n   154\t  2. 创建 `conversations` 
+记录，关联 `match_id`。\n   155\t  3. 创建两条 `conversation_participants` 记录
+，`last_read_message_id = NULL`。\n   156\t  4. 通过 Socket.io 向双方 emit `matc
+h:created` 事件，Payload 包含 `match_id`、`conversation_id`、`matched_user` 资料
+摘要。\n   157\t  5. 若接收方离线，触发推送通知（极光/Firebase）。\n   158\t- `m
+atches` 表字段：`id`, `user_a_id`, `user_b_id`, `status`（`pending`/`matched`/`u
+nmatched`），`created_at`, `updated_at`。\n   159\t- 事务：匹配创建必须使用数据
+库事务，确保 `matches` + `conversations` + `conversation_participants` 原子性。\
+n   160\t\n   161\t---\n   162\t\n   163\t### US-MATCH-4：匹配列表查看\n   164\t
+\n   165\t**作为** 已匹配成功的用户，  \n   166\t**我希望** 查看所有匹配成功的人
+列表，  \n   167\t**以便** 快速找到想聊天的人。\n   168\t\n   169\t#### 验收标准
+\n   170\t> 以上验收标准的完整 Gherkin 用例详见 `tests/bdd/matching.feature`。\n
+  171\t\n   172\t```gherkin\n   173\tFeature: Match List\n   174\t  Scenario: Us
+er sees their matches\n   175\t    Given Alice has matched with Bob and Charlie\
+n   176\t    When Alice opens the match list\n   177\t    Then she should see Bo
+b and Charlie ordered by match creation time descending\n   178\t    And each it
+em should show the matched user\'s nickname, avatar, and match time\n   179\t```
+\n   180\t\n   181\t#### 技术要求\n   182\t- 接口：`GET /matches?limit=20&cursor
+=`（游标分页）。\n   183\t- 查询当前用户参与的 `matches` 中 `status = \'matched\
+'` 的记录，按 `created_at DESC` 排序。\n   184\t- 返回体包含对方用户的 `user_id`
+, `nickname`, `avatar_url`, `match_id`, `conversation_id`, `matched_at`。\n   18
+5\t- 列表中的用户若被拉黑，则自动过滤（`unmatched` 状态）。\n   186\t\n   187\t-
+--\n   188\t\n   189\t## 3. 非功能需求\n   190\t\n   191\t### 性能\n   192\t- 首
+页推荐卡片加载时间 < 800ms（P95）。\n   193\t- 滑动操作响应时间 < 200ms。\n   19
+4\t- 双向匹配判定和创建 < 300ms（含事务）。\n   195\t- Redis 缓存命中时响应时间 
+< 100ms。\n   196\t\n   197\t### 安全\n   198\t- 推荐池必须排除资料不完整用户（
+后端通过 JOIN `user_profiles` 的 `is_complete` 字段过滤）。\n   199\t- 用户不能
+看到自己（`target_id != actor_id`）。\n   200\t- 已拉黑用户双向不可见、不可匹配
+。\n   201\t- 匹配成功后若一方拉黑另一方，`match.status` 应更新为 `unmatched`（
+拉黑模块实现，Matching 侧读取时过滤）。\n   202\t\n   203\t### 兼容性\n   204\t-
+距离计算在 MySQL 中使用 Haversine 公式，不依赖 Spatial 扩展，保证跨环境兼容。\n 
+ 205\t- 推荐列表为空时 Mobile 需展示空状态引导页。\n   206\t\n   207\t---\n   20
+8\t\n   209\t## 4. 里程碑\n   210\t\n   211\t| 阶段 | 目标 | 预计工期 |\n   212\
+t|------|------|----------|\n   213\t| M-MATCH-1 | 推荐 API + Redis 缓存 + Haver
+sine 排序 + Mobile 首页卡片 | 3 天 |\n   214\t| M-MATCH-2 | 滑动 API + 幂等性 + 
+双向匹配判定 + Match/Conversation 自动创建 | 2 天 |\n   215\t| M-MATCH-3 | Socke
+t.io 匹配通知 + 推送 + 匹配列表 + BDD 测试闭环 | 2 天 |\n   216\t\n   217\t**总
+预计工期：7 天。**\n   218\t\n   219\t---\n   220\t\n   221\t## 5. 风险与回滚策
+略\n   222\t\n   223\t| 风险 | 影响 | 缓解措施 |\n   224\t|------|------|-------
+---|\n   225\t| 推荐算法性能不足，首页加载超过 800ms | 高 | 加 Redis 缓存、建立
+复合索引、MVP 阶段限制候选池为 1000 人 |\n   226\t| 并发滑动导致重复创建 Match |
+中 | 数据库唯一索引 `(user_a_id, user_b_id)` + 事务处理 |\n   227\t| 缓存与数据
+库状态不一致（用户被拉黑后仍出现在推荐中） | 中 | 拉黑操作时主动清除双方 Redis 
+推荐缓存 |\n   228\t| 地理位置隐私合规风险 | 中 | 用户协议中明确告知位置用途，提
+供「全国」模式淡化精确位置 |\n   229\t\n   230\t### 回滚策略\n   231\t- **推荐算
+法故障**：关闭 Redis 缓存，直接查询数据库（响应变慢但可用）。\n   232\t- **匹配
+创建事务死锁**：重试 3 次，失败后返回临时错误并记录日志，不丢失滑动记录。\n   23
+3\t- **Socket.io 通知失败**：降级为仅推送通知（若用户离线）或记录待补发事件。\n'
+,
+        message='233 lines read from file starting from line 1. Total lines in f
+ile: 233. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(
+    arguments_part=' "/private/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/d
+oc-gardener-33-1296294217/CHANGELOG.md"}'
+)
+StatusUpdate(
+    context_usage=0.043560028076171875,
+    context_tokens=11419,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=5787,
+        output=386,
+        input_cache_read=5632,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-ajH8cc1EhKPE53zeTcA05qWM',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_mCcrIKdvF2cnFyyb0jNHKLeS',
+    return_value=ToolOk(
+        is_error=False,
+        output='     1\t# Changelog\n     2\t\n     3\tAll notable changes to th
+is project will be documented in this file.\n     4\t\n     5\tThe format is bas
+ed on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),\n     6\tand thi
+s project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+\n     7\t\n     8\t## [Unreleased]\n     9\t\n    10\t### Added\n    11\t- #30\
+n    12\t- #31\n',
+        message='12 lines read from file starting from line 1. Total lines in fi
+le: 12. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+StepBegin(n=6)
+ThinkPart(
+    type='think',
+    think='Now I have a good understanding of the PR. Let me analyze what\'s mis
+sing:\n\n1. **docs/api/matching.md** - Exists but is very minimal (only 7 lines)
+. The `docs-to-update.txt` says it should contain API docs for Matching module w
+ith request/response examples and error codes. Currently it just says "TODO: 由
+设计任务自动生成，待开发阶段补充。" This needs to be fleshed out based on the PR
+D.\n\n2. **docs/api/socket-events.md** - Exists and has content for `match:creat
+ed`. Seems okay but could be expanded.\n\n3. **docs/modules/matching.md** - Exis
+ts and is fairly comprehensive. Seems okay.\n\n4. **docs/api/INDEX.md** - Exists
+and links the docs. Seems okay.\n\n5. **prd/v1-matching.md** - Already has the d
+esign assets link at the top. Good.\n\n6. **CHANGELOG.md** - Has `[Unreleased]` 
+section with `#30` and `#31`, but `#33` is missing. Need to add it.\n\n7. **docs
+/design-docs/flutter.md** - Need to check if it exists and if Matching widgetboo
+k requirements need to be added.\n\n8. **docs/modules/INDEX.md** - Need to check
+if matching.md is registered.\n\nLet me also check if there are breaking changes
+. Based on the design spec, this is a design-only PR for issue #4 (Matching feat
+ure). It introduces new APIs and new mobile components but doesn\'t seem to modi
+fy existing APIs in a breaking way - it\'s adding new functionality. So no migra
+tion guide needed.\n\nLet me read the flutter.md and modules/INDEX.md to check t
+heir status.',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_U95aG7JcHUTJyh1AbzsfL0wx',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "/private/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n0000
+0gn/T/doc-gardener-33-1296294217/docs/design-docs/flutter.md"}'
+    ),
+    extras=None
+)
+ToolCall(
+    type='function',
+    id='tool_BDsJGC9hY6faot5SV0AjEh1M',
+    function=FunctionBody(name='ReadFile', arguments='{"path": "/'),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_U95aG7JcHUTJyh1AbzsfL0wx',
+    return_value=ToolOk(
+        is_error=False,
+        output="     1\t# Flutter 编码规范\n     2\t\n     3\t## 定位\n     4\t\
+n     5\tFlutter 是本项目的**移动端 App**，由全栈 Agent 在实现需求时统一维护。Ag
+ent 在修改 Flutter 代码时，必须保证与 `apps/api/` 的 API 契约和 `packages/design
+-system/` 的设计规范一致。\n     6\t\n     7\t## 项目结构（apps/mobile）\n     8
+\t\n     9\t```\n    10\tlib/\n    11\t├── main.dart\n    12\t├── app.dart\n    
+13\t├── core/\n    14\t│   ├── di/                 # GetIt / injectable 依赖注入
+\n    15\t│   ├── network/            # Dio 封装、拦截器\n    16\t│   ├── storag
+e/            # SharedPreferences / SecureStorage\n    17\t│   └── utils/       
+      # 工具函数\n    18\t├── data/\n    19\t│   ├── models/             # 由 Op
+enAPI 生成或手写的数据模型\n    20\t│   │   └── generated/      # openapi-genera
+tor 自动生成的模型\n    21\t│   │       └── auth/       # Auth 模块生成模型\n   
+22\t│   ├── repositories/       # 仓库实现\n    23\t│   └── datasources/        
+# 远程/本地数据源\n    24\t├── domain/\n    25\t│   ├── entities/           # 纯
+业务实体（手写）\n    26\t│   ├── repositories/       # 仓库接口\n    27\t│   └─
+─ usecases/           # 用例（可选）\n    28\t├── presentation/\n    29\t│   ├──
+pages/              # 页面\n    30\t│   ├── widgets/            # 可复用组件\n  
+ 31\t│   ├── blocs/              # BLoC / Cubit 状态管理\n    32\t│   └── routes
+.dart         # GoRouter 路由表\n    33\t└── design_system/          # 引用 pack
+ages/design-system 中的组件\n    34\t```\n    35\t\n    36\t## 状态管理\n    37\
+t\n    38\t- **全局状态**：使用 `flutter_bloc`（Cubit 为主，BLoC 为辅）\n    39\
+t- **局部状态**：`StatefulWidget` 或 `ValueNotifier`\n    40\t- **依赖注入**：`g
+et_it` + `injectable`\n    41\t\n    42\t## 命名规范\n    43\t\n    44\t- 文件名
+：`snake_case.dart`\n    45\t- 类名：`PascalCase`\n    46\t- Widget 类名必须以描
+述功能结尾（如 `HomePage`, `UserCardWidget`）\n    47\t- BLoC 相关：`xxx_bloc.da
+rt`, `xxx_event.dart`, `xxx_state.dart`\n    48\t- **设计系统组件必须以 `Sw` 为
+前缀**，如 `SwButton`, `SwAvatar`\n    49\t\n    50\t## 网络层\n    51\t\n    52
+\t- 使用 **Dio** + 拦截器处理统一错误、Token 刷新、日志\n    53\t- API 响应统一
+封装为 `Result<T>` 或 `Either<Failure, T>`\n    54\t- 所有 Model 使用 `freezed` 
++ `json_serializable`\n    55\t- Model 字段命名必须与后端 DTO 完全一致\n    56\t
+- **OpenAPI 生成模型**存放在 `apps/mobile/lib/models/generated/<module>/`，禁止
+手动修改生成文件\n    57\t\n    58\t### DioClient 单例模式\n    59\t\n    60\t`D
+ioClient` 必须在 `get_it` 中注册为 **全局单例**（`registerLazySingleton`），确保
+所有 Repository 共享同一 `Dio` 实例。这样当 DevTools 等模块需要热更新 `baseUrl` 
+时，变更对所有网络请求即时生效。\n    61\t\n    62\t```dart\n    63\t// apps/mob
+ile/lib/core/di/di.dart\n    64\tvoid configureDependencies() {\n    65\t  getIt
+.registerLazySingleton<DioClient>(DioClient.new);\n    66\t  // ...\n    67\t}\n
+   68\t```\n    69\t\n    70\tRepository 实现中禁止直接 `DioClient().dio`，应通
+过依赖注入获取：\n    71\t\n    72\t```dart\n    73\t// ✅ 正确\n    74\tclass A
+uthRepositoryImpl implements AuthRepository {\n    75\t  final Dio _dio;\n    76
+\t  AuthRepositoryImpl({Dio? dio}) : _dio = dio ?? getIt<DioClient>().dio;\n    
+77\t}\n    78\t\n    79\t// ❌ 错误（会导致多个 Dio 实例，baseUrl 热更新失效）\n
+   80\tAuthRepositoryImpl({Dio? dio}) : _dio = dio ?? DioClient().dio;\n    81\t
+```\n    82\t\n    83\t## UI 规范\n    84\t\n    85\t- 不使用硬编码颜色/字号，统
+一从 `packages/design-system` 的 `AppTheme` 读取\n    86\t- 页面之间使用 `go_rou
+ter` 导航\n    87\t- 图片资源使用 `flutter_gen` 自动生成引用\n    88\t- 字符串使
+用 `intl` / `flutter_localizations` 管理（优先中文）\n    89\t\n    90\t## 页面
+级 UI 开发前置规范\n    91\t\n    92\t任何涉及**新页面、新核心交互模式、新组件**
+的功能开发，必须严格遵守以下前置流程。Issue #2（Auth Login）因跳过该流程导致 Log
+inPage 未使用 design-system 组件、无 Widgetbook 用例、无原型图 review，已产生技
+术债务。\n    93\t\n    94\t### 强制前置条件（Must Have）\n    95\t\n    96\t1. 
+**低保真原型图评审通过**\n    97\t   - PM Agent 必须产出至少包含关键页面布局、交
+互状态、异常状态的低保真线框图（可存放于 `docs/design-docs/ui-specs/<feature>/`
+）。\n    98\t   - 人类确认原型图通过 review 后，才能进入 design-system 组件开发
+。\n    99\t\n   100\t2. **Design-Only PR 先走，且必须附带可查看的视觉产物**\n  
+101\t   - 在写后端 API、数据库 Entity、Dio 网络请求之前，先提交独立的 Design-Onl
+y PR。\n   102\t   - Design-Only PR 的变更范围仅限于：\n   103\t     - `packages
+/design-system/`（新增/修改组件）\n   104\t     - `packages/design-system/widget
+book/main.dart`（注册展示用例）\n   105\t     - `apps/mobile/lib/presentation/` 
+中的纯 UI 骨架（无 BLoC、无网络请求、无业务逻辑）\n   106\t   - **PR 中必须包含
+至少一张视觉产物**，供人类在不运行代码的情况下快速 review。推荐方式（按优先级排
+序）：\n   107\t     - **方案 A（推荐）**：提交 Golden File 截图测试。运行 `flut
+ter test --update-goldens` 生成 `*.png`，将生成的 golden 图片一并提交到 PR 中。
+人类可直接在 GitHub 上查看组件渲染效果。\n   108\t     - **方案 B**：若 golden f
+ile 暂时无法生成，PR 描述中必须包含运行命令，由人类在本地运行 `flutter run -d ch
+rome -t lib/widgetbook/main.dart` 或模拟器后，**截图并作为 PR review comment 贴
+回**，确认后方可合并。\n   109\t     - **方案 C（仅作补充）**：可用 Markdown / M
+ermaid / ASCII art 绘制线框逻辑图，但**不能替代**方案 A 或 B 的视觉验收。\n   11
+0\t\n   111\t3. **组件原子化评审**\n   112\t   - 页面中的任何可复用元素（按钮、
+输入框、卡片、列表项、弹窗）若 design-system 中不存在，必须先按 `atom → molecule
+→ organism` 层级在 design-system 中实现。\n   113\t   - **禁止**在 `pages/` 中直
+接使用原生 Material 组件（如 `TextField`、`ElevatedButton`、`OutlineInputBorder`
+）替代 design-system 组件。\n   114\t\n   115\t### 验收 Checklist\n   116\t\n   
+117\t在提交任何包含 Mobile UI 的 PR 前，PR 描述中必须勾选：\n   118\t\n   119\t-
+[ ] 该功能已产出低保真/高保真原型图，且已通过人类 review\n   120\t- [ ] 所有新增
+/修改的组件已在 `widgetbook/main.dart` 中注册\n   121\t- [ ] PR 中附带 Golden Fi
+le 截图或 Widgetbook 运行截图，供人类直接查看视觉产物\n   122\t- [ ] `pages/` 中
+未使用 `Color(0xFF...)`、`TextField`、`ElevatedButton` 等硬编码或原生 Material 
+组件替代 design-system\n   123\t- [ ] 页面中的状态（加载、空态、错误、禁用）在原
+型图中有明确定义\n   124\t\n   125\t### 违规回滚策略\n   126\t\n   127\t若发现已
+进入代码合并的页面存在未使用 design-system 组件、未走 Design-Only PR 的情况：\n 
+ 128\t- 标记为 **技术债务**，录入 `docs/exec-plans/tech-debt-tracker.md`\n   129
+\t- 在下一个迭代中优先安排 **Redesign-Only PR** 进行重构，不得在旧基础上继续堆叠
+业务逻辑。\n   130\t\n   131\t## 设计系统（Widgetbook）\n   132\t\n   133\t`pack
+ages/design-system/` 是本项目的**唯一设计源文件**。\n   134\t\n   135\t### 结构\
+n   136\t\n   137\t```\n   138\tpackages/design-system/\n   139\t├── lib/\n   14
+0\t│   ├── src/\n   141\t│   │   ├── theme/          # tokens + app_theme\n   14
+2\t│   │   ├── atoms/          # 原子组件（按钮、头像、标签）\n   143\t│   │   ├
+── molecules/      # 分子组件（输入框组合、用户卡片）\n   144\t│   │   └── organ
+isms/      # 有机体组件（底部导航、匹配弹窗）\n   145\t│   ├── widgetbook/      
+  # 组件展示平台\n   146\t│   │   └── main.dart       # 所有组件的可交互展示\n  
+147\t│   └── social_world_design_system.dart\n   148\t└── pubspec.yaml\n   149\t
+```\n   150\t\n   151\t### 强制规范\n   152\t\n   153\t1. **新增组件必须在 Widge
+tbook 注册**：每个 `atom`/`molecule`/`organism` 类都必须在 `widgetbook/main.dart
+` 中有至少一个展示用例\n   154\t2. **禁止在 page 中写死设计 Token**：所有颜色、
+字号、间距、圆角必须从 `DesignTokens` 读取\n   155\t3. **组件分类规则**：\n   15
+6\t   - `atoms/`：不可再分的最小 UI 元素\n   157\t   - `molecules/`：多个 atom 
+的组合\n   158\t   - `organisms/`：包含业务语义的复杂组件\n   159\t\n   160\t###
+Design-Only PR 流程\n   161\t\n   162\t当需求涉及不确定的设计方向时，Agent 可以
+先提交 **Design-Only PR**：\n   163\t\n   164\t1. 只修改 `packages/design-system
+/` 和 `apps/mobile/lib/presentation/`\n   165\t2. 所有新组件必须在 `widgetbook/m
+ain.dart` 中注册\n   166\t3. **不得包含**后端 API、数据库 Entity、Dio 网络请求\n
+  167\t4. PR 中必须附带 **Golden File 截图** 或 **Widgetbook 运行截图**，人类通
+过视觉产物验收设计方向\n   168\t5. 设计方向确定后，再提交 Full-Stack PR 完成 DB 
+→ API → Mobile 全链路\n   169\t\n   170\t## Debug-Only Widget 条件编译模式\n   1
+71\t\n   172\t当实现开发/调试专用 Widget（如 Dev Tools Drawer）时，必须遵守以下
+规范：\n   173\t\n   174\t1. **所有调试工具 Widget 必须包裹在 `if (kDebugMode) .
+..` 中**\n   175\t   - 入口注入示例：\n   176\t     ```dart\n   177\t     Widget
+build(BuildContext context) {\n   178\t       return MaterialApp.router(\n   179
+\t         // ...\n   180\t         builder: (context, child) {\n   181\t       
+   if (kDebugMode) {\n   182\t             return DevToolsWrapper(child: child!)
+;\n   183\t           }\n   184\t           return child!;\n   185\t         },\
+n   186\t       );\n   187\t     }\n   188\t     ```\n   189\t\n   190\t2. **禁
+止在 Release 模式下将调试 Widget 编译进产物**\n   191\t   - 通过 `const bool.fro
+mEnvironment('dart.vm.product')` 或 `kDebugMode` 进行编译期/运行期隔离。\n   192
+\t   - 与调试相关的路由、Repository、Cubit 注册同样应在 `kDebugMode` 分支下完成
+，避免增加 Release 包体积。\n   193\t\n   194\t3. **调试工具状态管理建议**\n   1
+95\t   - 允许使用 `StatefulWidget` / `ValueNotifier`（因仅开发期使用，逻辑通常较
+简单）。\n   196\t   - **建议统一使用 Cubit**，保持与生产代码一致的可读性和可维
+护性。\n   197\t\n   198\t## 禁止事项\n   199\t\n   200\t1. 禁止在 Widget 中直接
+调用 Dio/http\n   201\t2. 禁止在 BLoC 中直接操作 `BuildContext`\n   202\t3. 禁止
+使用 `dynamic` 传递 API 数据\n   203\t4. 禁止在 `presentation/` 中使用 `Color(0x
+FF...)` 硬编码\n",
+        message='203 lines read from file starting from line 1. Total lines in f
+ile: 203. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(
+    arguments_part='private/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/doc-
+gardener-33-1296294217/docs/modules/INDEX.md"}'
+)
+ToolCall(
+    type='function',
+    id='tool_7Qh4PPlhzYdTYvjrNRzVGZQa',
+    function=FunctionBody(
+        name='Shell',
+        arguments='{"command": "cd /private/var/folders/lt/w3sl6z8j5v50vt'
+    ),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_BDsJGC9hY6faot5SV0AjEh1M',
+    return_value=ToolOk(
+        is_error=False,
+        output='     1\t# 模块实现文档索引\n     2\t\n     3\t> 本目录按业务模块
+组织实现文档，跨越代码层级（DB / API / Mobile / BLoC / Widget）描述模块全貌。\n 
+   4\t> \n     5\t> **注意**：本仓库采用单一全栈 Agent 模式，一个模块的文档应覆
+盖后端到前端的完整链路。\n     6\t\n     7\t## 模块清单\n     8\t\n     9\t| 模
+块 | 说明 | 关联 PRD |\n    10\t|------|------|----------|\n    11\t| [auth.md](
+auth.md) | 注册、登录、Token 刷新、登出（DB → API → Mobile） | [prd/v1-mvp.md](.
+./../prd/v1-mvp.md) |\n    12\t| [profile.md](profile.md) | 个人资料、头像相册、
+年龄校验（DB → API → Mobile） | [prd/v1-profile.md](../../prd/v1-profile.md) |\n
+   13\t| [matching.md](matching.md) | 推荐、滑动、匹配成功（DB → API → Mobile） 
+| [docs/product-specs/matching.md](../product-specs/matching.md) |\n    14\t| [d
+ev-tools.md](dev-tools.md) | Debug 专用工具模块（Dev Tools Drawer） | [prd/v1-de
+v-tools-drawer.md](../../prd/v1-dev-tools-drawer.md) |\n    15\t| [im.md](im.md)
+| 会话、消息、已读回执、推送（DB → API → Mobile） | [docs/product-specs/im.md](.
+./product-specs/im.md) |\n    16\t| [admin.md](admin.md) | Admin Dashboard、用户
+列表管理 | [prd/v1-infrastructure-bootstrap.md](../../prd/v1-infrastructure-boot
+strap.md) |\n    17\t| [blocks-reports.md](blocks-reports.md) | 拉黑、举报基础 A
+PI | [prd/v1-infrastructure-bootstrap.md](../../prd/v1-infrastructure-bootstrap.
+md) |\n    18\t| [content-moderation.md](content-moderation.md) | 内容审核 Webho
+ok、照片状态管理 | [prd/v1-infrastructure-bootstrap.md](../../prd/v1-infrastruct
+ure-bootstrap.md) |\n    19\t\n    20\t## 写作规范\n    21\t\n    22\t每个模块文
+档应包含：\n    23\t1. **时序图/流程图**：Mermaid 描述核心流程（覆盖 API 和 Mobi
+le 的交互）\n    24\t2. **关键文件索引**：代码仓库中的关键文件路径（DB / API / M
+obile 三层）\n    25\t3. **状态机/数据结构**：核心实体状态转换\n    26\t4. **边
+界情况**：异常流程、权限校验、幂等性设计\n    27\t5. **全链路变更清单**：修改该
+模块时，Agent 需要同时改哪些文件\n',
+        message='27 lines read from file starting from line 1. Total lines in fi
+le: 27. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(
+    arguments_part='2s6knvf5n00000gn/T/doc-gardener-33-1296294217 && ls -la docs
+/migration/ 2>/dev/null || echo \\"docs/migration/ does not exist\\""}'
+)
+StatusUpdate(
+    context_usage=0.06881332397460938,
+    context_tokens=18039,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=6775,
+        output=537,
+        input_cache_read=11264,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-QCJ9qI9kGp8nSjTijBer6Euf',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_7Qh4PPlhzYdTYvjrNRzVGZQa',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='docs/migration/ does not exist\n',
+        message='Command executed successfully.',
+        display=[],
+        extras=None
+    )
+)
+StepBegin(n=7)
+ThinkPart(
+    type='think',
+    think='Now I have a clear picture. Let me analyze what\'s missing and what n
+eeds to be done:\n\n**Missing/Incomplete Documentation:**\n\n1. **`docs/api/matc
+hing.md`** - Is extremely minimal (7 lines). According to `designs/issue-4/docs-
+to-update.txt` and `design-spec.md` section 7.1, it should contain:\n   - `GET /
+matching/recommendations` request/response examples, error codes\n   - `POST /ma
+tching/actions` request/response examples, error codes\n   - Also from PRD: `GET
+/matches?limit=20&cursor=` for match list\n\n2. **`docs/api/socket-events.md`** 
+- Has basic content but could be expanded with more context (when it\'s emitted,
+who receives it, etc.). But it\'s acceptable. I\'ll leave it as is since it exis
+ts and has the required payload.\n\n3. **`docs/modules/matching.md`** - Already 
+comprehensive. Good.\n\n4. **`docs/design-docs/flutter.md`** - The design-spec.m
+d section 7.2 says: "在「Design-Only PR 验收 Checklist」中补充 Matching 相关组件
+的 Widgetbook 用例要求（已存在通用规范，本 Issue 执行即可）". This means the gen
+eral spec already exists and this issue just needs to follow it. So no changes n
+eeded here.\n\n5. **`docs/modules/INDEX.md`** - `matching.md` is already registe
+red. Good.\n\n6. **`prd/v1-matching.md`** - Already has the design asset link. G
+ood.\n\n7. **`CHANGELOG.md`** - Missing `#33`. Need to add it under `[Unreleased
+]` section.\n\n8. **Migration guide** - This PR adds new features (new APIs, new
+UI components) but doesn\'t appear to introduce breaking changes to existing API
+s. No migration guide needed.\n\nSo my action plan:\n1. Flesh out `docs/api/matc
+hing.md` with complete API documentation based on the PRD\n2. Update `CHANGELOG.
+md` to add `- #33`\n3. Commit and push\n\nLet me write a comprehensive `docs/api
+/matching.md` based on the PRD content.',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_JAMHamXQ77hUsAJoiwIAdVKv',
+    function=FunctionBody(
+        name='SetTodoList',
+        arguments='{"todos": [{"title":"读取项目地图 AGENTS.md 和当前 PR 变更","
+status":"done"},{"title":"分析变更文件，推断文档影响范围","status":"done"},{"tit
+le":"检查并补充遗漏的文档","status":"in_progress"},{"title":"检查 CHANGELOG.md 
+和迁移指南","status":"pending"},{"title":"提交并推送文档变更","status":"pending"
+},{"title":"输出结构化报告","status":"pending"}]}'
+    ),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_JAMHamXQ77hUsAJoiwIAdVKv',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='Todo list updated',
+        message='Todo list updated',
+        display=[
+            TodoDisplayBlock(
+                type='todo',
+                items=[
+                    TodoDisplayItem(
+                        title='读取项目地图 AGENTS.md 和当前 PR 变更',
+                        status='done'
+                    ),
+                    TodoDisplayItem(
+                        title='分析变更文件，推断文档影响范围',
+                        status='done'
+                    ),
+                    TodoDisplayItem(
+                        title='检查并补充遗漏的文档',
+                        status='in_progress'
+                    ),
+                    TodoDisplayItem(
+                        title='检查 CHANGELOG.md 和迁移指南',
+                        status='pending'
+                    ),
+                    TodoDisplayItem(
+                        title='提交并推送文档变更',
+                        status='pending'
+                    ),
+                    TodoDisplayItem(title='输出结构化报告', status='pending')
+                ]
+            )
+        ],
+        extras=None
+    )
+)
+StatusUpdate(
+    context_usage=0.08584976196289062,
+    context_tokens=22505,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=4585,
+        output=539,
+        input_cache_read=17920,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-o3rZSj7nTZgANw7xCXVR8Z8t',
+    plan_mode=False,
+    mcp_status=None
+)
+StepBegin(n=8)
+ThinkPart(
+    type='think',
+    think="Let me write the comprehensive docs/api/matching.md and update CHANGE
+LOG.md. I'll base the API docs on the PRD (prd/v1-matching.md) which has detaile
+d technical requirements.\n\nThe API doc should cover:\n1. GET /matching/recomme
+ndations\n2. POST /matching/actions\n3. GET /matches\n\nWith request params, res
+ponse examples, and error codes.\n\nThen update CHANGELOG.md.\n\nAfter that, I'l
+l check the git diff to make sure everything is good, commit and push.",
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_9cz0FnCk9XM3MUBeY7KG9n2g',
+    function=FunctionBody(
+        name='Shell',
+        arguments='{"command": "cat > /private/var/folders/lt/w3sl6z8j5v50vt2s6k
+nvf5n00000gn/T/doc-gardener-33-1296294217/docs/api/matching.md << \'EOF\'\\n# Ma
+tching API\\n\\n> 本文档描述 Matching 模块的接口契约，包含推荐、滑动和匹配列表接
+口定义。\\n> 关联设计规范: [design-spec.md](../../designs/issue-4/design-spec.md
+)\\n> 关联 PRD: [prd/v1-matching.md](../../prd/v1-matching.md)\\n\\n---\\n\\n## 
+1. 获取推荐卡片\\n\\n### `GET /matching/recommendations`\\n\\n获取当前用户的推荐
+卡片列表。\\n\\n#### Query Parameters\\n\\n| 参数 | 类型 | 必填 | 说明 |\\n|----
+--|------|------|------|\\n| `mode` | `string` | 否 | 推荐模式：`nearby`（附近，
+默认 50km）、`city`（同城）、`nationwide`（全国），默认 `nearby` |\\n| `limit` |
+`integer` | 否 | 返回数量上限，默认 `20` |\\n\\n#### Response 200 OK\\n\\n```jso
+n\\n{\\n  \\"data\\": [\\n    {\\n      \\"user_id\\": \\"uuid\\",\\n      \\"ni
+ckname\\": \\"Alice\\",\\n      \\"age\\": 24,\\n      \\"distance\\": 1.2,\\n  
+   \\"bio\\": \\"喜欢旅行和摄影\\",\\n      \\"avatar_url\\": \\"https://cdn.exa
+mple.com/avatars/uuid.jpg\\"\\n    }\\n  ]\\n}\\n```\\n\\n#### 过滤规则\\n\\n1. 
+目标用户资料完整（`user_profiles.is_complete = true`）。\\n2. 目标用户性别符合当
+前用户的 `preferred_gender`（若 `both` 则不限制）。\\n3. 当前用户性别符合目标用
+户的 `preferred_gender`（双向匹配偏好）。\\n4. 目标用户在设定距离范围内（Haversi
+ne 公式计算）。\\n5. 排除已存在 `match_actions`（Like 或 Pass）的记录。\\n6. 排
+除已存在 `matches`（无论状态）的记录。\\n7. 排除 `blocks` 表中的双向屏蔽记录。\\
+n\\n#### 排序规则（综合得分）\\n\\n- 距离越近越优先（权重 50%）\\n- 近期活跃用户
+优先（权重 30%）\\n- 新用户曝光加成（权重 20%）：注册 7 天内加 0.2\\n\\n#### 缓
+存策略\\n\\n- Redis 键：`recommendations:{user_id}`\\n- 存储内容：候选 `user_id`
+列表和得分的 JSON 字符串\\n- TTL：5 分钟\\n- 缓存击穿防护：使用互斥锁 `SET recom
+mendations:lock:{user_id} NX EX 10`\\n\\n---\\n\\n## 2. 滑动操作\\n\\n### `POST 
+/matching/actions`\\n\\n记录用户对目标卡片的滑动操作（Like 或 Pass）。\\n\\n####
+Request Body\\n\\n```json\\n{\\n  \\"target_id\\": \\"uuid\\",\\n  \\"action\\":
+\\"like\\"\\n}\\n```\\n\\n#### 字段说明\\n\\n| 字段 | 类型 | 必填 | 说明 |\\n|--
+----|------|------|------|\\n| `target_id` | `string` | 是 | 目标用户 ID |\\n| `
+action` | `string` | 是 | 操作类型：`like` / `pass` / `super_like` |\\n\\n#### R
+esponse 200 OK\\n\\n```json\\n{\\n  \\"data\\": {\\n    \\"matched\\": true,\\n 
+  \\"match_id\\": \\"uuid\\",\\n    \\"conversation_id\\": \\"uuid\\",\\n    \\"
+matched_user\\": {\\n      \\"user_id\\": \\"uuid\\",\\n      \\"nickname\\": \\
+"Alice\\",\\n      \\"avatar_url\\": \\"https://cdn.example.com/avatars/uuid.jpg
+\\"\\n    }\\n  }\\n}\\n```\\n\\n- 若 `matched` 为 `false`，则 `match_id`、`conv
+ersation_id`、`matched_user` 为 `null`。\\n- 若双向匹配成功，服务端会同时通过 So
+cket.io 向双方 emit `match:created` 事件。\\n\\n#### 幂等性\\n\\n`match_actions`
+表对 `(actor_id, target_id)` 建立唯一索引，重复插入被数据库拦截，后端捕获异常后
+返回成功，不创建重复记录。\\n\\n#### 边界情况\\n\\n- 若 `target_id == actor_id`
+，返回错误码 `1000`（参数错误）。\\n- 滑动成功后清除该用户的 Redis 推荐缓存 `rec
+ommendations:{user_id}`。\\n\\n---\\n\\n## 3. 获取匹配列表\\n\\n### `GET /matche
+s`\\n\\n获取当前用户已成功匹配的用户列表，支持游标分页。\\n\\n#### Query Paramet
+ers\\n\\n| 参数 | 类型 | 必填 | 说明 |\\n|------|------|------|------|\\n| `limi
+t` | `integer` | 否 | 每页数量，默认 `20` |\\n| `cursor` | `string` | 否 | 游标
+，用于翻页 |\\n\\n#### Response 200 OK\\n\\n```json\\n{\\n  \\"data\\": {\\n    
+\\"items\\": [\\n      {\\n        \\"match_id\\": \\"uuid\\",\\n        \\"conv
+ersation_id\\": \\"uuid\\",\\n        \\"user_id\\": \\"uuid\\",\\n        \\"ni
+ckname\\": \\"Alice\\",\\n        \\"avatar_url\\": \\"https://cdn.example.com/a
+vatars/uuid.jpg\\",\\n        \\"matched_at\\": \\"2026-04-15T08:30:00Z\\"\\n   
+  }\\n    ],\\n    \\"has_more\\": true,\\n    \\"next_cursor\\": \\"base64_curs
+or_string\\"\\n  }\\n}\\n```\\n\\n#### 查询规则\\n\\n- 查询当前用户参与的 `match
+es` 中 `status = \'matched\'` 的记录，按 `created_at DESC` 排序。\\n- 列表中的用
+户若被拉黑（状态变为 `unmatched`），自动过滤不展示。\\n\\n---\\n\\n## 4. 错误码
+表\\n\\n| 错误码 | 场景 | HTTP 状态码 |\\n|--------|------|-------------|\\n| `1
+000` | 参数错误（如滑动自己、非法 action 值） | 400 |\\n| `1001` | 用户资料不完
+整，无法获取推荐 | 403 |\\n| `1002` | 目标用户不存在 | 404 |\\n| `1003` | 推荐列
+表为空 | 200（正常返回空数组） |\\n| `2000` | 系统内部错误 | 500 |\\nEOF"}'
+    ),
+    extras=None
+)
+StatusUpdate(
+    context_usage=0.08802032470703125,
+    context_tokens=23074,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=802,
+        output=1590,
+        input_cache_read=22272,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-uLDTrlFHe8eFGlZ58tYvmuVG',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_9cz0FnCk9XM3MUBeY7KG9n2g',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='',
+        message='Command executed successfully.',
+        display=[],
+        extras=None
+    )
+)
+StepBegin(n=9)
+ThinkPart(
+    type='think',
+    think='Now let me update the CHANGELOG.md to add `#33` under the `[Unrelease
+d]` section.',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_72up8HiiiSJAZghpJsgA2jOE',
+    function=FunctionBody(
+        name='Shell',
+        arguments='{"command": "cat > /private/var/folders/lt/w3sl6z8j5v50vt2s6k
+nvf5n00000gn/T/doc-gardener-33-1296294217/CHANGELOG.md << \'EOF\'\\n# Changelog\
+\n\\nAll notable changes to this project will be documented in this file.\\n\\nT
+he format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),\
+\nand this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0
+.0.html).\\n\\n## [Unreleased]\\n\\n### Added\\n- #30\\n- #31\\n- #33\\nEOF"}'
+    ),
+    extras=None
+)
+StatusUpdate(
+    context_usage=0.09418487548828125,
+    context_tokens=24690,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=1650,
+        output=184,
+        input_cache_read=23040,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-jUIeRqWBoM4h0Ar4jbJaY4ya',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_72up8HiiiSJAZghpJsgA2jOE',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='',
+        message='Command executed successfully.',
+        display=[],
+        extras=None
+    )
+)
+StepBegin(n=10)
+ThinkPart(
+    type='think',
+    think="Let me now check if there are any other missing docs. Looking at the 
+design-spec.md section 7:\n\n- `docs/api/matching.md` - ✅ Updated\n- `docs/api/
+socket-events.md` - Already exists with content, acceptable\n- `docs/modules/mat
+ching.md` - Already comprehensive, acceptable\n- `docs/design-docs/flutter.md` -
+General spec exists, no changes needed per design spec note\n- `docs/modules/IND
+EX.md` - matching.md already registered, acceptable\n- `prd/v1-matching.md` - Al
+ready has design assets link, acceptable\n\nLet me also verify the git diff to m
+ake sure my changes look right, and then check if there are breaking changes tha
+t require a migration guide. This PR is design-only for issue #4 (new Matching f
+eature). It's adding new APIs and new UI components, not modifying existing ones
+. So no breaking changes, no migration guide needed.\n\nLet me check the git sta
+tus, diff, then commit and push.",
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_ugPFRxR7WwHidVRNDgyaX1Kq',
+    function=FunctionBody(
+        name='Shell',
+        arguments='{"command": "cd /private/var/folders/lt/w3sl6z8j5v50vt2s6knvf
+5n00000gn/T/doc-gardener-33-1296294217 && git status && echo \\"---\\" && git di
+ff docs/api/matching.md && echo \\"---\\" && git diff CHANGELOG.md"}'
+    ),
+    extras=None
+)
+StatusUpdate(
+    context_usage=0.0949859619140625,
+    context_tokens=24900,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=324,
+        output=286,
+        input_cache_read=24576,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-2mqLNygdKF1xoLBbXPErYBX8',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_ugPFRxR7WwHidVRNDgyaX1Kq',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='On branch design/issue-4\nYour branch is up to date with \'origi
+n/design/issue-4\'.\n\nChanges not staged for commit:\n  (use "git add <file>...
+" to update what will be committed)\n  (use "git restore <file>..." to discard c
+hanges in working directory)\n\tmodified:   CHANGELOG.md\n\tmodified:   docs/api
+/matching.md\n\nno changes added to commit (use "git add" and/or "git commit -a"
+)\n---\ndiff --git a/docs/api/matching.md b/docs/api/matching.md\nindex dfdcde3.
+.466322a 100644\n--- a/docs/api/matching.md\n+++ b/docs/api/matching.md\n@@ -1,7
++1,166 @@\n # Matching API\n \n-> 本文档描述 Matching 模块的接口契约，包含推荐和
+滑动接口定义。\n-> TODO: 由设计任务自动生成，待开发阶段补充。\n+> 本文档描述 Mat
+ching 模块的接口契约，包含推荐、滑动和匹配列表接口定义。\n+> 关联设计规范: [desi
+gn-spec.md](../../designs/issue-4/design-spec.md)\n+> 关联 PRD: [prd/v1-matching
+.md](../../prd/v1-matching.md)\n \n-## 相关设计\n-- 设计规范: [design-spec.md](.
+./../designs/issue-4/design-spec.md)\n+---\n+\n+## 1. 获取推荐卡片\n+\n+### `GET
+/matching/recommendations`\n+\n+获取当前用户的推荐卡片列表。\n+\n+#### Query Par
+ameters\n+\n+| 参数 | 类型 | 必填 | 说明 |\n+|------|------|------|------|\n+| `
+mode` | `string` | 否 | 推荐模式：`nearby`（附近，默认 50km）、`city`（同城）、`
+nationwide`（全国），默认 `nearby` |\n+| `limit` | `integer` | 否 | 返回数量上限
+，默认 `20` |\n+\n+#### Response 200 OK\n+\n+```json\n+{\n+  "data": [\n+    {\n
++      "user_id": "uuid",\n+      "nickname": "Alice",\n+      "age": 24,\n+    
+ "distance": 1.2,\n+      "bio": "喜欢旅行和摄影",\n+      "avatar_url": "https:
+//cdn.example.com/avatars/uuid.jpg"\n+    }\n+  ]\n+}\n+```\n+\n+#### 过滤规则\n
++\n+1. 目标用户资料完整（`user_profiles.is_complete = true`）。\n+2. 目标用户性
+别符合当前用户的 `preferred_gender`（若 `both` 则不限制）。\n+3. 当前用户性别符
+合目标用户的 `preferred_gender`（双向匹配偏好）。\n+4. 目标用户在设定距离范围内
+（Haversine 公式计算）。\n+5. 排除已存在 `match_actions`（Like 或 Pass）的记录。
+\n+6. 排除已存在 `matches`（无论状态）的记录。\n+7. 排除 `blocks` 表中的双向屏蔽
+记录。\n+\n+#### 排序规则（综合得分）\n+\n+- 距离越近越优先（权重 50%）\n+- 近期
+活跃用户优先（权重 30%）\n+- 新用户曝光加成（权重 20%）：注册 7 天内加 0.2\n+\n+
+#### 缓存策略\n+\n+- Redis 键：`recommendations:{user_id}`\n+- 存储内容：候选 `u
+ser_id` 列表和得分的 JSON 字符串\n+- TTL：5 分钟\n+- 缓存击穿防护：使用互斥锁 `S
+ET recommendations:lock:{user_id} NX EX 10`\n+\n+---\n+\n+## 2. 滑动操作\n+\n+##
+# `POST /matching/actions`\n+\n+记录用户对目标卡片的滑动操作（Like 或 Pass）。\n
++\n+#### Request Body\n+\n+```json\n+{\n+  "target_id": "uuid",\n+  "action": "l
+ike"\n+}\n+```\n+\n+#### 字段说明\n+\n+| 字段 | 类型 | 必填 | 说明 |\n+|------|-
+-----|------|------|\n+| `target_id` | `string` | 是 | 目标用户 ID |\n+| `action
+` | `string` | 是 | 操作类型：`like` / `pass` / `super_like` |\n+\n+#### Respons
+e 200 OK\n+\n+```json\n+{\n+  "data": {\n+    "matched": true,\n+    "match_id":
+"uuid",\n+    "conversation_id": "uuid",\n+    "matched_user": {\n+      "user_i
+d": "uuid",\n+      "nickname": "Alice",\n+      "avatar_url": "https://cdn.exam
+ple.com/avatars/uuid.jpg"\n+    }\n+  }\n+}\n+```\n+\n+- 若 `matched` 为 `false`
+，则 `match_id`、`conversation_id`、`matched_user` 为 `null`。\n+- 若双向匹配成
+功，服务端会同时通过 Socket.io 向双方 emit `match:created` 事件。\n+\n+#### 幂等
+性\n+\n+`match_actions` 表对 `(actor_id, target_id)` 建立唯一索引，重复插入被数
+据库拦截，后端捕获异常后返回成功，不创建重复记录。\n+\n+#### 边界情况\n+\n+- 若 
+`target_id == actor_id`，返回错误码 `1000`（参数错误）。\n+- 滑动成功后清除该用
+户的 Redis 推荐缓存 `recommendations:{user_id}`。\n+\n+---\n+\n+## 3. 获取匹配列
+表\n+\n+### `GET /matches`\n+\n+获取当前用户已成功匹配的用户列表，支持游标分页。
+\n+\n+#### Query Parameters\n+\n+| 参数 | 类型 | 必填 | 说明 |\n+|------|------|
+------|------|\n+| `limit` | `integer` | 否 | 每页数量，默认 `20` |\n+| `cursor`
+| `string` | 否 | 游标，用于翻页 |\n+\n+#### Response 200 OK\n+\n+```json\n+{\n+
+ "data": {\n+    "items": [\n+      {\n+        "match_id": "uuid",\n+        "c
+onversation_id": "uuid",\n+        "user_id": "uuid",\n+        "nickname": "Ali
+ce",\n+        "avatar_url": "https://cdn.example.com/avatars/uuid.jpg",\n+     
+  "matched_at": "2026-04-15T08:30:00Z"\n+      }\n+    ],\n+    "has_more": true
+,\n+    "next_cursor": "base64_cursor_string"\n+  }\n+}\n+```\n+\n+#### 查询规则
+\n+\n+- 查询当前用户参与的 `matches` 中 `status = \'matched\'` 的记录，按 `creat
+ed_at DESC` 排序。\n+- 列表中的用户若被拉黑（状态变为 `unmatched`），自动过滤不
+展示。\n+\n+---\n+\n+## 4. 错误码表\n+\n+| 错误码 | 场景 | HTTP 状态码 |\n+|----
+----|------|-------------|\n+| `1000` | 参数错误（如滑动自己、非法 action 值） |
+400 |\n+| `1001` | 用户资料不完整，无法获取推荐 | 403 |\n+| `1002` | 目标用户不
+存在 | 404 |\n+| `1003` | 推荐列表为空 | 200（正常返回空数组） |\n+| `2000` | 系
+统内部错误 | 500 |\n---\ndiff --git a/CHANGELOG.md b/CHANGELOG.md\nindex e5cad3b
+..f931085 100644\n--- a/CHANGELOG.md\n+++ b/CHANGELOG.md\n@@ -10,3 +10,4 @@ and 
+this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0\n #
+## Added\n - #30\n - #31\n+- #33\n',
+        message='Command executed successfully.',
+        display=[],
+        extras=None
+    )
+)
+StepBegin(n=11)
+ThinkPart(
+    type='think',
+    think='The changes look good. Now I need to:\n1. Commit the changes\n2. Push
+to origin design/issue-4\n3. Output the structured report\n\nLet me do the commi
+t and push first.',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_yL7rQSnuuUbFro2jSuQiqv1G',
+    function=FunctionBody(
+        name='Shell',
+        arguments='{"command": "cd /private/var/folders/lt/w3sl6z8j5v50vt2s6knvf
+5n00000gn/T/doc-gardener-33-1296294217 && git add -A && git commit -m \'docs: 补
+充 PR #33 文档 (by PR Doc Gardener)\' && git push origin design/issue-4"}'
+    ),
+    extras=None
+)
+StatusUpdate(
+    context_usage=0.10261154174804688,
+    context_tokens=26899,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=2067,
+        output=136,
+        input_cache_read=24832,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-si9rK4FKIzNURC3DLHUB2ee4',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_yL7rQSnuuUbFro2jSuQiqv1G',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='[design/issue-4 df450f3] docs: 补充 PR #33 文档 (by PR Doc Garde
+ner)\n 2 files changed, 164 insertions(+), 4 deletions(-)\nTo github.com:MatioYo
+shitoki/social-world.git\n   9d551db..df450f3  design/issue-4 -> design/issue-4\
+n',
+        message='Command executed successfully.',
+        display=[],
+        extras=None
+    )
+)
+StepBegin(n=12)
+ThinkPart(
+    type='think',
+    think='Let me update the todo list and output the final structured report.',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_Yr79O8N9KSzSWjWHBU6R92HC',
+    function=FunctionBody(
+        name='SetTodoList',
+        arguments='{"todos": [{"title":"读取项目地图 AGENTS.md 和当前 PR 变更","
+status":"done"},{"title":"分析变更文件，推断文档影响范围","status":"done"},{"tit
+le":"检查并补充遗漏的文档","status":"done"},{"title":"检查 CHANGELOG.md 和迁移指
+南","status":"done"},{"title":"提交并推送文档变更","status":"done"},{"title":"输
+出结构化报告","status":"in_progress"}]}'
+    ),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_Yr79O8N9KSzSWjWHBU6R92HC',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='Todo list updated',
+        message='Todo list updated',
+        display=[
+            TodoDisplayBlock(
+                type='todo',
+                items=[
+                    TodoDisplayItem(
+                        title='读取项目地图 AGENTS.md 和当前 PR 变更',
+                        status='done'
+                    ),
+                    TodoDisplayItem(
+                        title='分析变更文件，推断文档影响范围',
+                        status='done'
+                    ),
+                    TodoDisplayItem(
+                        title='检查并补充遗漏的文档',
+                        status='done'
+                    ),
+                    TodoDisplayItem(
+                        title='检查 CHANGELOG.md 和迁移指南',
+                        status='done'
+                    ),
+                    TodoDisplayItem(title='提交并推送文档变更', status='done'),
+                    TodoDisplayItem(
+                        title='输出结构化报告',
+                        status='in_progress'
+                    )
+                ]
+            )
+        ],
+        extras=None
+    )
+)
+StatusUpdate(
+    context_usage=0.10352706909179688,
+    context_tokens=27139,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=259,
+        output=117,
+        input_cache_read=26880,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-WlbxNEyvKXG9xM0LGasoLwo6',
+    plan_mode=False,
+    mcp_status=None
+)
+StepBegin(n=13)
+ThinkPart(
+    type='think',
+    think='Now I need to output the final structured report. Let me write a comp
+rehensive report in Chinese as requested.',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_TBIAPhJrSUERinqreJEfm87E',
+    function=FunctionBody(
+        name='Shell',
+        arguments='{"command": "cat << \'EOF\'\\n\\n============================
+====================================================\\nPR #33 文档协同检查报告（
+PR Doc Gardener）\\n============================================================
+====================\\n\\n一、基本信息\\n---------------------------------------
+-----------------------------------------\\nPR 编号:        #33\\n当前分支:     
+ design/issue-4\\nBase 分支:      main\\n变更范围:       Matching 模块设计规范 +
+文档补充\\n关联 PRD:       prd/v1-matching.md\\n设计资产:       designs/issue-4/
+\\n\\n二、变更文件分析\\n-------------------------------------------------------
+-------------------------\\n已变更文件（共 9 个）：\\n  1. designs/issue-4/desig
+n-spec.md          → Issue #4 Matching 设计规范\\n  2. designs/issue-4/docs-to-u
+pdate.txt      → 待更新文档清单\\n  3. designs/issue-4/mockup.html             →
+高保真原型\\n  4. designs/issue-4/wireframe.svg           → 低保真线框图\\n  5. 
+docs/api/INDEX.md                       → API 文档索引（已存在，正确）\\n  6. do
+cs/api/matching.md                    → Matching API 文档（原有内容极简，需补充
+）\\n  7. docs/api/socket-events.md               → Socket.io 事件文档（已存在，
+内容完整）\\n  8. docs/modules/matching.md                → 模块实现文档（已存在
+，内容完整）\\n  9. prd/v1-matching.md                      → PRD（已包含设计资
+产链接）\\n\\n三、文档同步检查结果\\n-------------------------------------------
+-------------------------------------\\n| 文档路径                              
+| 状态   | 说明                                  |\\n|--------------------------
+-------------|--------|---------------------------------------|\\n| docs/api/mat
+ching.md                  | ❌遗漏 | 仅有 7 行占位内容，缺少完整接口契约   |\\n|
+docs/api/socket-events.md             | ✅同步 | match:created Payload 已记录   
+      |\\n| docs/modules/matching.md              | ✅同步 | BLoC/Widget/路由/边
+界情况均已覆盖     |\\n| docs/api/INDEX.md                     | ✅同步 | 已正确
+链接 matching.md 和 socket-events.md |\\n| docs/modules/INDEX.md                
+| ✅同步 | matching.md 已在模块清单中注册        |\\n| prd/v1-matching.md       
+            | ✅同步 | 顶部已添加 designs/issue-4/ 链接注释  |\\n| docs/design-d
+ocs/flutter.md           | ✅同步 | 通用 Widgetbook 规范已存在，无需修改  |\\n| 
+CHANGELOG.md                          | ❌遗漏 | Unreleased 区块未记录 #33      
+      |\\n| docs/migration/README.md              | ⏭️跳过 | 本次 PR 为新增功能，
+无接口破坏性变更  |\\n\\n四、已执行的补充操作\\n--------------------------------
+------------------------------------------------\\n1. 重写 docs/api/matching.md\
+\n   - 补充 GET /matching/recommendations 完整文档（参数、响应示例、过滤规则、排
+序规则、缓存策略）\\n   - 补充 POST /matching/actions 完整文档（请求体、响应体、
+幂等性说明、边界情况）\\n   - 补充 GET /matches 匹配列表接口文档（游标分页、查询
+规则）\\n   - 补充错误码表（1000~2000）\\n\\n2. 更新 CHANGELOG.md\\n   - 在 [Unr
+eleased] → Added 下追加条目 `- #33`\\n\\n五、提交记录\\n------------------------
+--------------------------------------------------------\\nCommit: df450f3\\ndoc
+s: 补充 PR #33 文档 (by PR Doc Gardener)\\n\\n 2 files changed, 164 insertions(+
+), 4 deletions(-)\\n已推送至: origin/design/issue-4\\n\\n六、结论\\n------------
+--------------------------------------------------------------------\\n本次 PR #
+33 为 Matching 模块的 Design-Only PR，文档协同检查发现 2 处遗漏：\\n  - docs/api
+/matching.md 内容不完整（已补充）\\n  - CHANGELOG.md 未记录 PR 条目（已补充）\\n
+\\n其余文档（模块实现文档、Socket 事件文档、PRD、模块索引、Flutter 规范）均已同
+步。\\n由于本次变更为新增功能，不涉及接口破坏性变更，无需创建迁移指南。\\n\\n===
+=============================================================================\\n
+EOF"}'
+    ),
+    extras=None
+)
+StatusUpdate(
+    context_usage=0.10408782958984375,
+    context_tokens=27286,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=150,
+        output=946,
+        input_cache_read=27136,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-UP54tFeX9VBlvEWvYfBhLwFo',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_TBIAPhJrSUERinqreJEfm87E',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='\n==============================================================
+==================\nPR #33 文档协同检查报告（PR Doc Gardener）\n================
+================================================================\n\n一、基本信息
+\n------------------------------------------------------------------------------
+--\nPR 编号:        #33\n当前分支:       design/issue-4\nBase 分支:      main\n
+变更范围:       Matching 模块设计规范 + 文档补充\n关联 PRD:       prd/v1-matchin
+g.md\n设计资产:       designs/issue-4/\n\n二、变更文件分析\n--------------------
+------------------------------------------------------------\n已变更文件（共 9 
+个）：\n  1. designs/issue-4/design-spec.md          → Issue #4 Matching 设计规
+范\n  2. designs/issue-4/docs-to-update.txt      → 待更新文档清单\n  3. designs/
+issue-4/mockup.html             → 高保真原型\n  4. designs/issue-4/wireframe.svg
+          → 低保真线框图\n  5. docs/api/INDEX.md                       → API 文
+档索引（已存在，正确）\n  6. docs/api/matching.md                    → Matching 
+API 文档（原有内容极简，需补充）\n  7. docs/api/socket-events.md               →
+Socket.io 事件文档（已存在，内容完整）\n  8. docs/modules/matching.md           
+    → 模块实现文档（已存在，内容完整）\n  9. prd/v1-matching.md                 
+    → PRD（已包含设计资产链接）\n\n三、文档同步检查结果\n-----------------------
+---------------------------------------------------------\n| 文档路径           
+                  | 状态   | 说明                                  |\n|---------
+------------------------------|--------|---------------------------------------|
+\n| docs/api/matching.md                  | ❌遗漏 | 仅有 7 行占位内容，缺少完整
+接口契约   |\n| docs/api/socket-events.md             | ✅同步 | match:created P
+ayload 已记录          |\n| docs/modules/matching.md              | ✅同步 | BLo
+C/Widget/路由/边界情况均已覆盖     |\n| docs/api/INDEX.md                     | 
+✅同步 | 已正确链接 matching.md 和 socket-events.md |\n| docs/modules/INDEX.md  
+              | ✅同步 | matching.md 已在模块清单中注册        |\n| prd/v1-match
+ing.md                    | ✅同步 | 顶部已添加 designs/issue-4/ 链接注释  |\n| 
+docs/design-docs/flutter.md           | ✅同步 | 通用 Widgetbook 规范已存在，无
+需修改  |\n| CHANGELOG.md                          | ❌遗漏 | Unreleased 区块未
+记录 #33             |\n| docs/migration/README.md              | ⏭️跳过 | 本次 P
+R 为新增功能，无接口破坏性变更  |\n\n四、已执行的补充操作\n---------------------
+-----------------------------------------------------------\n1. 重写 docs/api/ma
+tching.md\n   - 补充 GET /matching/recommendations 完整文档（参数、响应示例、过
+滤规则、排序规则、缓存策略）\n   - 补充 POST /matching/actions 完整文档（请求体
+、响应体、幂等性说明、边界情况）\n   - 补充 GET /matches 匹配列表接口文档（游标
+分页、查询规则）\n   - 补充错误码表（1000~2000）\n\n2. 更新 CHANGELOG.md\n   - 
+在 [Unreleased] → Added 下追加条目 `- #33`\n\n五、提交记录\n--------------------
+------------------------------------------------------------\nCommit: df450f3\nd
+ocs: 补充 PR #33 文档 (by PR Doc Gardener)\n\n 2 files changed, 164 insertions(+
+), 4 deletions(-)\n已推送至: origin/design/issue-4\n\n六、结论\n----------------
+----------------------------------------------------------------\n本次 PR #33 为
+Matching 模块的 Design-Only PR，文档协同检查发现 2 处遗漏：\n  - docs/api/matchi
+ng.md 内容不完整（已补充）\n  - CHANGELOG.md 未记录 PR 条目（已补充）\n\n其余文
+档（模块实现文档、Socket 事件文档、PRD、模块索引、Flutter 规范）均已同步。\n由于
+本次变更为新增功能，不涉及接口破坏性变更，无需创建迁移指南。\n\n================
+================================================================\n',
+        message='Command executed successfully.',
+        display=[],
+        extras=None
+    )
+)
+StepBegin(n=14)
+ThinkPart(
+    type='think',
+    think="The user hasn't said anything new - this appears to be a system hint.
+The task is already complete. Let me update the todo list to mark everything as 
+done and provide a brief summary.",
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_sDWCzEaIXHnlhZRFU4xIsflg',
+    function=FunctionBody(
+        name='SetTodoList',
+        arguments='{"todos": [{"title":"读取项目地图 AGENTS.md 和当前 PR 变更","
+status":"done"},{"title":"分析变更文件，推断文档影响范围","status":"done"},{"tit
+le":"检查并补充遗漏的文档","status":"done"},{"title":"检查 CHANGELOG.md 和迁移指
+南","status":"done"},{"title":"提交并推送文档变更","status":"done"},{"title":"输
+出结构化报告","status":"done"}]}'
+    ),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_sDWCzEaIXHnlhZRFU4xIsflg',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='Todo list updated',
+        message='Todo list updated',
+        display=[
+            TodoDisplayBlock(
+                type='todo',
+                items=[
+                    TodoDisplayItem(
+                        title='读取项目地图 AGENTS.md 和当前 PR 变更',
+                        status='done'
+                    ),
+                    TodoDisplayItem(
+                        title='分析变更文件，推断文档影响范围',
+                        status='done'
+                    ),
+                    TodoDisplayItem(
+                        title='检查并补充遗漏的文档',
+                        status='done'
+                    ),
+                    TodoDisplayItem(
+                        title='检查 CHANGELOG.md 和迁移指南',
+                        status='done'
+                    ),
+                    TodoDisplayItem(title='提交并推送文档变更', status='done'),
+                    TodoDisplayItem(title='输出结构化报告', status='done')
+                ]
+            )
+        ],
+        extras=None
+    )
+)
+StatusUpdate(
+    context_usage=0.1109771728515625,
+    context_tokens=29092,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=1956,
+        output=141,
+        input_cache_read=27136,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-fuSUozAnaRBrYwFVmgZm42VR',
+    plan_mode=False,
+    mcp_status=None
+)
+StepBegin(n=15)
+ThinkPart(
+    type='think',
+    think="The task is complete. I've already performed all the required operati
+ons:\n\n1. Analyzed the PR changes\n2. Checked documentation synchronization\n3.
+Created/modified missing documentation files (docs/api/matching.md and CHANGELOG
+.md)\n4. Checked for breaking changes - none, so no migration guide needed\n5. O
+utput a structured report\n6. Committed and pushed the changes\n\nThe todo list 
+is all done. I should provide a brief completion message to the user.",
+    encrypted=None
+)
+TextPart(
+    type='text',
+    text='PR #33 文档协同检查与补充已完成。\n\n**已补充的遗漏项：**\n- `docs/api
+/matching.md`：从仅 7 行的占位内容扩充为完整的 API 契约文档，覆盖 `GET /matching
+/recommendations`、`POST /matching/actions`、`GET /matches` 三个接口的请求/响应
+示例、过滤规则、排序规则、缓存策略、幂等性说明及错误码表。\n- `CHANGELOG.md`：在
+`[Unreleased]` → `Added` 下追加 `- #33`。\n\n**无需处理项：**\n- `docs/migration
+/README.md`：本次 PR 为新增 Matching 功能，无接口破坏性变更，不创建迁移指南。\n-
+其余文档（`docs/modules/matching.md`、`docs/api/socket-events.md`、`prd/v1-match
+ing.md`、`docs/modules/INDEX.md`、`docs/design-docs/flutter.md`）均已同步，无需
+修改。\n\n**提交与推送：**\n- Commit `df450f3` 已推送至 `origin/design/issue-4`
+。'
+)
+StatusUpdate(
+    context_usage=0.11162948608398438,
+    context_tokens=29263,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=335,
+        output=311,
+        input_cache_read=28928,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-ItsJqmZs8tyxW3InTJJSgyue',
+    plan_mode=False,
+    mcp_status=None
+)
+TurnEnd()
+
+To resume this session: kimi -r 374178c2-ab28-4e5c-b5af-09832260edc1
+
+✅ 任务完成

@@ -1,0 +1,68 @@
+20:54:22.366 [ INFO] MAESTRO.logSystemInfo: ---- System Info ----
+20:54:22.367 [ INFO] MAESTRO.logSystemInfo: Maestro Version: 1.39.13
+20:54:22.367 [ INFO] MAESTRO.logSystemInfo: CI: Undefined
+20:54:22.367 [ INFO] MAESTRO.logSystemInfo: OS Name: Mac OS X
+20:54:22.367 [ INFO] MAESTRO.logSystemInfo: OS Version: 26.1
+20:54:22.367 [ INFO] MAESTRO.logSystemInfo: Architecture: aarch64
+20:54:22.368 [ INFO] MAESTRO.logSystemInfo: Java Version: 21
+20:54:22.376 [ INFO] MAESTRO.logSystemInfo: Xcode Version: null
+20:54:22.469 [DEBUG] io.micrometer.common.util.internal.logging.InternalLoggerFactory.newDefaultFactory: Using SLF4J as the default logging framework
+20:54:22.704 [ INFO] MAESTRO.logSystemInfo: Flutter Version: 3.24.5
+20:54:23.018 [ INFO] MAESTRO.logSystemInfo: Flutter Channel: stable
+20:54:23.018 [ INFO] MAESTRO.logSystemInfo: ---------------------
+20:54:23.273 [ INFO] maestro.orchestra.workspace.WorkspaceExecutionPlanner.plan: Created execution plan: ExecutionPlan(flowsToRun=[/Users/insulate/Desktop/social-world/.maestro/flows/auth/login.yaml, /Users/insulate/Desktop/social-world/.maestro/flows/profile/setup.yaml, /Users/insulate/Desktop/social-world/.maestro/flows/devtools/open_drawer.yaml, /Users/insulate/Desktop/social-world/.maestro/flows/devtools/edit_server_url.yaml], sequence=FlowSequence(flows=[], continueOnFailure=null))
+20:54:23.329 [ INFO] maestro.cli.command.TestCommand.runShardSuite: [shard 1] Selected device emulator-5554 using port 7001
+20:54:25.046 [ INFO] maestro.Maestro.invoke: Getting device info
+20:54:25.146 [ INFO] maestro.Maestro.invoke: Got device info: DeviceInfo(platform=ANDROID, widthPixels=1080, heightPixels=2400, widthGrid=1080, heightGrid=2400)
+20:54:25.203 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Define variables RUNNING
+20:54:25.204 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Define variables COMPLETED
+20:54:25.204 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Apply configuration RUNNING
+20:54:25.204 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Apply configuration COMPLETED
+20:54:25.205 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Launch app "com.example.mobile" RUNNING
+20:54:25.601 [ INFO] maestro.Maestro.launchApp: Launching app com.example.mobile
+20:54:25.675 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Launch app "com.example.mobile" COMPLETED
+20:54:25.676 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Run includes/login-as-test-user.yaml RUNNING
+20:54:25.676 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Apply configuration RUNNING
+20:54:25.676 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Apply configuration COMPLETED
+20:54:25.676 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Assert that "欢迎使用 Social World" is visible RUNNING
+20:54:43.003 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Assert that "欢迎使用 Social World" is visible FAILED
+20:54:43.003 [ INFO] maestro.Maestro.takeScreenshot: Taking screenshot
+20:54:43.005 [TRACE] maestro.utils.ScreenshotUtils.takeScreenshot: Taking screenshot to output sink
+20:54:43.141 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Run includes/login-as-test-user.yaml FAILED
+20:54:43.345 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Define variables RUNNING
+20:54:43.346 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Define variables COMPLETED
+20:54:43.346 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Apply configuration RUNNING
+20:54:43.346 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Apply configuration COMPLETED
+20:54:43.346 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Launch app "com.example.mobile" RUNNING
+20:54:43.737 [ INFO] maestro.Maestro.launchApp: Launching app com.example.mobile
+20:54:44.571 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Launch app "com.example.mobile" COMPLETED
+20:54:44.572 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Run includes/login-as-test-user.yaml RUNNING
+20:54:44.572 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Apply configuration RUNNING
+20:54:44.572 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Apply configuration COMPLETED
+20:54:44.572 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Assert that "欢迎使用 Social World" is visible RUNNING
+20:55:01.686 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Assert that "欢迎使用 Social World" is visible FAILED
+20:55:01.687 [ INFO] maestro.Maestro.takeScreenshot: Taking screenshot
+20:55:01.687 [TRACE] maestro.utils.ScreenshotUtils.takeScreenshot: Taking screenshot to output sink
+20:55:01.767 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Run includes/login-as-test-user.yaml FAILED
+20:55:01.778 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Define variables RUNNING
+20:55:01.779 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Define variables COMPLETED
+20:55:01.779 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Apply configuration RUNNING
+20:55:01.779 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Apply configuration COMPLETED
+20:55:01.779 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Launch app "com.example.mobile" RUNNING
+20:55:02.167 [ INFO] maestro.Maestro.launchApp: Launching app com.example.mobile
+20:55:02.473 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Launch app "com.example.mobile" COMPLETED
+20:55:02.473 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Assert that "开发工具" is visible RUNNING
+20:55:19.534 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Assert that "开发工具" is visible FAILED
+20:55:19.535 [ INFO] maestro.Maestro.takeScreenshot: Taking screenshot
+20:55:19.535 [TRACE] maestro.utils.ScreenshotUtils.takeScreenshot: Taking screenshot to output sink
+20:55:19.623 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Define variables RUNNING
+20:55:19.624 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Define variables COMPLETED
+20:55:19.624 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Apply configuration RUNNING
+20:55:19.624 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Apply configuration COMPLETED
+20:55:19.624 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Launch app "com.example.mobile" RUNNING
+20:55:20.075 [ INFO] maestro.Maestro.launchApp: Launching app com.example.mobile
+20:55:20.491 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Launch app "com.example.mobile" COMPLETED
+20:55:20.492 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Tap on id: dev_tools_toggle_button RUNNING
+20:55:37.589 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Tap on id: dev_tools_toggle_button FAILED
+20:55:37.589 [ INFO] maestro.Maestro.takeScreenshot: Taking screenshot
+20:55:37.589 [TRACE] maestro.utils.ScreenshotUtils.takeScreenshot: Taking screenshot to output sink

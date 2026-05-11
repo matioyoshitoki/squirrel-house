@@ -1,0 +1,14 @@
+[2026-04-08 16:17:41] PR #2 Review 启动
+分支: feat/unified-event-bus
+项目路径: ../new-world/new-world-api
+日志文件: logs/review-pr-2-20260408-161741.log
+
+=== Agent 输出 ===
+Usage: kimi [OPTIONS] COMMAND [ARGS]...
+Try 'kimi -h' for help.
+╭─ Error ──────────────────────────────────────────────────────────────────────╮
+│ Invalid value for '--agent-file': File 'configs/agents/reviewer.yaml' does   │
+│ not exist.                                                                   │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+❌ Review 失败: exit status 2

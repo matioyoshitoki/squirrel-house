@@ -1,0 +1,322 @@
+11:58:27.449 [ INFO] MAESTRO.logSystemInfo: ---- System Info ----
+11:58:27.450 [ INFO] MAESTRO.logSystemInfo: Maestro Version: 1.39.13
+11:58:27.450 [ INFO] MAESTRO.logSystemInfo: CI: Undefined
+11:58:27.450 [ INFO] MAESTRO.logSystemInfo: OS Name: Mac OS X
+11:58:27.450 [ INFO] MAESTRO.logSystemInfo: OS Version: 26.1
+11:58:27.450 [ INFO] MAESTRO.logSystemInfo: Architecture: aarch64
+11:58:27.450 [ INFO] MAESTRO.logSystemInfo: Java Version: 21
+11:58:27.457 [ INFO] MAESTRO.logSystemInfo: Xcode Version: null
+11:58:27.612 [DEBUG] io.micrometer.common.util.internal.logging.InternalLoggerFactory.newDefaultFactory: Using SLF4J as the default logging framework
+11:58:27.850 [ INFO] MAESTRO.logSystemInfo: Flutter Version: 3.24.5
+11:58:28.230 [ INFO] MAESTRO.logSystemInfo: Flutter Channel: stable
+11:58:28.230 [ INFO] MAESTRO.logSystemInfo: ---------------------
+11:58:28.558 [ INFO] maestro.orchestra.workspace.WorkspaceExecutionPlanner.plan: Created execution plan: ExecutionPlan(flowsToRun=[/private/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/rework-pr-55-374046402/.maestro/flows/matching/swipe_recommendations.yaml, /private/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/rework-pr-55-374046402/.maestro/flows/matching/view_match_list.yaml, /private/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/rework-pr-55-374046402/.maestro/flows/auth/login.yaml, /private/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/rework-pr-55-374046402/.maestro/flows/profile/setup.yaml, /private/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/rework-pr-55-374046402/.maestro/flows/devtools/open_drawer.yaml, /private/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/rework-pr-55-374046402/.maestro/flows/devtools/edit_server_url.yaml], sequence=FlowSequence(flows=[], continueOnFailure=null))
+11:58:28.654 [ INFO] maestro.cli.command.TestCommand.runShardSuite: [shard 1] Selected device emulator-5556 using port 7001
+11:58:30.011 [ INFO] maestro.Maestro.invoke: Getting device info
+11:58:30.153 [ INFO] maestro.Maestro.invoke: Got device info: DeviceInfo(platform=ANDROID, widthPixels=1080, heightPixels=2400, widthGrid=1080, heightGrid=2400)
+11:58:30.205 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Define variables RUNNING
+11:58:30.207 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Define variables COMPLETED
+11:58:30.208 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Apply configuration RUNNING
+11:58:30.208 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Apply configuration COMPLETED
+11:58:30.208 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Launch app "com.example.mobile" with clear state RUNNING
+11:58:30.208 [ INFO] maestro.Maestro.clearAppState: Clearing app state com.example.mobile
+11:58:30.651 [ INFO] maestro.Maestro.launchApp: Launching app com.example.mobile
+11:58:30.754 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Launch app "com.example.mobile" with clear state COMPLETED
+11:58:30.754 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Run includes/login-as-test-user.yaml RUNNING
+11:58:30.755 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Apply configuration RUNNING
+11:58:30.755 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Apply configuration COMPLETED
+11:58:30.755 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Assert that "欢迎使用 Social World" is visible RUNNING
+11:58:31.962 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Assert that "欢迎使用 Social World" is visible COMPLETED
+11:58:31.963 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Assert that "手机号一键登录" is visible RUNNING
+11:58:32.997 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Assert that "手机号一键登录" is visible COMPLETED
+11:58:32.997 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Tap on "手机号" RUNNING
+11:58:33.065 [ INFO] maestro.Maestro.tap-BUbHBYE: Tapping on element:  UiElement(treeNode=TreeNode(attributes={text=, accessibilityText=, hintText=手机号, ignoreBoundsFiltering=false, resource-id=, clickable=true, bounds=[42,677][1038,809], enabled=true, focused=false, checked=false, scrollable=false, selected=false, class=android.widget.EditText}, children=[], clickable=true, enabled=true, focused=false, checked=false, selected=false), bounds=Bounds(x=42, y=677, width=996, height=132))
+11:58:34.147 [ INFO] maestro.Maestro.tap-BUbHBYE: Refreshed element
+11:58:34.148 [ INFO] maestro.Maestro.hierarchyBasedTap-hbl3e4M: Tapping at (540, 743) using hierarchy based logic for wait
+11:58:34.148 [TRACE] maestro.utils.ScreenshotUtils.takeScreenshot: Taking screenshot to byte array
+11:58:34.148 [TRACE] maestro.utils.ScreenshotUtils.takeScreenshot: Taking screenshot to output sink
+11:58:35.907 [ INFO] maestro.Maestro.hierarchyBasedTap-hbl3e4M: Something have changed in the UI judging by view hierarchy. Proceed.
+11:58:35.907 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Tap on "手机号" COMPLETED
+11:58:35.908 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Input text 13800138000 RUNNING
+11:58:35.908 [ INFO] maestro.Maestro.inputText: Inputting text: 13800138000
+11:58:37.999 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Input text 13800138000 COMPLETED
+11:58:38.000 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Tap on "获取验证码" RUNNING
+11:58:38.100 [ INFO] maestro.Maestro.tap-BUbHBYE: Tapping on element:  UiElement(treeNode=TreeNode(attributes={text=, accessibilityText=获取验证码, hintText=, ignoreBoundsFiltering=false, resource-id=, clickable=true, bounds=[720,851][1038,998], enabled=true, focused=false, checked=false, scrollable=false, selected=false, class=android.widget.Button}, children=[], clickable=true, enabled=true, focused=false, checked=false, selected=false), bounds=Bounds(x=720, y=851, width=318, height=147))
+11:58:39.211 [ INFO] maestro.Maestro.tap-BUbHBYE: Refreshed element
+11:58:39.211 [ INFO] maestro.Maestro.hierarchyBasedTap-hbl3e4M: Tapping at (879, 924) using hierarchy based logic for wait
+11:58:39.211 [TRACE] maestro.utils.ScreenshotUtils.takeScreenshot: Taking screenshot to byte array
+11:58:39.211 [TRACE] maestro.utils.ScreenshotUtils.takeScreenshot: Taking screenshot to output sink
+11:58:40.255 [ INFO] maestro.Maestro.hierarchyBasedTap-hbl3e4M: Something have changed in the UI judging by view hierarchy. Proceed.
+11:58:40.255 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Tap on "获取验证码" COMPLETED
+11:58:40.255 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Tap on "验证码" RUNNING
+11:58:40.306 [ INFO] maestro.Maestro.tap-BUbHBYE: Tapping on element:  UiElement(treeNode=TreeNode(attributes={text=, accessibilityText=, hintText=验证码, ignoreBoundsFiltering=false, resource-id=, clickable=true, bounds=[42,861][678,987], enabled=true, focused=false, checked=false, scrollable=false, selected=false, class=android.widget.EditText}, children=[], clickable=true, enabled=true, focused=false, checked=false, selected=false), bounds=Bounds(x=42, y=861, width=636, height=126))
+11:58:41.327 [ INFO] maestro.Maestro.tap-BUbHBYE: Refreshed element
+11:58:41.327 [ INFO] maestro.Maestro.hierarchyBasedTap-hbl3e4M: Tapping at (360, 924) using hierarchy based logic for wait
+11:58:41.327 [TRACE] maestro.utils.ScreenshotUtils.takeScreenshot: Taking screenshot to byte array
+11:58:41.327 [TRACE] maestro.utils.ScreenshotUtils.takeScreenshot: Taking screenshot to output sink
+11:58:42.318 [ INFO] maestro.Maestro.hierarchyBasedTap-hbl3e4M: Something have changed in the UI judging by view hierarchy. Proceed.
+11:58:42.318 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Tap on "验证码" COMPLETED
+11:58:42.318 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Input text 123456 RUNNING
+11:58:42.318 [ INFO] maestro.Maestro.inputText: Inputting text: 123456
+11:58:44.107 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Input text 123456 COMPLETED
+11:58:44.107 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Hide Keyboard RUNNING
+11:58:44.107 [ INFO] maestro.Maestro.hideKeyboard: Hiding Keyboard
+11:58:45.162 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Hide Keyboard COMPLETED
+11:58:45.162 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Tap on "登录" RUNNING
+11:58:45.210 [ INFO] maestro.Maestro.tap-BUbHBYE: Tapping on element:  UiElement(treeNode=TreeNode(attributes={text=, accessibilityText=登录, hintText=, ignoreBoundsFiltering=false, resource-id=, clickable=true, bounds=[42,1082][1038,1208], enabled=true, focused=false, checked=false, scrollable=false, selected=false, class=android.widget.Button}, children=[], clickable=true, enabled=true, focused=false, checked=false, selected=false), bounds=Bounds(x=42, y=1082, width=996, height=126))
+11:58:46.329 [ INFO] maestro.Maestro.tap-BUbHBYE: Refreshed element
+11:58:46.329 [ INFO] maestro.Maestro.hierarchyBasedTap-hbl3e4M: Tapping at (540, 1145) using hierarchy based logic for wait
+11:58:46.329 [TRACE] maestro.utils.ScreenshotUtils.takeScreenshot: Taking screenshot to byte array
+11:58:46.329 [TRACE] maestro.utils.ScreenshotUtils.takeScreenshot: Taking screenshot to output sink
+11:58:47.346 [ INFO] maestro.Maestro.hierarchyBasedTap-hbl3e4M: Something have changed in the UI judging by view hierarchy. Proceed.
+11:58:47.347 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Tap on "登录" COMPLETED
+11:58:47.347 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Run includes/login-as-test-user.yaml COMPLETED
+11:58:47.347 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Assert that id: mode_tab_nearby is visible RUNNING
+11:59:04.457 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Assert that id: mode_tab_nearby is visible FAILED
+11:59:04.458 [ INFO] maestro.Maestro.takeScreenshot: Taking screenshot
+11:59:04.458 [TRACE] maestro.utils.ScreenshotUtils.takeScreenshot: Taking screenshot to output sink
+11:59:04.773 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Define variables RUNNING
+11:59:04.774 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Define variables COMPLETED
+11:59:04.774 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Apply configuration RUNNING
+11:59:04.774 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Apply configuration COMPLETED
+11:59:04.774 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Launch app "com.example.mobile" with clear state RUNNING
+11:59:04.774 [ INFO] maestro.Maestro.clearAppState: Clearing app state com.example.mobile
+11:59:05.595 [ INFO] maestro.Maestro.launchApp: Launching app com.example.mobile
+11:59:05.662 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Launch app "com.example.mobile" with clear state COMPLETED
+11:59:05.662 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Run includes/login-as-test-user.yaml RUNNING
+11:59:05.662 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Apply configuration RUNNING
+11:59:05.662 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Apply configuration COMPLETED
+11:59:05.663 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Assert that "欢迎使用 Social World" is visible RUNNING
+11:59:07.443 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Assert that "欢迎使用 Social World" is visible COMPLETED
+11:59:07.443 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Assert that "手机号一键登录" is visible RUNNING
+11:59:07.959 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Assert that "手机号一键登录" is visible COMPLETED
+11:59:07.959 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Tap on "手机号" RUNNING
+11:59:08.016 [ INFO] maestro.Maestro.tap-BUbHBYE: Tapping on element:  UiElement(treeNode=TreeNode(attributes={text=, accessibilityText=, hintText=手机号, ignoreBoundsFiltering=false, resource-id=, clickable=true, bounds=[42,677][1038,809], enabled=true, focused=false, checked=false, scrollable=false, selected=false, class=android.widget.EditText}, children=[], clickable=true, enabled=true, focused=false, checked=false, selected=false), bounds=Bounds(x=42, y=677, width=996, height=132))
+11:59:09.169 [ INFO] maestro.Maestro.tap-BUbHBYE: Refreshed element
+11:59:09.169 [ INFO] maestro.Maestro.hierarchyBasedTap-hbl3e4M: Tapping at (540, 743) using hierarchy based logic for wait
+11:59:09.169 [TRACE] maestro.utils.ScreenshotUtils.takeScreenshot: Taking screenshot to byte array
+11:59:09.169 [TRACE] maestro.utils.ScreenshotUtils.takeScreenshot: Taking screenshot to output sink
+11:59:10.807 [ INFO] maestro.Maestro.hierarchyBasedTap-hbl3e4M: Something have changed in the UI judging by view hierarchy. Proceed.
+11:59:10.807 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Tap on "手机号" COMPLETED
+11:59:10.807 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Input text 13800138000 RUNNING
+11:59:10.807 [ INFO] maestro.Maestro.inputText: Inputting text: 13800138000
+11:59:12.864 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Input text 13800138000 COMPLETED
+11:59:12.864 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Tap on "获取验证码" RUNNING
+11:59:12.934 [ INFO] maestro.Maestro.tap-BUbHBYE: Tapping on element:  UiElement(treeNode=TreeNode(attributes={text=, accessibilityText=获取验证码, hintText=, ignoreBoundsFiltering=false, resource-id=, clickable=true, bounds=[720,851][1038,998], enabled=true, focused=false, checked=false, scrollable=false, selected=false, class=android.widget.Button}, children=[], clickable=true, enabled=true, focused=false, checked=false, selected=false), bounds=Bounds(x=720, y=851, width=318, height=147))
+11:59:14.021 [ INFO] maestro.Maestro.tap-BUbHBYE: Refreshed element
+11:59:14.021 [ INFO] maestro.Maestro.hierarchyBasedTap-hbl3e4M: Tapping at (879, 924) using hierarchy based logic for wait
+11:59:14.021 [TRACE] maestro.utils.ScreenshotUtils.takeScreenshot: Taking screenshot to byte array
+11:59:14.021 [TRACE] maestro.utils.ScreenshotUtils.takeScreenshot: Taking screenshot to output sink
+11:59:15.043 [ INFO] maestro.Maestro.hierarchyBasedTap-hbl3e4M: Something have changed in the UI judging by view hierarchy. Proceed.
+11:59:15.043 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Tap on "获取验证码" COMPLETED
+11:59:15.043 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Tap on "验证码" RUNNING
+11:59:15.111 [ INFO] maestro.Maestro.tap-BUbHBYE: Tapping on element:  UiElement(treeNode=TreeNode(attributes={text=, accessibilityText=, hintText=验证码, ignoreBoundsFiltering=false, resource-id=, clickable=true, bounds=[42,861][678,987], enabled=true, focused=false, checked=false, scrollable=false, selected=false, class=android.widget.EditText}, children=[], clickable=true, enabled=true, focused=false, checked=false, selected=false), bounds=Bounds(x=42, y=861, width=636, height=126))
+11:59:16.153 [ INFO] maestro.Maestro.tap-BUbHBYE: Refreshed element
+11:59:16.153 [ INFO] maestro.Maestro.hierarchyBasedTap-hbl3e4M: Tapping at (360, 924) using hierarchy based logic for wait
+11:59:16.153 [TRACE] maestro.utils.ScreenshotUtils.takeScreenshot: Taking screenshot to byte array
+11:59:16.153 [TRACE] maestro.utils.ScreenshotUtils.takeScreenshot: Taking screenshot to output sink
+11:59:17.095 [ INFO] maestro.Maestro.hierarchyBasedTap-hbl3e4M: Something have changed in the UI judging by view hierarchy. Proceed.
+11:59:17.095 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Tap on "验证码" COMPLETED
+11:59:17.095 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Input text 123456 RUNNING
+11:59:17.095 [ INFO] maestro.Maestro.inputText: Inputting text: 123456
+11:59:18.984 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Input text 123456 COMPLETED
+11:59:18.984 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Hide Keyboard RUNNING
+11:59:18.984 [ INFO] maestro.Maestro.hideKeyboard: Hiding Keyboard
+11:59:20.163 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Hide Keyboard COMPLETED
+11:59:20.163 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Tap on "登录" RUNNING
+11:59:20.183 [ INFO] maestro.Maestro.tap-BUbHBYE: Tapping on element:  UiElement(treeNode=TreeNode(attributes={text=, accessibilityText=登录, hintText=, ignoreBoundsFiltering=false, resource-id=, clickable=true, bounds=[42,1082][1038,1208], enabled=true, focused=false, checked=false, scrollable=false, selected=false, class=android.widget.Button}, children=[], clickable=true, enabled=true, focused=false, checked=false, selected=false), bounds=Bounds(x=42, y=1082, width=996, height=126))
+11:59:21.105 [ INFO] maestro.Maestro.tap-BUbHBYE: Refreshed element
+11:59:21.106 [ INFO] maestro.Maestro.hierarchyBasedTap-hbl3e4M: Tapping at (540, 1145) using hierarchy based logic for wait
+11:59:21.106 [TRACE] maestro.utils.ScreenshotUtils.takeScreenshot: Taking screenshot to byte array
+11:59:21.106 [TRACE] maestro.utils.ScreenshotUtils.takeScreenshot: Taking screenshot to output sink
+11:59:22.178 [ INFO] maestro.Maestro.hierarchyBasedTap-hbl3e4M: Something have changed in the UI judging by view hierarchy. Proceed.
+11:59:22.179 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Tap on "登录" COMPLETED
+11:59:22.179 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Run includes/login-as-test-user.yaml COMPLETED
+11:59:22.179 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Tap on id: tab_messages RUNNING
+11:59:39.299 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Tap on id: tab_messages FAILED
+11:59:39.300 [ INFO] maestro.Maestro.takeScreenshot: Taking screenshot
+11:59:39.300 [TRACE] maestro.utils.ScreenshotUtils.takeScreenshot: Taking screenshot to output sink
+11:59:39.401 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Define variables RUNNING
+11:59:39.402 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Define variables COMPLETED
+11:59:39.402 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Apply configuration RUNNING
+11:59:39.402 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Apply configuration COMPLETED
+11:59:39.402 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Launch app "com.example.mobile" with clear state RUNNING
+11:59:39.402 [ INFO] maestro.Maestro.clearAppState: Clearing app state com.example.mobile
+11:59:40.246 [ INFO] maestro.Maestro.launchApp: Launching app com.example.mobile
+11:59:40.311 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Launch app "com.example.mobile" with clear state COMPLETED
+11:59:40.311 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Run includes/login-as-test-user.yaml RUNNING
+11:59:40.311 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Apply configuration RUNNING
+11:59:40.311 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Apply configuration COMPLETED
+11:59:40.311 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Assert that "欢迎使用 Social World" is visible RUNNING
+11:59:41.713 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Assert that "欢迎使用 Social World" is visible COMPLETED
+11:59:41.713 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Assert that "手机号一键登录" is visible RUNNING
+11:59:42.642 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Assert that "手机号一键登录" is visible COMPLETED
+11:59:42.642 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Tap on "手机号" RUNNING
+11:59:42.703 [ INFO] maestro.Maestro.tap-BUbHBYE: Tapping on element:  UiElement(treeNode=TreeNode(attributes={text=, accessibilityText=, hintText=手机号, ignoreBoundsFiltering=false, resource-id=, clickable=true, bounds=[42,677][1038,809], enabled=true, focused=false, checked=false, scrollable=false, selected=false, class=android.widget.EditText}, children=[], clickable=true, enabled=true, focused=false, checked=false, selected=false), bounds=Bounds(x=42, y=677, width=996, height=132))
+11:59:43.779 [ INFO] maestro.Maestro.tap-BUbHBYE: Refreshed element
+11:59:43.779 [ INFO] maestro.Maestro.hierarchyBasedTap-hbl3e4M: Tapping at (540, 743) using hierarchy based logic for wait
+11:59:43.779 [TRACE] maestro.utils.ScreenshotUtils.takeScreenshot: Taking screenshot to byte array
+11:59:43.779 [TRACE] maestro.utils.ScreenshotUtils.takeScreenshot: Taking screenshot to output sink
+11:59:45.199 [ INFO] maestro.Maestro.hierarchyBasedTap-hbl3e4M: Something have changed in the UI judging by view hierarchy. Proceed.
+11:59:45.199 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Tap on "手机号" COMPLETED
+11:59:45.199 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Input text 13800138000 RUNNING
+11:59:45.199 [ INFO] maestro.Maestro.inputText: Inputting text: 13800138000
+11:59:47.185 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Input text 13800138000 COMPLETED
+11:59:47.186 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Tap on "获取验证码" RUNNING
+11:59:47.215 [ INFO] maestro.Maestro.tap-BUbHBYE: Tapping on element:  UiElement(treeNode=TreeNode(attributes={text=, accessibilityText=获取验证码, hintText=, ignoreBoundsFiltering=false, resource-id=, clickable=true, bounds=[720,851][1038,998], enabled=true, focused=false, checked=false, scrollable=false, selected=false, class=android.widget.Button}, children=[], clickable=true, enabled=true, focused=false, checked=false, selected=false), bounds=Bounds(x=720, y=851, width=318, height=147))
+11:59:48.340 [ INFO] maestro.Maestro.tap-BUbHBYE: Refreshed element
+11:59:48.341 [ INFO] maestro.Maestro.hierarchyBasedTap-hbl3e4M: Tapping at (879, 924) using hierarchy based logic for wait
+11:59:48.341 [TRACE] maestro.utils.ScreenshotUtils.takeScreenshot: Taking screenshot to byte array
+11:59:48.341 [TRACE] maestro.utils.ScreenshotUtils.takeScreenshot: Taking screenshot to output sink
+11:59:49.472 [ INFO] maestro.Maestro.hierarchyBasedTap-hbl3e4M: Something have changed in the UI judging by view hierarchy. Proceed.
+11:59:49.472 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Tap on "获取验证码" COMPLETED
+11:59:49.472 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Tap on "验证码" RUNNING
+11:59:49.654 [ INFO] maestro.Maestro.tap-BUbHBYE: Tapping on element:  UiElement(treeNode=TreeNode(attributes={text=, accessibilityText=, hintText=验证码, ignoreBoundsFiltering=false, resource-id=, clickable=true, bounds=[42,861][678,987], enabled=true, focused=false, checked=false, scrollable=false, selected=false, class=android.widget.EditText}, children=[], clickable=true, enabled=true, focused=false, checked=false, selected=false), bounds=Bounds(x=42, y=861, width=636, height=126))
+11:59:50.516 [ INFO] maestro.Maestro.tap-BUbHBYE: Refreshed element
+11:59:50.516 [ INFO] maestro.Maestro.hierarchyBasedTap-hbl3e4M: Tapping at (360, 924) using hierarchy based logic for wait
+11:59:50.516 [TRACE] maestro.utils.ScreenshotUtils.takeScreenshot: Taking screenshot to byte array
+11:59:50.516 [TRACE] maestro.utils.ScreenshotUtils.takeScreenshot: Taking screenshot to output sink
+11:59:51.488 [ INFO] maestro.Maestro.hierarchyBasedTap-hbl3e4M: Something have changed in the UI judging by view hierarchy. Proceed.
+11:59:51.489 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Tap on "验证码" COMPLETED
+11:59:51.489 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Input text 123456 RUNNING
+11:59:51.489 [ INFO] maestro.Maestro.inputText: Inputting text: 123456
+11:59:53.311 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Input text 123456 COMPLETED
+11:59:53.311 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Hide Keyboard RUNNING
+11:59:53.311 [ INFO] maestro.Maestro.hideKeyboard: Hiding Keyboard
+11:59:54.422 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Hide Keyboard COMPLETED
+11:59:54.422 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Tap on "登录" RUNNING
+11:59:54.440 [ INFO] maestro.Maestro.tap-BUbHBYE: Tapping on element:  UiElement(treeNode=TreeNode(attributes={text=, accessibilityText=登录, hintText=, ignoreBoundsFiltering=false, resource-id=, clickable=true, bounds=[42,1082][1038,1208], enabled=true, focused=false, checked=false, scrollable=false, selected=false, class=android.widget.Button}, children=[], clickable=true, enabled=true, focused=false, checked=false, selected=false), bounds=Bounds(x=42, y=1082, width=996, height=126))
+11:59:55.523 [ INFO] maestro.Maestro.tap-BUbHBYE: Refreshed element
+11:59:55.523 [ INFO] maestro.Maestro.hierarchyBasedTap-hbl3e4M: Tapping at (540, 1145) using hierarchy based logic for wait
+11:59:55.523 [TRACE] maestro.utils.ScreenshotUtils.takeScreenshot: Taking screenshot to byte array
+11:59:55.523 [TRACE] maestro.utils.ScreenshotUtils.takeScreenshot: Taking screenshot to output sink
+11:59:57.273 [ INFO] maestro.Maestro.hierarchyBasedTap-hbl3e4M: Something have changed in the UI judging by view hierarchy. Proceed.
+11:59:57.274 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Tap on "登录" COMPLETED
+11:59:57.274 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Run includes/login-as-test-user.yaml COMPLETED
+11:59:57.281 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Define variables RUNNING
+11:59:57.281 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Define variables COMPLETED
+11:59:57.281 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Apply configuration RUNNING
+11:59:57.282 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Apply configuration COMPLETED
+11:59:57.282 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Launch app "com.example.mobile" with clear state RUNNING
+11:59:57.282 [ INFO] maestro.Maestro.clearAppState: Clearing app state com.example.mobile
+11:59:58.134 [ INFO] maestro.Maestro.launchApp: Launching app com.example.mobile
+11:59:58.189 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Launch app "com.example.mobile" with clear state COMPLETED
+11:59:58.190 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Assert that "完善资料" is visible RUNNING
+12:00:15.305 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Assert that "完善资料" is visible FAILED
+12:00:15.306 [ INFO] maestro.Maestro.takeScreenshot: Taking screenshot
+12:00:15.306 [TRACE] maestro.utils.ScreenshotUtils.takeScreenshot: Taking screenshot to output sink
+12:00:15.416 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Define variables RUNNING
+12:00:15.416 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Define variables COMPLETED
+12:00:15.416 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Apply configuration RUNNING
+12:00:15.416 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Apply configuration COMPLETED
+12:00:15.416 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Launch app "com.example.mobile" with clear state RUNNING
+12:00:15.416 [ INFO] maestro.Maestro.clearAppState: Clearing app state com.example.mobile
+12:00:16.116 [ INFO] maestro.Maestro.launchApp: Launching app com.example.mobile
+12:00:16.167 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Launch app "com.example.mobile" with clear state COMPLETED
+12:00:16.168 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Assert that "开发工具" is visible RUNNING
+12:00:19.147 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Assert that "开发工具" is visible COMPLETED
+12:00:19.147 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Tap on id: dev_tools_toggle_button RUNNING
+12:00:19.222 [ INFO] maestro.Maestro.tap-BUbHBYE: Tapping on element:  UiElement(treeNode=TreeNode(attributes={text=, accessibilityText=开发工具, hintText=, ignoreBoundsFiltering=false, resource-id=dev_tools_toggle_button, clickable=true, bounds=[912,1064][1059,1211], enabled=true, focused=false, checked=false, scrollable=false, selected=false, class=android.widget.Button}, children=[], clickable=true, enabled=true, focused=false, checked=false, selected=false), bounds=Bounds(x=912, y=1064, width=147, height=147))
+12:00:20.362 [ INFO] maestro.Maestro.tap-BUbHBYE: Refreshed element
+12:00:20.364 [ INFO] maestro.Maestro.hierarchyBasedTap-hbl3e4M: Tapping at (985, 1137) using hierarchy based logic for wait
+12:00:20.365 [TRACE] maestro.utils.ScreenshotUtils.takeScreenshot: Taking screenshot to byte array
+12:00:20.365 [TRACE] maestro.utils.ScreenshotUtils.takeScreenshot: Taking screenshot to output sink
+12:00:21.628 [ INFO] maestro.Maestro.hierarchyBasedTap-hbl3e4M: Something have changed in the UI judging by view hierarchy. Proceed.
+12:00:21.628 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Tap on id: dev_tools_toggle_button COMPLETED
+12:00:21.628 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Assert that "服务器地址" is visible RUNNING
+12:00:21.701 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Assert that "服务器地址" is visible COMPLETED
+12:00:21.710 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Define variables RUNNING
+12:00:21.712 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Define variables COMPLETED
+12:00:21.712 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Apply configuration RUNNING
+12:00:21.712 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Apply configuration COMPLETED
+12:00:21.712 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Launch app "com.example.mobile" with clear state RUNNING
+12:00:21.712 [ INFO] maestro.Maestro.clearAppState: Clearing app state com.example.mobile
+12:00:22.548 [ INFO] maestro.Maestro.launchApp: Launching app com.example.mobile
+12:00:22.600 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Launch app "com.example.mobile" with clear state COMPLETED
+12:00:22.600 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Tap on id: dev_tools_toggle_button RUNNING
+12:00:24.122 [ INFO] maestro.Maestro.tap-BUbHBYE: Tapping on element:  UiElement(treeNode=TreeNode(attributes={text=, accessibilityText=开发工具, hintText=, ignoreBoundsFiltering=false, resource-id=dev_tools_toggle_button, clickable=true, bounds=[912,1064][1059,1211], enabled=true, focused=false, checked=false, scrollable=false, selected=false, class=android.widget.Button}, children=[], clickable=true, enabled=true, focused=false, checked=false, selected=false), bounds=Bounds(x=912, y=1064, width=147, height=147))
+12:00:25.460 [ INFO] maestro.Maestro.tap-BUbHBYE: Refreshed element
+12:00:25.460 [ INFO] maestro.Maestro.hierarchyBasedTap-hbl3e4M: Tapping at (985, 1137) using hierarchy based logic for wait
+12:00:25.460 [TRACE] maestro.utils.ScreenshotUtils.takeScreenshot: Taking screenshot to byte array
+12:00:25.460 [TRACE] maestro.utils.ScreenshotUtils.takeScreenshot: Taking screenshot to output sink
+12:00:26.541 [ INFO] maestro.Maestro.hierarchyBasedTap-hbl3e4M: Something have changed in the UI judging by view hierarchy. Proceed.
+12:00:26.541 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Tap on id: dev_tools_toggle_button COMPLETED
+12:00:26.541 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Assert that "服务器地址" is visible RUNNING
+12:00:26.616 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Assert that "服务器地址" is visible COMPLETED
+12:00:26.616 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Tap on id: server_base_url_field RUNNING
+12:00:26.702 [ INFO] maestro.Maestro.tap-BUbHBYE: Tapping on element:  UiElement(treeNode=TreeNode(attributes={text=, accessibilityText=, hintText=Server Base URL
+服务器地址, ignoreBoundsFiltering=false, resource-id=server_base_url_field, clickable=false, bounds=[282,252][1038,806], enabled=true, focused=false, checked=false, scrollable=false, selected=false, class=android.widget.EditText}, children=[TreeNode(attributes={text=http://10.0.2.2:3001/api/v1, accessibilityText=, hintText=服务器地址, ignoreBoundsFiltering=false, resource-id=, clickable=true, bounds=[335,396][986,585], enabled=true, focused=false, checked=false, scrollable=false, selected=false, class=android.widget.EditText}, children=[], clickable=true, enabled=true, focused=false, checked=false, selected=false), TreeNode(attributes={text=, accessibilityText=保存配置, hintText=, ignoreBoundsFiltering=false, resource-id=, clickable=true, bounds=[335,627][986,753], enabled=true, focused=false, checked=false, scrollable=false, selected=false, class=android.widget.Button}, children=[], clickable=true, enabled=true, focused=false, checked=false, selected=false)], clickable=false, enabled=true, focused=false, checked=false, selected=false), bounds=Bounds(x=282, y=252, width=756, height=554))
+12:00:27.827 [ INFO] maestro.Maestro.tap-BUbHBYE: Refreshed element
+12:00:27.828 [ INFO] maestro.Maestro.hierarchyBasedTap-hbl3e4M: Tapping at (660, 529) using hierarchy based logic for wait
+12:00:27.828 [TRACE] maestro.utils.ScreenshotUtils.takeScreenshot: Taking screenshot to byte array
+12:00:27.828 [TRACE] maestro.utils.ScreenshotUtils.takeScreenshot: Taking screenshot to output sink
+12:00:29.873 [ INFO] maestro.Maestro.hierarchyBasedTap-hbl3e4M: Something have changed in the UI judging by view hierarchy. Proceed.
+12:00:29.874 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Tap on id: server_base_url_field COMPLETED
+12:00:29.874 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Input text http://192.168.1.100:3000/api/v1 RUNNING
+12:00:29.874 [ INFO] maestro.Maestro.inputText: Inputting text: http://192.168.1.100:3000/api/v1
+12:00:38.239 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Input text http://192.168.1.100:3000/api/v1 COMPLETED
+12:00:38.239 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Tap on "保存配置" RUNNING
+12:00:38.482 [ INFO] maestro.Maestro.tap-BUbHBYE: Tapping on element:  UiElement(treeNode=TreeNode(attributes={text=, accessibilityText=保存配置, hintText=, ignoreBoundsFiltering=false, resource-id=, clickable=true, bounds=[335,690][986,816], enabled=true, focused=false, checked=false, scrollable=false, selected=false, class=android.widget.Button}, children=[], clickable=true, enabled=true, focused=false, checked=false, selected=false), bounds=Bounds(x=335, y=690, width=651, height=126))
+12:00:39.706 [ INFO] maestro.Maestro.tap-BUbHBYE: Refreshed element
+12:00:39.706 [ INFO] maestro.Maestro.hierarchyBasedTap-hbl3e4M: Tapping at (660, 753) using hierarchy based logic for wait
+12:00:39.706 [TRACE] maestro.utils.ScreenshotUtils.takeScreenshot: Taking screenshot to byte array
+12:00:39.706 [TRACE] maestro.utils.ScreenshotUtils.takeScreenshot: Taking screenshot to output sink
+12:00:40.787 [ INFO] maestro.Maestro.hierarchyBasedTap-hbl3e4M: Something have changed in the UI judging by view hierarchy. Proceed.
+12:00:40.787 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Tap on "保存配置" COMPLETED
+12:00:40.787 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Assert that "保存成功，新配置已生效" is visible RUNNING
+12:00:40.910 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Assert that "保存成功，新配置已生效" is visible COMPLETED
+12:00:40.911 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Tap on id: server_base_url_field RUNNING
+12:00:40.992 [ INFO] maestro.Maestro.tap-BUbHBYE: Tapping on element:  UiElement(treeNode=TreeNode(attributes={text=, accessibilityText=, hintText=Server Base URL
+服务器地址, ignoreBoundsFiltering=false, resource-id=server_base_url_field, clickable=false, bounds=[282,252][1038,869], enabled=true, focused=false, checked=false, scrollable=false, selected=false, class=android.widget.EditText}, children=[TreeNode(attributes={text=http://192.168.1.100:3000/api/v1, accessibilityText=, hintText=服务器地址, ignoreBoundsFiltering=false, resource-id=, clickable=true, bounds=[335,396][986,648], enabled=true, focused=true, checked=false, scrollable=false, selected=false, class=android.widget.EditText}, children=[], clickable=true, enabled=true, focused=true, checked=false, selected=false), TreeNode(attributes={text=, accessibilityText=保存配置, hintText=, ignoreBoundsFiltering=false, resource-id=, clickable=true, bounds=[335,690][986,816], enabled=true, focused=false, checked=false, scrollable=false, selected=false, class=android.widget.Button}, children=[], clickable=true, enabled=true, focused=false, checked=false, selected=false)], clickable=false, enabled=true, focused=false, checked=false, selected=false), bounds=Bounds(x=282, y=252, width=756, height=617))
+12:00:42.088 [ INFO] maestro.Maestro.tap-BUbHBYE: Refreshed element
+12:00:42.088 [ INFO] maestro.Maestro.hierarchyBasedTap-hbl3e4M: Tapping at (660, 560) using hierarchy based logic for wait
+12:00:42.088 [TRACE] maestro.utils.ScreenshotUtils.takeScreenshot: Taking screenshot to byte array
+12:00:42.088 [TRACE] maestro.utils.ScreenshotUtils.takeScreenshot: Taking screenshot to output sink
+12:00:43.065 [TRACE] maestro.utils.ScreenshotUtils.takeScreenshot: Taking screenshot to byte array
+12:00:43.065 [TRACE] maestro.utils.ScreenshotUtils.takeScreenshot: Taking screenshot to output sink
+12:00:43.380 [ INFO] maestro.Maestro.hierarchyBasedTap-hbl3e4M: Screenshots are not different enough (d=0.0)
+12:00:43.380 [ INFO] maestro.Maestro.hierarchyBasedTap-hbl3e4M: Nothing changed in the UI.
+12:00:43.725 [TRACE] maestro.utils.ScreenshotUtils.takeScreenshot: Taking screenshot to byte array
+12:00:43.725 [TRACE] maestro.utils.ScreenshotUtils.takeScreenshot: Taking screenshot to output sink
+12:00:44.306 [ INFO] maestro.Maestro.hierarchyBasedTap-hbl3e4M: Something have changed in the UI judging by screenshot (d=0.0071922657). Proceed.
+12:00:44.312 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Tap on id: server_base_url_field COMPLETED
+12:00:44.312 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Input text http://example.com:8080/api/v2 RUNNING
+12:00:44.312 [ INFO] maestro.Maestro.inputText: Inputting text: http://example.com:8080/api/v2
+12:00:49.019 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Input text http://example.com:8080/api/v2 COMPLETED
+12:00:49.019 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Tap on "保存配置" RUNNING
+12:00:49.087 [ INFO] maestro.Maestro.tap-BUbHBYE: Tapping on element:  UiElement(treeNode=TreeNode(attributes={text=, accessibilityText=保存配置, hintText=, ignoreBoundsFiltering=false, resource-id=, clickable=true, bounds=[335,816][986,942], enabled=true, focused=false, checked=false, scrollable=false, selected=false, class=android.widget.Button}, children=[], clickable=true, enabled=true, focused=false, checked=false, selected=false), bounds=Bounds(x=335, y=816, width=651, height=126))
+12:00:50.184 [ INFO] maestro.Maestro.tap-BUbHBYE: Refreshed element
+12:00:50.184 [ INFO] maestro.Maestro.hierarchyBasedTap-hbl3e4M: Tapping at (660, 879) using hierarchy based logic for wait
+12:00:50.184 [TRACE] maestro.utils.ScreenshotUtils.takeScreenshot: Taking screenshot to byte array
+12:00:50.184 [TRACE] maestro.utils.ScreenshotUtils.takeScreenshot: Taking screenshot to output sink
+12:00:51.223 [ INFO] maestro.Maestro.hierarchyBasedTap-hbl3e4M: Something have changed in the UI judging by view hierarchy. Proceed.
+12:00:51.223 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Tap on "保存配置" COMPLETED
+12:00:51.223 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Assert that "保存成功，新配置已生效" is visible RUNNING
+12:00:51.300 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Assert that "保存成功，新配置已生效" is visible COMPLETED
+12:00:51.300 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Tap on id: server_base_url_field RUNNING
+12:00:51.391 [ INFO] maestro.Maestro.tap-BUbHBYE: Tapping on element:  UiElement(treeNode=TreeNode(attributes={text=, accessibilityText=, hintText=Server Base URL
+服务器地址, ignoreBoundsFiltering=false, resource-id=server_base_url_field, clickable=false, bounds=[282,252][1038,995], enabled=true, focused=false, checked=false, scrollable=false, selected=false, class=android.widget.EditText}, children=[TreeNode(attributes={text=http://192.168.1.100:3000/api/v1http://example.com:8080/api/v2, accessibilityText=, hintText=服务器地址, ignoreBoundsFiltering=false, resource-id=, clickable=true, bounds=[335,396][986,774], enabled=true, focused=true, checked=false, scrollable=false, selected=false, class=android.widget.EditText}, children=[], clickable=true, enabled=true, focused=true, checked=false, selected=false), TreeNode(attributes={text=, accessibilityText=保存配置, hintText=, ignoreBoundsFiltering=false, resource-id=, clickable=true, bounds=[335,816][986,942], enabled=true, focused=false, checked=false, scrollable=false, selected=false, class=android.widget.Button}, children=[], clickable=true, enabled=true, focused=false, checked=false, selected=false)], clickable=false, enabled=true, focused=false, checked=false, selected=false), bounds=Bounds(x=282, y=252, width=756, height=743))
+12:00:52.562 [ INFO] maestro.Maestro.tap-BUbHBYE: Refreshed element
+12:00:52.563 [ INFO] maestro.Maestro.hierarchyBasedTap-hbl3e4M: Tapping at (660, 623) using hierarchy based logic for wait
+12:00:52.563 [TRACE] maestro.utils.ScreenshotUtils.takeScreenshot: Taking screenshot to byte array
+12:00:52.563 [TRACE] maestro.utils.ScreenshotUtils.takeScreenshot: Taking screenshot to output sink
+12:00:53.462 [TRACE] maestro.utils.ScreenshotUtils.takeScreenshot: Taking screenshot to byte array
+12:00:53.463 [TRACE] maestro.utils.ScreenshotUtils.takeScreenshot: Taking screenshot to output sink
+12:00:53.747 [ INFO] maestro.Maestro.hierarchyBasedTap-hbl3e4M: Something have changed in the UI judging by screenshot (d=0.006703028). Proceed.
+12:00:53.748 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Tap on id: server_base_url_field COMPLETED
+12:00:53.748 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Erase text RUNNING
+12:00:53.748 [ INFO] maestro.Maestro.eraseText: Erasing 50 characters
+12:00:58.215 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Erase text COMPLETED
+12:00:58.215 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Input text http://10.0.2.2:3001/api/v1 RUNNING
+12:00:58.215 [ INFO] maestro.Maestro.inputText: Inputting text: http://10.0.2.2:3001/api/v1
+12:01:02.634 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Input text http://10.0.2.2:3001/api/v1 COMPLETED
+12:01:02.634 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Tap on "保存配置" RUNNING
+12:01:02.707 [ INFO] maestro.Maestro.tap-BUbHBYE: Tapping on element:  UiElement(treeNode=TreeNode(attributes={text=, accessibilityText=保存配置, hintText=, ignoreBoundsFiltering=false, resource-id=, clickable=true, bounds=[335,879][986,1005], enabled=true, focused=false, checked=false, scrollable=false, selected=false, class=android.widget.Button}, children=[], clickable=true, enabled=true, focused=false, checked=false, selected=false), bounds=Bounds(x=335, y=879, width=651, height=126))
+12:01:03.794 [ INFO] maestro.Maestro.tap-BUbHBYE: Refreshed element
+12:01:03.795 [ INFO] maestro.Maestro.hierarchyBasedTap-hbl3e4M: Tapping at (660, 942) using hierarchy based logic for wait
+12:01:03.795 [TRACE] maestro.utils.ScreenshotUtils.takeScreenshot: Taking screenshot to byte array
+12:01:03.795 [TRACE] maestro.utils.ScreenshotUtils.takeScreenshot: Taking screenshot to output sink
+12:01:04.831 [ INFO] maestro.Maestro.hierarchyBasedTap-hbl3e4M: Something have changed in the UI judging by view hierarchy. Proceed.
+12:01:04.831 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Tap on "保存配置" COMPLETED
+12:01:04.831 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Assert that "保存成功，新配置已生效" is visible RUNNING
+12:01:04.906 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Assert that "保存成功，新配置已生效" is visible COMPLETED

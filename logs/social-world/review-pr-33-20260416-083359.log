@@ -1,0 +1,2418 @@
+[2026-04-16 08:33:59] PR #33 Review 启动
+分支: design/issue-4
+项目路径: ../../social-world
+日志文件: /Users/insulate/Desktop/new-world/new-world-ops/logs/social-world/review-pr-33-20260416-083359.log
+【任务上下文】
+- PR 编号: #33
+- 项目路径: ../../social-world
+- 项目地图: ../../social-world/AGENTS.md
+- 关联 PRD: ../../social-world/prd/v1-dev-tools-drawer.md,../../social-world/prd
+/v1-auth-login.md,../../social-world/prd/v1-matching.md
+- 文档目录: ../../social-world/docs
+
+【辅助审查文件】
+以下文件已在工作目录中生成，请在审查时按需读取（若文件不存在或为空则跳过）：
+- 文档覆盖信息: /var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/review-pr-33-17
+91497718/.doc-coverage.txt
+- 设计资产列表: /var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/review-pr-33-17
+91497718/.design-assets.txt
+- Figma 链接: /var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/review-pr-33-1791
+497718/.figma-links.txt
+
+Review PR #33, branch: design/issue-4. After completing the review, you MUST wri
+te the full markdown report to logs/review-report-33.md
+TurnBegin(
+    user_input='【任务上下文】\n- PR 编号: #33\n- 项目路径: ../../social-world\n
+- 项目地图: ../../social-world/AGENTS.md\n- 关联 PRD: ../../social-world/prd/v1-
+dev-tools-drawer.md,../../social-world/prd/v1-auth-login.md,../../social-world/p
+rd/v1-matching.md\n- 文档目录: ../../social-world/docs\n\n【辅助审查文件】\n以下
+文件已在工作目录中生成，请在审查时按需读取（若文件不存在或为空则跳过）：\n- 文档
+覆盖信息: /var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/review-pr-33-17914977
+18/.doc-coverage.txt\n- 设计资产列表: /var/folders/lt/w3sl6z8j5v50vt2s6knvf5n000
+00gn/T/review-pr-33-1791497718/.design-assets.txt\n- Figma 链接: /var/folders/lt
+/w3sl6z8j5v50vt2s6knvf5n00000gn/T/review-pr-33-1791497718/.figma-links.txt\n\nRe
+view PR #33, branch: design/issue-4. After completing the review, you MUST write
+the full markdown report to logs/review-report-33.md'
+)
+StepBegin(n=1)
+ThinkPart(
+    type='think',
+    think='用户要求我审查 PR #33，分支为 design/issue-4。我需要按照系统提示中的
+审查流程进行：\n\n1. 先读取必要文件：AGENTS.md、PRD文件、文档覆盖信息、设计资产
+列表、Figma链接\n2. 检查 git diff\n3. 执行各项审查：全链路完整性、规范符合性、契
+约一致性、测试覆盖、文档同步、UI/设计一致性\n4. 输出报告到 logs/review-report-33
+.md\n\n让我先并行读取所有必要的参考文件。',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_SfTmCW23GpT7l567wSb7FwhR',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "../../social-world/AGENTS.md"}'
+    ),
+    extras=None
+)
+ToolCall(
+    type='function',
+    id='tool_oa3FsuODwykSDkHmkSFQGQVK',
+    function=FunctionBody(name='ReadFile', arguments=''),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_SfTmCW23GpT7l567wSb7FwhR',
+    return_value=ToolError(
+        is_error=True,
+        output='',
+        message='`../../social-world/AGENTS.md` is not an absolute path. You mus
+t provide an absolute path to read a file outside the working directory.',
+        display=[BriefDisplayBlock(type='brief', text='Invalid path')],
+        extras=None
+    )
+)
+ToolCallPart(
+    arguments_part='{"path": "/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/r
+eview-pr-33-1791497718/.doc-coverage.txt"}'
+)
+ToolCall(
+    type='function',
+    id='tool_WkKicLvAIXnvwXN3zMkWlkKj',
+    function=FunctionBody(name='ReadFile', arguments='{"'),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_oa3FsuODwykSDkHmkSFQGQVK',
+    return_value=ToolOk(
+        is_error=False,
+        output='     1\t=== PR 变更文件 ===\n     2\tdesigns/issue-4/design-spec
+.md\n     3\tdesigns/issue-4/docs-to-update.txt\n     4\tdesigns/issue-4/mockup.
+html\n     5\tdesigns/issue-4/wireframe.svg\n     6\tdocs/api/INDEX.md\n     7\t
+docs/api/matching.md\n     8\tdocs/api/socket-events.md\n     9\tdocs/modules/ma
+tching.md\n    10\tprd/v1-matching.md\n    11\t\n    12\t=== PR 中变更的文档文件
+===\n    13\tdocs/api/INDEX.md\n    14\tdocs/api/matching.md\n    15\tdocs/api/s
+ocket-events.md\n    16\tdocs/modules/matching.md\n    17\t\n    18\t=== 现有 do
+cs 目录结构（顶层） ===\n    19\tapi\n    20\tapi-contracts\n    21\tdesign-docs
+\n    22\texec-plans\n    23\tmodules\n    24\tproduct-specs\n    25\tQUALITY_SC
+ORE.md\n    26\t\n    27\tdocs/api:\n    28\tINDEX.md\n    29\tmatching.md\n    
+30\tsocket-events.md\n    31\t\n    32\tdocs/api-contracts:\n    33\tauth.yaml\n
+   34\tcommon.yaml\n    35\tim.yaml\n    36\tINDEX.md\n    37\tmatching.yaml\n  
+ 38\toss.yaml\n    39\tprofile.yaml\n    40\t\n    41\tdocs/design-docs:\n    42
+\tADR-001-monorepo.md\n    43\tapi.md\n    44\tcore-beliefs.md\n    45\tdb.md\n 
+  46\tflutter.md\n    47\tINDEX.md\n    48\tnestjs.md\n    49\tobservability.md\
+n    50\treadability.md\n    51\ttesting.md\n    52\tui-specs\n    53\tui-style-
+guide\n    54\t\n    55\tdocs/design-docs/ui-specs:\n    56\tauth\n    57\tdev-t
+ools\n    58\tprofile\n    59\t\n    60\tdocs/design-docs/ui-specs/auth:\n    61
+\tlogin-page-wireframe.md\n    62\t\n    63\tdocs/design-docs/ui-specs/dev-tools
+:\n    64\tdev-tools-drawer-wireframe.md\n    65\t\n    66\tdocs/design-docs/ui-
+specs/profile:\n    67\tprofile-edit-wireframe.md\n    68\tprofile-setup-wirefra
+me.md\n',
+        message='68 lines read from file starting from line 1. Total lines in fi
+le: 68. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(
+    arguments_part='path": "/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/rev
+iew-pr-33-1791497718/.design-assets.txt"}'
+)
+ToolCall(
+    type='function',
+    id='tool_h0Gt9eb68EI6zNBoEQGCckVJ',
+    function=FunctionBody(name='ReadFile', arguments='{"path": "/'),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_WkKicLvAIXnvwXN3zMkWlkKj',
+    return_value=ToolOk(
+        is_error=False,
+        output='     1\tdesigns/issue-4/wireframe.svg\n     2\t/var/folders/lt/w
+3sl6z8j5v50vt2s6knvf5n00000gn/T/review-pr-33-1791497718/designs/issue-4/wirefram
+e.svg\n     3\t/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/review-pr-33-179
+1497718/designs/issue-4/docs-to-update.txt\n     4\t/var/folders/lt/w3sl6z8j5v50
+vt2s6knvf5n00000gn/T/review-pr-33-1791497718/designs/issue-4/mockup.html\n     5
+\t/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/review-pr-33-1791497718/desig
+ns/issue-4/design-spec.md\n     6\t/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000g
+n/T/review-pr-33-1791497718/designs/issue-29/wireframe.svg\n     7\t/var/folders
+/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/review-pr-33-1791497718/designs/issue-29/do
+cs-to-update.txt\n     8\t/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/revie
+w-pr-33-1791497718/designs/issue-29/mockup.html\n     9\t/var/folders/lt/w3sl6z8
+j5v50vt2s6knvf5n00000gn/T/review-pr-33-1791497718/designs/issue-29/design-spec.m
+d\n',
+        message='9 lines read from file starting from line 1. Total lines in fil
+e: 9. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(
+    arguments_part='var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/review-pr-33
+-1791497718/.figma-links.txt"}'
+)
+ToolCall(
+    type='function',
+    id='tool_OuH4tUjP3I0IzG7ZnwA8pSJb',
+    function=FunctionBody(name='ReadFile', arguments='{"path": "../../'),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_h0Gt9eb68EI6zNBoEQGCckVJ',
+    return_value=ToolError(
+        is_error=True,
+        output='',
+        message='`/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/review-pr-33-
+1791497718/.figma-links.txt` does not exist.',
+        display=[BriefDisplayBlock(type='brief', text='File not found')],
+        extras=None
+    )
+)
+ToolCallPart(arguments_part='social-world/prd/v1-dev-tools-drawer.md"}')
+ToolCall(
+    type='function',
+    id='tool_jPt7t1klhMFjOZ45ApNvk8Bb',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "../../social-world/prd/v1-auth-login.md'
+    ),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_OuH4tUjP3I0IzG7ZnwA8pSJb',
+    return_value=ToolError(
+        is_error=True,
+        output='',
+        message='`../../social-world/prd/v1-dev-tools-drawer.md` is not an absol
+ute path. You must provide an absolute path to read a file outside the working d
+irectory.',
+        display=[BriefDisplayBlock(type='brief', text='Invalid path')],
+        extras=None
+    )
+)
+ToolCallPart(arguments_part='"}')
+ToolCall(
+    type='function',
+    id='tool_v3ETxZAxlGRx1PE1xeR2E3ZF',
+    function=FunctionBody(name='ReadFile', arguments='{"path":'),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_jPt7t1klhMFjOZ45ApNvk8Bb',
+    return_value=ToolError(
+        is_error=True,
+        output='',
+        message='`../../social-world/prd/v1-auth-login.md` is not an absolute pa
+th. You must provide an absolute path to read a file outside the working directo
+ry.',
+        display=[BriefDisplayBlock(type='brief', text='Invalid path')],
+        extras=None
+    )
+)
+ToolCallPart(arguments_part=' "../../social-world/prd/v1-matching.md"}')
+ToolResult(
+    tool_call_id='tool_v3ETxZAxlGRx1PE1xeR2E3ZF',
+    return_value=ToolError(
+        is_error=True,
+        output='',
+        message='`../../social-world/prd/v1-matching.md` is not an absolute path
+. You must provide an absolute path to read a file outside the working directory
+.',
+        display=[BriefDisplayBlock(type='brief', text='Invalid path')],
+        extras=None
+    )
+)
+StatusUpdate(
+    context_usage=0.02239227294921875,
+    context_tokens=5870,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=1518,
+        output=370,
+        input_cache_read=4352,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-mDdugupK4XHI3WW1ZBSmfVOg',
+    plan_mode=False,
+    mcp_status=None
+)
+StepBegin(n=2)
+ThinkPart(
+    type='think',
+    think='我需要获取项目的绝对路径。让我先检查当前工作目录，然后构建绝对路径。
+同时我已经获得了 .doc-coverage.txt 和 .design-assets.txt 的内容。\n\n.doc-covera
+ge.txt 显示：\n- PR 变更文件：designs/issue-4/design-spec.md, designs/issue-4/do
+cs-to-update.txt, designs/issue-4/mockup.html, designs/issue-4/wireframe.svg, do
+cs/api/INDEX.md, docs/api/matching.md, docs/api/socket-events.md, docs/modules/m
+atching.md, prd/v1-matching.md\n- 这是一个设计资产和文档更新为主的 PR，没有代码
+文件变更！\n\n让我先获取绝对路径，然后读取 PRD 和 git diff。',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_iwtDyJG7KhdQTlSlLWjrqH5t',
+    function=FunctionBody(
+        name='Shell',
+        arguments='{"command": "cd ../../social-world && pwd"}'
+    ),
+    extras=None
+)
+StatusUpdate(
+    context_usage=0.028980255126953125,
+    context_tokens=7597,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=1965,
+        output=170,
+        input_cache_read=5632,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-4z3foozdz7sKnTPgmWAyBu8p',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_iwtDyJG7KhdQTlSlLWjrqH5t',
+    return_value=ToolReturnValue(
+        is_error=True,
+        output='/bin/bash: line 0: cd: ../../social-world: No such file or direc
+tory\n',
+        message='Command failed with exit code: 1.',
+        display=[
+            BriefDisplayBlock(type='brief', text='Failed with exit code: 1')
+        ],
+        extras=None
+    )
+)
+StepBegin(n=3)
+ThinkPart(
+    type='think',
+    think='../../social-world 不存在，让我查看当前目录和寻找项目路径。',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_nCjHeiw2IVnE3q64K4fwMh0t',
+    function=FunctionBody(
+        name='Shell',
+        arguments='{"command": "pwd && ls -la && find / -maxdepth 4 -name \\"soc
+ial-world\\" -type d 2>/dev/null | head -20"}'
+    ),
+    extras=None
+)
+StatusUpdate(
+    context_usage=0.029827117919921875,
+    context_tokens=7819,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=395,
+        output=63,
+        input_cache_read=7424,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-LabHMAU5m7iG9LQQgT3M7mg4',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_nCjHeiw2IVnE3q64K4fwMh0t',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='/private/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/review-
+pr-33-1791497718\ntotal 888\ndrwx------@  33 insulate  staff    1056 Apr 16 08:3
+4 .\ndrwx------@ 720 insulate  staff   23040 Apr 16 08:34 ..\n-rw-r--r--@   1 in
+sulate  staff     866 Apr 16 08:34 .design-assets.txt\n-rw-r--r--@   1 insulate 
+staff    1085 Apr 16 08:34 .doc-coverage.txt\n-rw-r--r--@   1 insulate  staff   
+ 694 Apr 16 08:34 .env.example\n-rw-r--r--@   1 insulate  staff      84 Apr 16 0
+8:34 .git\ndrwxr-xr-x@   4 insulate  staff     128 Apr 16 08:34 .github\n-rw-r--
+r--@   1 insulate  staff     779 Apr 16 08:34 .gitignore\ndrwxr-xr-x@   3 insula
+te  staff      96 Apr 16 08:34 .husky\ndrwxr-xr-x@   4 insulate  staff     128 A
+pr 16 08:34 .kimi\n-rw-r--r--@   1 insulate  staff   18066 Apr 16 08:34 AGENT-FI
+RST-PROJECT-SEED.md\n-rw-r--r--@   1 insulate  staff    2825 Apr 16 08:34 AGENTS
+.md\ndrwxr-xr-x@   5 insulate  staff     160 Apr 16 08:34 apps\n-rw-r--r--@   1 
+insulate  staff     292 Apr 16 08:34 CHANGELOG.md\ndrwxr-xr-x@   4 insulate  sta
+ff     128 Apr 16 08:34 designs\n-rw-r--r--@   1 insulate  staff    1991 Apr 16 
+08:34 docker-compose.yml\ndrwxr-xr-x@   9 insulate  staff     288 Apr 16 08:34 d
+ocs\n-rw-r--r--@   1 insulate  staff      53 Apr 16 08:34 go.mod\ndrwxr-xr-x@   
+3 insulate  staff      96 Apr 16 08:34 internal\ndrwxr-xr-x@   2 insulate  staff
+     64 Apr 16 08:34 logs\n-rw-r--r--@   1 insulate  staff    2509 Apr 16 08:34 
+Makefile\n-rw-r--r--@   1 insulate  staff     253 Apr 16 08:34 melos.yaml\n-rw-r
+--r--@   1 insulate  staff     154 Apr 16 08:34 openapitools.json\n-rw-r--r--@  
+1 insulate  staff     887 Apr 16 08:34 package.json\ndrwxr-xr-x@   4 insulate  s
+taff     128 Apr 16 08:34 packages\n-rw-r--r--@   1 insulate  staff  363710 Apr 
+16 08:34 pnpm-lock.yaml\n-rw-r--r--@   1 insulate  staff      40 Apr 16 08:34 pn
+pm-workspace.yaml\ndrwxr-xr-x@  10 insulate  staff     320 Apr 16 08:34 prd\n-rw
+-r--r--@   1 insulate  staff     206 Apr 16 08:34 pubspec.yaml\n-rw-r--r--@   1 
+insulate  staff    1670 Apr 16 08:34 README.md\ndrwxr-xr-x@  10 insulate  staff 
+   320 Apr 16 08:34 scripts\ndrwxr-xr-x@   4 insulate  staff     128 Apr 16 08:3
+4 tests\n-rw-r--r--@   1 insulate  staff     456 Apr 16 08:34 turbo.json\n/Users
+/insulate/Desktop/social-world\n',
+        message='Command executed successfully.',
+        display=[],
+        extras=None
+    )
+)
+StepBegin(n=4)
+ThinkPart(
+    type='think',
+    think='项目就在当前目录 /private/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000
+gn/T/review-pr-33-1791497718 下。让我读取必要的文件：AGENTS.md、PRD文件、设计资
+产、git diff 等。',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_EejK22wspeVPGMP44wu3f0KU',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "/private/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n0000
+0gn/T/review-pr-33-1791497718/AGENTS.md"}'
+    ),
+    extras=None
+)
+ToolCall(
+    type='function',
+    id='tool_wmBWG8Js1lUXkde2zsXfc0DI',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "/private/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n0000
+0gn'
+    ),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_EejK22wspeVPGMP44wu3f0KU',
+    return_value=ToolOk(
+        is_error=False,
+        output='     1\t# Social World 智能体导航地图\n     2\t\n     3\t> 仓库
+即唯一真实来源。不在仓库里的知识等于不存在。\n     4\t\n     5\t## 文档地图\n   
+ 6\t\n     7\t| 你要找什么     | 去哪里                                         
+                                     |\n     8\t| -------------- | -------------
+----------------------------------------------------------------------- |\n     
+9\t| 项目背景       | [README.md](README.md)                                    
+                          |\n    10\t| 编码与架构规范 | [docs/design-docs/INDEX.
+md](docs/design-docs/INDEX.md)                               |\n    11\t| UI 风
+格规范    | [docs/design-docs/ui-style-guide/INDEX.md](docs/design-docs/ui-style
+-guide/INDEX.md) |\n    12\t| 业务术语       | [docs/product-specs/glossary.md](
+docs/product-specs/glossary.md)                     |\n    13\t| 当前需求       
+| [prd/v1-mvp.md](prd/v1-mvp.md)                                                
+      |\n    14\t| 模块实现       | [docs/modules/INDEX.md](docs/modules/INDEX.m
+d)（含 profile）                         |\n    15\t| 技术债务       | [docs/exe
+c-plans/tech-debt-tracker.md](docs/exec-plans/tech-debt-tracker.md)         |\n 
+  16\t| Agent 配置     | `.kimi/agents/`                                        
+                             |\n    17\t| 子 Agent       | `.kimi/agents/subagen
+ts/`（explore / plan / coder）                                  |\n    18\t\n   
+19\t## 目录结构\n    20\t\n    21\t```\n    22\tdocs/design-docs/    # 架构规范
+、编码约定、数据库/API 规范\n    23\tdocs/product-specs/  # 业务术语、领域规则\n
+   24\tdocs/modules/        # 模块实现文档（跨代码层级）\n    25\tprd/          
+      # 产品需求文档\n    26\tapps/                # mobile (Flutter), api (Nest
+JS), admin (Next.js)\n    27\tpackages/            # shared-types, design-system
+\n    28\t```\n    29\t\n    30\t## 黄金原则\n    31\t\n    32\t1. **全链路交付*
+*：一个需求必须同时包含 DB + API + Mobile 的实现\n    33\t2. **契约同步**：`pack
+ages/shared-types/` 是前后端的唯一真实来源\n    34\t3. **约束即代码**：linter、h
+ooks、CI 会强制执行规则，不在规则里的约束等于不存在\n    35\t4. **效果优先**：先
+跑通端到端，再考虑优雅性\n    36\t\n    37\t## 常见任务\n    38\t\n    39\t| 任
+务             | 命令                                                  |\n    40
+\t| ---------------- | ----------------------------------------------------- |\n
+   41\t| 启动开发环境     | `make dev`                                          
+ |\n    42\t| 检查文档健康     | `make check-docs`                              
+      |\n    43\t| 运行测试         | `make test`                               
+           |\n    44\t| 安装 hooks       | `make hooks`                         
+                |\n    45\t| 启动开发 Agent   | `.kimi/agents/start-dev-agent.sh
+`                     |\n    46\t| 启动文档园丁     | `.kimi/agents/start-doc-ga
+rdener.sh`                  |\n    47\t| 启动 PR 文档园丁 | `.kimi/agents/start-
+pr-doc-gardener.sh [base-branch]` |\n',
+        message='47 lines read from file starting from line 1. Total lines in fi
+le: 47. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(
+    arguments_part='/T/review-pr-33-1791497718/prd/v1-dev-tools-drawer.md"}'
+)
+ToolCall(
+    type='function',
+    id='tool_HvSXAMMw9DQx6kYLprD3lsIk',
+    function=FunctionBody(name='ReadFile', arguments='{"path":'),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_wmBWG8Js1lUXkde2zsXfc0DI',
+    return_value=ToolOk(
+        is_error=False,
+        output='     1\t# V1 Dev Tools Drawer 产品需求文档\n     2\t\n     3\t> 
+状态：待评审  \n     4\t> 版本：1.0  \n     5\t> 日期：2026-04-10  \n     6\t> 
+关联 Issue：#29\n     7\t\n     8\t## 1. 背景与目标\n     9\t\n    10\t### 背景\
+n    11\tSocial World 采用前后端分离架构，开发/测试阶段需要频繁切换后端服务器地
+址（如本地 `localhost`、内网测试环境、Staging 环境）。当前修改 `baseUrl` 需要重
+新编译 App，效率较低。\n    12\t\n    13\t### 目标\n    14\t1. 在 Debug 模式下提
+供常驻悬浮入口，快速唤起开发工具抽屉。\n    15\t2. 支持在运行时修改 Server Base 
+URL，并持久化到本地存储。\n    16\t3. 确保 Release 模式下完全排除调试代码，不影
+响包体积与用户体验。\n    17\t\n    18\t---\n    19\t\n    20\t## 2. 用户故事与
+验收标准\n    21\t\n    22\t### US-DEVTOOLS-1：Debug 模式悬浮抽屉\n    23\t\n   
+24\t**作为** 移动开发者，  \n    25\t**我希望** 在 Debug 模式下从任意页面唤起开
+发工具抽屉，  \n    26\t**以便** 快速查看和修改调试配置。\n    27\t\n    28\t###
+# 验收标准\n    29\t\n    30\t```gherkin\n    31\tFeature: Dev Tools Drawer\n   
+32\t  Scenario: Debug mode shows the toggle button\n    33\t    Given the app is
+running in debug mode\n    34\t    Then a semi-transparent toggle button should 
+be visible on the right edge of the screen\n    35\t\n    36\t  Scenario: Releas
+e mode hides the toggle button\n    37\t    Given the app is running in release 
+mode\n    38\t    Then the dev tools toggle button should not exist in the widge
+t tree\n    39\t\n    40\t  Scenario: Open and close the drawer\n    41\t    Giv
+en the app is running in debug mode\n    42\t    When the user taps the toggle b
+utton\n    43\t    Then the dev tools drawer should slide in from the right\n   
+44\t    When the user taps the overlay mask or the close button\n    45\t    The
+n the drawer should slide out and disappear\n    46\t```\n    47\t\n    48\t####
+技术要求\n    49\t- 悬浮按钮位置：`Alignment.centerRight`，右侧距边 `8.0`。\n   
+50\t- 按钮尺寸：`56.0 × 56.0`，圆形，背景色 `DesignTokens.primary.withOpacity(0.
+85)`。\n    51\t- 抽屉宽度：屏幕宽度的 80%，最大 `320.0`。\n    52\t- 进入/退出
+动画：`SlideTransition`，时长 `250ms / 200ms`，曲线 `easeOutCubic / easeInCubic`
+。\n    53\t\n    54\t---\n    55\t\n    56\t### US-DEVTOOLS-2：运行时修改 Serve
+r Base URL\n    57\t\n    58\t**作为** 移动开发者，  \n    59\t**我希望** 在抽屉
+内修改 Server Base URL 并立即生效，  \n    60\t**以便** 在不重新编译的情况下切换
+后端环境。\n    61\t\n    62\t#### 验收标准\n    63\t\n    64\t```gherkin\n    6
+5\tFeature: Server Base URL Tool\n    66\t  Scenario: Save a valid URL\n    67\t
+   Given the dev tools drawer is open\n    68\t    And the current server base u
+rl is "http://localhost:3000/api/v1"\n    69\t    When the user enters "http://1
+92.168.1.100:3000/api/v1"\n    70\t    And the user taps the save button\n    71
+\t    Then the URL should be persisted to local storage\n    72\t    And a succe
+ss message should be shown\n    73\t    And the DioClient baseUrl should be upda
+ted\n    74\t\n    75\t  Scenario: Invalid URL shows error\n    76\t    Given th
+e dev tools drawer is open\n    77\t    When the user enters "not-a-url"\n    78
+\t    Then the input border should turn red\n    79\t    And an error caption sh
+ould appear\n    80\t    And the save button should be disabled\n    81\t\n    8
+2\t  Scenario: Empty URL shows error\n    83\t    Given the dev tools drawer is 
+open\n    84\t    When the user clears the input field\n    85\t    Then the inp
+ut border should turn red\n    86\t    And an error caption "请输入服务器地址" s
+hould appear\n    87\t    And the save button should be disabled\n    88\t```\n 
+  89\t\n    90\t#### 技术要求\n    91\t- 默认值：`const String.fromEnvironment(\
+'API_BASE_URL\', defaultValue: \'http://localhost:3000/api/v1\')`。\n    92\t- 
+校验规则：非空；必须以 `http://` 或 `https://` 开头。\n    93\t- 持久化键：`dev_
+tools_server_base_url`，使用 `SharedPreferences`。\n    94\t- 保存成功后通过 `Sn
+ackBar` 提示 "保存成功，新配置已生效"。\n    95\t\n    96\t---\n    97\t\n    98
+\t## 3. 非功能需求\n    99\t\n   100\t### 性能\n   101\t- 抽屉开闭动画必须保持 6
+0fps，不得引起页面掉帧。\n   102\t- SharedPreferences 读写为异步操作，保存按钮需
+进入 `isLoading` 状态防止重复提交。\n   103\t\n   104\t### 安全\n   105\t- Relea
+se 模式下调试代码必须完全不可见，且不得编译进产物（使用 `kDebugMode` 条件编译）
+。\n   106\t- 本地保存的 URL 仅用于开发/测试，不进入生产环境。\n   107\t\n   108
+\t### 兼容性\n   109\t- 支持 Android 10+ 和 iOS 14+。\n   110\t- 抽屉布局需适配 
+360dp ~ 414dp 屏幕宽度。\n   111\t\n   112\t---\n   113\t\n   114\t## 4. 里程碑\
+n   115\t\n   116\t| 阶段 | 目标 | 预计工期 |\n   117\t|------|------|----------
+|\n   118\t| M-DEVTOOLS-0 | UI 设计评审与 Design-Only PR | 1 天 |\n   119\t| M-D
+EVTOOLS-1 | DevTools Widget + Cubit + Repository 实现 | 1 天 |\n   120\t| M-DEVT
+OOLS-2 | DioClient 热重载 + Widget 测试 + BDD 测试 | 1 天 |\n   121\t\n   122\t*
+*总预计工期：3 天。**\n   123\t\n   124\t---\n   125\t\n   126\t## 5. 风险与回滚
+策略\n   127\t\n   128\t| 风险 | 影响 | 缓解措施 |\n   129\t|------|------|-----
+-----|\n   130\t| `kDebugMode` 使用不当导致 Release 包包含调试代码 | 高 | Code R
+eview 中强制检查所有新增调试 Widget 是否包裹在 `if (kDebugMode)` 中 |\n   131\t|
+非法 URL 导致 Dio 请求失败 | 低 | 保存前进行格式校验，错误时禁止保存 |\n   132\t
+| SharedPreferences 写入失败 | 低 | 捕获异常并显示错误提示，不影响主业务 |\n   1
+33\t\n   134\t### 回滚策略\n   135\t- **URL 配置错误**：开发者可随时重新打开抽屉
+修改回正确的 URL。\n   136\t- **调试代码误合入**：立即回滚 PR，并在 `docs/design
+-docs/flutter.md` 的 Debug-Only 规范中补充拦截规则。\n',
+        message='136 lines read from file starting from line 1. Total lines in f
+ile: 136. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(
+    arguments_part=' "/private/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/r
+eview-pr-33-1791497718/prd/v1-auth-login.md"}'
+)
+ToolCall(
+    type='function',
+    id='tool_BL4Rr6Jp1obicSqR4KQA1oF4',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "/private/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n0000
+0gn'
+    ),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_HvSXAMMw9DQx6kYLprD3lsIk',
+    return_value=ToolOk(
+        is_error=False,
+        output='     1\t# V1 Auth Login 产品需求文档\n     2\t\n     3\t> 状态：
+待评审  \n     4\t> 版本：1.0  \n     5\t> 日期：2026-04-10  \n     6\t> 关联 PR
+D：[prd/v1-mvp.md](./v1-mvp.md)\n     7\t\n     8\t## 1. 背景与目标\n     9\t\n 
+  10\t### 背景\n    11\tSocial World 是一款面向年轻人群的陌生人社交应用，用户在
+首次使用 App 时必须完成身份认证。V1 MVP 阶段要求认证流程足够轻量，以降低新用户流
+失率；同时需要为后续匹配、IM 等功能提供可信的 `user_id` 和 Token 机制。\n    12\
+t\n    13\t### 目标\n    14\t1. 支持新用户通过手机号 + SMS 验证码快速注册。\n   
+15\t2. 支持老用户通过手机号 + SMS 验证码快速登录。\n    16\t3. 建立安全的 JWT To
+ken 体系（Access 15min + Refresh 7天）。\n    17\t4. 支持 Token 静默刷新和主动登
+出。\n    18\t5. 新设备登录时，使旧设备 Refresh Token 失效，防止账号共享风险。\n
+   19\t6. 登录后根据资料完成度决定跳转目标（资料设置页 或 首页）。\n    20\t\n  
+ 21\t---\n    22\t\n    23\t## 2. 用户故事与验收标准\n    24\t\n    25\t### US-A
+UTH-1：新用户注册\n    26\t\n    27\t**作为** 新用户，  \n    28\t**我希望** 通
+过手机号和短信验证码注册账号，  \n    29\t**以便** 快速开始使用 App。\n    30\t\
+n    31\t#### 验收标准\n    32\t> 以上验收标准的完整 Gherkin 用例详见 `tests/bdd
+/auth_login.feature`。\n    33\t\n    34\t```gherkin\n    35\tFeature: Phone Num
+ber Registration\n    36\t  Scenario: New user registers successfully\n    37\t 
+  Given the user has never registered before\n    38\t    When the user enters a
+valid phone number "13800138000" and SMS code "123456"\n    39\t    Then a new u
+ser account should be created with phone "13800138000"\n    40\t    And the user
+should receive an access_token and a refresh_token\n    41\t    And the response
+code should be 0\n    42\t    And the user should be redirected to profile setup
+\n    43\t\n    44\t  Scenario: Invalid SMS code blocks registration\n    45\t  
+ Given the user has never registered before\n    46\t    When the user enters ph
+one "13800138000" and incorrect SMS code "999999"\n    47\t    Then registration
+should fail with code 1001\n    48\t    And no user account should be created\n 
+  49\t    And the response should not reveal whether the phone number exists\n  
+ 50\t\n    51\t  Scenario: Expired SMS code blocks registration\n    52\t    Giv
+en the user has requested an SMS code more than 5 minutes ago\n    53\t    When 
+the user enters the expired SMS code\n    54\t    Then registration should fail 
+with code 1001\n    55\t```\n    56\t\n    57\t#### 技术要求\n    58\t- 手机号作
+为唯一用户标识，格式校验中国大陆手机号 `1[3-9]\\d{9}`。\n    59\t- SMS 验证码 MV
+P 阶段使用固定码 `123456`（开发环境），生产环境接入阿里云短信。\n    60\t- 验证
+码有效期 5 分钟，存储于 Redis：`sms_code:{phone}`。\n    61\t- 注册成功后自动生
+成 UUID v7 作为 `user_id`。\n    62\t\n    63\t---\n    64\t\n    65\t### US-AUT
+H-2：老用户登录\n    66\t\n    67\t**作为** 已有账号的用户，  \n    68\t**我希望
+** 通过手机号和短信验证码快速登录，  \n    69\t**以便** 继续我的社交体验。\n    
+70\t\n    71\t#### 验收标准\n    72\t> 以上验收标准的完整 Gherkin 用例详见 `test
+s/bdd/auth_login.feature`。\n    73\t\n    74\t```gherkin\n    75\tFeature: Phon
+e Number Login\n    76\t  Scenario: Existing user logs in successfully\n    77\t
+   Given the user already has an account with phone "13800138000"\n    78\t    W
+hen the user enters phone "13800138000" and correct SMS code "123456"\n    79\t 
+  Then the user should receive a new access_token and refresh_token\n    80\t   
+And the response code should be 0\n    81\t    And the user should land on the h
+ome screen if profile is complete\n    82\t    And the user should be redirected
+to profile setup if profile is incomplete\n    83\t\n    84\t  Scenario: Invalid
+SMS code blocks login\n    85\t    Given the user already has an account\n    86
+\t    When the user enters an incorrect SMS code\n    87\t    Then login should 
+fail with code 1001\n    88\t    And the response should not reveal whether the 
+phone number exists\n    89\t```\n    90\t\n    91\t#### 技术要求\n    92\t- 登
+录接口与注册接口在 URL 层面可合并为 `POST /auth/login`（后端执行 findOrCreate）
+。\n    93\t- 返回体中必须包含 `is_new_user: boolean`，供 Mobile 判断是否为首次
+注册。\n    94\t- 登录成功后更新 `users.last_login_at` 字段。\n    95\t\n    96\
+t---\n    97\t\n    98\t### US-AUTH-3：Token 刷新\n    99\t\n   100\t**作为** 已
+登录用户，  \n   101\t**我希望** Access Token 过期后自动刷新，  \n   102\t**以便
+** 无需频繁重新登录。\n   103\t\n   104\t#### 验收标准\n   105\t> 以上验收标准的
+完整 Gherkin 用例详见 `tests/bdd/auth_login.feature`。\n   106\t\n   107\t```ghe
+rkin\n   108\tFeature: Token Refresh\n   109\t  Scenario: Refresh access token w
+ith valid refresh token\n   110\t    Given the user has a valid refresh_token\n 
+ 111\t    When the app calls POST /auth/refresh with the refresh_token\n   112\t
+   Then a new access_token and refresh_token pair should be returned\n   113\t  
+ And the old refresh_token should be invalidated\n   114\t    And the response c
+ode should be 0\n   115\t\n   116\t  Scenario: Expired refresh token forces re-l
+ogin\n   117\t    Given the user has an expired or revoked refresh_token\n   118
+\t    When the app calls POST /auth/refresh\n   119\t    Then the API should ret
+urn code 2001\n   120\t    And the app should redirect the user to the login scr
+een\n   121\t```\n   122\t\n   123\t#### 技术要求\n   124\t- Access Token 有效期
+15 分钟，Refresh Token 有效期 7 天。\n   125\t- Refresh Token 使用一次性（Rotati
+on）机制：刷新后旧 Refresh Token 立即失效。\n   126\t- Refresh Token 状态维护于 
+Redis：`refresh_token:{jti}`，存储 user_id 和过期时间。\n   127\t- Mobile 侧在收
+到 401 时，自动调用 `/auth/refresh`，成功后重试原请求。\n   128\t\n   129\t---\n
+  130\t\n   131\t### US-AUTH-4：主动登出\n   132\t\n   133\t**作为** 已登录用户
+，  \n   134\t**我希望** 能够主动登出，  \n   135\t**以便** 保护我的账号安全。\n
+  136\t\n   137\t#### 验收标准\n   138\t> 以上验收标准的完整 Gherkin 用例详见 `t
+ests/bdd/auth_login.feature`。\n   139\t\n   140\t```gherkin\n   141\tFeature: U
+ser Logout\n   142\t  Scenario: User logs out successfully\n   143\t    Given th
+e user is currently logged in\n   144\t    When the user taps "Log Out" and conf
+irms\n   145\t    Then the app should call POST /auth/logout\n   146\t    And th
+e current access_token and refresh_token should be invalidated\n   147\t    And 
+the app should clear all local tokens and redirect to the login screen\n   148\t
+```\n   149\t\n   150\t#### 技术要求\n   151\t- `POST /auth/logout` 接收当前 Acc
+ess Token 或 Refresh Token，将其加入 Redis 黑名单（TTL 与 Token 剩余有效期一致）
+。\n   152\t- Mobile 登出后必须清除 SecureStorage/Keychain 中的 Token。\n   153\
+t\n   154\t---\n   155\t\n   156\t### US-AUTH-5：多端登录安全\n   157\t\n   158\
+t**作为** 平台运营者，  \n   159\t**我希望** 新设备登录时使旧设备的 Refresh Toke
+n 失效，  \n   160\t**以便** 降低账号共享和被盗风险。\n   161\t\n   162\t#### 验
+收标准\n   163\t> 以上验收标准的完整 Gherkin 用例详见 `tests/bdd/auth_login.feat
+ure`。\n   164\t\n   165\t```gherkin\n   166\tFeature: Multi-Device Login Securi
+ty\n   167\t  Scenario: New device login invalidates old refresh token\n   168\t
+   Given the user is logged in on Device A\n   169\t    When the user logs in on
+Device B with the same phone number\n   170\t    Then Device A\'s refresh_token 
+should become invalid\n   171\t    And Device A should receive 2001 on the next 
+token refresh attempt\n   172\t    And Device B should receive a new valid token
+pair\n   173\t```\n   174\t\n   175\t#### 技术要求\n   176\t- Redis 中维护 `user
+_active_refresh:{user_id}`，记录当前唯一有效的 Refresh Token JTI。\n   177\t- 新
+登录发生时，覆盖该键值，并同时将旧 Refresh Token 加入黑名单。\n   178\t- 该策略
+仅针对 Refresh Token；Access Token 在旧设备上仍可继续使用至过期（15 分钟内），属
+于可接受风险。\n   179\t\n   180\t---\n   181\t\n   182\t## 3. 非功能需求\n   18
+3\t\n   184\t### 性能\n   185\t- `POST /auth/login` 响应时间 P95 < 300ms（不含短
+信发送延迟）。\n   186\t- `POST /auth/refresh` 响应时间 P95 < 150ms。\n   187\t\
+n   188\t### 安全\n   189\t- 所有认证相关 API 强制使用 HTTPS。\n   190\t- 验证码
+错误时返回统一错误码 `1001`，不区分「用户不存在」或「验证码错误」。\n   191\t- A
+ccess Token 和 Refresh Token 不存储于本地明文（Mobile 使用 Flutter `flutter_secu
+re_storage`）。\n   192\t- 登录接口增加基础速率限制：同一手机号 1 分钟内最多请求
+1 次验证码，1 小时内最多 5 次。\n   193\t\n   194\t### 兼容性\n   195\t- 支持 An
+droid 10+ 和 iOS 14+。\n   196\t- Token 刷新机制对 Mobile 开发者透明（通过 HTTP 
+Interceptor 实现）。\n   197\t\n   198\t---\n   199\t\n   200\t## 4. 里程碑\n   
+201\t\n   202\t| 阶段 | 目标 | 预计工期 |\n   203\t|------|------|----------|\n 
+ 204\t| M-AUTH-0 | UI 设计评审与 Design-Only PR（前置强制） | 1 天 |\n   205\t| 
+M-AUTH-1 | 注册/登录 API + SMS 验证码逻辑 + Mobile 登录页 + BDD 测试 | 2 天 |\n 
+ 206\t| M-AUTH-2 | Token 刷新 + 登出 + 多端安全 + Mobile 拦截器集成 | 1 天 |\n  
+207\t\n   208\t**总预计工期：4 天（含 M-AUTH-0）。**\n   209\t\n   210\t> **⚠️ 流
+程债务标注**：M-AUTH-1 实际开发中（PR #11）跳过了 M-AUTH-0，导致 `login_page.dar
+t` 未使用 `packages/design-system` 组件、缺失 Widgetbook 用例、无原型图 review 
+记录。该债务已录入 `docs/exec-plans/tech-debt-tracker.md`，需在 Issue #3 开始前
+优先清理。\n   211\t\n   212\t---\n   213\t\n   214\t## 5. 风险与回滚策略\n   21
+5\t\n   216\t| 风险 | 影响 | 缓解措施 |\n   217\t|------|------|----------|\n   
+218\t| 固定 SMS 码 `123456` 被滥用导致垃圾注册 | 中 | 生产环境切换真实短信通道前
+，开发环境通过白名单限制注册手机号 |\n   219\t| Token 刷新并发竞争导致同一 Refre
+sh Token 被使用两次 | 中 | Redis 对 Refresh Token 操作使用 Lua 脚本或分布式锁保
+证原子性 |\n   220\t| 旧设备 Access Token 在 15 分钟内仍可用 | 低 | MVP 阶段可接
+受；M2 后引入 Access Token 黑名单机制 |\n   221\t| **设计流程被跳过导致 UI 债务*
+* | **中** | **已更新 `docs/design-docs/flutter.md`，后续 Issue 必须强制执行 M-X
+X-0 的 Design-Only PR 卡点；当前债务需在 Issue #3 前清理** |\n   222\t\n   223\t
+### 回滚策略\n   224\t- **SMS 通道故障**：可在配置中切回固定码模式，保证开发/测
+试环境可用。\n   225\t- **Token 验证逻辑 Bug**：通过 Redis 批量清空 `refresh_tok
+en:*` 和黑名单，强制所有用户重新登录。\n',
+        message='225 lines read from file starting from line 1. Total lines in f
+ile: 225. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(arguments_part='/T/review-pr-33-1791497718/prd/v1-matching.md"}')
+ToolCall(
+    type='function',
+    id='tool_AX74AO2vgf2U1DNgjkYZixj9',
+    function=FunctionBody(name='Shell', arguments='{"command": "cd /'),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_BL4Rr6Jp1obicSqR4KQA1oF4',
+    return_value=ToolOk(
+        is_error=False,
+        output='     1\t# V1 Matching 产品需求文档\n     2\t\n     3\t> 状态：待
+评审  \n     4\t> 版本：1.0  \n     5\t> 日期：2026-04-10  \n     6\t> 关联 PRD
+：[prd/v1-mvp.md](./v1-mvp.md)\n     7\t>\n     8\t> 设计资产参见 [designs/issue
+-4/](../designs/issue-4/)\n     9\t\n    10\t## 1. 背景与目标\n    11\t\n    12\
+t### 背景\n    13\tSocial World 的核心体验是「滑动匹配」。用户在首页看到基于地理
+位置和偏好筛选推荐的卡片，通过左滑（Pass）或右滑（Like）表达喜好。当两个用户互相
+喜欢时，系统创建一次 `Match` 并自动开启 `Conversation`，促成后续的即时通讯。\n  
+ 14\t\n    15\t### 目标\n    16\t1. 为用户推荐附近符合偏好条件的异性/同性用户卡
+片。\n    17\t2. 支持左滑 Pass 和右滑 Like，操作幂等。\n    18\t3. 双向喜欢时自
+动创建 `Match` 和 `Conversation`，并实时推送通知。\n    19\t4. 排除已交互、已匹
+配、已拉黑和资料不完整的用户。\n    20\t5. 推荐结果缓存于 Redis，减少数据库查询
+压力。\n    21\t6. 支持「同城」「全国」两种距离范围切换。\n    22\t\n    23\t---
+\n    24\t\n    25\t## 2. 用户故事与验收标准\n    26\t\n    27\t### US-MATCH-1：
+获取推荐卡片\n    28\t\n    29\t**作为** 已完善资料的用户，  \n    30\t**我希望*
+* 看到附近符合条件的用户卡片，  \n    31\t**以便** 发现感兴趣的社交对象。\n    3
+2\t\n    33\t#### 验收标准\n    34\t> 以上验收标准的完整 Gherkin 用例详见 `tests
+/bdd/matching.feature`。\n    35\t\n    36\t```gherkin\n    37\tFeature: Card Re
+commendations\n    38\t  Scenario: User sees recommendation cards\n    39\t    G
+iven the user is on the home screen with a complete profile\n    40\t    And the
+re are 20 eligible candidates nearby\n    41\t    When the app requests GET /mat
+ching/recommendations\n    42\t    Then the user should receive a stack of up to
+20 profile cards\n    43\t    And each card should contain: user_id, nickname, a
+ge, distance, bio, avatar_url\n    44\t    And the cards should be sorted by com
+posite score\n    45\t\n    46\t  Scenario: Cache hit returns quickly\n    47\t 
+  Given the user has requested recommendations within the last 5 minutes\n    48
+\t    When the app requests GET /matching/recommendations again\n    49\t    The
+n the API should return cached results from Redis within 100ms\n    50\t\n    51
+\t  Scenario: No eligible candidates\n    52\t    Given the user is in a remote 
+area with no other users\n    53\t    When the app requests recommendations\n   
+54\t    Then the API should return an empty list\n    55\t    And the app should
+show an empty state "附近暂无可推荐用户"\n    56\t```\n    57\t\n    58\t#### 技
+术要求\n    59\t- 接口：`GET /matching/recommendations?mode=nearby&limit=20`。\n
+   60\t- `mode` 参数：`nearby`（默认 50km）、`city`（同城市，根据用户当前位置行
+政边界）、`nationwide`（全国）。\n    61\t- 过滤条件：\n    62\t  1. 目标用户资
+料完整。\n    63\t  2. 目标用户性别符合当前用户的 `preferred_gender`（若 `both` 
+则不限制）。\n    64\t  3. 当前用户性别符合目标用户的 `preferred_gender`（双向匹
+配偏好）。\n    65\t  4. 目标用户在设定距离范围内（Haversine 公式计算）。\n    6
+6\t  5. 排除已存在 `match_actions`（Like 或 Pass）的记录。\n    67\t  6. 排除已
+存在 `matches`（无论状态）的记录。\n    68\t  7. 排除 `blocks` 表中的双向屏蔽记
+录（blocker_id 或 blocked_id 为当前用户）。\n    69\t- 排序规则（综合得分）：\n 
+  70\t  - 距离越近越优先（权重 50%）：`score += (1 - distance / max_distance) * 
+0.5`\n    71\t  - 近期活跃用户优先（权重 30%）：根据 `last_active_at` 分档（24h 
+内 1.0，7 天内 0.7，30 天内 0.4，其余 0.1）。\n    72\t  - 新用户曝光加成（权重 
+20%）：注册 7 天内加 0.2。\n    73\t- Redis 缓存：`recommendations:{user_id}`，S
+tring（JSON）存储候选 `user_id` 列表和得分，TTL 5 分钟。\n    74\t- 缓存击穿防护
+：使用互斥锁（Redis `SET recommendations:lock:{user_id} NX EX 10`）。\n    75\t\
+n    76\t---\n    77\t\n    78\t### US-MATCH-2：滑动操作\n    79\t\n    80\t**作
+为** 用户，  \n    81\t**我希望** 通过左滑或右滑表达喜好，  \n    82\t**以便** 
+快速筛选感兴趣的人。\n    83\t\n    84\t#### 验收标准\n    85\t> 以上验收标准的
+完整 Gherkin 用例详见 `tests/bdd/matching.feature`。\n    86\t\n    87\t```gherk
+in\n    88\tFeature: Swipe Actions\n    89\t  Scenario: User likes a profile\n  
+ 90\t    Given the user sees a card for target user "Bob"\n    91\t    When the 
+user swipes right or taps the like button\n    92\t    Then a like action should
+be recorded in match_actions\n    93\t    And the target user should be removed 
+from the user\'s recommendation cache\n    94\t\n    95\t  Scenario: User passes
+a profile\n    96\t    Given the user sees a card for target user "Charlie"\n   
+97\t    When the user swipes left or taps the pass button\n    98\t    Then a pa
+ss action should be recorded in match_actions\n    99\t    And the target user s
+hould be removed from the user\'s recommendation cache\n   100\t\n   101\t  Scen
+ario: Duplicate swipe is idempotent\n   102\t    Given the user has already like
+d target user "Bob"\n   103\t    When the user likes "Bob" again within 1 second
+\n   104\t    Then the API should return success without creating a duplicate ma
+tch_actions record\n   105\t    And no duplicate match should be created\n   106
+\t\n   107\t  Scenario: User cannot swipe themselves\n   108\t    Given the user
+sees their own profile in the candidate list by accident\n   109\t    When the u
+ser tries to like themselves\n   110\t    Then the API should reject with code 1
+000\n   111\t```\n   112\t\n   113\t#### 技术要求\n   114\t- 接口：`POST /matchi
+ng/actions`（`target_id`, `action: \'like\' | \'pass\'`）。\n   115\t- 幂等性：`
+match_actions` 表对 `(actor_id, target_id)` 建立唯一索引，重复插入被数据库拦截，
+后端捕获异常返回成功。\n   116\t- 自身滑动校验：若 `target_id == actor_id`，返回
+`code=1000`。\n   117\t- 滑动后清除 Redis 缓存 `recommendations:{user_id}`，确保
+下次请求不再包含该用户。\n   118\t- `match_actions` 表字段：`id`, `actor_id`, `t
+arget_id`, `action`（`like`/`pass`/`super_like`）, `created_at`。\n   119\t\n   
+120\t---\n   121\t\n   122\t### US-MATCH-3：双向匹配成功\n   123\t\n   124\t**作
+为** 用户，  \n   125\t**我希望** 当我和对方互相喜欢时自动配对成功，  \n   126\t
+**以便** 立即开始聊天。\n   127\t\n   128\t#### 验收标准\n   129\t> 以上验收标准
+的完整 Gherkin 用例详见 `tests/bdd/matching.feature`。\n   130\t\n   131\t```ghe
+rkin\n   132\tFeature: Mutual Like Creates Match\n   133\t  Scenario: Mutual lik
+e triggers match and conversation\n   134\t    Given Alice liked Bob\n   135\t  
+ And Bob has not yet liked Alice\n   136\t    When Bob likes Alice\n   137\t    
+Then a match record should be created with status "matched"\n   138\t    And a c
+onversation should be auto-created for Alice and Bob\n   139\t    And both users
+should receive a match notification via Socket.io\n   140\t    And both users sh
+ould see the new match in their match list\n   141\t\n   142\t  Scenario: One-wa
+y like remains pending\n   143\t    Given Alice liked Bob\n   144\t    And Bob h
+as not liked Alice\n   145\t    When the system checks for mutual like\n   146\t
+   Then no match record should exist\n   147\t    And no conversation should be 
+created\n   148\t```\n   149\t\n   150\t#### 技术要求\n   151\t- 匹配判定：在 `P
+OST /matching/actions` 处理 `like` 时，查询 `match_actions` 是否存在 `actor_id =
+target_id AND target_id = actor_id AND action = \'like\'`。\n   152\t- 若存在双
+向喜欢：\n   153\t  1. 创建 `matches` 记录：`user_a_id`（较小的 UUID）、`user_b_
+id`（较大的 UUID），`status = \'matched\'`。\n   154\t  2. 创建 `conversations` 
+记录，关联 `match_id`。\n   155\t  3. 创建两条 `conversation_participants` 记录
+，`last_read_message_id = NULL`。\n   156\t  4. 通过 Socket.io 向双方 emit `matc
+h:created` 事件，Payload 包含 `match_id`、`conversation_id`、`matched_user` 资料
+摘要。\n   157\t  5. 若接收方离线，触发推送通知（极光/Firebase）。\n   158\t- `m
+atches` 表字段：`id`, `user_a_id`, `user_b_id`, `status`（`pending`/`matched`/`u
+nmatched`），`created_at`, `updated_at`。\n   159\t- 事务：匹配创建必须使用数据
+库事务，确保 `matches` + `conversations` + `conversation_participants` 原子性。\
+n   160\t\n   161\t---\n   162\t\n   163\t### US-MATCH-4：匹配列表查看\n   164\t
+\n   165\t**作为** 已匹配成功的用户，  \n   166\t**我希望** 查看所有匹配成功的人
+列表，  \n   167\t**以便** 快速找到想聊天的人。\n   168\t\n   169\t#### 验收标准
+\n   170\t> 以上验收标准的完整 Gherkin 用例详见 `tests/bdd/matching.feature`。\n
+  171\t\n   172\t```gherkin\n   173\tFeature: Match List\n   174\t  Scenario: Us
+er sees their matches\n   175\t    Given Alice has matched with Bob and Charlie\
+n   176\t    When Alice opens the match list\n   177\t    Then she should see Bo
+b and Charlie ordered by match creation time descending\n   178\t    And each it
+em should show the matched user\'s nickname, avatar, and match time\n   179\t```
+\n   180\t\n   181\t#### 技术要求\n   182\t- 接口：`GET /matches?limit=20&cursor
+=`（游标分页）。\n   183\t- 查询当前用户参与的 `matches` 中 `status = \'matched\
+'` 的记录，按 `created_at DESC` 排序。\n   184\t- 返回体包含对方用户的 `user_id`
+, `nickname`, `avatar_url`, `match_id`, `conversation_id`, `matched_at`。\n   18
+5\t- 列表中的用户若被拉黑，则自动过滤（`unmatched` 状态）。\n   186\t\n   187\t-
+--\n   188\t\n   189\t## 3. 非功能需求\n   190\t\n   191\t### 性能\n   192\t- 首
+页推荐卡片加载时间 < 800ms（P95）。\n   193\t- 滑动操作响应时间 < 200ms。\n   19
+4\t- 双向匹配判定和创建 < 300ms（含事务）。\n   195\t- Redis 缓存命中时响应时间 
+< 100ms。\n   196\t\n   197\t### 安全\n   198\t- 推荐池必须排除资料不完整用户（
+后端通过 JOIN `user_profiles` 的 `is_complete` 字段过滤）。\n   199\t- 用户不能
+看到自己（`target_id != actor_id`）。\n   200\t- 已拉黑用户双向不可见、不可匹配
+。\n   201\t- 匹配成功后若一方拉黑另一方，`match.status` 应更新为 `unmatched`（
+拉黑模块实现，Matching 侧读取时过滤）。\n   202\t\n   203\t### 兼容性\n   204\t-
+距离计算在 MySQL 中使用 Haversine 公式，不依赖 Spatial 扩展，保证跨环境兼容。\n 
+ 205\t- 推荐列表为空时 Mobile 需展示空状态引导页。\n   206\t\n   207\t---\n   20
+8\t\n   209\t## 4. 里程碑\n   210\t\n   211\t| 阶段 | 目标 | 预计工期 |\n   212\
+t|------|------|----------|\n   213\t| M-MATCH-1 | 推荐 API + Redis 缓存 + Haver
+sine 排序 + Mobile 首页卡片 | 3 天 |\n   214\t| M-MATCH-2 | 滑动 API + 幂等性 + 
+双向匹配判定 + Match/Conversation 自动创建 | 2 天 |\n   215\t| M-MATCH-3 | Socke
+t.io 匹配通知 + 推送 + 匹配列表 + BDD 测试闭环 | 2 天 |\n   216\t\n   217\t**总
+预计工期：7 天。**\n   218\t\n   219\t---\n   220\t\n   221\t## 5. 风险与回滚策
+略\n   222\t\n   223\t| 风险 | 影响 | 缓解措施 |\n   224\t|------|------|-------
+---|\n   225\t| 推荐算法性能不足，首页加载超过 800ms | 高 | 加 Redis 缓存、建立
+复合索引、MVP 阶段限制候选池为 1000 人 |\n   226\t| 并发滑动导致重复创建 Match |
+中 | 数据库唯一索引 `(user_a_id, user_b_id)` + 事务处理 |\n   227\t| 缓存与数据
+库状态不一致（用户被拉黑后仍出现在推荐中） | 中 | 拉黑操作时主动清除双方 Redis 
+推荐缓存 |\n   228\t| 地理位置隐私合规风险 | 中 | 用户协议中明确告知位置用途，提
+供「全国」模式淡化精确位置 |\n   229\t\n   230\t### 回滚策略\n   231\t- **推荐算
+法故障**：关闭 Redis 缓存，直接查询数据库（响应变慢但可用）。\n   232\t- **匹配
+创建事务死锁**：重试 3 次，失败后返回临时错误并记录日志，不丢失滑动记录。\n   23
+3\t- **Socket.io 通知失败**：降级为仅推送通知（若用户离线）或记录待补发事件。\n'
+,
+        message='233 lines read from file starting from line 1. Total lines in f
+ile: 233. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(
+    arguments_part='private/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/revi
+ew-pr-33-1791497718 && git diff origin/main..HEAD --stat && echo \\"---\\" && gi
+t diff origin/main..HEAD"}'
+)
+StatusUpdate(
+    context_usage=0.03383636474609375,
+    context_tokens=8870,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=1190,
+        output=382,
+        input_cache_read=7680,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-hDIB1dDwq89OnEvUQB3pkpX6',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_AX74AO2vgf2U1DNgjkYZixj9',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output=' designs/issue-4/design-spec.md     | 268 +++++++++++\n designs/
+issue-4/docs-to-update.txt |   5 +\n designs/issue-4/mockup.html        | 931 ++
++++++++++++++++++++++++++++++++++++\n designs/issue-4/wireframe.svg      | 259 +
+++++++++++\n docs/api/INDEX.md                  |   6 +\n docs/api/matching.md  
+            |   6 +\n docs/api/socket-events.md          |  19 +\n docs/modules/
+matching.md           |  98 ++++\n prd/v1-matching.md                 |   2 +\n 
+9 files changed, 1594 insertions(+)\n---\ndiff --git a/designs/issue-4/design-sp
+ec.md b/designs/issue-4/design-spec.md\nnew file mode 100644\nindex 0000000..c09
+f884\n--- /dev/null\n+++ b/designs/issue-4/design-spec.md\n@@ -0,0 +1,268 @@\n+#
+Issue #4 Matching 设计规范\n+\n+> 关联 PRD：[prd/v1-matching.md](../../prd/v1-ma
+tching.md)  \n+> 关联 Issue：#4  \n+> 技术栈：Flutter (Mobile) + BLoC/Cubit\n+\n
++---\n+\n+## 1. 页面/场景清单\n+\n+| 序号 | 页面/场景 | 说明 | 关键状态 |\n+|---
+---|-----------|------|----------|\n+| 1 | **首页-推荐卡片** | 用户进入 App 后默
+认页面，展示可滑动的推荐卡片堆叠 | Loading、正常态（卡片堆叠）、空数据态 |\n+| 2
+| **滑动操作反馈** | 用户左滑 Pass / 右滑 Like 时的实时视觉反馈 | 拖动中、释放动
+画、操作成功 |\n+| 3 | **配对成功弹窗** | 双向喜欢时触发的全屏 Modal，引导用户聊
+天或继续滑动 | 动画进入、可关闭 |\n+| 4 | **匹配列表页** | 底部导航「消息」入口
+内的配对成功用户列表 | Loading、列表态、空态 |\n+\n+### 场景流程图\n+\n+```\n+Ho
+mePage\n+  ├── 加载中 → CircularProgressIndicator\n+  ├── 有数据 → SwipeCardStac
+k + 操作按钮\n+  │       ├── 左滑/点击 ✕ → Pass\n+  │       ├── 右滑/点击 ♥ → Li
+ke\n+  │       └── 双向 Like → MatchSuccessDialog\n+  └── 无数据 → EmptyRecommen
+dationView\n+\n+MatchListPage (Tab: 消息)\n+  ├── 加载中 → CircularProgressIndic
+ator\n+  └── 有数据 → MatchListItem 列表\n+```\n+\n+---\n+\n+## 2. 视觉系统\n+\n
++视觉系统严格复用项目已有 Design Token，**禁止新增硬编码色值**。\n+\n+### 2.1 色
+板\n+\n+| Token | 色值 | 使用场景 |\n+|-------|------|----------|\n+| `DesignTok
+ens.primary` | `#6750A4` | 主按钮、激活 Tab、底部导航选中态、Like 按钮 hover 强
+调 |\n+| `DesignTokens.background` | `#FFFBFE` | 页面背景、Card 背景 |\n+| `Desi
+gnTokens.textPrimary` | `#1C1B1F` | 标题、正文、图标主色 |\n+| `DesignTokens.err
+or` | `#B3261E` | Pass 操作色、错误提示 |\n+| `ColorScheme.surface` | `#F3EDF7` 
+| Tab 背景、头像 fallback 背景 |\n+| `ColorScheme.outline` | `#79747E` | 辅助文
+字、分割线、次要按钮边框 |\n+\n+额外语义色（需在 `tokens.dart` / `app_theme.dart
+` 中注册）：\n+- `--success` / `likeActionColor`: `#2E7D32` — Like 按钮、配对成
+功状态\n+\n+### 2.2 字体\n+\n+| Token | 值 | 使用场景 |\n+|-------|-----|-------
+---|\n+| `DesignTokens.fontSizeHeadline` | `28.0` | 空状态大标题（暂不适用本 Iss
+ue） |\n+| `DesignTokens.fontSizeTitle` | `22.0` | 卡片姓名、弹窗标题、页面标题 
+|\n+| `DesignTokens.fontSizeBody` | `16.0` | 按钮文字、列表主文字 |\n+| `DesignT
+okens.fontSizeCaption` | `12.0` | 距离/时间、Bio、底部导航标签 |\n+\n+### 2.3 间
+距与圆角\n+\n+| Token | 值 | 使用场景 |\n+|-------|-----|----------|\n+| `Design
+Tokens.spacingMd` | `16.0` | 页面边距、Card 内边距、列表项间距 |\n+| `DesignToke
+ns.spacingSm` | `12.0` | Tab 内间距、操作按钮与卡片间距 |\n+| `DesignTokens.spac
+ingXs` | `8.0` | 行内小间距、文字与图标间距 |\n+| `DesignTokens.radiusLg` | `16.
+0` | 推荐卡片圆角、弹窗圆角 |\n+| `DesignTokens.radiusMd` | `12.0` | 按钮、列表
+项、小卡片圆角 |\n+| `DesignTokens.radiusSm` | `8.0` | Tag、Badge 圆角 |\n+\n+##
+# 2.4 布局尺寸\n+\n+- **手机画布**：按 375×812pt（iPhone X 基准）设计\n+- **推荐
+卡片**：水平边距 16pt，圆角 16pt，图片区高度 340pt，信息区高度自适应\n+- **卡片
+堆叠视觉差**：下层卡片 scale(0.95) + translateY(12pt)\n+- **操作按钮**：直径 64p
+t，与卡片底部间距 16pt\n+- **底部导航栏**：高度 80pt（含 Home Indicator 安全区）
+\n+\n+---\n+\n+## 3. 组件清单\n+\n+### 3.1 需新增 design-system 组件\n+\n+| 层级
+| 组件名 | 文件路径 | 说明 | Widgetbook 用例要求 |\n+|------|--------|----------
+|------|---------------------|\n+| atom | `SwActionButton` | `packages/design-sy
+stem/lib/src/atoms/sw_action_button.dart` | 圆形操作按钮（Pass/Like 两种变体） |
+默认态、禁用态、按下态 |\n+| molecule | `SwipeCard` | `packages/design-system/li
+b/src/molecules/swipe_card.dart` | 可拖动/可点击的推荐用户卡片 | 默认态、拖动中(
+show like badge)、拖动中(show pass badge) |\n+| organism | `SwipeCardStack` | `p
+ackages/design-system/lib/src/organisms/swipe_card_stack.dart` | 卡片堆叠容器，
+管理多层卡片渲染与手势冲突 | 3张卡片堆叠、1张卡片、空态 |\n+| organism | `MatchS
+uccessDialog` | `packages/design-system/lib/src/organisms/match_success_dialog.d
+art` | 配对成功全屏弹窗，含头像组合、CTA 按钮 | 默认态 |\n+| molecule | `MatchLi
+stItem` | `packages/design-system/lib/src/molecules/match_list_item.dart` | 匹配
+列表单项，含头像、昵称、时间、聊天入口 | 默认态 |\n+\n+### 3.2 页面级 Widget\n+\
+n+| Widget 名 | 路径 | 说明 |\n+|-----------|------|------|\n+| `HomePage` | `ap
+ps/mobile/lib/presentation/pages/home_page.dart` | 首页，承载模式切换、卡片堆叠
+、操作按钮、底部导航 |\n+| `MatchListPage` | `apps/mobile/lib/presentation/pages
+/match_list_page.dart` | 匹配列表页，底部导航「消息」Tab 内容 |\n+| `EmptyRecomm
+endationView` | `apps/mobile/lib/presentation/widgets/empty_recommendation_view.
+dart` | 推荐为空时的占位视图（可复用） |\n+\n+### 3.3 禁止直接使用原生组件替代\n
++\n+- 禁止用 `ElevatedButton` / `IconButton` 直接替代 `SwActionButton`\n+- 禁止
+在 `pages/` 中写死 `Color(0xFF...)` 或 `BoxDecoration` 颜色值\n+- 卡片阴影、圆角
+、间距必须来自 `DesignTokens`\n+\n+---\n+\n+## 4. 图片/图标资源\n+\n+本设计全部
+使用 Emoji / 矢量图标 / CSS 渐变占位，**无需额外图片资源**。实际开发时：\n+\n+| 
+资源位置 | 说明 |\n+|----------|------|\n+| 用户头像 | 网络图 `Image.network(car
+d.avatarUrl)`，fallback 到 `SwAvatar` |\n+| 空状态插图 | 使用 `Icons.search_off`
+或 Lottie 动画（待产品确认），MVP 阶段可用 `Icons.person_off` 替代 |\n+| 操作按
+钮图标 | Material `Icons.close` (Pass) / `Icons.favorite` (Like)，颜色语义化 |\n
++| 底部导航图标 | Material `Icons.home` / `Icons.chat_bubble` / `Icons.person` |
+\n+\n+> **待产品确认**：配对成功弹窗是否使用 Lottie 庆祝动画？当前原型使用 CSS c
+onfetti 演示，Flutter 侧可用 `AnimatedContainer` + `Particle` 简易实现，或引入 `
+lottie` 包。\n+\n+---\n+\n+## 5. 交互说明\n+\n+### 5.1 手势与动画\n+\n+| 交互 | 
+触发 | 动画表现 | 时长 | 曲线 |\n+|------|------|----------|------|------|\n+| 
+卡片拖动 | 手指按住并水平移动 | 卡片跟随手指，旋转 angle = dx × 0.05°，Like/Pass
+badge 透明度渐变 | 实时 | — |\n+| 释放-Pass | 左滑超过阈值（≈120pt）或点击 ✕ | 
+卡片向左飞出屏幕，下层卡片 scale 恢复 1.0 | 300ms | `easeOutCubic` |\n+| 释放-Li
+ke | 右滑超过阈值或点击 ♥ | 卡片向右飞出屏幕，触发 API；若双向匹配则弹 MatchSucc
+essDialog | 300ms | `easeOutCubic` |\n+| 弹窗进入 | 双向匹配成功 | 背景遮罩 fade
+In + 内容 scale(0.9→1.0) | 300ms | `easeOutBack`（轻微回弹） |\n+| 弹窗关闭 | 点
+击「继续滑动」或遮罩 | 背景 fadeOut + 内容 scale(0.95) + opacity(0) | 200ms | `e
+aseInCubic` |\n+| 列表加载 | 进入 MatchListPage | 顶部 CircularProgressIndicator
+，数据返回后列表淡入 | 200ms | `easeIn` |\n+\n+### 5.2 状态与边界\n+\n+| 状态 | 
+视觉处理 |\n+|------|----------|\n+| 推荐加载中 | 页面居中 `CircularProgressIndi
+cator(color: DesignTokens.primary)` |\n+| 推荐空数据 | `EmptyRecommendationView`
+：图标 + 文案「附近暂无可推荐用户」+ 切换全国按钮 |\n+| 滑动后缓存刷新 | 卡片飞
+出后，若剩余卡片 < 3 张，自动触发下一页加载（底部小 loading） |\n+| 网络错误 | `
+SnackBar` 提示 + 重试按钮（`SwButton.outlined`） |\n+| 滑动自己（极端边界） | 后
+端返回 code=1000，前端展示 `SnackBar`「操作异常，请稍后再试」 |\n+\n+### 5.3 模
+式切换\n+\n+- 顶部 Tab 切换「附近 / 同城 / 全国」时：\n+  1. 当前卡片堆叠淡出（1
+50ms）\n+  2. 触发 `GET /matching/recommendations?mode=xxx`\n+  3. 新卡片堆叠淡
+入（200ms）\n+\n+---\n+\n+## 6. BLoC / Event / State 设计\n+\n+### 6.1 MatchingB
+loc（首页推荐 + 滑动）\n+\n+```dart\n+// matching_bloc.dart\n+class MatchingBloc
+extends Bloc<MatchingEvent, MatchingState> { ... }\n+\n+// matching_event.dart\n
++abstract class MatchingEvent {}\n+class RecommendationsRequested extends Matchi
+ngEvent {\n+  final String mode; // \'nearby\' | \'city\' | \'nationwide\'\n+}\n
++class SwipeActionSubmitted extends MatchingEvent {\n+  final String targetId;\n
++  final SwipeAction action; // like | pass\n+}\n+class MatchModalDismissed exte
+nds MatchingEvent {}\n+\n+// matching_state.dart\n+abstract class MatchingState 
+{}\n+class MatchingInitial extends MatchingState {}\n+class MatchingLoadInProgre
+ss extends MatchingState {}\n+class MatchingLoadSuccess extends MatchingState {\
+n+  final List<RecommendationCard> cards;\n+  final String mode;\n+}\n+class Mat
+chingLoadEmpty extends MatchingState {\n+  final String mode;\n+}\n+class Matchi
+ngSwipeInProgress extends MatchingState {\n+  final List<RecommendationCard> car
+ds;\n+  final String targetId;\n+  final SwipeAction action;\n+}\n+class Matchin
+gMatchCreated extends MatchingState {\n+  final MatchSummary match; // 用于弹窗
+展示\n+}\n+class MatchingFailure extends MatchingState {\n+  final String messag
+e;\n+}\n+```\n+\n+### 6.2 MatchListCubit（匹配列表）\n+\n+```dart\n+// match_lis
+t_cubit.dart\n+class MatchListCubit extends Cubit<MatchListState> {\n+  Future<v
+oid> fetchMatches({String? cursor}) async { ... }\n+}\n+\n+// match_list_state.d
+art\n+abstract class MatchListState {}\n+class MatchListInitial extends MatchLis
+tState {}\n+class MatchListLoadInProgress extends MatchListState {}\n+class Matc
+hListLoadSuccess extends MatchListState {\n+  final List<MatchItem> matches;\n+ 
+final bool hasMore;\n+  final String? nextCursor;\n+}\n+class MatchListLoadFailu
+re extends MatchListState {\n+  final String message;\n+}\n+```\n+\n+### 6.3 Soc
+ket.io 事件监听\n+\n+- 在 `HomePage` 的 `initState` 中建立 Socket 连接（或通过全
+局 BLoC）\n+- 监听 `match:created` 事件，接收到后向 `MatchingBloc` dispatch `Ext
+ernalMatchReceived(matchSummary)`\n+- `MatchingBloc` 状态流转至 `MatchingMatchCr
+eated`，触发 `MatchSuccessDialog`\n+\n+---\n+\n+## 7. 需更新文档\n+\n+本设计产物
+完成后，以下文档必须同步新增或更新，以保证后续开发 Agent 有唯一真实来源。\n+\n+#
+## 7.1 API 文档\n+\n+| 文档路径 | 更新说明 |\n+|----------|----------|\n+| `docs
+/api/matching.md` | 新增 Matching 模块 API 文档，包含 `GET /matching/recommendat
+ions` 与 `POST /matching/actions` 的请求/响应示例、错误码表 |\n+| `docs/api/sock
+et-events.md` | 新增 Socket.io 事件文档，记录 `match:created` 的 Payload 结构 |\
+n+\n+### 7.2 架构/流程文档\n+\n+| 文档路径 | 更新说明 |\n+|----------|----------
+|\n+| `docs/modules/matching.md` | 更新 Matching 模块实现文档，补全 Flutter 侧的
+BLoC、Widget、路由映射关系 |\n+| `docs/design-docs/flutter.md` | 在「Design-Only
+PR 验收 Checklist」中补充 Matching 相关组件的 Widgetbook 用例要求（已存在通用规
+范，本 Issue 执行即可） |\n+\n+### 7.3 模块索引\n+\n+| 文档路径 | 更新说明 |\n+|
+----------|----------|\n+| `docs/modules/INDEX.md` | 确认 `matching.md` 已在模块
+清单中注册（已注册，无需修改） |\n+\n+### 7.4 PRD 注释\n+\n+- 在 `prd/v1-matchin
+g.md` 顶部添加链接注释：`设计资产参见 designs/issue-4/`\n+\n+---\n+\n+## 8. 验收
+Checklist（供 Design-Only PR 使用）\n+\n+- [ ] 低保真/高保真原型图已产出（本文件
++ wireframe.svg + mockup.html）\n+- [ ] 所有新增组件已在 `widgetbook/main.dart` 
+中注册 use-case\n+- [ ] PR 中附带 Golden File 截图或 Widgetbook 运行截图\n+- [ ]
+`pages/` 中未使用 `Color(0xFF...)`、`TextField`、`ElevatedButton` 等硬编码或原生
+Material 组件替代 design-system\n+- [ ] 页面中的状态（加载、空态、错误、配对成功
+弹窗）在原型图中有明确定义\ndiff --git a/designs/issue-4/docs-to-update.txt b/de
+signs/issue-4/docs-to-update.txt\nnew file mode 100644\nindex 0000000..a2fe108\n
+--- /dev/null\n+++ b/designs/issue-4/docs-to-update.txt\n@@ -0,0 +1,5 @@\n+docs/
+api/matching.md|新增 Matching 模块 API 文档，包含推荐和滑动接口的契约定义\n+ doc
+s/api/socket-events.md|新增 Socket.io 事件文档，记录 match:created 的 Payload 结
+构\n+ docs/modules/matching.md|更新 Matching 模块实现文档，补全 Flutter BLoC、Wi
+dget、路由映射\n+ docs/design-docs/flutter.md|补充 Matching 组件的 Widgetbook 用
+例执行记录（可选）\n+ prd/v1-matching.md|顶部添加设计资产链接注释 designs/issue-
+4/\n\\ No newline at end of file\ndiff --git a/designs/issue-4/mockup.html b/des
+igns/issue-4/mockup.html\nnew file mode 100644\nindex 0000000..1f13deb\n--- /dev
+/null\n+++ b/designs/issue-4/mockup.html\n@@ -0,0 +1,931 @@\n+<!DOCTYPE html>\n+
+<html lang="zh-CN">\n+<head>\n+  <meta charset="UTF-8">\n+  <meta name="viewport
+" content="width=device-width, initial-scale=1.0">\n+  <title>Social World - Mat
+ching 高保真原型</title>\n+  <style>\n+    :root {\n+      --primary: #6750A4;\n
++      --background: #FFFBFE;\n+      --textPrimary: #1C1B1F;\n+      --error: #
+B3261E;\n+      --surface: #F3EDF7;\n+      --onSurfaceVariant: #49454F;\n+     
+--outline: #79747E;\n+      --success: #2E7D32;\n+      --font-headline: 28px;\n
++      --font-title: 22px;\n+      --font-body: 16px;\n+      --font-caption: 12
+px;\n+      --radius-sm: 8px;\n+      --radius-md: 12px;\n+      --radius-lg: 16
+px;\n+      --space-xs: 8px;\n+      --space-sm: 12px;\n+      --space-md: 16px;
+\n+      --space-lg: 24px;\n+      --space-xl: 32px;\n+    }\n+\n+    * {\n+    
+ margin: 0;\n+      padding: 0;\n+      box-sizing: border-box;\n+    }\n+\n+   
+body {\n+      font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Rob
+oto, \'Helvetica Neue\', Arial, sans-serif;\n+      background: #e5e5e5;\n+     
+display: flex;\n+      justify-content: center;\n+      align-items: flex-start;
+\n+      min-height: 100vh;\n+      padding: 24px;\n+      gap: 24px;\n+      fl
+ex-wrap: wrap;\n+    }\n+\n+    .phone-frame {\n+      width: 375px;\n+      hei
+ght: 812px;\n+      background: var(--background);\n+      border-radius: 40px;\
+n+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);\n+      overflow: hidden
+;\n+      position: relative;\n+      flex-shrink: 0;\n+    }\n+\n+    .status-b
+ar {\n+      height: 44px;\n+      background: var(--background);\n+      displa
+y: flex;\n+      align-items: center;\n+      justify-content: center;\n+      f
+ont-size: 14px;\n+      font-weight: 600;\n+      color: var(--textPrimary);\n+ 
+    position: relative;\n+      z-index: 10;\n+    }\n+\n+    .screen {\n+      
+height: calc(100% - 44px - 80px);\n+      overflow-y: auto;\n+      position: re
+lative;\n+    }\n+\n+    .screen-header {\n+      padding: var(--space-sm) var(-
+-space-md);\n+      display: flex;\n+      align-items: center;\n+      justify-
+content: center;\n+      position: relative;\n+    }\n+\n+    .screen-title {\n+
+     font-size: var(--font-title);\n+      font-weight: 700;\n+      color: var(
+--textPrimary);\n+    }\n+\n+    /* Mode Selector */\n+    .mode-tabs {\n+      
+display: flex;\n+      background: var(--surface);\n+      border-radius: 24px;\
+n+      padding: 4px;\n+      margin: 0 var(--space-md) var(--space-md);\n+    }
+\n+\n+    .mode-tab {\n+      flex: 1;\n+      padding: 8px 0;\n+      text-alig
+n: center;\n+      border-radius: 20px;\n+      font-size: 14px;\n+      font-we
+ight: 500;\n+      color: var(--onSurfaceVariant);\n+      cursor: pointer;\n+  
+   transition: all 0.2s ease;\n+      border: none;\n+      background: transpar
+ent;\n+    }\n+\n+    .mode-tab.active {\n+      background: var(--primary);\n+ 
+    color: #fff;\n+    }\n+\n+    /* Card Stack */\n+    .card-stack-container {
+\n+      position: relative;\n+      width: 100%;\n+      height: 480px;\n+     
+padding: 0 var(--space-md);\n+    }\n+\n+    .profile-card {\n+      position: a
+bsolute;\n+      width: calc(100% - 32px);\n+      height: 460px;\n+      backgr
+ound: #fff;\n+      border-radius: var(--radius-lg);\n+      box-shadow: 0 4px 2
+0px rgba(0,0,0,0.08);\n+      overflow: hidden;\n+      transition: transform 0.
+3s ease, opacity 0.3s ease;\n+      cursor: grab;\n+    }\n+\n+    .profile-card
+:nth-child(2) {\n+      transform: scale(0.95) translateY(12px);\n+      opacity
+: 0.7;\n+      z-index: 1;\n+    }\n+\n+    .profile-card:nth-child(1) {\n+     
+z-index: 2;\n+    }\n+\n+    .card-image {\n+      width: 100%;\n+      height: 
+340px;\n+      object-fit: cover;\n+      background: linear-gradient(135deg, #E
+8E0EB 0%, #D4C8DB 100%);\n+      display: flex;\n+      align-items: center;\n+ 
+    justify-content: center;\n+      font-size: 80px;\n+    }\n+\n+    .card-inf
+o {\n+      padding: var(--space-md);\n+    }\n+\n+    .card-name {\n+      font
+-size: var(--font-title);\n+      font-weight: 700;\n+      color: var(--textPri
+mary);\n+      margin-bottom: 4px;\n+    }\n+\n+    .card-meta {\n+      font-si
+ze: 14px;\n+      color: var(--onSurfaceVariant);\n+      margin-bottom: var(--s
+pace-xs);\n+      display: flex;\n+      align-items: center;\n+      gap: 4px;\
+n+    }\n+\n+    .card-bio {\n+      font-size: 14px;\n+      color: var(--outli
+ne);\n+      line-height: 1.4;\n+    }\n+\n+    .swipe-badge {\n+      position:
+absolute;\n+      top: 24px;\n+      padding: 8px 16px;\n+      border-radius: v
+ar(--radius-sm);\n+      font-size: 20px;\n+      font-weight: 800;\n+      text
+-transform: uppercase;\n+      letter-spacing: 2px;\n+      transform: rotate(-1
+5deg);\n+      opacity: 0;\n+      transition: opacity 0.2s ease;\n+    }\n+\n+ 
+  .swipe-badge.like {\n+      right: 24px;\n+      color: var(--success);\n+    
+ border: 3px solid var(--success);\n+    }\n+\n+    .swipe-badge.pass {\n+      
+left: 24px;\n+      color: var(--error);\n+      border: 3px solid var(--error);
+\n+    }\n+\n+    /* Action Buttons */\n+    .action-buttons {\n+      display: 
+flex;\n+      justify-content: center;\n+      gap: 48px;\n+      padding: var(-
+-space-md) 0;\n+    }\n+\n+    .action-btn {\n+      width: 64px;\n+      height
+: 64px;\n+      border-radius: 50%;\n+      border: none;\n+      display: flex;
+\n+      align-items: center;\n+      justify-content: center;\n+      font-size
+: 28px;\n+      cursor: pointer;\n+      transition: transform 0.15s ease, box-s
+hadow 0.15s ease;\n+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);\n+    }\n+\n+  
+ .action-btn:active {\n+      transform: scale(0.92);\n+    }\n+\n+    .action-b
+tn.pass {\n+      background: #fff;\n+      color: var(--error);\n+      border:
+2px solid #F5E5E4;\n+    }\n+\n+    .action-btn.like {\n+      background: #fff;
+\n+      color: var(--success);\n+      border: 2px solid #E5F0E5;\n+    }\n+\n+
+   /* Bottom Nav */\n+    .bottom-nav {\n+      position: absolute;\n+      bott
+om: 0;\n+      left: 0;\n+      right: 0;\n+      height: 80px;\n+      backgrou
+nd: #fff;\n+      border-top: 1px solid rgba(0,0,0,0.05);\n+      display: flex;
+\n+      justify-content: space-around;\n+      align-items: center;\n+      pad
+ding-bottom: 12px;\n+    }\n+\n+    .nav-item {\n+      display: flex;\n+      f
+lex-direction: column;\n+      align-items: center;\n+      gap: 4px;\n+      cu
+rsor: pointer;\n+      padding: 8px 16px;\n+      border-radius: var(--radius-md
+);\n+      transition: background 0.2s ease;\n+    }\n+\n+    .nav-item:hover {\
+n+      background: rgba(103, 80, 164, 0.05);\n+    }\n+\n+    .nav-icon {\n+   
+  width: 24px;\n+      height: 24px;\n+      display: flex;\n+      align-items:
+center;\n+      justify-content: center;\n+      font-size: 20px;\n+    }\n+\n+ 
+  .nav-icon.active {\n+      background: var(--primary);\n+      color: #fff;\n+
+     border-radius: 50%;\n+      width: 32px;\n+      height: 32px;\n+    }\n+\n
++    .nav-label {\n+      font-size: var(--font-caption);\n+      color: var(--o
+utline);\n+    }\n+\n+    .nav-label.active {\n+      color: var(--primary);\n+ 
+    font-weight: 500;\n+    }\n+\n+    /* Empty State */\n+    .empty-state {\n+
+     display: flex;\n+      flex-direction: column;\n+      align-items: center;
+\n+      justify-content: center;\n+      height: 100%;\n+      padding: var(--s
+pace-xl);\n+      text-align: center;\n+    }\n+\n+    .empty-illustration {\n+ 
+    width: 120px;\n+      height: 120px;\n+      background: var(--surface);\n+ 
+    border-radius: 50%;\n+      display: flex;\n+      align-items: center;\n+  
+   justify-content: center;\n+      font-size: 56px;\n+      margin-bottom: var(
+--space-lg);\n+    }\n+\n+    .empty-title {\n+      font-size: var(--font-body)
+;\n+      font-weight: 600;\n+      color: var(--textPrimary);\n+      margin-bo
+ttom: var(--space-xs);\n+    }\n+\n+    .empty-subtitle {\n+      font-size: 14p
+x;\n+      color: var(--outline);\n+      margin-bottom: var(--space-lg);\n+    
+}\n+\n+    .empty-btn {\n+      padding: 12px 24px;\n+      border-radius: 24px;
+\n+      border: 1px solid var(--outline);\n+      background: #fff;\n+      col
+or: var(--primary);\n+      font-size: 14px;\n+      font-weight: 500;\n+      c
+ursor: pointer;\n+    }\n+\n+    /* Match Success Modal */\n+    .modal-overlay 
+{\n+      position: absolute;\n+      inset: 0;\n+      background: rgba(0,0,0,0
+.6);\n+      display: flex;\n+      align-items: center;\n+      justify-content
+: center;\n+      padding: var(--space-md);\n+      opacity: 0;\n+      pointer-
+events: none;\n+      transition: opacity 0.3s ease;\n+      z-index: 100;\n+   
+}\n+\n+    .modal-overlay.show {\n+      opacity: 1;\n+      pointer-events: aut
+o;\n+    }\n+\n+    .match-modal {\n+      background: #fff;\n+      border-radi
+us: var(--radius-lg);\n+      padding: var(--space-xl);\n+      width: 100%;\n+ 
+    max-width: 320px;\n+      text-align: center;\n+      transform: scale(0.9);
+\n+      transition: transform 0.3s ease;\n+    }\n+\n+    .modal-overlay.show .
+match-modal {\n+      transform: scale(1);\n+    }\n+\n+    .match-title {\n+   
+  font-size: var(--font-title);\n+      font-weight: 700;\n+      color: var(--t
+extPrimary);\n+      margin-bottom: var(--space-lg);\n+    }\n+\n+    .match-ava
+tars {\n+      display: flex;\n+      justify-content: center;\n+      align-ite
+ms: center;\n+      gap: -8px;\n+      margin-bottom: var(--space-lg);\n+      p
+osition: relative;\n+    }\n+\n+    .match-avatar {\n+      width: 72px;\n+     
+height: 72px;\n+      border-radius: 50%;\n+      background: var(--surface);\n+
+     display: flex;\n+      align-items: center;\n+      justify-content: center
+;\n+      font-size: 32px;\n+      border: 3px solid #fff;\n+      box-shadow: 0
+2px 8px rgba(0,0,0,0.1);\n+    }\n+\n+    .match-avatar:first-child {\n+      ma
+rgin-right: -12px;\n+      z-index: 1;\n+    }\n+\n+    .match-heart {\n+      p
+osition: absolute;\n+      width: 32px;\n+      height: 32px;\n+      background
+: var(--primary);\n+      border-radius: 50%;\n+      display: flex;\n+      ali
+gn-items: center;\n+      justify-content: center;\n+      font-size: 16px;\n+  
+   color: #fff;\n+      z-index: 2;\n+      border: 2px solid #fff;\n+    }\n+\n
++    .match-text {\n+      font-size: 14px;\n+      color: var(--onSurfaceVarian
+t);\n+      margin-bottom: 4px;\n+    }\n+\n+    .match-subtext {\n+      font-s
+ize: 13px;\n+      color: var(--outline);\n+      margin-bottom: var(--space-lg)
+;\n+    }\n+\n+    .modal-btn {\n+      width: 100%;\n+      padding: 14px;\n+  
+   border-radius: 24px;\n+      border: none;\n+      font-size: 14px;\n+      f
+ont-weight: 600;\n+      cursor: pointer;\n+      margin-bottom: var(--space-sm)
+;\n+    }\n+\n+    .modal-btn.primary {\n+      background: var(--primary);\n+  
+   color: #fff;\n+    }\n+\n+    .modal-btn.secondary {\n+      background: tran
+sparent;\n+      color: var(--onSurfaceVariant);\n+      border: 1px solid var(-
+-outline);\n+    }\n+\n+    /* Match List */\n+    .match-list {\n+      padding
+: 0 var(--space-md);\n+    }\n+\n+    .match-item {\n+      display: flex;\n+   
+  align-items: center;\n+      padding: var(--space-md);\n+      background: #ff
+f;\n+      border-radius: var(--radius-md);\n+      margin-bottom: var(--space-s
+m);\n+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);\n+      cursor: pointer;\n+ 
+    transition: background 0.15s ease;\n+    }\n+\n+    .match-item:hover {\n+  
+   background: #fafafa;\n+    }\n+\n+    .match-avatar-small {\n+      width: 48
+px;\n+      height: 48px;\n+      border-radius: 50%;\n+      background: var(--
+surface);\n+      display: flex;\n+      align-items: center;\n+      justify-co
+ntent: center;\n+      font-size: 22px;\n+      margin-right: var(--space-md);\n
++      flex-shrink: 0;\n+    }\n+\n+    .match-info {\n+      flex: 1;\n+    }\n
++\n+    .match-name {\n+      font-size: var(--font-body);\n+      font-weight: 
+600;\n+      color: var(--textPrimary);\n+      margin-bottom: 2px;\n+    }\n+\n
++    .match-time {\n+      font-size: 13px;\n+      color: var(--outline);\n+   
+}\n+\n+    .match-chat-btn {\n+      width: 40px;\n+      height: 40px;\n+      
+border-radius: 50%;\n+      background: rgba(103, 80, 164, 0.08);\n+      border
+: none;\n+      display: flex;\n+      align-items: center;\n+      justify-cont
+ent: center;\n+      font-size: 18px;\n+      color: var(--primary);\n+      cur
+sor: pointer;\n+    }\n+\n+    /* Widget Labels */\n+    .widget-label {\n+     
+position: absolute;\n+      top: 8px;\n+      right: 8px;\n+      background: rg
+ba(103, 80, 164, 0.9);\n+      color: #fff;\n+      font-size: 10px;\n+      pad
+ding: 4px 8px;\n+      border-radius: 4px;\n+      font-family: \'SF Mono\', Mon
+aco, monospace;\n+      z-index: 50;\n+    }\n+\n+    .phone-label {\n+      tex
+t-align: center;\n+      margin-top: 12px;\n+      font-size: 14px;\n+      font
+-weight: 600;\n+      color: var(--textPrimary);\n+    }\n+\n+    .phone-subtitl
+e {\n+      text-align: center;\n+      font-size: 12px;\n+      color: var(--ou
+tline);\n+      margin-top: 4px;\n+    }\n+\n+    /* Confetti */\n+    .confetti
+{\n+      position: absolute;\n+      width: 8px;\n+      height: 8px;\n+      p
+ointer-events: none;\n+      animation: confetti-fall 1.5s ease-out forwards;\n+
+   }\n+\n+    @keyframes confetti-fall {\n+      0% { transform: translateY(0) r
+otate(0deg); opacity: 1; }\n+      100% { transform: translateY(300px) rotate(72
+0deg); opacity: 0; }\n+    }\n+  </style>\n+</head>\n+<body>\n+\n+  <!-- =======
+=== PHONE 1: HOME / CARD STACK ========== -->\n+  <div>\n+    <div class="phone-
+frame">\n+      <div class="widget-label">HomePage</div>\n+      <div class="sta
+tus-bar">9:41</div>\n+      <div class="screen">\n+        <!-- Mode Tabs -->\n+
+       <div class="mode-tabs">\n+          <button class="mode-tab active">附近<
+/button>\n+          <button class="mode-tab">同城</button>\n+          <button 
+class="mode-tab">全国</button>\n+        </div>\n+\n+        <!-- Card Stack -->
+\n+        <div class="card-stack-container" id="cardStack">\n+          <div cl
+ass="profile-card" data-index="1">\n+            <div class="swipe-badge pass">P
+ASS</div>\n+            <div class="swipe-badge like">LIKE</div>\n+            <
+div class="card-image">👩🏻</div>\n+            <div class="card-info">\n+        
+     <div class="card-name">小雨, 24</div>\n+              <div class="card-meta
+">📍 2.5km · 刚刚活跃</div>\n+              <div class="card-bio">喜欢旅行、摄影
+、咖啡 ☕️ 周末常去探店</div>\n+            </div>\n+          </div>\n+         
+<div class="profile-card" data-index="2">\n+            <div class="card-image">
+👨🏻</div>\n+            <div class="card-info">\n+              <div class="card-
+name">阿杰, 27</div>\n+              <div class="card-meta">📍 5.1km · 2小时前活
+跃</div>\n+              <div class="card-bio">程序员、吉他手、铲屎官 🐱</div>\n
++            </div>\n+          </div>\n+        </div>\n+\n+        <!-- Action
+Buttons -->\n+        <div class="action-buttons">\n+          <button class="ac
+tion-btn pass" onclick="swipeCard(\'pass\')">✕</button>\n+          <button clas
+s="action-btn like" onclick="swipeCard(\'like\')">♥</button>\n+        </div>\n+
+     </div>\n+\n+      <!-- Bottom Nav -->\n+      <div class="bottom-nav">\n+  
+     <div class="nav-item">\n+          <div class="nav-icon active">🏠</div>\n+
+         <div class="nav-label active">首页</div>\n+        </div>\n+        <di
+v class="nav-item" onclick="showScreen(\'matchList\')">\n+          <div class="
+nav-icon">💬</div>\n+          <div class="nav-label">消息</div>\n+        </div
+>\n+        <div class="nav-item">\n+          <div class="nav-icon">👤</div>\n+
+         <div class="nav-label">我的</div>\n+        </div>\n+      </div>\n+   
+</div>\n+    <div class="phone-label">正常态：推荐卡片堆叠</div>\n+    <div clas
+s="phone-subtitle">Widget: HomePage + SwipeCardStack + SwActionButton</div>\n+  
+</div>\n+\n+  <!-- ========== PHONE 2: EMPTY STATE ========== -->\n+  <div>\n+  
+ <div class="phone-frame">\n+      <div class="widget-label">EmptyRecommendation
+View</div>\n+      <div class="status-bar">9:41</div>\n+      <div class="screen
+">\n+        <div class="mode-tabs">\n+          <button class="mode-tab active"
+>附近</button>\n+          <button class="mode-tab">同城</button>\n+          <b
+utton class="mode-tab">全国</button>\n+        </div>\n+        <div class="empt
+y-state">\n+          <div class="empty-illustration">🔍</div>\n+          <div 
+class="empty-title">附近暂无可推荐用户</div>\n+          <div class="empty-subti
+tle">扩大范围或稍后再来看看吧</div>\n+          <button class="empty-btn">切换至
+全国模式</button>\n+        </div>\n+      </div>\n+      <div class="bottom-nav
+">\n+        <div class="nav-item">\n+          <div class="nav-icon active">🏠<
+/div>\n+          <div class="nav-label active">首页</div>\n+        </div>\n+  
+     <div class="nav-item">\n+          <div class="nav-icon">💬</div>\n+       
+  <div class="nav-label">消息</div>\n+        </div>\n+        <div class="nav-i
+tem">\n+          <div class="nav-icon">👤</div>\n+          <div class="nav-lab
+el">我的</div>\n+        </div>\n+      </div>\n+    </div>\n+    <div class="ph
+one-label">异常态：空数据引导</div>\n+    <div class="phone-subtitle">Widget: Em
+ptyRecommendationView</div>\n+  </div>\n+\n+  <!-- ========== PHONE 3: MATCH SUC
+CESS MODAL ========== -->\n+  <div>\n+    <div class="phone-frame">\n+      <div
+class="widget-label">MatchSuccessDialog</div>\n+      <div class="status-bar">9:
+41</div>\n+      <div class="screen">\n+        <div class="mode-tabs">\n+      
+   <button class="mode-tab active">附近</button>\n+          <button class="mode
+-tab">同城</button>\n+          <button class="mode-tab">全国</button>\n+       
+</div>\n+        <div class="card-stack-container">\n+          <div class="prof
+ile-card" style="opacity:0.5;">\n+            <div class="card-image">👩🏻</div>\n
++            <div class="card-info">\n+              <div class="card-name">小雨
+, 24</div>\n+              <div class="card-meta">📍 2.5km</div>\n+             
+<div class="card-bio">喜欢旅行、摄影、咖啡 ☕️</div>\n+            </div>\n+     
+    </div>\n+        </div>\n+        <div class="action-buttons">\n+          <
+button class="action-btn pass">✕</button>\n+          <button class="action-btn 
+like">♥</button>\n+        </div>\n+      </div>\n+      <div class="bottom-nav"
+>\n+        <div class="nav-item">\n+          <div class="nav-icon active">🏠</
+div>\n+          <div class="nav-label active">首页</div>\n+        </div>\n+   
+    <div class="nav-item">\n+          <div class="nav-icon">💬</div>\n+        
+ <div class="nav-label">消息</div>\n+        </div>\n+        <div class="nav-it
+em">\n+          <div class="nav-icon">👤</div>\n+          <div class="nav-labe
+l">我的</div>\n+        </div>\n+      </div>\n+\n+      <!-- Match Modal (alway
+s visible for demo) -->\n+      <div class="modal-overlay show" id="matchModal">
+\n+        <div class="match-modal">\n+          <div class="match-title">🎉 配
+对成功！</div>\n+          <div class="match-avatars">\n+            <div class=
+"match-avatar">😊</div>\n+            <div class="match-heart">💕</div>\n+      
+     <div class="match-avatar">👩🏻</div>\n+          </div>\n+          <div clas
+s="match-text">你们互相喜欢了对方</div>\n+          <div class="match-subtext">
+现在可以开始聊天啦</div>\n+          <button class="modal-btn primary" onclick="
+hideModal()">立即聊天</button>\n+          <button class="modal-btn secondary" o
+nclick="hideModal()">继续滑动</button>\n+        </div>\n+      </div>\n+    </d
+iv>\n+    <div class="phone-label">配对成功态：双向喜欢弹窗</div>\n+    <div cla
+ss="phone-subtitle">Widget: MatchSuccessDialog (organism)</div>\n+  </div>\n+\n+
+ <!-- ========== PHONE 4: MATCH LIST ========== -->\n+  <div>\n+    <div class="
+phone-frame">\n+      <div class="widget-label">MatchListPage</div>\n+      <div
+class="status-bar">9:41</div>\n+      <div class="screen">\n+        <div class=
+"screen-header">\n+          <div class="screen-title">我的配对</div>\n+        
+</div>\n+        <div class="match-list">\n+          <div class="match-item">\n
++            <div class="match-avatar-small">👩🏻</div>\n+            <div class="
+match-info">\n+              <div class="match-name">小雨</div>\n+              
+<div class="match-time">2小时前配对</div>\n+            </div>\n+            <bu
+tton class="match-chat-btn">💬</button>\n+          </div>\n+          <div clas
+s="match-item">\n+            <div class="match-avatar-small">👨🏻</div>\n+       
+    <div class="match-info">\n+              <div class="match-name">阿杰</div>\
+n+              <div class="match-time">昨天配对</div>\n+            </div>\n+  
+         <button class="match-chat-btn">💬</button>\n+          </div>\n+       
+  <div class="match-item">\n+            <div class="match-avatar-small">👩🏼</div
+>\n+            <div class="match-info">\n+              <div class="match-name"
+>Alice</div>\n+              <div class="match-time">3天前配对</div>\n+         
+  </div>\n+            <button class="match-chat-btn">💬</button>\n+          </
+div>\n+          <div class="match-item">\n+            <div class="match-avatar
+-small">👨🏽</div>\n+            <div class="match-info">\n+              <div cla
+ss="match-name">Bob</div>\n+              <div class="match-time">上周配对</div>
+\n+            </div>\n+            <button class="match-chat-btn">💬</button>\n
++          </div>\n+        </div>\n+      </div>\n+      <div class="bottom-nav
+">\n+        <div class="nav-item" onclick="showScreen(\'home\')">\n+          <
+div class="nav-icon">🏠</div>\n+          <div class="nav-label">首页</div>\n+  
+     </div>\n+        <div class="nav-item">\n+          <div class="nav-icon ac
+tive">💬</div>\n+          <div class="nav-label active">消息</div>\n+        </
+div>\n+        <div class="nav-item">\n+          <div class="nav-icon">👤</div>
+\n+          <div class="nav-label">我的</div>\n+        </div>\n+      </div>\n
++    </div>\n+    <div class="phone-label">匹配列表页</div>\n+    <div class="ph
+one-subtitle">Widget: MatchListPage + MatchListItem</div>\n+  </div>\n+\n+  <scr
+ipt>\n+    // Card swipe interaction for Phone 1\n+    let currentCard = documen
+t.querySelector(\'#cardStack .profile-card:first-child\');\n+    let isDragging 
+= false;\n+    let startX = 0;\n+    let currentX = 0;\n+\n+    if (currentCard)
+{\n+      currentCard.addEventListener(\'mousedown\', startDrag);\n+      curren
+tCard.addEventListener(\'touchstart\', startDrag, {passive: false});\n+    }\n+\
+n+    document.addEventListener(\'mousemove\', drag);\n+    document.addEventLis
+tener(\'touchmove\', drag, {passive: false});\n+    document.addEventListener(\'
+mouseup\', endDrag);\n+    document.addEventListener(\'touchend\', endDrag);\n+\
+n+    function startDrag(e) {\n+      if (!currentCard) return;\n+      isDraggi
+ng = true;\n+      startX = e.type.includes(\'mouse\') ? e.clientX : e.touches[0
+].clientX;\n+      currentCard.style.transition = \'none\';\n+    }\n+\n+    fun
+ction drag(e) {\n+      if (!isDragging || !currentCard) return;\n+      e.preve
+ntDefault();\n+      const x = e.type.includes(\'mouse\') ? e.clientX : e.touche
+s[0].clientX;\n+      currentX = x - startX;\n+      const rotate = currentX * 0
+.05;\n+      currentCard.style.transform = `translateX(${currentX}px) rotate(${r
+otate}deg)`;\n+\n+      const likeBadge = currentCard.querySelector(\'.swipe-bad
+ge.like\');\n+      const passBadge = currentCard.querySelector(\'.swipe-badge.p
+ass\');\n+      if (likeBadge) likeBadge.style.opacity = currentX > 60 ? Math.mi
+n(currentX / 120, 1) : 0;\n+      if (passBadge) passBadge.style.opacity = curre
+ntX < -60 ? Math.min(Math.abs(currentX) / 120, 1) : 0;\n+    }\n+\n+    function
+endDrag() {\n+      if (!isDragging || !currentCard) return;\n+      isDragging 
+= false;\n+      currentCard.style.transition = \'transform 0.3s ease, opacity 0
+.3s ease\';\n+\n+      if (currentX > 120) {\n+        currentCard.style.transfo
+rm = \'translateX(400px) rotate(30deg)\';\n+        currentCard.style.opacity = 
+\'0\';\n+        setTimeout(() => handleSwipe(\'like\'), 300);\n+      } else if
+(currentX < -120) {\n+        currentCard.style.transform = \'translateX(-400px)
+rotate(-30deg)\';\n+        currentCard.style.opacity = \'0\';\n+        setTime
+out(() => handleSwipe(\'pass\'), 300);\n+      } else {\n+        currentCard.st
+yle.transform = \'\';\n+        const likeBadge = currentCard.querySelector(\'.s
+wipe-badge.like\');\n+        const passBadge = currentCard.querySelector(\'.swi
+pe-badge.pass\');\n+        if (likeBadge) likeBadge.style.opacity = 0;\n+      
+ if (passBadge) passBadge.style.opacity = 0;\n+      }\n+      currentX = 0;\n+ 
+  }\n+\n+    function swipeCard(direction) {\n+      if (!currentCard) return;\n
++      currentCard.style.transition = \'transform 0.4s ease, opacity 0.4s ease\'
+;\n+      if (direction === \'like\') {\n+        currentCard.style.transform = 
+\'translateX(400px) rotate(30deg)\';\n+        currentCard.querySelector(\'.swip
+e-badge.like\').style.opacity = \'1\';\n+      } else {\n+        currentCard.st
+yle.transform = \'translateX(-400px) rotate(-30deg)\';\n+        currentCard.que
+rySelector(\'.swipe-badge.pass\').style.opacity = \'1\';\n+      }\n+      curre
+ntCard.style.opacity = \'0\';\n+      setTimeout(() => handleSwipe(direction), 4
+00);\n+    }\n+\n+    function handleSwipe(direction) {\n+      if (!currentCard
+) return;\n+      // For demo, show match success on "like"\n+      if (directio
+n === \'like\') {\n+        setTimeout(() => {\n+          document.getElementBy
+Id(\'matchModal\').classList.add(\'show\');\n+          createConfetti();\n+    
+   }, 200);\n+      }\n+      // Remove card and update\n+      const stack = do
+cument.getElementById(\'cardStack\');\n+      if (stack && currentCard) {\n+    
+   currentCard.remove();\n+        currentCard = stack.querySelector(\'.profile-
+card:first-child\');\n+        if (currentCard) {\n+          currentCard.style.
+transform = \'\';\n+          currentCard.style.opacity = \'1\';\n+          cur
+rentCard.addEventListener(\'mousedown\', startDrag);\n+          currentCard.add
+EventListener(\'touchstart\', startDrag, {passive: false});\n+        }\n+      
+}\n+    }\n+\n+    function hideModal() {\n+      document.getElementById(\'matc
+hModal\').classList.remove(\'show\');\n+    }\n+\n+    function createConfetti()
+{\n+      const modal = document.querySelector(\'#matchModal .match-modal\');\n+
+     if (!modal) return;\n+      const colors = [\'#6750A4\', \'#FF4081\', \'#FF
+D700\', \'#4CAF50\', \'#2196F3\'];\n+      for (let i = 0; i < 30; i++) {\n+    
+   const confetti = document.createElement(\'div\');\n+        confetti.classNam
+e = \'confetti\';\n+        confetti.style.left = Math.random() * 100 + \'%\';\n
++        confetti.style.top = \'-10px\';\n+        confetti.style.background = c
+olors[Math.floor(Math.random() * colors.length)];\n+        confetti.style.anima
+tionDelay = Math.random() * 0.5 + \'s\';\n+        confetti.style.borderRadius =
+Math.random() > 0.5 ? \'50%\' : \'0\';\n+        modal.appendChild(confetti);\n+
+       setTimeout(() => confetti.remove(), 2000);\n+      }\n+    }\n+\n+    fun
+ction showScreen(screen) {\n+      // Demo navigation - in real app this would r
+oute\n+    }\n+  </script>\n+</body>\n+</html>\n\\ No newline at end of file\ndi
+ff --git a/designs/issue-4/wireframe.svg b/designs/issue-4/wireframe.svg\nnew fi
+le mode 100644\nindex 0000000..dd11d60\n--- /dev/null\n+++ b/designs/issue-4/wir
+eframe.svg\n@@ -0,0 +1,259 @@\n+<svg xmlns="http://www.w3.org/2000/svg" viewBox=
+"0 0 1600 1200" width="1600" height="1200">\n+  <defs>\n+    <marker id="arrowhe
+ad" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">\n+     
+<polygon points="0 0, 10 3.5, 0 7" fill="#666"/>\n+    </marker>\n+    <filter i
+d="shadow" x="-20%" y="-20%" width="140%" height="140%">\n+      <feDropShadow d
+x="2" dy="2" stdDeviation="2" flood-color="#000" flood-opacity="0.15"/>\n+    </
+filter>\n+  </defs>\n+  \n+  <!-- Background -->\n+  <rect width="1600" height="
+1200" fill="#f5f5f5"/>\n+  \n+  <!-- Title -->\n+  <text x="800" y="40" font-fam
+ily="sans-serif" font-size="24" font-weight="bold" text-anchor="middle" fill="#3
+33">Issue #4 Matching - 线框图</text>\n+  \n+  <!-- ========== SCREEN 1: HOME / 
+CARD STACK ========== -->\n+  <g transform="translate(60, 80)">\n+    <rect widt
+h="320" height="680" rx="24" fill="#fff" filter="url(#shadow)"/>\n+    <rect x="
+0" y="0" width="320" height="44" rx="24" fill="#e0e0e0"/>\n+    <rect x="0" y="2
+2" width="320" height="22" fill="#e0e0e0"/>\n+    \n+    <!-- Status bar -->\n+ 
+  <text x="160" y="30" font-family="sans-serif" font-size="12" text-anchor="midd
+le" fill="#666">9:41</text>\n+    \n+    <!-- Mode selector tabs -->\n+    <rect
+x="16" y="56" width="288" height="36" rx="18" fill="#eee"/>\n+    <rect x="20" y
+="60" width="88" height="28" rx="14" fill="#999"/>\n+    <text x="64" y="78" fon
+t-family="sans-serif" font-size="11" text-anchor="middle" fill="#fff">附近</text
+>\n+    <text x="160" y="78" font-family="sans-serif" font-size="11" text-anchor
+="middle" fill="#666">同城</text>\n+    <text x="256" y="78" font-family="sans-s
+erif" font-size="11" text-anchor="middle" fill="#666">全国</text>\n+    \n+    <
+!-- Card stack - back card -->\n+    <rect x="36" y="108" width="248" height="36
+0" rx="16" fill="#ddd" stroke="#bbb" stroke-width="1"/>\n+    \n+    <!-- Card s
+tack - front card -->\n+    <rect x="28" y="100" width="264" height="376" rx="16
+" fill="#f8f8f8" stroke="#999" stroke-width="2"/>\n+    <!-- Avatar placeholder 
+-->\n+    <rect x="28" y="100" width="264" height="280" rx="16" fill="#e8e8e8"/>
+\n+    <rect x="28" y="372" width="264" height="4" fill="none"/>\n+    \n+    <!
+-- Profile info -->\n+    <text x="44" y="404" font-family="sans-serif" font-siz
+e="18" font-weight="bold" fill="#333">昵称, 24</text>\n+    <text x="44" y="428"
+font-family="sans-serif" font-size="12" fill="#666">📍 2.5km</text>\n+    <text 
+x="44" y="450" font-family="sans-serif" font-size="12" fill="#666">喜欢旅行、摄
+影、咖啡 ☕️</text>\n+    \n+    <!-- Swipe indicators -->\n+    <rect x="44" y="
+120" width="72" height="32" rx="4" fill="#fff" stroke="#999" stroke-width="2" st
+roke-dasharray="4,2" opacity="0.8"/>\n+    <text x="80" y="140" font-family="san
+s-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="#666">PASS
+</text>\n+    <rect x="204" y="120" width="72" height="32" rx="4" fill="#fff" st
+roke="#999" stroke-width="2" stroke-dasharray="4,2" opacity="0.8"/>\n+    <text 
+x="240" y="140" font-family="sans-serif" font-size="12" font-weight="bold" text-
+anchor="middle" fill="#666">LIKE</text>\n+    \n+    <!-- Action buttons -->\n+ 
+  <circle cx="80" cy="540" r="32" fill="#f0f0f0" stroke="#999" stroke-width="2"/
+>\n+    <text x="80" y="546" font-family="sans-serif" font-size="20" text-anchor
+="middle" fill="#666">✕</text>\n+    <circle cx="240" cy="540" r="32" fill="#f0f
+0f0" stroke="#999" stroke-width="2"/>\n+    <text x="240" y="546" font-family="s
+ans-serif" font-size="20" text-anchor="middle" fill="#666">♥</text>\n+    \n+   
+<!-- Bottom nav -->\n+    <rect x="0" y="616" width="320" height="64" fill="#f8f
+8f8" stroke="#eee" stroke-width="1"/>\n+    <circle cx="80" cy="648" r="16" fill
+="#999"/>\n+    <text x="80" y="654" font-family="sans-serif" font-size="12" tex
+t-anchor="middle" fill="#fff">🏠</text>\n+    <circle cx="160" cy="648" r="16" f
+ill="none" stroke="#999" stroke-width="2"/>\n+    <text x="160" y="654" font-fam
+ily="sans-serif" font-size="12" text-anchor="middle" fill="#666">💬</text>\n+   
+<circle cx="240" cy="648" r="16" fill="none" stroke="#999" stroke-width="2"/>\n+
+   <text x="240" y="654" font-family="sans-serif" font-size="12" text-anchor="mi
+ddle" fill="#666">👤</text>\n+    \n+    <!-- Screen label -->\n+    <text x="16
+0" y="710" font-family="sans-serif" font-size="14" font-weight="bold" text-ancho
+r="middle" fill="#333">首页 - 推荐卡片</text>\n+    <text x="160" y="730" font-f
+amily="sans-serif" font-size="11" text-anchor="middle" fill="#666">Widget: HomeP
+age / SwipeCardStack</text>\n+  </g>\n+  \n+  <!-- ========== SCREEN 2: EMPTY ST
+ATE ========== -->\n+  <g transform="translate(420, 80)">\n+    <rect width="320
+" height="680" rx="24" fill="#fff" filter="url(#shadow)"/>\n+    <rect x="0" y="
+0" width="320" height="44" rx="24" fill="#e0e0e0"/>\n+    <rect x="0" y="22" wid
+th="320" height="22" fill="#e0e0e0"/>\n+    <text x="160" y="30" font-family="sa
+ns-serif" font-size="12" text-anchor="middle" fill="#666">9:41</text>\n+    \n+ 
+  <!-- Mode selector tabs -->\n+    <rect x="16" y="56" width="288" height="36" 
+rx="18" fill="#eee"/>\n+    <rect x="20" y="60" width="88" height="28" rx="14" f
+ill="#999"/>\n+    <text x="64" y="78" font-family="sans-serif" font-size="11" t
+ext-anchor="middle" fill="#fff">附近</text>\n+    <text x="160" y="78" font-fami
+ly="sans-serif" font-size="11" text-anchor="middle" fill="#666">同城</text>\n+  
+ <text x="256" y="78" font-family="sans-serif" font-size="11" text-anchor="middl
+e" fill="#666">全国</text>\n+    \n+    <!-- Empty illustration -->\n+    <circl
+e cx="160" cy="280" r="60" fill="#eee" stroke="#ddd" stroke-width="2"/>\n+    <t
+ext x="160" y="290" font-family="sans-serif" font-size="32" text-anchor="middle"
+fill="#bbb">🔍</text>\n+    <text x="160" y="380" font-family="sans-serif" font-
+size="16" font-weight="bold" text-anchor="middle" fill="#666">附近暂无可推荐用户
+</text>\n+    <text x="160" y="408" font-family="sans-serif" font-size="12" text
+-anchor="middle" fill="#999">扩大范围或稍后再来看看吧</text>\n+    <rect x="100"
+y="440" width="120" height="36" rx="18" fill="#f0f0f0" stroke="#999" stroke-widt
+h="1"/>\n+    <text x="160" y="462" font-family="sans-serif" font-size="12" text
+-anchor="middle" fill="#666">切换全国</text>\n+    \n+    <!-- Bottom nav -->\n+
+   <rect x="0" y="616" width="320" height="64" fill="#f8f8f8" stroke="#eee" stro
+ke-width="1"/>\n+    <circle cx="80" cy="648" r="16" fill="#999"/>\n+    <text x
+="80" y="654" font-family="sans-serif" font-size="12" text-anchor="middle" fill=
+"#fff">🏠</text>\n+    <circle cx="160" cy="648" r="16" fill="none" stroke="#999
+" stroke-width="2"/>\n+    <text x="160" y="654" font-family="sans-serif" font-s
+ize="12" text-anchor="middle" fill="#666">💬</text>\n+    <circle cx="240" cy="6
+48" r="16" fill="none" stroke="#999" stroke-width="2"/>\n+    <text x="240" y="6
+54" font-family="sans-serif" font-size="12" text-anchor="middle" fill="#666">👤<
+/text>\n+    \n+    <text x="160" y="710" font-family="sans-serif" font-size="14
+" font-weight="bold" text-anchor="middle" fill="#333">空状态</text>\n+    <text 
+x="160" y="730" font-family="sans-serif" font-size="11" text-anchor="middle" fil
+l="#666">Widget: EmptyRecommendationView</text>\n+  </g>\n+  \n+  <!-- =========
+= SCREEN 3: MATCH SUCCESS MODAL ========== -->\n+  <g transform="translate(780, 
+80)">\n+    <rect width="320" height="680" rx="24" fill="#fff" filter="url(#shad
+ow)"/>\n+    <rect x="0" y="0" width="320" height="44" rx="24" fill="#e0e0e0"/>\
+n+    <rect x="0" y="22" width="320" height="22" fill="#e0e0e0"/>\n+    <text x=
+"160" y="30" font-family="sans-serif" font-size="12" text-anchor="middle" fill="
+#666">9:41</text>\n+    \n+    <!-- Background dim -->\n+    <rect x="0" y="44" 
+width="320" height="636" fill="#000" opacity="0.5"/>\n+    \n+    <!-- Modal con
+tent -->\n+    <rect x="24" y="160" width="272" height="360" rx="16" fill="#fff"
+filter="url(#shadow)"/>\n+    <text x="160" y="200" font-family="sans-serif" fon
+t-size="18" font-weight="bold" text-anchor="middle" fill="#333">🎉 配对成功！</t
+ext>\n+    \n+    <!-- Avatars -->\n+    <circle cx="120" cy="260" r="36" fill="
+#ddd" stroke="#999" stroke-width="2"/>\n+    <text x="120" y="270" font-family="
+sans-serif" font-size="14" text-anchor="middle" fill="#666">我</text>\n+    <cir
+cle cx="200" cy="260" r="36" fill="#ddd" stroke="#999" stroke-width="2"/>\n+    
+<text x="200" y="270" font-family="sans-serif" font-size="14" text-anchor="middl
+e" fill="#666">TA</text>\n+    <text x="160" y="266" font-family="sans-serif" fo
+nt-size="16" text-anchor="middle" fill="#999">💕</text>\n+    \n+    <text x="16
+0" y="330" font-family="sans-serif" font-size="14" text-anchor="middle" fill="#6
+66">你们互相喜欢了对方</text>\n+    <text x="160" y="354" font-family="sans-seri
+f" font-size="12" text-anchor="middle" fill="#999">现在可以开始聊天啦</text>\n+ 
+  \n+    <!-- Buttons -->\n+    <rect x="48" y="390" width="224" height="44" rx=
+"22" fill="#999"/>\n+    <text x="160" y="418" font-family="sans-serif" font-siz
+e="14" font-weight="bold" text-anchor="middle" fill="#fff">立即聊天</text>\n+   
+<rect x="48" y="450" width="224" height="44" rx="22" fill="#f0f0f0" stroke="#999
+" stroke-width="1"/>\n+    <text x="160" y="478" font-family="sans-serif" font-s
+ize="14" text-anchor="middle" fill="#666">继续滑动</text>\n+    \n+    <text x="
+160" y="710" font-family="sans-serif" font-size="14" font-weight="bold" text-anc
+hor="middle" fill="#333">配对成功弹窗</text>\n+    <text x="160" y="730" font-fa
+mily="sans-serif" font-size="11" text-anchor="middle" fill="#666">Widget: MatchS
+uccessDialog</text>\n+  </g>\n+  \n+  <!-- ========== SCREEN 4: MATCH LIST =====
+===== -->\n+  <g transform="translate(1140, 80)">\n+    <rect width="320" height
+="680" rx="24" fill="#fff" filter="url(#shadow)"/>\n+    <rect x="0" y="0" width
+="320" height="44" rx="24" fill="#e0e0e0"/>\n+    <rect x="0" y="22" width="320"
+height="22" fill="#e0e0e0"/>\n+    <text x="160" y="30" font-family="sans-serif"
+font-size="12" text-anchor="middle" fill="#666">9:41</text>\n+    \n+    <!-- He
+ader -->\n+    <text x="160" y="76" font-family="sans-serif" font-size="16" font
+-weight="bold" text-anchor="middle" fill="#333">我的配对</text>\n+    \n+    <!-
+- Match list items -->\n+    <g transform="translate(16, 100)">\n+      <!-- Ite
+m 1 -->\n+      <rect width="288" height="72" rx="8" fill="#f8f8f8" stroke="#eee
+" stroke-width="1"/>\n+      <circle cx="36" cy="36" r="24" fill="#ddd"/>\n+    
+ <text x="72" y="32" font-family="sans-serif" font-size="14" font-weight="bold" 
+fill="#333">小林</text>\n+      <text x="72" y="52" font-family="sans-serif" fon
+t-size="11" fill="#999">2小时前配对</text>\n+      <rect x="240" y="20" width="3
+6" height="32" rx="16" fill="#f0f0f0" stroke="#999" stroke-width="1"/>\n+      <
+text x="258" y="40" font-family="sans-serif" font-size="12" text-anchor="middle"
+fill="#666">💬</text>\n+      \n+      <!-- Item 2 -->\n+      <g transform="tra
+nslate(0, 84)">\n+        <rect width="288" height="72" rx="8" fill="#f8f8f8" st
+roke="#eee" stroke-width="1"/>\n+        <circle cx="36" cy="36" r="24" fill="#d
+dd"/>\n+        <text x="72" y="32" font-family="sans-serif" font-size="14" font
+-weight="bold" fill="#333">阿杰</text>\n+        <text x="72" y="52" font-family
+="sans-serif" font-size="11" fill="#999">昨天配对</text>\n+        <rect x="240"
+y="20" width="36" height="32" rx="16" fill="#f0f0f0" stroke="#999" stroke-width=
+"1"/>\n+        <text x="258" y="40" font-family="sans-serif" font-size="12" tex
+t-anchor="middle" fill="#666">💬</text>\n+      </g>\n+      \n+      <!-- Item 
+3 -->\n+      <g transform="translate(0, 168)">\n+        <rect width="288" heig
+ht="72" rx="8" fill="#f8f8f8" stroke="#eee" stroke-width="1"/>\n+        <circle
+cx="36" cy="36" r="24" fill="#ddd"/>\n+        <text x="72" y="32" font-family="
+sans-serif" font-size="14" font-weight="bold" fill="#333">Alice</text>\n+       
+<text x="72" y="52" font-family="sans-serif" font-size="11" fill="#999">3天前配
+对</text>\n+        <rect x="240" y="20" width="36" height="32" rx="16" fill="#f
+0f0f0" stroke="#999" stroke-width="1"/>\n+        <text x="258" y="40" font-fami
+ly="sans-serif" font-size="12" text-anchor="middle" fill="#666">💬</text>\n+    
+ </g>\n+    </g>\n+    \n+    <!-- Bottom nav -->\n+    <rect x="0" y="616" widt
+h="320" height="64" fill="#f8f8f8" stroke="#eee" stroke-width="1"/>\n+    <circl
+e cx="80" cy="648" r="16" fill="none" stroke="#999" stroke-width="2"/>\n+    <te
+xt x="80" y="654" font-family="sans-serif" font-size="12" text-anchor="middle" f
+ill="#666">🏠</text>\n+    <circle cx="160" cy="648" r="16" fill="#999"/>\n+    
+<text x="160" y="654" font-family="sans-serif" font-size="12" text-anchor="middl
+e" fill="#fff">💬</text>\n+    <circle cx="240" cy="648" r="16" fill="none" stro
+ke="#999" stroke-width="2"/>\n+    <text x="240" y="654" font-family="sans-serif
+" font-size="12" text-anchor="middle" fill="#666">👤</text>\n+    \n+    <text x
+="160" y="710" font-family="sans-serif" font-size="14" font-weight="bold" text-a
+nchor="middle" fill="#333">匹配列表</text>\n+    <text x="160" y="730" font-fami
+ly="sans-serif" font-size="11" text-anchor="middle" fill="#666">Widget: MatchLis
+tPage / MatchListItem</text>\n+  </g>\n+  \n+  <!-- ========== FLOW DIAGRAM ====
+====== -->\n+  <g transform="translate(60, 820)">\n+    <rect width="1400" heigh
+t="340" rx="12" fill="#fff" filter="url(#shadow)"/>\n+    <text x="700" y="32" f
+ont-family="sans-serif" font-size="16" font-weight="bold" text-anchor="middle" f
+ill="#333">用户流程图</text>\n+    \n+    <!-- Flow nodes -->\n+    <rect x="40"
+y="60" width="120" height="48" rx="8" fill="#e8e8e8" stroke="#999" stroke-width=
+"2"/>\n+    <text x="100" y="88" font-family="sans-serif" font-size="12" text-an
+chor="middle" fill="#333">进入首页</text>\n+    \n+    <rec[...truncated]\n',
+        message='Command executed successfully. Output is truncated to fit in th
+e message.',
+        display=[],
+        extras=None
+    )
+)
+StepBegin(n=5)
+ThinkPart(
+    type='think',
+    think='我已经读取了主要文件。从 git diff 和 .doc-coverage.txt 可以看出，PR #
+33 的变更全部是文档和设计资产文件，没有任何代码文件变更。具体变更包括：\n\n1. de
+signs/issue-4/design-spec.md（新增）\n2. designs/issue-4/docs-to-update.txt（新
+增）\n3. designs/issue-4/mockup.html（新增）\n4. designs/issue-4/wireframe.svg（
+新增）\n5. docs/api/INDEX.md（修改）\n6. docs/api/matching.md（修改）\n7. docs/a
+pi/socket-events.md（修改）\n8. docs/modules/matching.md（修改）\n9. prd/v1-matc
+hing.md（修改）\n\n这是一个 Design-Only PR（设计文档 PR），关联 Issue #4（Matchi
+ng 模块）。\n\n让我继续读取变更的文档内容，以便进行文档同步审查。同时需要检查 do
+cs/modules/INDEX.md 是否包含 matching 模块。',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_F0s6yIkBg4pyV3AQKGOQltGL',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "/private/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n0000
+0gn/T/review-pr-33-1791497718/docs/api/INDEX.md"}'
+    ),
+    extras=None
+)
+ToolCall(
+    type='function',
+    id='tool_TVAlNzPkwIAE29UPXZk7s2mm',
+    function=FunctionBody(name='ReadFile', arguments='{"path": "/private/var'),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_F0s6yIkBg4pyV3AQKGOQltGL',
+    return_value=ToolOk(
+        is_error=False,
+        output='     1\t# API 文档索引\n     2\t\n     3\t| 文档 | 说明 |\n     
+4\t|------|------|\n     5\t| [matching.md](matching.md) | Matching 模块接口契约
+与错误码 |\n     6\t| [socket-events.md](socket-events.md) | Socket.io 事件定义 
+|\n',
+        message='6 lines read from file starting from line 1. Total lines in fil
+e: 6. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(
+    arguments_part='/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/review-pr-33-17
+91497718/docs/api/matching.md"}'
+)
+ToolCall(
+    type='function',
+    id='tool_Ui9tKVQ5K8qAuthPjbe8zwnL',
+    function=FunctionBody(name='ReadFile', arguments='{"path": "/private/var'),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_TVAlNzPkwIAE29UPXZk7s2mm',
+    return_value=ToolOk(
+        is_error=False,
+        output='     1\t# 新增 Matching 模块 API 文档，包含推荐和滑动接口的契约
+定义\n     2\t\n     3\t> TODO: 由设计任务自动生成，待开发阶段补充。\n     4\t\n
+    5\t## 相关设计\n     6\t- 设计规范: [design-spec.md](../../designs/issue-4/d
+esign-spec.md)\n',
+        message='6 lines read from file starting from line 1. Total lines in fil
+e: 6. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(
+    arguments_part='/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/review-pr-33-17
+91497718/docs/api/socket-events.md"}'
+)
+ToolCall(
+    type='function',
+    id='tool_FdhOK2GIjxBZUxak22CSoqC5',
+    function=FunctionBody(name='ReadFile', arguments='{"path": "/private/var'),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_Ui9tKVQ5K8qAuthPjbe8zwnL',
+    return_value=ToolOk(
+        is_error=False,
+        output='     1\t# Socket.io 事件\n     2\t\n     3\t## `match:created`\n
+    4\t\n     5\t双向匹配成功后，服务端向双方用户推送。\n     6\t\n     7\t### P
+ayload\n     8\t\n     9\t```json\n    10\t{\n    11\t  "match_id": "string",\n 
+  12\t  "conversation_id": "string",\n    13\t  "matched_user": {\n    14\t    "
+user_id": "string",\n    15\t    "nickname": "string",\n    16\t    "avatar_url"
+: "string"\n    17\t  }\n    18\t}\n    19\t```\n',
+        message='19 lines read from file starting from line 1. Total lines in fi
+le: 19. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(
+    arguments_part='/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/review-pr-33-17
+91497718/docs/modules/matching.md"}'
+)
+ToolCall(
+    type='function',
+    id='tool_o8jORB2I7aKhIWZib8Ioharj',
+    function=FunctionBody(name='ReadFile', arguments='{"path": "/private/var'),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_FdhOK2GIjxBZUxak22CSoqC5',
+    return_value=ToolOk(
+        is_error=False,
+        output="     1\t# Matching 模块实现\n     2\t\n     3\t## 职责\n     4\t
+\n     5\t负责推荐卡片生成、滑动操作处理、双向匹配判定与通知。\n     6\t\n     7
+\t## 流程图\n     8\t\n     9\t### 推荐卡片\n    10\t\n    11\t```mermaid\n    1
+2\tsequenceDiagram\n    13\t    participant C as Flutter App\n    14\t    partic
+ipant API as MatchingController\n    15\t    participant S as MatchingService\n 
+  16\t    participant DB as MySQL\n    17\t    participant R as Redis\n    18\t\
+n    19\t    C->>API: GET /matching/recommendations\n    20\t    API->>S: getRec
+ommendations(userId, location, filters)\n    21\t    S->>R: get candidate pool\n
+   22\t    alt cache miss\n    23\t        S->>DB: query candidates (Haversine +
+filters)\n    24\t        DB-->>S: user list\n    25\t        S->>R: cache candi
+date pool (TTL 5min)\n    26\t    end\n    27\t    S-->>API: sorted cards\n    2
+8\t    API-->>C: 200 OK\n    29\t```\n    30\t\n    31\t### 滑动与匹配\n    32\t
+\n    33\t```mermaid\n    34\tsequenceDiagram\n    35\t    participant C as Flut
+ter App\n    36\t    participant API as MatchingController\n    37\t    particip
+ant S as MatchingService\n    38\t    participant DB as MySQL\n    39\t    parti
+cipant WS as Socket.io\n    40\t\n    41\t    C->>API: POST /matching/actions (t
+arget_id, action=like)\n    42\t    API->>S: recordAction(userId, targetId, acti
+on)\n    43\t    S->>DB: insert match_actions\n    44\t    S->>DB: checkMutualLi
+ke(targetId, userId)\n    45\t    alt mutual like\n    46\t        S->>DB: creat
+e match + conversation\n    47\t        S->>WS: emit match:created to both users
+\n    48\t    end\n    49\t    S-->>API: result\n    50\t    API-->>C: 200 OK\n 
+  51\t```\n    52\t\n    53\t## Flutter 架构\n    54\t\n    55\t### BLoC / Event
+/ State\n    56\t\n    57\t#### MatchingBloc（首页推荐 + 滑动）\n    58\t\n    5
+9\t```dart\n    60\t// matching_bloc.dart\n    61\tclass MatchingBloc extends Bl
+oc<MatchingEvent, MatchingState> { ... }\n    62\t\n    63\t// matching_event.da
+rt\n    64\tabstract class MatchingEvent {}\n    65\tclass RecommendationsReques
+ted extends MatchingEvent {\n    66\t  final String mode; // 'nearby' | 'city' |
+'nationwide'\n    67\t}\n    68\tclass SwipeActionSubmitted extends MatchingEven
+t {\n    69\t  final String targetId;\n    70\t  final SwipeAction action; // li
+ke | pass\n    71\t}\n    72\tclass MatchModalDismissed extends MatchingEvent {}
+\n    73\t\n    74\t// matching_state.dart\n    75\tabstract class MatchingState
+{}\n    76\tclass MatchingInitial extends MatchingState {}\n    77\tclass Matchi
+ngLoadInProgress extends MatchingState {}\n    78\tclass MatchingLoadSuccess ext
+ends MatchingState {\n    79\t  final List<RecommendationCard> cards;\n    80\t 
+final String mode;\n    81\t}\n    82\tclass MatchingLoadEmpty extends MatchingS
+tate {\n    83\t  final String mode;\n    84\t}\n    85\tclass MatchingSwipeInPr
+ogress extends MatchingState {\n    86\t  final List<RecommendationCard> cards;\
+n    87\t  final String targetId;\n    88\t  final SwipeAction action;\n    89\t
+}\n    90\tclass MatchingMatchCreated extends MatchingState {\n    91\t  final M
+atchSummary match; // 用于弹窗展示\n    92\t}\n    93\tclass MatchingFailure ext
+ends MatchingState {\n    94\t  final String message;\n    95\t}\n    96\t```\n 
+  97\t\n    98\t#### MatchListCubit（匹配列表）\n    99\t\n   100\t```dart\n   1
+01\t// match_list_cubit.dart\n   102\tclass MatchListCubit extends Cubit<MatchLi
+stState> {\n   103\t  Future<void> fetchMatches({String? cursor}) async { ... }\
+n   104\t}\n   105\t\n   106\t// match_list_state.dart\n   107\tabstract class M
+atchListState {}\n   108\tclass MatchListInitial extends MatchListState {}\n   1
+09\tclass MatchListLoadInProgress extends MatchListState {}\n   110\tclass Match
+ListLoadSuccess extends MatchListState {\n   111\t  final List<MatchItem> matche
+s;\n   112\t  final bool hasMore;\n   113\t  final String? nextCursor;\n   114\t
+}\n   115\tclass MatchListLoadFailure extends MatchListState {\n   116\t  final 
+String message;\n   117\t}\n   118\t```\n   119\t\n   120\t### 组件清单\n   121\
+t\n   122\t| 层级 | 组件名 | 文件路径 | 说明 |\n   123\t|------|--------|-------
+---|------|\n   124\t| atom | `SwActionButton` | `packages/design-system/lib/src
+/atoms/sw_action_button.dart` | 圆形操作按钮（Pass/Like 两种变体） |\n   125\t| 
+molecule | `SwipeCard` | `packages/design-system/lib/src/molecules/swipe_card.da
+rt` | 可拖动/可点击的推荐用户卡片 |\n   126\t| organism | `SwipeCardStack` | `pa
+ckages/design-system/lib/src/organisms/swipe_card_stack.dart` | 卡片堆叠容器，管
+理多层卡片渲染与手势冲突 |\n   127\t| organism | `MatchSuccessDialog` | `package
+s/design-system/lib/src/organisms/match_success_dialog.dart` | 配对成功全屏弹窗
+，含头像组合、CTA 按钮 |\n   128\t| molecule | `MatchListItem` | `packages/desig
+n-system/lib/src/molecules/match_list_item.dart` | 匹配列表单项，含头像、昵称、
+时间、聊天入口 |\n   129\t\n   130\t### 页面级 Widget\n   131\t\n   132\t| Widge
+t 名 | 路径 | 说明 |\n   133\t|-----------|------|------|\n   134\t| `HomePage` 
+| `apps/mobile/lib/presentation/pages/home_page.dart` | 首页，承载模式切换、卡片
+堆叠、操作按钮、底部导航 |\n   135\t| `MatchListPage` | `apps/mobile/lib/present
+ation/pages/match_list_page.dart` | 匹配列表页，底部导航「消息」Tab 内容 |\n   1
+36\t| `EmptyRecommendationView` | `apps/mobile/lib/presentation/widgets/empty_re
+commendation_view.dart` | 推荐为空时的占位视图 |\n   137\t\n   138\t### 路由映射
+\n   139\t\n   140\t| 路由名 | 页面 | 参数 |\n   141\t|--------|------|------|\n
+  142\t| `/home` | `HomePage` | 无 |\n   143\t| `/messages` | `MatchListPage` | 
+无（底部导航 Tab） |\n   144\t\n   145\t### Socket.io 事件监听\n   146\t\n   147
+\t- 在 `HomePage` 的 `initState` 中建立 Socket 连接（或通过全局 BLoC）\n   148\t
+- 监听 `match:created` 事件，接收到后向 `MatchingBloc` dispatch `ExternalMatchRe
+ceived(matchSummary)`\n   149\t- `MatchingBloc` 状态流转至 `MatchingMatchCreated
+`，触发 `MatchSuccessDialog`\n   150\t\n   151\t## 关键文件\n   152\t\n   153\t|
+文件 | 路径 |\n   154\t|------|------|\n   155\t| Controller | `apps/api/src/mod
+ules/matching/matching.controller.ts` |\n   156\t| Service | `apps/api/src/modul
+es/matching/matching.service.ts` |\n   157\t| DTO | `apps/api/src/modules/matchi
+ng/dto/` |\n   158\t| Flutter BLoC | `apps/mobile/lib/presentation/blocs/matchin
+g/` |\n   159\t| Card Widget | `apps/mobile/lib/presentation/widgets/swipe_card.
+dart` |\n   160\t\n   161\t## 边界情况\n   162\t\n   163\t1. **重复滑动**：同一
+用户短时间内重复滑动同一人，后端幂等处理（MySQL `INSERT IGNORE` 或唯一索引拦截）
+\n   164\t2. **滑动自己**：返回 `code=1000` 参数错误\n   165\t3. **缓存击穿**：
+推荐池使用 Redis + 本地缓存双层防护，DB 查询加互斥锁\n   166\t4. **新用户冷启动*
+*：注册完成后自动生成首批推荐池\n",
+        message='166 lines read from file starting from line 1. Total lines in f
+ile: 166. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(
+    arguments_part='/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/review-pr-33-17
+91497718/docs/modules/INDEX.md"}'
+)
+ToolCall(
+    type='function',
+    id='tool_dYZGTXCKILj73x6xx5CW2FZV',
+    function=FunctionBody(name='ReadFile', arguments='{"path": "/private/var'),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_o8jORB2I7aKhIWZib8Ioharj',
+    return_value=ToolOk(
+        is_error=False,
+        output='     1\t# 模块实现文档索引\n     2\t\n     3\t> 本目录按业务模块
+组织实现文档，跨越代码层级（DB / API / Mobile / BLoC / Widget）描述模块全貌。\n 
+   4\t> \n     5\t> **注意**：本仓库采用单一全栈 Agent 模式，一个模块的文档应覆
+盖后端到前端的完整链路。\n     6\t\n     7\t## 模块清单\n     8\t\n     9\t| 模
+块 | 说明 | 关联 PRD |\n    10\t|------|------|----------|\n    11\t| [auth.md](
+auth.md) | 注册、登录、Token 刷新、登出（DB → API → Mobile） | [prd/v1-mvp.md](.
+./../prd/v1-mvp.md) |\n    12\t| [profile.md](profile.md) | 个人资料、头像相册、
+年龄校验（DB → API → Mobile） | [prd/v1-profile.md](../../prd/v1-profile.md) |\n
+   13\t| [matching.md](matching.md) | 推荐、滑动、匹配成功（DB → API → Mobile） 
+| [docs/product-specs/matching.md](../product-specs/matching.md) |\n    14\t| [d
+ev-tools.md](dev-tools.md) | Debug 专用工具模块（Dev Tools Drawer） | [prd/v1-de
+v-tools-drawer.md](../../prd/v1-dev-tools-drawer.md) |\n    15\t| [im.md](im.md)
+| 会话、消息、已读回执、推送（DB → API → Mobile） | [docs/product-specs/im.md](.
+./product-specs/im.md) |\n    16\t| [admin.md](admin.md) | Admin Dashboard、用户
+列表管理 | [prd/v1-infrastructure-bootstrap.md](../../prd/v1-infrastructure-boot
+strap.md) |\n    17\t| [blocks-reports.md](blocks-reports.md) | 拉黑、举报基础 A
+PI | [prd/v1-infrastructure-bootstrap.md](../../prd/v1-infrastructure-bootstrap.
+md) |\n    18\t| [content-moderation.md](content-moderation.md) | 内容审核 Webho
+ok、照片状态管理 | [prd/v1-infrastructure-bootstrap.md](../../prd/v1-infrastruct
+ure-bootstrap.md) |\n    19\t\n    20\t## 写作规范\n    21\t\n    22\t每个模块文
+档应包含：\n    23\t1. **时序图/流程图**：Mermaid 描述核心流程（覆盖 API 和 Mobi
+le 的交互）\n    24\t2. **关键文件索引**：代码仓库中的关键文件路径（DB / API / M
+obile 三层）\n    25\t3. **状态机/数据结构**：核心实体状态转换\n    26\t4. **边
+界情况**：异常流程、权限校验、幂等性设计\n    27\t5. **全链路变更清单**：修改该
+模块时，Agent 需要同时改哪些文件\n',
+        message='27 lines read from file starting from line 1. Total lines in fi
+le: 27. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(
+    arguments_part='/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/review-pr-33-17
+91497718/docs/design-docs/INDEX.md"}'
+)
+StatusUpdate(
+    context_usage=0.13452911376953125,
+    context_tokens=35266,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=26562,
+        output=537,
+        input_cache_read=8704,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-COlK1xmSfASqJR20QJyUmBno',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_dYZGTXCKILj73x6xx5CW2FZV',
+    return_value=ToolOk(
+        is_error=False,
+        output='     1\t# 设计文档索引\n     2\t\n     3\t> 本目录存放编码规范、
+架构决策与技术约束。Agent 在写代码前应先查阅对应规范。\n     4\t\n     5\t## 文
+档清单与验证状态\n     6\t\n     7\t| 文档                                      
+        | 状态         | 说明                                        |\n     8\t
+| -------------------------------------------------- | ------------ | ----------
+--------------------------------- |\n     9\t| [core-beliefs.md](core-beliefs.md
+)                 | ✅ Validated | Agent-First 工程理念                        |
+\n    10\t| [db.md](db.md)                                     | ⚠️ WIP       | 
+数据库规范与核心 ER 设计                    |\n    11\t| [api.md](api.md)       
+                           | ⚠️ WIP       | API 设计规范与 OpenAPI 约定          
+      |\n    12\t| [testing.md](testing.md)                           | ✅ Valid
+ated | 测试策略与验收标准规范                      |\n    13\t| [flutter.md](flu
+tter.md)                           | ⚠️ WIP       | Flutter 编码规范与目录约定   
+              |\n    14\t| [nestjs.md](nestjs.md)                             | 
+⚠️ WIP       | NestJS 编码规范与分层约定                   |\n    15\t| [observab
+ility.md](observability.md)               | ⚠️ WIP       | 可观测性规范（日志、指
+标）                  |\n    16\t| [readability.md](readability.md)             
+     | ✅ Validated | 代码可读性与命名规范                        |\n    17\t| [
+ADR-001-monorepo.md](ADR-001-monorepo.md)         | ✅ Validated | 为什么选择 Mo
+norepo                         |\n    18\t| [ui-style-guide/INDEX.md](ui-style-g
+uide/INDEX.md) | ✅ Validated | UI 风格规范、Design Token、原子组件使用规则 |\n 
+  19\t\n    20\t## 状态定义\n    21\t\n    22\t- ✅ **Validated**：文档已审阅，
+与代码一致\n    23\t- ⚠️ **WIP**：骨架已建立，存在已知差距（允许在演进中逐步补全
+）\n    24\t- ❌ **Outdated**：文档与代码不一致，需优先更新\n',
+        message='24 lines read from file starting from line 1. Total lines in fi
+le: 24. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+StepBegin(n=6)
+ThinkPart(
+    type='think',
+    think='我现在掌握了足够的信息来进行审查。让我总结一下：\n\n**PR #33 变更内容
+：**\n- 这是一个 Design-Only PR，分支名为 `design/issue-4`\n- 只包含设计资产和文
+档更新，没有任何代码文件变更\n- 新增 `designs/issue-4/` 目录下的设计规范、原型图
+、线框图\n- 更新 `docs/api/INDEX.md`, `docs/api/matching.md`, `docs/api/socket-e
+vents.md`\n- 更新 `docs/modules/matching.md`\n- 更新 `prd/v1-matching.md`（添加
+设计资产链接）\n\n**审查分析：**\n\n1. **全链路完整性**：这是一个 Design-Only PR
+，不包含 DB + API + Mobile 代码实现。这是符合预期的，因为 PRD 中明确提到了 M-MAT
+CH-0 是 "UI 设计评审与 Design-Only PR"，而且 PRD `v1-matching.md` 中也有设计资产
+链接。但作为审查，我应该指出这仅包含设计和文档，后续需要补充代码实现。\n\n2. **
+规范符合性**：需要检查设计规范是否符合 `docs/design-docs/` 中的约定。设计规范使
+用了 Design Tokens，符合 UI 风格规范。需要查看 `docs/design-docs/ui-style-guide/
+` 和 `flutter.md` 等规范来确认。\n\n3. **契约一致性**：由于没有任何代码变更，此
+项 N/A 或待后续实现。\n\n4. **测试覆盖**：Design-Only PR 不需要代码测试，但应该
+有设计验收 Checklist。design-spec.md 第 8 节有验收 Checklist。\n\n5. **文档同步*
+*：\n   - `docs/api/matching.md` 第一行是 "# 新增 Matching 模块 API 文档..."，这
+看起来像是把设计说明直接作为标题了，格式不正确。标题应该是 "Matching API" 之类的
+，然后下面才是说明。\n   - `docs/modules/matching.md` 已经在 `docs/modules/INDEX
+.md` 中注册\n   - `docs/api/INDEX.md` 已更新\n   - 但 `docs/design-docs/flutter.
+md` 没有按 `docs-to-update.txt` 中的计划更新（虽然标记为可选）\n   - `prd/v1-mat
+ching.md` 已更新（顶部添加设计资产链接）\n\n6. **UI/设计一致性**：由于这是设计资
+产 PR，应该检查设计资产本身是否完整、一致。design-spec.md 存在，mockup.html 和 w
+ireframe.svg 也存在。\n\n7. **文档同步审查硬规则**：\n   - 这个 PR 没有修改对外
+暴露的 API 代码（Controller、Router 等），只有文档占位文件 `docs/api/matching.md
+` 和 `docs/api/socket-events.md`。\n   - 这个 PR 没有修改核心业务流程的代码实现
+，只是设计文档。\n   - matching.md 已在 `docs/modules/INDEX.md` 中注册。\n   - 
+因此文档同步硬规则不适用直接判 ❌ 的情况。但 `docs/api/matching.md` 的标题格式有
+问题。\n\n让我再读取一些相关文件来检查规范一致性。',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_bKK7hUjGbimwJJ0KhUOTiBJg',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "/private/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n0000
+0gn/T/review-pr-33-1791497718/docs/design-docs/ui-style-guide/INDEX.md"}'
+    ),
+    extras=None
+)
+ToolCall(
+    type='function',
+    id='tool_JFDLftsx7arWcdDDEmD2koZJ',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "/private/var/folders/lt/w3sl6z8j5v50vt2'
+    ),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_bKK7hUjGbimwJJ0KhUOTiBJg',
+    return_value=ToolOk(
+        is_error=False,
+        output="     1\t# UI 风格规范索引\n     2\t\n     3\t> Agent 在修改任何 
+UI 代码前，必须先阅读本目录下的对应规范。\n     4\t\n     5\t## 快速导航\n     6
+\t\n     7\t| 我要做什么              | 先读                                    
+                         |\n     8\t| ----------------------- | ----------------
+------------------------------------------------- |\n     9\t| 修改颜色/字体/间
+距/圆角 | [tokens.md](tokens.md) + [assets/tokens.json](assets/tokens.json) |\n 
+  10\t| 使用/新增原子组件       | [components.md](components.md)                
+                   |\n    11\t| 写 Flutter Mobile 页面  | [mobile-patterns.md](m
+obile-patterns.md)                          |\n    12\t| 写 Next.js Admin 页面  
+| [admin-patterns.md](admin-patterns.md)                            |\n    13\t|
+提交 UI PR 前检查       | [verification.md](verification.md)                    
+           |\n    14\t\n    15\t## 不可违反的原则\n    16\t\n    17\t1. **禁止硬
+编码**颜色/字号/间距/圆角 —— 必须使用 `packages/design-system/lib/src/theme/toke
+ns.dart` 中的 `DesignTokens`\n    18\t2. **所有新 Widget** 必须在 `widgetbook/ma
+in.dart` 中注册至少一个 use-case\n    19\t3. **所有视觉变更** 必须通过 `make des
+ign-check`\n    20\t4. Mobile 与 Admin 共享同一套核心 Token（主色、错误色、文字
+色）\n    21\t\n    22\t## 文档清单与验证状态\n    23\t\n    24\t| 文档         
+                           | 状态         | 说明                          |\n   
+25\t| ---------------------------------------- | ------------ | ----------------
+------------- |\n    26\t| [core-beliefs.md](core-beliefs.md)       | ✅ Validat
+ed | UI 设计的黄金原则（DO/DON'T） |\n    27\t| [tokens.md](tokens.md)          
+        | ✅ Validated | Design Token 规范与同步契约   |\n    28\t| [components.
+md](components.md)           | ✅ Validated | 原子组件使用规则              |\n 
+  29\t| [mobile-patterns.md](mobile-patterns.md) | ⚠️ WIP       | Flutter 页面模
+式              |\n    30\t| [admin-patterns.md](admin-patterns.md)   | ⚠️ WIP   
+   | Admin 页面模式                |\n    31\t| [verification.md](verification.m
+d)       | ✅ Validated | UI 验证与验收标准             |\n    32\t\n    33\t## 
+状态定义\n    34\t\n    35\t- ✅ **Validated**：文档已审阅，与代码一致\n    36\t
+- ⚠️ **WIP**：骨架已建立，允许在演进中逐步补全\n    37\t- ❌ **Outdated**：文档与
+代码不一致，需优先更新\n",
+        message='37 lines read from file starting from line 1. Total lines in fi
+le: 37. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(
+    arguments_part='s6knvf5n00000gn/T/review-pr-33-1791497718/docs/design-docs/f
+lutter.md"}'
+)
+ToolCall(
+    type='function',
+    id='tool_mUZsFYzcwRsISYLY3r85Toyf',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "/private/var/folders/lt/w3sl6'
+    ),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_JFDLftsx7arWcdDDEmD2koZJ',
+    return_value=ToolOk(
+        is_error=False,
+        output="     1\t# Flutter 编码规范\n     2\t\n     3\t## 定位\n     4\t\
+n     5\tFlutter 是本项目的**移动端 App**，由全栈 Agent 在实现需求时统一维护。Ag
+ent 在修改 Flutter 代码时，必须保证与 `apps/api/` 的 API 契约和 `packages/design
+-system/` 的设计规范一致。\n     6\t\n     7\t## 项目结构（apps/mobile）\n     8
+\t\n     9\t```\n    10\tlib/\n    11\t├── main.dart\n    12\t├── app.dart\n    
+13\t├── core/\n    14\t│   ├── di/                 # GetIt / injectable 依赖注入
+\n    15\t│   ├── network/            # Dio 封装、拦截器\n    16\t│   ├── storag
+e/            # SharedPreferences / SecureStorage\n    17\t│   └── utils/       
+      # 工具函数\n    18\t├── data/\n    19\t│   ├── models/             # 由 Op
+enAPI 生成或手写的数据模型\n    20\t│   │   └── generated/      # openapi-genera
+tor 自动生成的模型\n    21\t│   │       └── auth/       # Auth 模块生成模型\n   
+22\t│   ├── repositories/       # 仓库实现\n    23\t│   └── datasources/        
+# 远程/本地数据源\n    24\t├── domain/\n    25\t│   ├── entities/           # 纯
+业务实体（手写）\n    26\t│   ├── repositories/       # 仓库接口\n    27\t│   └─
+─ usecases/           # 用例（可选）\n    28\t├── presentation/\n    29\t│   ├──
+pages/              # 页面\n    30\t│   ├── widgets/            # 可复用组件\n  
+ 31\t│   ├── blocs/              # BLoC / Cubit 状态管理\n    32\t│   └── routes
+.dart         # GoRouter 路由表\n    33\t└── design_system/          # 引用 pack
+ages/design-system 中的组件\n    34\t```\n    35\t\n    36\t## 状态管理\n    37\
+t\n    38\t- **全局状态**：使用 `flutter_bloc`（Cubit 为主，BLoC 为辅）\n    39\
+t- **局部状态**：`StatefulWidget` 或 `ValueNotifier`\n    40\t- **依赖注入**：`g
+et_it` + `injectable`\n    41\t\n    42\t## 命名规范\n    43\t\n    44\t- 文件名
+：`snake_case.dart`\n    45\t- 类名：`PascalCase`\n    46\t- Widget 类名必须以描
+述功能结尾（如 `HomePage`, `UserCardWidget`）\n    47\t- BLoC 相关：`xxx_bloc.da
+rt`, `xxx_event.dart`, `xxx_state.dart`\n    48\t- **设计系统组件必须以 `Sw` 为
+前缀**，如 `SwButton`, `SwAvatar`\n    49\t\n    50\t## 网络层\n    51\t\n    52
+\t- 使用 **Dio** + 拦截器处理统一错误、Token 刷新、日志\n    53\t- API 响应统一
+封装为 `Result<T>` 或 `Either<Failure, T>`\n    54\t- 所有 Model 使用 `freezed` 
++ `json_serializable`\n    55\t- Model 字段命名必须与后端 DTO 完全一致\n    56\t
+- **OpenAPI 生成模型**存放在 `apps/mobile/lib/models/generated/<module>/`，禁止
+手动修改生成文件\n    57\t\n    58\t### DioClient 单例模式\n    59\t\n    60\t`D
+ioClient` 必须在 `get_it` 中注册为 **全局单例**（`registerLazySingleton`），确保
+所有 Repository 共享同一 `Dio` 实例。这样当 DevTools 等模块需要热更新 `baseUrl` 
+时，变更对所有网络请求即时生效。\n    61\t\n    62\t```dart\n    63\t// apps/mob
+ile/lib/core/di/di.dart\n    64\tvoid configureDependencies() {\n    65\t  getIt
+.registerLazySingleton<DioClient>(DioClient.new);\n    66\t  // ...\n    67\t}\n
+   68\t```\n    69\t\n    70\tRepository 实现中禁止直接 `DioClient().dio`，应通
+过依赖注入获取：\n    71\t\n    72\t```dart\n    73\t// ✅ 正确\n    74\tclass A
+uthRepositoryImpl implements AuthRepository {\n    75\t  final Dio _dio;\n    76
+\t  AuthRepositoryImpl({Dio? dio}) : _dio = dio ?? getIt<DioClient>().dio;\n    
+77\t}\n    78\t\n    79\t// ❌ 错误（会导致多个 Dio 实例，baseUrl 热更新失效）\n
+   80\tAuthRepositoryImpl({Dio? dio}) : _dio = dio ?? DioClient().dio;\n    81\t
+```\n    82\t\n    83\t## UI 规范\n    84\t\n    85\t- 不使用硬编码颜色/字号，统
+一从 `packages/design-system` 的 `AppTheme` 读取\n    86\t- 页面之间使用 `go_rou
+ter` 导航\n    87\t- 图片资源使用 `flutter_gen` 自动生成引用\n    88\t- 字符串使
+用 `intl` / `flutter_localizations` 管理（优先中文）\n    89\t\n    90\t## 页面
+级 UI 开发前置规范\n    91\t\n    92\t任何涉及**新页面、新核心交互模式、新组件**
+的功能开发，必须严格遵守以下前置流程。Issue #2（Auth Login）因跳过该流程导致 Log
+inPage 未使用 design-system 组件、无 Widgetbook 用例、无原型图 review，已产生技
+术债务。\n    93\t\n    94\t### 强制前置条件（Must Have）\n    95\t\n    96\t1. 
+**低保真原型图评审通过**\n    97\t   - PM Agent 必须产出至少包含关键页面布局、交
+互状态、异常状态的低保真线框图（可存放于 `docs/design-docs/ui-specs/<feature>/`
+）。\n    98\t   - 人类确认原型图通过 review 后，才能进入 design-system 组件开发
+。\n    99\t\n   100\t2. **Design-Only PR 先走，且必须附带可查看的视觉产物**\n  
+101\t   - 在写后端 API、数据库 Entity、Dio 网络请求之前，先提交独立的 Design-Onl
+y PR。\n   102\t   - Design-Only PR 的变更范围仅限于：\n   103\t     - `packages
+/design-system/`（新增/修改组件）\n   104\t     - `packages/design-system/widget
+book/main.dart`（注册展示用例）\n   105\t     - `apps/mobile/lib/presentation/` 
+中的纯 UI 骨架（无 BLoC、无网络请求、无业务逻辑）\n   106\t   - **PR 中必须包含
+至少一张视觉产物**，供人类在不运行代码的情况下快速 review。推荐方式（按优先级排
+序）：\n   107\t     - **方案 A（推荐）**：提交 Golden File 截图测试。运行 `flut
+ter test --update-goldens` 生成 `*.png`，将生成的 golden 图片一并提交到 PR 中。
+人类可直接在 GitHub 上查看组件渲染效果。\n   108\t     - **方案 B**：若 golden f
+ile 暂时无法生成，PR 描述中必须包含运行命令，由人类在本地运行 `flutter run -d ch
+rome -t lib/widgetbook/main.dart` 或模拟器后，**截图并作为 PR review comment 贴
+回**，确认后方可合并。\n   109\t     - **方案 C（仅作补充）**：可用 Markdown / M
+ermaid / ASCII art 绘制线框逻辑图，但**不能替代**方案 A 或 B 的视觉验收。\n   11
+0\t\n   111\t3. **组件原子化评审**\n   112\t   - 页面中的任何可复用元素（按钮、
+输入框、卡片、列表项、弹窗）若 design-system 中不存在，必须先按 `atom → molecule
+→ organism` 层级在 design-system 中实现。\n   113\t   - **禁止**在 `pages/` 中直
+接使用原生 Material 组件（如 `TextField`、`ElevatedButton`、`OutlineInputBorder`
+）替代 design-system 组件。\n   114\t\n   115\t### 验收 Checklist\n   116\t\n   
+117\t在提交任何包含 Mobile UI 的 PR 前，PR 描述中必须勾选：\n   118\t\n   119\t-
+[ ] 该功能已产出低保真/高保真原型图，且已通过人类 review\n   120\t- [ ] 所有新增
+/修改的组件已在 `widgetbook/main.dart` 中注册\n   121\t- [ ] PR 中附带 Golden Fi
+le 截图或 Widgetbook 运行截图，供人类直接查看视觉产物\n   122\t- [ ] `pages/` 中
+未使用 `Color(0xFF...)`、`TextField`、`ElevatedButton` 等硬编码或原生 Material 
+组件替代 design-system\n   123\t- [ ] 页面中的状态（加载、空态、错误、禁用）在原
+型图中有明确定义\n   124\t\n   125\t### 违规回滚策略\n   126\t\n   127\t若发现已
+进入代码合并的页面存在未使用 design-system 组件、未走 Design-Only PR 的情况：\n 
+ 128\t- 标记为 **技术债务**，录入 `docs/exec-plans/tech-debt-tracker.md`\n   129
+\t- 在下一个迭代中优先安排 **Redesign-Only PR** 进行重构，不得在旧基础上继续堆叠
+业务逻辑。\n   130\t\n   131\t## 设计系统（Widgetbook）\n   132\t\n   133\t`pack
+ages/design-system/` 是本项目的**唯一设计源文件**。\n   134\t\n   135\t### 结构\
+n   136\t\n   137\t```\n   138\tpackages/design-system/\n   139\t├── lib/\n   14
+0\t│   ├── src/\n   141\t│   │   ├── theme/          # tokens + app_theme\n   14
+2\t│   │   ├── atoms/          # 原子组件（按钮、头像、标签）\n   143\t│   │   ├
+── molecules/      # 分子组件（输入框组合、用户卡片）\n   144\t│   │   └── organ
+isms/      # 有机体组件（底部导航、匹配弹窗）\n   145\t│   ├── widgetbook/      
+  # 组件展示平台\n   146\t│   │   └── main.dart       # 所有组件的可交互展示\n  
+147\t│   └── social_world_design_system.dart\n   148\t└── pubspec.yaml\n   149\t
+```\n   150\t\n   151\t### 强制规范\n   152\t\n   153\t1. **新增组件必须在 Widge
+tbook 注册**：每个 `atom`/`molecule`/`organism` 类都必须在 `widgetbook/main.dart
+` 中有至少一个展示用例\n   154\t2. **禁止在 page 中写死设计 Token**：所有颜色、
+字号、间距、圆角必须从 `DesignTokens` 读取\n   155\t3. **组件分类规则**：\n   15
+6\t   - `atoms/`：不可再分的最小 UI 元素\n   157\t   - `molecules/`：多个 atom 
+的组合\n   158\t   - `organisms/`：包含业务语义的复杂组件\n   159\t\n   160\t###
+Design-Only PR 流程\n   161\t\n   162\t当需求涉及不确定的设计方向时，Agent 可以
+先提交 **Design-Only PR**：\n   163\t\n   164\t1. 只修改 `packages/design-system
+/` 和 `apps/mobile/lib/presentation/`\n   165\t2. 所有新组件必须在 `widgetbook/m
+ain.dart` 中注册\n   166\t3. **不得包含**后端 API、数据库 Entity、Dio 网络请求\n
+  167\t4. PR 中必须附带 **Golden File 截图** 或 **Widgetbook 运行截图**，人类通
+过视觉产物验收设计方向\n   168\t5. 设计方向确定后，再提交 Full-Stack PR 完成 DB 
+→ API → Mobile 全链路\n   169\t\n   170\t## Debug-Only Widget 条件编译模式\n   1
+71\t\n   172\t当实现开发/调试专用 Widget（如 Dev Tools Drawer）时，必须遵守以下
+规范：\n   173\t\n   174\t1. **所有调试工具 Widget 必须包裹在 `if (kDebugMode) .
+..` 中**\n   175\t   - 入口注入示例：\n   176\t     ```dart\n   177\t     Widget
+build(BuildContext context) {\n   178\t       return MaterialApp.router(\n   179
+\t         // ...\n   180\t         builder: (context, child) {\n   181\t       
+   if (kDebugMode) {\n   182\t             return DevToolsWrapper(child: child!)
+;\n   183\t           }\n   184\t           return child!;\n   185\t         },\
+n   186\t       );\n   187\t     }\n   188\t     ```\n   189\t\n   190\t2. **禁
+止在 Release 模式下将调试 Widget 编译进产物**\n   191\t   - 通过 `const bool.fro
+mEnvironment('dart.vm.product')` 或 `kDebugMode` 进行编译期/运行期隔离。\n   192
+\t   - 与调试相关的路由、Repository、Cubit 注册同样应在 `kDebugMode` 分支下完成
+，避免增加 Release 包体积。\n   193\t\n   194\t3. **调试工具状态管理建议**\n   1
+95\t   - 允许使用 `StatefulWidget` / `ValueNotifier`（因仅开发期使用，逻辑通常较
+简单）。\n   196\t   - **建议统一使用 Cubit**，保持与生产代码一致的可读性和可维
+护性。\n   197\t\n   198\t## 禁止事项\n   199\t\n   200\t1. 禁止在 Widget 中直接
+调用 Dio/http\n   201\t2. 禁止在 BLoC 中直接操作 `BuildContext`\n   202\t3. 禁止
+使用 `dynamic` 传递 API 数据\n   203\t4. 禁止在 `presentation/` 中使用 `Color(0x
+FF...)` 硬编码\n",
+        message='203 lines read from file starting from line 1. Total lines in f
+ile: 203. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(
+    arguments_part='z8j5v50vt2s6knvf5n00000gn/T/review-pr-33-1791497718/prd/v1-m
+atching.md", "n_lines": 15}'
+)
+ToolCall(
+    type='function',
+    id='tool_MfkjFr8V81UZdfbxN8x1Z5QR',
+    function=FunctionBody(name='Shell', arguments='{"command": "cd /'),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_mUZsFYzcwRsISYLY3r85Toyf',
+    return_value=ToolOk(
+        is_error=False,
+        output='     1\t# V1 Matching 产品需求文档\n     2\t\n     3\t> 状态：待
+评审  \n     4\t> 版本：1.0  \n     5\t> 日期：2026-04-10  \n     6\t> 关联 PRD
+：[prd/v1-mvp.md](./v1-mvp.md)\n     7\t>\n     8\t> 设计资产参见 [designs/issue
+-4/](../designs/issue-4/)\n     9\t\n    10\t## 1. 背景与目标\n    11\t\n    12\
+t### 背景\n    13\tSocial World 的核心体验是「滑动匹配」。用户在首页看到基于地理
+位置和偏好筛选推荐的卡片，通过左滑（Pass）或右滑（Like）表达喜好。当两个用户互相
+喜欢时，系统创建一次 `Match` 并自动开启 `Conversation`，促成后续的即时通讯。\n  
+ 14\t\n    15\t### 目标\n',
+        message='15 lines read from file starting from line 1. Total lines in fi
+le: 233.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(
+    arguments_part='private/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/revi
+ew-pr-33-1791497718 && make check-docs 2>&1 || true"}'
+)
+StatusUpdate(
+    context_usage=0.15066146850585938,
+    context_tokens=39495,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=4423,
+        output=890,
+        input_cache_read=35072,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-1fepa9P1HbECx7oNrAOrnrVO',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_MfkjFr8V81UZdfbxN8x1Z5QR',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='bash scripts/docscheck/main.sh\n[docscheck] Running documentatio
+n health check...\n[docscheck] Checking glossary term consistency...\n⚠️  Glossar
+y 术语未在 docs/ 或 prd/ 中使用: AccessToken\n⚠️  Glossary 术语未在 docs/ 或 prd/
+中使用: ActivityScore\n⚠️  Glossary 术语未在 docs/ 或 prd/ 中使用: ContentModerat
+ion\n⚠️  Glossary 术语未在 docs/ 或 prd/ 中使用: Dislike\n⚠️  Glossary 术语未在 do
+cs/ 或 prd/ 中使用: Nearby\n⚠️  Glossary 术语未在 docs/ 或 prd/ 中使用: OnlineSta
+tus\n⚠️  Glossary 术语未在 docs/ 或 prd/ 中使用: RefreshToken\n⚠️  Glossary 术语未
+在 docs/ 或 prd/ 中使用: SmsCode\n⚠️  Glossary 术语未在 docs/ 或 prd/ 中使用: Sup
+erLike\n⚠️  Glossary 术语未在 docs/ 或 prd/ 中使用: UnreadCount\n[docscheck] Glos
+sary consistency check completed.\n✅ Documentation health check passed.\n',
+        message='Command executed successfully.',
+        display=[],
+        extras=None
+    )
+)
+StepBegin(n=7)
+ThinkPart(
+    type='think',
+    think='现在我已经掌握了所有必要信息。让我进行完整的审查分析：\n\n**PR 性质判
+定：**\n这是一个 Design-Only PR（分支名 `design/issue-4`），只包含设计资产和文档
+更新，没有任何代码文件变更。这是为 Issue #4（Matching 模块）产出的设计规范文档。
+\n\n**逐项审查：**\n\n1. **全链路完整性**：\n   - Design-Only PR 不包含 DB + API
++ Mobile 代码实现是正常的。\n   - 根据 PRD `v1-matching.md` 里程碑 M-MATCH-0 就
+是 "UI 设计评审与 Design-Only PR"。\n   - 但作为审查，应指出这是一个前置设计 PR
+，后续仍需补充全链路实现。\n   - 状态：⚠️/✅（取决于角度，可以标记为 ⚠️ 并说明原因
+）\n\n2. **规范符合性**：\n   - `design-spec.md` 明确禁止硬编码色值，要求使用 De
+signTokens。\n   - 组件命名规范符合 `Sw` 前缀要求（`SwActionButton`, `SwipeCard`
+, `SwipeCardStack`, `MatchSuccessDialog`, `MatchListItem`）。\n   - 目录结构符合
+`packages/design-system/lib/src/{atoms,molecules,organisms}/` 规范。\n   - 状态
+：✅\n\n3. **契约一致性**：\n   - 由于没有任何代码变更，此项标记为 N/A 或 ✅。\n
+  - 状态：N/A（无代码变更）\n\n4. **测试覆盖**：\n   - Design-Only PR 不需要代码
+测试。\n   - `design-spec.md` 第 8 节包含 Design-Only PR 验收 Checklist。\n   - 
+状态：N/A\n\n5. **文档同步**：\n   - `docs/modules/INDEX.md` 已包含 `matching.md
+` 注册。✅\n   - `docs/api/INDEX.md` 已更新。✅\n   - `docs/api/matching.md` 已
+创建，但**标题格式严重错误**：第一行是 `# 新增 Matching 模块 API 文档，包含推荐
+和滑动接口的契约定义`，这明显是把设计说明的文案直接放到了标题位置。应该改为正常
+的文档标题如 `# Matching API`，然后把说明放到正文中。\n   - `docs/api/socket-eve
+nts.md` 格式正常。✅\n   - `docs/modules/matching.md` 内容完整。✅\n   - `prd/v1
+-matching.md` 已添加设计资产链接。✅\n   - `docs/design-docs/flutter.md` 未更新 
+Matching 组件的 Widgetbook 用例执行记录（虽然 `docs-to-update.txt` 中标记为可选
+）。\n   - 结论：文档同步存在质量问题（`docs/api/matching.md` 标题错误），但索引
+注册等是完整的。\n\n6. **UI/设计一致性**：\n   - 由于这是设计资产 PR，应该检查设
+计资产是否完整。\n   - `designs/issue-4/design-spec.md` 存在且完整。✅\n   - `de
+signs/issue-4/mockup.html` 存在。✅\n   - `designs/issue-4/wireframe.svg` 存在。
+✅\n   - 设计规范本身与 `docs/design-docs/ui-style-guide/` 的 Token 规范一致（使
+用了已定义的色值如 `#6750A4` 等）。\n   - 状态：✅\n\n7. **可运行性**：\n   - `m
+ake check-docs` 通过。✅\n   - `make test` / `make lint` 因无代码变更，无需特别
+检查。\n\n**关键问题：**\n`docs/api/matching.md` 的标题是一个完整的设计说明句子
+，而不是文档标题。这是文档质量问题。\n\n让我整理最终报告。\n\n关于前端变更审查硬
+规则：\n- PR diff 中没有前端/UI/Mobile 代码文件（如 `.tsx`、`.vue`、`.dart`、`.s
+css`、`.css`、`.html` 等）。\n- `mockup.html` 是设计资产（原型图），不是实际的前
+端代码。\n- 因此不适用 "前端变更审查硬规则" 中直接判 ❌ 的情况。\n\n关于文档同步
+审查硬规则：\n- PR 没有修改对外暴露的 API 代码（Controller、Router 等），只有文
+档占位。\n- PR 没有修改核心业务流程/架构的代码实现。\n- 新模块 `matching` 已在 `
+docs/modules/INDEX.md` 中注册。\n- 因此不适用直接判 ❌ 的情况。\n\n但 `docs/api/
+matching.md` 的标题格式问题仍需要修改。',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_Hwni6DQuu8i3cxgGR7Kfh1nV',
+    function=FunctionBody(
+        name='Shell',
+        arguments='{"command": "cd /private/var/folders/lt/w3sl6z8j5v50vt2s6knvf
+5n00000gn/T/review-pr-33-1791497718 && git diff origin/main..HEAD --name-only"}'
+    ),
+    extras=None
+)
+StatusUpdate(
+    context_usage=0.17107772827148438,
+    context_tokens=44847,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=5423,
+        output=1040,
+        input_cache_read=39424,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-LernLUT9paeCqb9AYwMcfHUB',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_Hwni6DQuu8i3cxgGR7Kfh1nV',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='designs/issue-4/design-spec.md\ndesigns/issue-4/docs-to-update.t
+xt\ndesigns/issue-4/mockup.html\ndesigns/issue-4/wireframe.svg\ndocs/api/INDEX.m
+d\ndocs/api/matching.md\ndocs/api/socket-events.md\ndocs/modules/matching.md\npr
+d/v1-matching.md\n',
+        message='Command executed successfully.',
+        display=[],
+        extras=None
+    )
+)
+StepBegin(n=8)
+ThinkPart(
+    type='think',
+    think='现在我可以写审查报告了。\n\nPR #33 分析：\n- 纯 Design-Only PR，无代
+码变更\n- 为 Issue #4 Matching 产出设计资产\n- 问题：`docs/api/matching.md` 标题
+格式错误，把说明文字当成标题\n\n审查结论：需要修改 `docs/api/matching.md` 的标题
+。\n\n让我再确认一下 `docs/api/matching.md` 的实际内容，确保我的判断准确。',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_5LSoW2dF9MObuv1nNZUw1ovq',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "/private/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n0000
+0gn/T/review-pr-33-1791497718/docs/api/matching.md"}'
+    ),
+    extras=None
+)
+StatusUpdate(
+    context_usage=0.17540740966796875,
+    context_tokens=45982,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=1182,
+        output=155,
+        input_cache_read=44800,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-DlL0HIS3kYGbSIfY1bP2NZM7',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_5LSoW2dF9MObuv1nNZUw1ovq',
+    return_value=ToolOk(
+        is_error=False,
+        output='     1\t# 新增 Matching 模块 API 文档，包含推荐和滑动接口的契约
+定义\n     2\t\n     3\t> TODO: 由设计任务自动生成，待开发阶段补充。\n     4\t\n
+    5\t## 相关设计\n     6\t- 设计规范: [design-spec.md](../../designs/issue-4/d
+esign-spec.md)\n',
+        message='6 lines read from file starting from line 1. Total lines in fil
+e: 6. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+StepBegin(n=9)
+ThinkPart(
+    type='think',
+    think='确认：`docs/api/matching.md` 的标题确实是 "# 新增 Matching 模块 API 
+文档，包含推荐和滑动接口的契约定义"，这明显是一个描述性句子被错误地用作 Markdown
+标题。\n\n现在让我写完整的审查报告并输出到 `logs/review-report-33.md`。\n\n报告
+结构：\n- 审查结果表格\n- 问题详情\n- 总结\n\n状态判定：\n- 全链路完整性：⚠️（Des
+ign-Only PR 无代码实现，符合 M-MATCH-0 预期，但需后续补齐）\n- 规范符合性：✅（
+设计规范符合项目 UI 风格规范）\n- 契约一致性：N/A（无代码变更）\n- 测试覆盖：N/A
+（Design-Only PR）\n- 文档同步：❌（`docs/api/matching.md` 标题格式错误）\n- UI/
+设计一致性：✅（设计资产完整，与项目 Token 规范一致）\n\n报告写入路径：`logs/rev
+iew-report-33.md`',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_zBGRcz0opIyCvuPoA7lE6gJZ',
+    function=FunctionBody(
+        name='WriteFile',
+        arguments='{"path": "/private/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n0000
+0gn/T/review-pr-33-1791497718/logs/review-report-33.md", "content": "## 审查结果
+\\n\\n| 检查项 | 状态 | 说明 |\\n|--------|------|------|\\n| 全链路完整性 | ⚠️ |
+本 PR 为 Design-Only PR（分支 `design/issue-4`），未包含 DB / API / Mobile 代码
+实现，符合 PRD `v1-matching.md` 中 M-MATCH-0「UI 设计评审与 Design-Only PR」的定
+位；后续需补充全链路实现 |\\n| 规范符合性 | ✅ | 设计规范严格复用项目现有 Design
+Token，组件命名符合 `Sw` 前缀约定，目录结构符合 `packages/design-system/lib/src/
+{atoms,molecules,organisms}/` 规范 |\\n| 契约一致性 | N/A | PR 中无代码文件变更
+，暂不涉及前后端契约同步 |\\n| 测试覆盖 | N/A | Design-Only PR 不涉及代码测试；`
+design-spec.md` 第 8 节已包含 Design-Only PR 验收 Checklist |\\n| 文档同步 | ❌ 
+| `docs/api/matching.md` 标题格式错误，将描述性说明误作 Markdown 标题；其余文档
+索引、模块注册、PRD 链接均已同步 |\\n| UI/设计一致性 | ✅ | `designs/issue-4/` 
+下设计资产（`design-spec.md`、`mockup.html`、`wireframe.svg`）完整，色板/字号/间
+距与 `docs/design-docs/ui-style-guide/tokens.md` 一致 |\\n| 可运行性 | ✅ | `mak
+e check-docs` 通过 |\\n\\n\\n## 问题详情\\n\\n1. **问题**：`docs/api/matching.md
+` 标题格式错误，当前标题为一句完整的描述性说明（\\"新增 Matching 模块 API 文档，
+包含推荐和滑动接口的契约定义\\"），不符合 Markdown 文档标题规范，且会导致 API 文
+档索引渲染异常。\\n   **建议**：修改 `docs/api/matching.md`，将第一行改为简洁的
+文档标题（如 `# Matching API`），并将原说明文字移至正文或 `> TODO` 注释下方。示
+例修改如下：\\n   ```markdown\\n   # Matching API\\n\\n   > 本文档描述 Matching 
+模块的接口契约，包含推荐和滑动接口定义。\\n   > TODO: 由设计任务自动生成，待开发
+阶段补充。\\n\\n   ## 相关设计\\n   - 设计规范: [design-spec.md](../../designs/i
+ssue-4/design-spec.md)\\n   ```\\n\\n2. **问题**：`docs/api/matching.md` 与 `doc
+s/api/socket-events.md` 目前仅为占位文档，正文内容极度精简（仅含 TODO 和相关设计
+链接）。\\n   **建议**：在后续开发 PR 中，按 PRD 和 `design-spec.md` 的约定补全
+以下内容：\\n   - `docs/api/matching.md`：补充 `GET /matching/recommendations` 
+与 `POST /matching/actions` 的请求/响应示例、Query 参数说明、错误码表。\\n   - `
+docs/api/socket-events.md`：补充 `match:created` 事件的发送时机、完整 Payload 字
+段说明、示例数据。\\n\\n3. **问题**：`designs/issue-4/docs-to-update.txt` 文件末
+尾缺少换行符（`\\\\ No newline at end of file`），`mockup.html` 同样缺少末尾换行
+符。\\n   **建议**：在 `designs/issue-4/docs-to-update.txt` 和 `designs/issue-4/
+mockup.html` 文件末尾追加一个换行符，保持仓库文本文件格式统一。\\n\\n\\n## 总结\
+\n\\n本次 PR 作为 Issue #4 Matching 的 **Design-Only PR**，设计资产产出完整，设
+计规范与项目现有 Token 体系一致，模块注册和 PRD 链接同步到位。主要阻塞点是 **`do
+cs/api/matching.md` 的标题格式错误**，修复该问题后即可通过审查。\\n\\n**结论：❌
+需修改**\\n"}'
+    ),
+    extras=None
+)
+StatusUpdate(
+    context_usage=0.176483154296875,
+    context_tokens=46264,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=440,
+        output=1140,
+        input_cache_read=45824,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-WQQUDHZdNjgQwDzSGGm9ZpwL',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_zBGRcz0opIyCvuPoA7lE6gJZ',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='',
+        message='File successfully overwritten. Current size: 3191 bytes.',
+        display=[
+            DiffDisplayBlock(
+                type='diff',
+                path='/private/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/r
+eview-pr-33-1791497718/logs/review-report-33.md',
+                old_text='',
+                new_text='## 审查结果\n\n| 检查项 | 状态 | 说明 |\n|--------|---
+---|------|\n| 全链路完整性 | ⚠️ | 本 PR 为 Design-Only PR（分支 `design/issue-4`
+），未包含 DB / API / Mobile 代码实现，符合 PRD `v1-matching.md` 中 M-MATCH-0「U
+I 设计评审与 Design-Only PR」的定位；后续需补充全链路实现 |\n| 规范符合性 | ✅ |
+设计规范严格复用项目现有 Design Token，组件命名符合 `Sw` 前缀约定，目录结构符合 
+`packages/design-system/lib/src/{atoms,molecules,organisms}/` 规范 |\n| 契约一致
+性 | N/A | PR 中无代码文件变更，暂不涉及前后端契约同步 |\n| 测试覆盖 | N/A | Des
+ign-Only PR 不涉及代码测试；`design-spec.md` 第 8 节已包含 Design-Only PR 验收 C
+hecklist |\n| 文档同步 | ❌ | `docs/api/matching.md` 标题格式错误，将描述性说明
+误作 Markdown 标题；其余文档索引、模块注册、PRD 链接均已同步 |\n| UI/设计一致性 
+| ✅ | `designs/issue-4/` 下设计资产（`design-spec.md`、`mockup.html`、`wirefram
+e.svg`）完整，色板/字号/间距与 `docs/design-docs/ui-style-guide/tokens.md` 一致 
+|\n| 可运行性 | ✅ | `make check-docs` 通过 |\n\n\n## 问题详情\n\n1. **问题**：`
+docs/api/matching.md` 标题格式错误，当前标题为一句完整的描述性说明（"新增 Matchi
+ng 模块 API 文档，包含推荐和滑动接口的契约定义"），不符合 Markdown 文档标题规范
+，且会导致 API 文档索引渲染异常。\n   **建议**：修改 `docs/api/matching.md`，将
+第一行改为简洁的文档标题（如 `# Matching API`），并将原说明文字移至正文或 `> TOD
+O` 注释下方。示例修改如下：\n   ```markdown\n   # Matching API\n\n   > 本文档描
+述 Matching 模块的接口契约，包含推荐和滑动接口定义。\n   > TODO: 由设计任务自动
+生成，待开发阶段补充。\n\n   ## 相关设计\n   - 设计规范: [design-spec.md](../../
+designs/issue-4/design-spec.md)\n   ```\n\n2. **问题**：`docs/api/matching.md` 
+与 `docs/api/socket-events.md` 目前仅为占位文档，正文内容极度精简（仅含 TODO 和
+相关设计链接）。\n   **建议**：在后续开发 PR 中，按 PRD 和 `design-spec.md` 的约
+定补全以下内容：\n   - `docs/api/matching.md`：补充 `GET /matching/recommendatio
+ns` 与 `POST /matching/actions` 的请求/响应示例、Query 参数说明、错误码表。\n   
+- `docs/api/socket-events.md`：补充 `match:created` 事件的发送时机、完整 Payload
+字段说明、示例数据。\n\n3. **问题**：`designs/issue-4/docs-to-update.txt` 文件末
+尾缺少换行符（`\\ No newline at end of file`），`mockup.html` 同样缺少末尾换行符
+。\n   **建议**：在 `designs/issue-4/docs-to-update.txt` 和 `designs/issue-4/moc
+kup.html` 文件末尾追加一个换行符，保持仓库文本文件格式统一。\n\n\n## 总结\n\n本
+次 PR 作为 Issue #4 Matching 的 **Design-Only PR**，设计资产产出完整，设计规范与
+项目现有 Token 体系一致，模块注册和 PRD 链接同步到位。主要阻塞点是 **`docs/api/m
+atching.md` 的标题格式错误**，修复该问题后即可通过审查。\n\n**结论：❌ 需修改**'
+,
+                old_start=1,
+                new_start=1,
+                is_summary=False
+            )
+        ],
+        extras=None
+    )
+)
+StepBegin(n=10)
+ThinkPart(
+    type='think',
+    think='审查报告已成功写入 `logs/review-report-33.md`。我已经完成了对 PR #33 
+的审查：\n\n1. 读取了项目地图 (AGENTS.md)、PRD 文件、文档覆盖信息、设计资产列表\
+n2. 检查了 git diff，确认这是一个 Design-Only PR，无代码变更\n3. 读取了所有变更
+的文档文件\n4. 运行了 `make check-docs`，结果通过\n5. 按照审查范围逐项检查：\n  
+- 全链路完整性：⚠️（Design-Only PR 符合预期，但后续需补代码）\n   - 规范符合性：
+✅\n   - 契约一致性：N/A\n   - 测试覆盖：N/A\n   - 文档同步：❌（`docs/api/match
+ing.md` 标题格式错误）\n   - UI/设计一致性：✅\n   - 可运行性：✅\n\n最终结论为 
+❌ 需修改，主要问题是 `docs/api/matching.md` 把描述性句子当作了 Markdown 标题。
+报告已按要求写入指定路径。',
+    encrypted=None
+)
+TextPart(
+    type='text',
+    text='审查已完成，报告已写入 `/private/var/folders/lt/w3sl6z8j5v50vt2s6knvf5
+n00000gn/T/review-pr-33-1791497718/logs/review-report-33.md`。\n\n**审查结论：❌
+需修改**\n\n核心问题：`docs/api/matching.md` 的标题是一整句描述性说明（`# 新增 M
+atching 模块 API 文档，包含推荐和滑动接口的契约定义`），不符合 Markdown 文档标题
+规范，建议改为 `# Matching API` 并将原说明移入正文。\n\n其余方面：\n- 这是一个 *
+*Design-Only PR**（分支 `design/issue-4`），无代码变更\n- 设计资产完整（`design-
+spec.md` + `mockup.html` + `wireframe.svg`）\n- 设计规范与项目现有 Design Token 
+一致\n- 模块已在 `docs/modules/INDEX.md` 注册，`make check-docs` 通过'
+)
+StatusUpdate(
+    context_usage=0.18096160888671875,
+    context_tokens=47438,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=1358,
+        output=438,
+        input_cache_read=46080,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-tgD19WiEussAFhrvoiVmKfOb',
+    plan_mode=False,
+    mcp_status=None
+)
+TurnEnd()
+
+To resume this session: kimi -r e0edaeed-0fd9-4cba-9305-04b230efd92c
+
+✅ Review 完成

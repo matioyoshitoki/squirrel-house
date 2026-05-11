@@ -1,0 +1,3612 @@
+[2026-04-25 12:16:38] PR #58 Doc Gardener 启动
+Merged: false
+Base: main
+Head: feat/issue-5
+日志: /Users/insulate/Desktop/new-world/new-world-ops/logs/social-world/doc-gardener-pr-58-20260425-121638.log
+【任务上下文】
+- PR 编号: #58
+- 项目路径: /var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/doc-gardener-58-126
+6463958
+- 项目地图: ../../social-world/AGENTS.md
+- 关联 PRD: ../../social-world/prd/v1-profile.md,../../social-world/prd/v1-mvp.m
+d,../../social-world/prd/v1-matching.md
+- 文档目录: ../../social-world/docs
+
+你是规范演进 Agent。
+
+【输入】
+- 以下是一个 PR 的多次代码审查报告汇总
+- 请读取项目的 AGENTS.md 了解规范文档结构
+
+【PR #58 历史 Review 报告汇总（共 10 次）】
+
+--- 第 1 次 Review ---
+## 审查结论
+
+审查结论: **NEEDS_MAJOR_FIX**
+
+PR #58 实现了 V1 IM（即时通讯）模块的核心功能：消息收发、已读回执、会话列表、系
+统消息推送。整体架构方向正确，全链路（DB → API → Mobile → Design System → E2E）
+均有覆盖，但存在 **4 个 Blocking 级别的运行时缺陷** 和 **7 个 Major 级别的规范/
+架构/测试缺陷**，必须在合并前修复。
+
+---
+
+## 阻塞问题（Blocking）
+
+### 1. ImBloc 在 Event Handler 外部调用 `emit`，导致运行时 StateError
+- **位置**: `apps/mobile/lib/presentation/blocs/im/im_bloc.dart:61-62`
+- **问题**: `onError` 回调在 Socket 发生错误时直接调用 `emit(ImError(...))`。但 
+`_onConnect` 是同步 event handler，执行完即返回；当 Socket 后续发生错误时，`emit
+` 已不在有效的 handler 上下文中，flutter_bloc 会抛出 `StateError: emit was calle
+d after an event handler completed normally.`
+- **影响**: Socket 连接失败或断线时 App 直接崩溃
+- **修复**: 将 socket 错误封装为独立 event，通过 `add()` 投递到 Bloc 事件循环：
+  ```dart
+  onError: (data) {
+    add(ImSocketErrorReceived(data['message'] as String? ?? 'Socket error'));
+  },
+  ```
+并在 `ImBloc` 中注册 `on<ImSocketErrorReceived>((event, emit) => emit(ImError(ev
+ent.message)));`
+- **依据**: `docs/design-docs/flutter.md` 中 BLoC 状态管理规范 + flutter_bloc 官
+方文档约束
+
+### 2. ImBloc 消息未按 Conversation 隔离，跨会话消息会串扰到当前聊天
+- **位置**: `apps/mobile/lib/presentation/blocs/im/im_bloc.dart:103-117`, `210-2
+13`
+- **问题**: 
+  1. `_parseSocketMessage` 未解析并保存 `conversation_id`（虽然 Gateway payload 
+包含该字段）；
+  2. `_getConversationIdForMessage` 直接返回 `_currentConversationId` 而非从消息
+中读取；
+  3. 因此 `_onMessageReceived` 中的条件判断永远为 `true`，任何会话的 socket 消息
+都会被追加到当前显示的消息列表。
+- **影响**: 用户在 Conversation A 聊天时，如果收到 Conversation B 的新消息，B 的
+消息会错误显示在 A 的聊天界面中
+- **修复**: 
+  1. 在 `MessageItem` 中增加 `conversationId` 字段；
+  2. 在 `_parseSocketMessage` 中解析 `data['conversation_id']`；
+  3. `_onMessageReceived` 中严格比对 `event.message.conversationId == _currentCo
+nversationId`，不匹配则丢弃或仅更新会话列表
+- **依据**: PRD `v1-mvp.md` US-4 中「Alice opens the conversation」的会话隔离要
+求
+
+### 3. ChatPage 在 `ImMessageRead` 状态下返回空消息列表，导致 UI 清空
+- **位置**: `apps/mobile/lib/presentation/pages/chat_page.dart:236-244`
+- **问题**: `_getMessagesFromState` 对 `ImMessageRead` state 返回 `[]`（第 240-2
+43 行注释甚至承认这是故意留空）。当对方已读消息时，Socket 触发 `_onReadReceipt`
+，Bloc emit `ImMessageRead`，ChatPage 重新 build 并调用 `_getMessagesFromState`
+，消息列表突然变为空，界面显示 "你们已匹配成功，开始聊天吧" 系统提示。
+- **影响**: 用户看到对方已读后，自己的消息列表瞬间清空，功能完全不可用
+- **修复**: 
+  ```dart
+  if (state is ImMessageRead) {
+    return state.messages; // 或从 Bloc 的 _messages 返回
+  }
+  ```
+同时需要在 `ImBloc._onReadReceipt` 中维护 `_messages` 列表的已读状态（或至少不破
+坏现有列表）。
+- **依据**: `git diff` 中的代码证据 + PRD 中「Read receipt」功能完整性要求
+
+### 4. MatchingService 事务中调用 ImService.createSystemMessage 未共用 Transacti
+on Manager
+- **位置**: `apps/api/src/modules/matching/matching.service.ts:462-465`, `apps/a
+pi/src/modules/im/im.service.ts:369-385`
+- **问题**: `MatchingService.checkAndCreateMutualMatch` 在 `dataSource.transacti
+on(async (manager) => { ... })` 内部调用 `this.imService.createSystemMessage()`
+，但 `createSystemMessage` 使用的是 `this.messageRepo.save(message)`（标准 Repos
+itory，不绑定事务 manager）。因此 system message 不在同一事务中：若事务回滚，`ma
+tches`/`conversations`/`participants` 被回滚，但 `messages` 表中仍残留一条指向不
+存在 conversation 的孤儿记录。
+- **影响**: 数据不一致，极端情况下产生无关联的 system message
+- **修复**: 方案 A（推荐）：让 `createSystemMessage` 接受可选的 `EntityManager`
+：
+  ```typescript
+  async createSystemMessage(
+    conversationId: string,
+    content: string,
+    manager?: EntityManager,
+  ): Promise<MessageEntity> {
+    const repo = manager ? manager.getRepository(MessageEntity) : this.messageRe
+po;
+    const message = repo.create({ ... });
+    await repo.save(message);
+    return message;
+  }
+  ```
+并在 `MatchingService` 中传入 `manager`。
+- **依据**: `docs/design-docs/nestjs.md` 第 129-142 行事务发射规则中的事务边界要
+求 + PRD `v1-matching.md` US-MATCH-3 中「事务：匹配创建必须使用数据库事务，确保 
+`matches` + `conversations` + `conversation_participants` 原子性」
+
+---
+
+## 严重问题（Major）
+
+### 5. Design System 组件命名违反 `Sw` 前缀强制规范
+- **位置**: 
+  - `packages/design-system/lib/src/molecules/chat_bubble.dart` (类名 `ChatBubbl
+e`)
+  - `packages/design-system/lib/src/molecules/chat_input_bar.dart` (类名 `ChatIn
+putBar`)
+  - `packages/design-system/lib/src/molecules/conversation_list_item.dart` (类名
+`ConversationListItem`)
+- **问题**: 所有新增 design-system 组件均未以 `Sw` 为前缀
+- **影响**: 命名空间污染，与 flutter.md 的强制规范冲突，未来难以通过 linter 自动
+识别 design-system 组件
+- **修复**: 重命名为 `SwChatBubble`、`SwChatInputBar`、`SwConversationListItem`
+，同步修改 `social_world_design_system.dart` 的 export 语句、所有引用处（`chat_p
+age.dart`、`match_list_page.dart`、`widgetbook/main.dart`）以及 Maestro flow 中
+涉及的 id（如有）
+- **依据**: `docs/design-docs/flutter.md` 第 48 行："设计系统组件必须以 `Sw` 为
+前缀"
+
+### 6. IM Gateway 直接内联构造 emit Payload，未使用 shared-types 契约类型
+- **位置**: `apps/api/src/modules/im/im.gateway.ts` 多处（如第 101-105 行 `messa
+ge:ack`、第 113-122 行 `message:receive`、第 156 行 `message:read_receipt`）
+- **问题**: Gateway 直接手写 `{}` 对象作为 payload，未从 `packages/shared-types`
+导入类型安全的 DTO/Interface
+- **影响**: 前后端契约不同步风险高，字段命名漂移（如 `sequence_id` vs `sequenceI
+d`）难以在编译期发现
+- **修复**: 在 `packages/shared-types` 中定义 Socket Event DTO（如 `MessageRecei
+vedEvent`、`MessageAckEvent`、`ReadReceiptEvent`），Gateway 中导入并实例化这些类
+型
+- **依据**: `docs/design-docs/nestjs.md` 第 144-151 行："Payload 类型：必须使用 
+`shared-types` 中定义的 DTO/Interface，禁止内联 `any`"
+
+### 7. MatchingService 直接 import 并注入 ImService，违反模块间解耦规范
+- **位置**: `apps/api/src/modules/matching/matching.service.ts:25`, `matching.mo
+dule.ts:30`
+- **问题**: Matching 模块直接依赖 Im 模块的内部 Service，且引入了 `forwardRef` 
+循环依赖
+- **影响**: 模块边界模糊，Matching 模块的单元测试必须 Mock ImService，增加了耦合
+度
+- **修复**: 通过 `EventEmitter2` 发布 `match:created` 事件，在 `ImModule` 中监听
+该事件并创建 system message。移除 `MatchingService` 对 `ImService` 的直接依赖和 
+`forwardRef`。
+- **依据**: `docs/design-docs/nestjs.md` 第 70 行："模块之间通过 Interface / Eve
+ntEmitter 解耦，禁止直接 import 其他模块的内部 Service"
+
+### 8. ConversationListCubit 分页逻辑缺陷，导致无法加载更多或无限重复加载
+- **位置**: `apps/mobile/lib/presentation/blocs/im/conversation_list_cubit.dart:
+32-36`
+- **问题**: 
+  1. `ImRepository.getConversations` 返回类型为 `List<ConversationItem>`，**丢弃
+了 API 返回的 `next_cursor` 和 `has_more`**；
+  2. Cubit 中 `nextCursor` 被错误地设为传入的 `cursor`（旧值）而非服务端返回的新
+游标：
+     ```dart
+     nextCursor: result.isNotEmpty ? cursor : null,
+     ```
+  3. 当首次加载完成后，`nextCursor` 为 `null`，但 `hasMore` 可能为 `true`；UI 会
+触发加载更多，传入 `cursor: null`，导致**重复加载第一页**，形成无限循环（或至少
+无法加载后续页）。
+- **影响**: 会话列表分页功能完全不可用；用户超过 20 个会话时只能看到前 20 个
+- **修复**: 
+  1. 修改 `ImRepository` 接口：
+     ```dart
+     Future<({List<ConversationItem> items, bool hasMore, String? nextCursor})> 
+getConversations(...)
+     ```
+  2. `ImRepositoryImpl` 从响应中解析 `data['next_cursor']` 和 `data['has_more']`
+；
+  3. Cubit 中使用服务端返回的 `nextCursor`：
+     ```dart
+     nextCursor: result.nextCursor,
+     hasMore: result.hasMore,
+     ```
+- **依据**: `docs/api-contracts/im.yaml` 中 `ListConversations` 的响应结构包含 `
+next_cursor` / `has_more`；PRD 功能完整性要求
+
+### 9. Maestro E2E 中 `conversation_item_` 精确匹配无法命中动态 id
+- **位置**: `.maestro/flows/im/send_message.yaml:23-24`, `.maestro/flows/im/view
+_conversation_list.yaml:36-38`
+- **问题**: Maestro 的 `id` 匹配是精确匹配 Android `resource-id`。但 `Conversati
+onListItem` 的 `Semantics` identifier 是动态生成的 `conversation_item_$nickname`
+（如 `conversation_item_Alice`），Maestro flow 中写死 `conversation_item_` 永远
+匹配不到任何元素。
+- **影响**: E2E 测试中的会话列表点击步骤永远失败（但因标记了 `optional: true` 被
+静默跳过）
+- **修复**: 
+  - 方案 A：将 `ConversationListItem` 的 `identifier` 改为固定值 `conversation_i
+tem`，Maestro 通过列表索引或文本匹配定位；
+  - 方案 B：保留动态 id，但 Maestro 使用 `tapOn: "Alice"` 通过昵称文本定位（需确
+保昵称在 semantics 中可访问）。
+- **依据**: `docs/design-docs/flutter.md` Accessibility 章节："`identifier: 'xxx
+'` 生成稳定的 `resource-id`" + Maestro 精确匹配行为
+
+### 10. 新增 Design System 组件缺少 Golden Test 与 Widget Test
+- **位置**: `packages/design-system/lib/src/molecules/chat_bubble.dart`, `chat_i
+nput_bar.dart`, `conversation_list_item.dart`
+- **问题**: PR 新增 3 个 design-system 组件，但 `packages/design-system/test/` 
+下未增加任何对应 golden test 或 widget test
+- **影响**: 无视觉回归保护，后续样式变更可能破坏 IM 核心 UI 而无人知晓
+- **修复**: 
+  1. 在 `packages/design-system/test/im_components_golden_test.dart` 中补充 `SwC
+hatBubble`（self / other / system / sending / failed 状态）、`SwChatInputBar`（e
+mpty / typing / over-limit 状态）、`SwConversationListItem`（default / unread / 
+long-message 状态）的 golden test；
+  2. 运行 `flutter test --update-goldens` 生成基准图并提交。
+- **依据**: `docs/design-docs/testing.md` 第 333-375 行 Golden File Testing 规范
+："新增/修改的 `packages/design-system` 组件必须编写 Golden Test"
+
+### 11. Maestro flow 过度使用 `optional: true`，丧失 E2E 验收价值
+- **位置**: `.maestro/flows/im/send_message.yaml`（第 24、29、33、35、40、41、44
+、45、48、49 行均为 `optional: true`）
+- **问题**: 核心断言步骤（如点击输入框、输入文本、点击发送、断言消息可见）全部被
+标记为 optional，意味着即使 IM 核心功能完全损坏，E2E 也会全部跳过并通过。
+- **影响**: E2E 测试失去回归验证意义
+- **修复**: 仅对「会话可能为空」这类条件分支步骤保留 `optional`（如首次进入无会
+话时的空状态）。以下步骤必须移除 `optional`：
+  - 切换消息 Tab (`tab_messages`)
+  - 点击输入框 (`chat_input_field`)
+  - 输入消息内容
+  - 点击发送 (`chat_send_button`)
+  - 断言消息可见 (`assertVisible: "你好"`)
+- **依据**: `docs/design-docs/testing.md` 第 326-331 行："涉及 Mobile 用户流程的
+PR，必须包含可运行的 Maestro E2E 测试"
+
+---
+
+## 轻微问题（Minor）
+
+### 12. `ImBloc._messages` 列表无上限，长会话存在内存泄漏风险
+- **位置**: `apps/mobile/lib/presentation/blocs/im/im_bloc.dart:15`
+- **建议**: 为 `_messages` 设置上限（如保留最近 500 条），或实现消息淘汰策略
+
+### 13. `ImService.sendMessage` 的 `client_message_id` 回退生成逻辑与 DTO 语义不
+符
+- **位置**: `apps/api/src/modules/im/im.service.ts:75`
+- **问题**: `const clientMessageId = dto.client_message_id ?? uuidv7();` 在客户
+端未传 `client_message_id` 时服务端生成一个。但幂等去重逻辑（第 112 行）要求 `dt
+o.client_message_id` 存在才查询 existing。如果客户端没传，服务端生成的 id 不会被
+用于去重查询，但也不会重复（因为每次 uuidv7 都不同）。逻辑上无害，但语义上 `clie
+nt_message_id` 应始终由客户端生成。
+- **建议**: 在 `SendMessageDto` 中移除 `@IsOptional()`，强制要求客户端提供 `clie
+nt_message_id`
+
+### 14. `docs/modules/im.md` 关键文件路径与实际文件名不一致
+- **位置**: `docs/modules/im.md:62`
+- **问题**: 文档中 "Conversation List Page" 指向 `apps/mobile/lib/presentation/p
+ages/match_list_page.dart`，但 `match_list_page.dart` 现在已被改造为 Conversatio
+n List（原来的 MatchList 功能被替换），文件名未改。虽然功能正确，但文件名与页面
+职责不符，增加维护成本。
+- **建议**: 在 tech-debt-tracker 中记录，后续将 `match_list_page.dart` 重命名为 
+`conversation_list_page.dart`
+
+---
+
+## 验证结果
+
+| 维度 | 状态 | 说明 |
+|------|------|------|
+| 功能完整性 | ❌ | 核心 IM 功能存在 4 个 Blocking 运行时缺陷（Bloc emit 越界、
+消息串扰、UI 清空、分页失效），导致功能不可用或数据不一致 |
+| 代码规范性 | ❌ | Design System 组件命名未加 `Sw` 前缀（flutter.md 强制规范）
+；模块间直接 Service 依赖违反 nestjs.md 解耦规范；Gateway payload 未使用 shared-
+types |
+| 全链路完整性 | ✅ | DB（Entity + Migration）→ API（Controller + Gateway + Serv
+ice）→ Mobile（Repository + BLoC + Page）→ Design System → Maestro E2E 全链路已
+覆盖 |
+| 规范符合性 | ❌ | 事务边界不符合 nestjs.md 要求；Maestro 兼容性存在动态 id 和
+过度 optional 问题；Accessibility 基本合规（使用了 Semantics + onTapDown） |
+| 测试覆盖 | ❌ | MatchingService 单元测试已补充 IM 相关 mock（✅），但新增 Desi
+gn System 组件完全缺失 Golden Test 和 Widget Test；Maestro E2E 流于形式 |
+| 文档同步 | ⚠️ | `docs/modules/im.md` 已更新关键文件索引（✅），但 `docs/api/soc
+ket-events.md` 未更新 IM 命名空间事件定义（仍只有 `matching` 命名空间的事件） |
+
+---
+
+## 风险与建议
+
+1. **循环依赖风险**: `MatchingModule ↔ ImModule` 通过 `forwardRef` 建立循环依赖
+，虽然 NestJS 支持，但增加了启动时复杂度和潜在的初始化顺序问题。建议通过 EventEm
+itter 解耦（见 Major-7）。
+
+2. **Socket 连接管理风险**: `ChatPage` 每次进入都通过 `getIt<ImBloc>()` 创建新的
+Bloc 和 Socket 连接，退出时断开。如果用户在会话列表和聊天页之间频繁切换，会导致 
+Socket 频繁重连。建议在 App 生命周期内维持单一 Socket 连接（如将 `ImBloc` 提升为
+全局单例或在 `MainPage` 层级管理）。
+
+3. **Redis 未读数一致性风险**: `markAsRead` 中 `await this.redis.set(..., "0")` 
+与 `participantRepo.update` 是两个独立操作，无事务。如果 Redis 操作成功但 DB upd
+ate 失败，会导致未读数不一致。建议增加补偿机制或统一在 DB 事务成功后才清 Redis。
+
+4. **消息顺序风险**: `getMessages` 中 `messages.reverse()` 修改了数组（虽然 Type
+Script 中 `slice` 已复制），但如果 `hasMore=false` 时 `results` 直接赋值给 `mess
+ages` 再 `reverse`，会修改原数组。虽然 `results` 是局部变量，不影响外部，但建议
+改用 `[...messages].reverse()` 保证不可变性。
+
+
+--- 第 2 次 Review ---
+# PR #58 审查报告
+
+> **PR**: feat/issue-5 — [IM] V1 Instant Messaging - 实时聊天、已读回执与会话列
+表  
+> **审查范围**: 49 files changed, ~3,102 insertions, ~38 deletions  
+> **审查依据**: AGENTS.md, docs/design-docs/{flutter.md, nestjs.md, testing.md, 
+api.md}, prd/v1-mvp.md, prd/v1-matching.md, prd/v1-profile.md, docs/modules/im.m
+d, docs/api/socket-events.md
+
+---
+
+## 审查结论
+
+**审查结论: NEEDS_MAJOR_FIX**
+
+PR 实现了 IM 模块的核心链路（DB → API → Mobile），功能骨架完整，设计系统组件规范
+达标，E2E 流程和 BDD 骨架已建立。但存在以下必须修复的严重问题：
+
+1. **新增后端代码零测试覆盖**（~664 行 Service/Gateway/Controller 无单元/集成测
+试）
+2. **缺失 Socket 事件契约 YAML**（违反 api.md 强制规范）
+3. **Maestro E2E 发送消息流存在流程断点**（未处理无会话的空状态，测试会失败）
+
+---
+
+## 阻塞问题（Blocking）
+
+**无**
+
+---
+
+## 严重问题（Major）
+
+### 1. IM 后端新增代码零单元/集成测试覆盖
+- **位置**: `apps/api/src/modules/im/im.service.ts` (399 行), `im.gateway.ts` (1
+97 行), `im.controller.ts` (68 行)
+- **问题**: PR 新增了 IM 核心后端模块，但没有任何 `.spec.ts` 测试文件。`matching
+.service.spec.ts` 在同期被更新（说明项目有测试传统），但 IM 模块完全缺失。
+- **影响**: 无法验证消息幂等去重、已读回执逻辑、会话权限校验、分页 cursor 边界、
+异常处理路径等核心行为。后续重构极易引入回归。
+- **修复**:  
+在 `apps/api/src/modules/im/tests/` 下新增：
+  - `im.service.spec.ts`：覆盖 `sendMessage`（含重复 client_message_id 幂等）、`
+markAsRead`、`getMessages` 分页、`getConversations` 聚合、`verifyConversationMem
+bership`
+  - `im.gateway.spec.ts`：覆盖 Socket 认证拒绝、`message:send` 事件处理、`messag
+e:read` 事件处理、错误广播
+  - `im.controller.spec.ts`：覆盖 `GET /conversations` 和 `GET /messages` 的 Gua
+rd、参数校验、响应结构
+- **依据**: `docs/design-docs/testing.md` 第 17-22 行："后端：NestJS 使用 Jest，
+覆盖率目标 >80%"
+
+### 2. 缺失 IM Socket 事件契约 YAML
+- **位置**: `docs/api-contracts/` 目录下无 `im-events.yaml`
+- **问题**: `im.gateway.ts` 发射了 5 个服务端事件：`message:ack`、`message:recei
+ve`、`message:read_receipt`、`conversation:updated`、`message:error`。但 `docs/a
+pi-contracts/` 下只有 `im.yaml`（REST 契约），没有 `im-events.yaml`（WebSocket 
+事件契约）。
+- **影响**: 前后端事件契约不同步时无文档可核对；新 Agent 接入时无法从仓库获知完
+整事件列表和 Payload Schema。
+- **修复**:  
+新建 `docs/api-contracts/im-events.yaml`，定义所有事件：
+  - `message:ack` — Payload: `{ client_message_id, sequence_id, id }`
+  - `message:receive` — Payload: `{ id, conversation_id, sender_id, type, conten
+t, sequence_id, client_message_id, created_at }`
+  - `message:read_receipt` — Payload: `{ conversation_id, last_read_message_id }
+`
+  - `conversation:updated` — Payload: `{ conversation_id, updated_at }`
+  - `message:error` — Payload: `{ message }`
+- **依据**: `docs/design-docs/api.md` 第 89-118 行（不变量 A）："后端每新增一个 
+`server.emit()` 事件，必须同时满足：`docs/api-contracts/<module>-events.yaml` 中
+定义了该事件的 Schema"
+
+### 3. Maestro E2E `send_message.yaml` 存在流程断点
+- **位置**: `.maestro/flows/im/send_message.yaml` 第 22-34 行
+- **问题**: Flow 先 `optional: true` 点击 `conversation_item`，然后 `optional: t
+rue` 断言 `chat_back_button`，随后**无条件**执行 `tapOn: { id: "chat_input_field
+" }` 和 `inputText: "你好"`。如果测试环境没有预置会话（如首次运行或新 emulator）
+，用户仍停留在「消息」列表页，`chat_input_field` 不存在，测试直接失败。
+- **影响**: E2E 无法在干净环境跑通，丧失回归测试价值。
+- **修复**:  
+提供两条路径之一：
+  - **路径 A（推荐）**: 在 flow 开头通过 API 预创建 match + conversation（类似 `
+e2e-backend` 依赖注入测试数据），确保会话存在；
+  - **路径 B**: 在点击 `chat_input_field` 前增加条件分支，若仍停留在消息列表页（
+assertVisible `conversation_item` 失败），则跳过发送测试并标记为 skipped。
+- **依据**: `docs/design-docs/testing.md` 第 60-66 行："涉及数据库状态变更的功能
+，BDD/Maestro E2E 必须覆盖完整闭环：产生数据 → 查询数据 → 断言状态"
+
+### 4. `ImBloc` 已读回执仅标记单条消息为 read，与 BDD 描述不符
+- **位置**: `apps/mobile/lib/presentation/blocs/im/im_bloc.dart` 第 151-174 行
+- **问题**: `_onReadReceipt` 中只有 `msg.id == event.lastReadMessageId` 的那一条
+消息状态被改为 `'read'`。但 BDD feature `im_read_receipts.feature` 要求："all un
+read messages from Alice should be marked as 'read'"（`tests/bdd/step-definition
+s/common.js` 第 184-185 行）。此外，UI 上虽然只显示最后一条消息的状态，但数据模
+型层面所有更早的已发送消息也应视为已读。
+- **影响**: 若用户发送了多条消息，对方打开会话后，只有最后一条状态变为"已读"，前
+面的仍保持"sent"，与 IM 常规范式不符。
+- **修复**:  
+在 `_onReadReceipt` 中，将所有 `senderId == _currentUserId` 且 `sequenceId <= re
+adMessageSequenceId`（或 `id == lastReadMessageId` 及之前所有消息）的状态均设为 
+`'read'`。
+- **依据**: `tests/bdd/im_read_receipts.feature` 隐含需求 + `prd/v1-mvp.md` 第 1
+47-152 行
+
+---
+
+## 轻微问题（Minor）
+
+### 5. BDD Step Definitions 为空实现
+- **位置**: `tests/bdd/step-definitions/im_*.steps.js`（6 个文件）
+- **问题**: 所有 IM 的 BDD step 文件仅导入 `commonSteps`，而 `commonSteps` 中的 
+IM 相关 step 全为 `() => {}` 空函数。BDD 测试会"通过"但不验证任何业务行为。
+- **影响**: BDD 验收测试流于形式，无法发现 API 回归。
+- **修复**: 逐步为关键场景（发送消息、已读回执、会话列表）编写实际调用 API 的 st
+ep 实现。至少为 `im_start_chatting_after_match` 和 `im_real_time_message_deliver
+y` 编写可运行的 steps。
+- **依据**: `docs/design-docs/testing.md` 第 46-56 行："mock 实现必须与真实组件
+的业务契约一致"、"BDD 测试验证的是业务行为"
+
+### 6. `ImBloc` 生命周期与 Socket 连接策略不经济
+- **位置**: `apps/mobile/lib/presentation/pages/chat_page.dart` 第 72-81 行 / `a
+pp.dart` 第 72-82 行
+- **问题**: `ChatPage` 每次进入都通过 `getIt<ImBloc>()`（factory）创建新 `ImBloc
+`，退出时 `BlocProvider` dispose 导致 `close()` 调用，进而断开 Socket。用户从聊
+天页返回消息列表后 Socket 断开，再次进入又重新连接。消息列表页无法实时收到 `conv
+ersation:updated` 事件。
+- **影响**: 多设备/多端场景下实时性受损；频繁重连增加服务端负载。
+- **修复**: 考虑将 `ImBloc` 提升为应用级单例（或至少在 `MainPage` 级别提供），在
+`MatchListPage` 中监听 `conversation:updated` 以刷新列表。若 MVP 明确不追求此优
+化，可在 `docs/exec-plans/tech-debt-tracker.md` 中记录。
+- **依据**: `docs/modules/im.md` 边界情况说明："离线补推：用户重连后，拉取 `last
+_ack_sequence_id` 之后的所有消息" — 暗示应维护长连接。
+
+### 7. `PushService` 未在 IM 模块中集成
+- **位置**: `apps/api/src/modules/im/im.gateway.ts`
+- **问题**: `v1-mvp.md` 第 163 行要求"离线用户通过极光推送/Firebase 触发新消息提
+醒"，且 BDD feature `im_real_time_message_delivery.feature` 第 13-18 行断言离线
+时应触发推送。但 `ImGateway` / `ImService` 从未调用 `PushService.sendPush()`。
+- **影响**: 离线用户收不到新消息推送。
+- **修复**: 在 `ImGateway.handleSendMessage` 中，向 `user:${otherId}` 发射 `mess
+age:receive` 后，若该 room 中无在线 socket（可通过 `this.server.in(`user:${other
+Id}`).fetchSockets()` 判断），调用 `PushService.sendPush()` 发送离线提醒。
+- **依据**: `prd/v1-mvp.md` 第 163 行 + `tests/bdd/im_real_time_message_delivery
+.feature`
+
+### 8. `ImModule` 重复创建 Redis 连接
+- **位置**: `apps/api/src/modules/im/im.module.ts` 第 28-31 行
+- **问题**: `ImModule` 自行 `new Redis(redisConfig)` 创建 Redis 客户端，而 `Matc
+hingModule` 也做了同样的事。这会导致两个独立的 Redis 连接。
+- **影响**: 资源浪费；连接数翻倍。
+- **修复**: 建议统一在 `AppModule` 或独立的 `RedisModule` 中提供 `REDIS_CLIENT`
+，各业务模块 `imports` 共享。若项目现有惯例如此，可列入技术债务。
+- **依据**: `docs/design-docs/nestjs.md` 第 68-70 行："模块之间通过 Interface / 
+EventEmitter 解耦"
+
+### 9. `SwChatInputBar` 中的 `TextField` 未暴露 `onChanged` 给外部
+- **位置**: `packages/design-system/lib/src/molecules/chat_input_bar.dart` 第 10
+9-131 行
+- **问题**: 组件内部用 `_controller.addListener` 监听文本变化，但没有向外部暴露 
+`onChanged` 回调。若父组件需要实时校验（如敏感词过滤），无法介入。
+- **影响**: 扩展性受限。
+- **修复**: 增加可选参数 `final ValueChanged<String>? onChanged;`，在 `_onTextCh
+anged` 中调用 `widget.onChanged?.call(_controller.text)`。
+- **依据**: 设计系统可扩展性最佳实践（非强制规范，属建议）
+
+### 10. `send_message.yaml` 中 `assertVisible: "你好"` 可能受多条消息干扰
+- **位置**: `.maestro/flows/im/send_message.yaml` 第 41 行
+- **问题**: 若测试环境已存在历史消息包含"你好"，Maestro 的 `assertVisible` 可能
+匹配到旧消息而非刚发送的新消息。
+- **影响**: E2E 假阳性。
+- **修复**: 使用唯一测试文本如 `"E2E_TEST_HELLO_{{timestamp}}"`，或给最新消息气
+泡增加 `Semantics(identifier: 'latest_self_message')`。
+- **依据**: `docs/design-docs/testing.md` 第 121-124 行：定位策略应优先使用稳定
+的 `resource-id`
+
+---
+
+## 验证结果
+
+| 维度 | 状态 | 说明 |
+|------|------|------|
+| 功能完整性 | ✅ | 消息发送、已读回执、会话列表、消息历史拉取、系统消息、幂等去
+重均已实现 |
+| 代码规范性 | ⚠️ | NestJS/Flutter 分层、命名、DTO 校验基本合规；但 Redis 客户端
+未共享、缺失事件契约 YAML |
+| 全链路完整性 | ✅ | DB（Migration + Entity）→ API（REST + Socket）→ Mobile（BL
+oC + Repository + SocketClient）链路贯通 |
+| 规范符合性 | ⚠️ | 设计系统组件合规（无硬编码颜色、使用 DesignTokens）；但 `im-e
+vents.yaml` 缺失，违反 api.md |
+| 测试覆盖 | ❌ | Mobile E2E（Maestro）流已建立但 `send_message.yaml` 有断点；Go
+lden Test 和 Widgetbook 完整；**后端 IM 模块零单元/集成测试** |
+| 文档同步 | ✅ | `docs/api/socket-events.md`、`docs/modules/im.md` 已更新；共享
+类型已导出 |
+
+---
+
+## 风险与建议
+
+### 高优先级修复（建议阻塞合并前完成）
+1. **补充 `im.service.spec.ts` 和 `im.gateway.spec.ts`**：至少覆盖消息幂等、会话
+权限拒绝、已读回执 Redis 重置、分页 cursor 边界。
+2. **新建 `docs/api-contracts/im-events.yaml`**：补全 5 个服务端事件的 Schema 定
+义。
+3. **修复 `send_message.yaml` 流程断点**：增加会话预创建或条件跳过逻辑，确保干净
+环境可跑通。
+
+### 中优先级修复（建议后续迭代）
+4. **优化 `ImBloc` 生命周期**：考虑将 Socket 连接提升为应用级，避免频繁断连；在
+消息列表页消费 `conversation:updated` 实现实时刷新。
+5. **集成 `PushService` 到 IM Gateway**：在接收方离线时触发推送，满足 MVP PRD 要
+求。
+6. **统一 Redis 客户端提供方式**：避免各模块重复创建连接。
+
+### 已验证的亮点
+- **设计系统交付规范**：`SwChatBubble`、`SwChatInputBar`、`SwConversationListIte
+m` 均已在 Widgetbook 注册，附有 Golden Test 截图，无硬编码颜色，Accessibility（S
+emantics + onTapDown）符合 flutter.md 要求。
+- **Migration 合规**：`AlterMessagesSenderIdNullable20250425000000` 存在 up/down
+方法，符合 `nestjs.md` 迁移规范。
+- **共享类型契约同步**：`packages/shared-types/src/im-socket-events.ts` 已定义，
+并在前后端同时引用。
+- **Makefile 构建顺序修复**：`shared-types` 先于 `apps/api` 构建，且新增了结构测
+试 `test_makefile_build_order.py` 进行守护。
+
+
+--- 第 3 次 Review ---
+# PR #58 代码审查报告
+
+## 审查结论
+
+审查结论: **NEEDS_MAJOR_FIX**
+
+PR 实现了 IM（即时通讯）模块的核心功能，包含后端 Socket.io Gateway、消息服务、前
+端聊天页面/会话列表、Design System 组件及 E2E 测试。整体架构方向正确，设计系统组
+件符合规范，Maestro E2E 测试覆盖到位。
+
+但存在 **2 个 Major 问题**：
+1. Mobile 端 ImBloc 的已读回执逻辑存在边界 bug，会导致所有己方消息被错误标记为已
+读；
+2. 后端离线推送未集成 PushService，PRD 要求的离线消息推送未实现；
+3. BDD 测试只有 feature 文件，缺少可执行的 step 实现。
+
+## 阻塞问题（Blocking）
+
+无。
+
+## 严重问题（Major）
+
+### 1. ImBloc 已读回执逻辑错误标记所有己方消息为已读
+- **位置**: `apps/mobile/lib/presentation/blocs/im/im_bloc.dart:153-163`
+- **问题**: 当 `_onReadReceipt` 收到 `lastReadMessageId` 且该消息 ID 不在当前内
+存中的 `_messages` 列表时（`lastReadIndex == -1`），条件 `shouldMarkRead = lastR
+eadIndex == -1 || i <= lastReadIndex` 会成立，导致**所有己方消息**被标记为 `read
+`。这在用户未加载全部历史消息时（例如只加载了最近 20 条，但对方已读了更早的消息
+），会错误地将当前可见的较新消息也标为已读。
+- **影响**: 消息发送方的 UI 上，未读的新消息会错误显示“已读”状态，用户体验受损。
+- **修复**:
+  ```dart
+  // 仅当 lastReadMessageId 存在于当前消息列表时才批量标记
+  final shouldMarkRead = lastReadIndex != -1 && i <= lastReadIndex;
+  ```
+或者，如果希望在 lastReadMessageId 不在列表时也标记（例如列表中只有更早消息），
+需要更精确地比较 sequence_id 而不是列表索引。
+- **依据**: `prd/v1-mvp.md` US-4 要求“Alice should see the message status change
+to '已读'”，而当前实现会导致错误的消息被标记；`tests/bdd/im_read_receipts.featur
+e` 也要求仅已读消息状态变化。
+
+### 2. 离线消息推送未实现（PushService 未在 IM Gateway 中调用）
+- **位置**: `apps/api/src/modules/im/im.gateway.ts:90-142`
+- **问题**: `handleSendMessage` 在消息保存后，仅通过 `this.server.to(\`user:${ot
+herId}\`)` 向接收者推送 `message:receive` 事件。若接收者不在线（Socket 未连接）
+，消息只会被持久化且 Redis unread_count 增加，但**不会触发任何推送通知**。`PushS
+ervice` 已在 `apps/api/src/modules/push/push.service.ts` 中定义，但 `ImGateway` 
+未注入和使用它。
+- **影响**: 离线用户无法收到新消息提醒，违反 PRD 中“离线用户通过极光推送/Firebas
+e 触发新消息提醒”的验收标准。
+- **修复**:
+  1. 在 `ImGateway` 构造函数中注入 `PushService`。
+  2. 在 `handleSendMessage` 中，emit 到 `user:${otherId}` 后检查该 room 内是否有
+在线 socket，若无则调用 `pushService.sendPush(...)`。
+  ```typescript
+  // 在 ImGateway 构造函数中添加
+  private readonly pushService: PushService,
+
+  // 在 handleSendMessage 中 emit 后添加
+  const sockets = await this.server.in(`user:${otherId}`).fetchSockets();
+  if (sockets.length === 0) {
+    await this.pushService.sendPush(
+      otherId,
+      '新消息',
+      '您收到一条新消息',
+      { conversation_id: dto.conversation_id },
+    );
+  }
+  ```
+- **依据**: `prd/v1-mvp.md` 中 US-4 技术要求明确提到“离线用户通过极光推送/Fireba
+se 触发新消息提醒”；`tests/bdd/im_real_time_message_delivery.feature` 第 13-18 
+行要求“a push notification should be triggered for Bob”。
+
+### 3. BDD 测试缺少可执行的 Step 实现
+- **位置**: `tests/bdd/step-definitions/im_*.steps.js`
+- **问题**: 所有 IM 相关的 BDD step 定义文件（如 `im_start_chatting_after_match.
+steps.js`、`im_read_receipts.steps.js` 等）均使用 `autoBindSteps(feature, )`，即
+**仅依赖通用步骤**，没有针对 IM 业务行为（如 Socket.io 连接、消息发送、已读回执
+、未读数验证）编写具体的 Given/When/Then 实现。这意味着这些 `.feature` 文件虽然
+存在，但无法执行有效的验收测试。
+- **影响**: BDD 测试无法验证 IM 核心业务流程的闭环（写 → 读 → 断言），违背 `docs
+/design-docs/testing.md` 中“数据闭环原则”。
+- **修复**: 为每个 IM feature 编写具体的 step 实现，至少覆盖：
+  - 建立两个测试用户的 Socket.io 连接（`im` namespace）
+  - 发送消息并断言对方收到 `message:receive` 事件
+  - 断言 Redis `unread_count` 变化
+  - 发送 `message:read` 并断言对方收到 `message:read_receipt`
+- **依据**: `docs/design-docs/testing.md` 第 56-67 行强调“数据闭环原则”和“mock 
+实现必须与真实组件的业务契约一致”；`prd/v1-mvp.md` 中每个用户故事均要求 BDD 覆盖
+。
+
+## 轻微问题（Minor）
+
+### 4. API 契约字段名与控制器返回值不一致
+- **位置**: `docs/api-contracts/im.yaml:56-74`
+- **问题**: `ConversationDto` 中定义的字段为 `id`，而 `ImController.getConversat
+ions` 实际返回的字段名为 `conversation_id`。Mobile 端解析代码 (`im_repository_im
+pl.dart:99`) 使用的是 `conversation_id`，与控制器一致，但与 OpenAPI 契约不一致。
+- **修复**: 将 `docs/api-contracts/im.yaml` 中 `ConversationDto` 的 `id` 改为 `c
+onversation_id`。
+- **依据**: `docs/design-docs/nestjs.md` 第 86 行要求“DTO 的字段命名必须与 `pack
+ages/shared-types/` 中的接口定义完全一致”。
+
+### 5. ChatPage 空消息列表时固定显示系统提示语
+- **位置**: `apps/mobile/lib/presentation/pages/chat_page.dart:118-124`
+- **问题**: 当消息列表为空时，直接显示固定的系统消息“你们已匹配成功，开始聊天吧”
+。但如果会话有消息后被清空（如未来实现删除功能），或用户进入一个有历史消息的会话
+但加载失败，这个固定文案不准确。
+- **修复**: 将系统消息的显示与“消息列表为空”状态解耦，仅在会话确实没有任何消息（
+包括系统消息）时显示该欢迎语，或从后端拉取真正的 system message。
+- **依据**: `prd/v1-mvp.md` US-4 要求“Alice should see the system message”，但并
+未要求在没有系统消息时也显示该文案。
+
+### 6. ImBloc 语义状态混用
+- **位置**: `apps/mobile/lib/presentation/blocs/im/im_bloc.dart:117-118`
+- **问题**: 当收到对方消息时（`_onMessageReceived`），emit 的是 `ImMessageSent` 
+状态。该状态语义上表示“我发送的消息已确认”，却被用于“收到新消息”场景，状态语义混
+乱。
+- **修复**: 建议新增 `ImMessageReceived` 状态，或在 UI 层统一用 `ImMessagesLoade
+d` 表示消息列表更新。
+- **依据**: `docs/design-docs/flutter.md` 要求状态管理保持可读性。
+
+### 7. `getMessages` 分页 next_cursor 逻辑缺少注释
+- **位置**: `apps/api/src/modules/im/im.service.ts:189-199`
+- **问题**: `nextCursor` 取的是 `messages[0].sequence_id`，而 `messages` 经过 `r
+everse()` 后 `messages[0]` 是本次返回的最旧消息。该逻辑虽然结果正确，但非常反直
+觉，缺少注释说明，未来维护者容易误改。
+- **修复**: 在 `nextCursor` 赋值处添加注释，说明 cursor 是“当前页最旧消息的 sequ
+ence_id，用于下一页加载更旧的消息”。
+
+## 验证结果
+
+| 维度 | 状态 | 说明 |
+|------|------|------|
+| 功能完整性 | ⚠️ | 核心收发消息、已读回执、会话列表已实现。但**离线推送未实现**
+，与 PRD 要求有差距。 |
+| 代码规范性 | ✅ | 后端符合 NestJS 分层规范；Flutter 组件使用 DesignTokens，无
+硬编码颜色；Maestro 兼容性良好（使用 `onTapDown`、`Semantics(identifier)`）。 |
+| 全链路完整性 | ✅ | DB（messages 表 + migration）→ API（Controller/Gateway/Ser
+vice）→ Mobile（BLoC/Repository/SocketClient）→ DesignSystem 已贯通。 |
+| 规范符合性 | ✅ | 设计系统组件有 Widgetbook 用例和 Golden Test；API 契约文档已
+更新；Socket 事件命名符合 `模块名:动作` 规范。 |
+| 测试覆盖 | ⚠️ | 后端单元测试覆盖核心路径；Mobile Widget Golden Test 覆盖新组件
+；Maestro E2E 流程已添加。**但 BDD 测试缺少可执行 step 实现**。 |
+| 文档同步 | ✅ | `docs/modules/im.md`、`docs/api/socket-events.md`、`docs/api-c
+ontracts/im-events.yaml` 均已同步。 |
+
+## 风险与建议
+
+1. **推送降级策略**: 当前 `PushService` 是 MVP skeleton（仅打印日志）。建议在 `I
+mGateway` 中集成时，将推送调用包裹在 try/catch 中，确保推送失败不影响消息发送主
+流程。
+
+2. **Socket 房间在线状态检查**: `ImGateway` 中判断用户是否在线可使用 `this.serve
+r.in(\`user:${userId}\`).fetchSockets()`，但需注意这会增加一次异步 IO。如果推送
+是高频场景，可考虑维护一个内存中的在线用户映射（如 Redis / 进程内 Map）来优化。
+
+3. **消息加载分页边界**: `ChatPage` 目前只在 `initState` 时加载一次消息，未实现
+下拉加载更多历史消息。虽然当前 PR 范围可能不包含，但建议在下个迭代补充 `ListView
+` 的 `onNotification` 滚动监听以触发分页加载。
+
+4. **BDD 测试闭环**: 强烈建议在下个迭代中补齐 IM 相关 BDD 的 step 实现，尤其是“
+发送 → 查询会话列表 → 断言未读数”的完整链路。当前只有 feature 文件无法提供回归保
+护。
+
+5. **Design-Only PR 流程回顾**: 本次 PR 同时包含了 design-system 组件（`SwChatBu
+bble`、`SwChatInputBar`、`SwConversationListItem`）和业务逻辑代码。根据 `AGENTS.
+md` 中 Flutter 规范，Design-Only PR 应先走且“禁止直接写入 `packages/`”。本次 PR 
+可能是功能开发 PR 直接合入了 design-system 组件（这在执行计划允许范围内，因为规
+范说“后续功能开发 PR 统一迁入”），但建议确认是否已有对应的 `designs/issue-5/MANI
+FEST.md` 记录此次迁移。
+
+
+--- 第 4 次 Review ---
+## 审查结论
+
+审查结论: **NEEDS_MAJOR_FIX**
+
+PR #58 实现了 IM（即时通讯）全链路模块，覆盖 DB → API → Mobile → Design-System →
+文档，整体架构方向正确，组件封装和 Maestro E2E 流也有配套产出。但存在 **6 个 Blo
+cking 问题**，其中核心消息发送功能在 Mobile 端完全不可用（Socket 未连接），且后
+端 Service/Controller 层违反了 NestJS 编码规范（直接返回 Entity）。这些问题必须
+在合并前修复。
+
+---
+
+## 阻塞问题（Blocking）
+
+### 1. Mobile 端 Socket 从未连接，消息发送功能完全不可用
+- **位置**: `apps/mobile/lib/presentation/pages/chat_page.dart:36-40`
+- **问题**: `ChatPage.initState` 中创建了 `ImBloc` 并加载历史消息，但 **从未发送
+`ImConnectRequested` 事件**。全局搜索（`Grep` 验证）确认 `ImConnectRequested` 仅
+在 `im_event.dart` 和 `im_bloc.dart` 中存在，没有任何 UI 代码调用它。
+- **影响**: `_socketClient` 始终为 `null`，`_onSendMessage` 中的 `_socketClient?
+.sendMessage(...)` 永远为空操作。用户点击发送后消息状态停留在 `sending`，永远不
+会到达服务端。
+- **修复**:
+  1. 在 `ChatPage.initState` 中，从 `AuthBloc` 或 `SecureStorage` 获取当前用户的
+JWT token，并调用 `bloc.add(ImConnectRequested(token))`。
+  2. 在 `ChatPage.dispose` 中调用 `bloc.add(const ImDisconnectRequested())` 以清
+理连接。
+- **依据**: `prd/v1-mvp.md` 第 160 行明确要求“使用 Socket.io 实现实时消息收发”；
+`docs/design-docs/nestjs.md` Socket.io Gateway 规范要求客户端必须连接后才能收发
+事件。
+
+### 2. `ImBloc` 连接状态会覆盖消息状态，导致 UI 显示加载中并丢失消息列表
+- **位置**: `apps/mobile/lib/presentation/blocs/im/im_bloc.dart:68-75`
+- **问题**: `_onConnect` 发射 `ImConnected()`，`_onDisconnect` 发射 `ImDisconnec
+ted()`。这两个状态类不包含消息列表。`ChatPage` 的 `BlocConsumer` builder 仅在 `s
+tate is ImMessagesLoaded || state is ImMessageSending || state is ImMessageSent 
+|| state is ImMessageRead` 时渲染消息列表，否则回退到 `CircularProgressIndicator
+`。
+- **影响**: 一旦 Socket 连接/断开，聊天页面会从“显示消息”瞬间变成“全屏加载圈”。
+- **修复**:
+  - 方案 A：删除 `ImConnected` / `ImDisconnected` 这两个独立状态，改为在现有消息
+状态类中增加 `isConnected` 字段；
+  - 方案 B：在 `ChatPage` builder 中增加对 `ImConnected` / `ImDisconnected` 的处
+理，保持上一状态的消息列表渲染。
+- **依据**: `docs/design-docs/flutter.md` 状态管理规范要求 BLoC 状态应支持 UI 的
+连续渲染，不应因连接状态抖动导致页面骨架重置。
+
+### 3. `ImService.getMessages` 直接返回 TypeORM Entity，违反分层规范
+- **位置**: `apps/api/src/modules/im/im.service.ts:157-200`
+- **问题**: `getMessages` 的返回类型显式声明为 `Promise<{ items: MessageEntity[]
+; next_cursor: string | null; has_more: boolean }>`，直接返回数据库 Entity。
+- **影响**: 违反 NestJS 编码规范，存在泄露内部字段（如未来可能新增的敏感 DB 字段
+）的风险。
+- **修复**:
+  1. 新建 `MessageResponseDto`，字段与 `MessageEntity` 对应但显式排除内部字段；
+  2. 在 `getMessages` 中将 `MessageEntity` 数组映射为 `MessageResponseDto[]` 后
+返回。
+- **依据**: `docs/design-docs/nestjs.md` 第 56 行 “Service 层：禁止直接返回 Enti
+ty”；第 85 行 “所有出参使用显式 DTO，禁止直接返回 TypeORM Entity”。
+
+### 4. `ImController` API 响应直接包含 TypeORM Entity
+- **位置**: `apps/api/src/modules/im/im.controller.ts:56-66`
+- **问题**: `getMessages` 调用 `imService.getMessages(...)` 后，将返回的 `data` 
+直接包装进 `{ code: 0, message: "success", data }`。由于 `ImService` 返回的是 `M
+essageEntity[]`，Controller 实际上在 HTTP 响应中序列化了 Entity。
+- **影响**: 同 Blocking-3，违反 Controller 层“禁止直接返回 Entity”的规范。
+- **修复**: 在 `ImService` 修复为返回 DTO 后，Controller 自然合规；若需临时修复
+，可在 Controller 中增加一层 `data.items.map(...)` 转换为 DTO。
+- **依据**: `docs/design-docs/nestjs.md` 第 56 行 Controller 职责表：“禁止直接操
+作 Repository”；以及 DTO 规范：“禁止使用 Entity 作为接口类型”。
+
+### 5. `MessageEntity` 唯一索引与幂等去重逻辑不一致
+- **位置**: `apps/api/src/database/entities/message.entity.ts:13-15`
+- **问题**: 唯一索引仅建立在 `client_message_id` 单列上：
+  ```typescript
+  @Index("idx_messages_client_message_id", ["client_message_id"], { unique: true
+})
+  ```
+但 `ImService.sendMessage` 的幂等去重查询使用的是 `(conversation_id, client_mess
+age_id)` 组合条件（`im.service.ts:115-118`）。
+- **影响**: 如果同一用户在不同会话中因客户端 bug 产生了相同的 `client_message_id
+`，DB 层面会报唯一约束冲突（`ER_DUP_ENTRY`），但去重查询因限定了 `conversation_i
+d` 而找不到已有记录，导致代码进入 `throw err` 分支，返回 500 错误而非幂等成功。
+- **修复**:
+  1. 将 Entity 索引改为复合唯一索引：`@Index("idx_messages_conv_client_msg_id", 
+["conversation_id", "client_message_id"], { unique: true })`；
+  2. 同步修改 Migration 文件 `20250425000000-AlterMessagesSenderIdNullable.ts`（
+或新建 Migration）删除旧索引、创建新索引；
+  3. 同步更新 `im.service.ts` 中 `catch (err)` 块的 `err.message.includes(...)` 
+匹配字符串，确保能捕获新的索引名错误信息。
+- **依据**: `docs/modules/im.md` 边界情况第 1 条明确说明“客户端生成 `client_mess
+age_id`，服务端幂等去重”；幂等去重查询与唯一索引必须语义一致。
+
+### 6. `SendMessageDto.client_message_id` 校验规则与服务端 fallback 逻辑矛盾
+- **位置**: `apps/api/src/modules/im/dto/send-message.dto.ts:14-15` 与 `apps/api
+/src/modules/im/im.service.ts:76`
+- **问题**: DTO 中 `client_message_id` 使用了 `@IsString()`（表示必填），但 `ImS
+ervice.sendMessage` 中写了 `const clientMessageId = dto.client_message_id ?? uui
+dv7();`，暗示该字段可选。
+- **影响**: 如果客户端请求体中省略 `client_message_id`，`class-validator` 会在 C
+ontroller/Guard 阶段拦截并返回 400，不会走到 Service 的 fallback 逻辑。两个层面
+的语义不一致。
+- **修复**:
+  - 方案 A：在 DTO 上增加 `@IsOptional()`，使 Service 的 fallback 逻辑真正生效；
+  - 方案 B：删除 Service 中的 `?? uuidv7()` fallback，要求客户端必须提供（更符合
+当前 DTO 定义）。
+推荐方案 A，因为客户端在断网重发场景下需要依赖服务端生成 ID。
+- **依据**: `docs/design-docs/nestjs.md` 第 83-87 行 DTO 与校验规范：“DTO 的字段
+命名必须与 `packages/shared-types/` 中的接口定义完全一致”；接口契约应前后一致。
+
+---
+
+## 严重问题（Major）
+
+### 1. `ChatPage` 未实现图片消息，与 PRD 需求不符
+- **位置**: `apps/mobile/lib/presentation/pages/chat_page.dart:127-169`；`packag
+es/design-system/lib/src/molecules/chat_bubble.dart:117-118`
+- **问题**: `ChatPage` 的 `itemBuilder` 中所有消息都当作文本渲染；`SwChatBubble.
+_buildContent` 明确注释 “For simplicity, treat all as text. Image handling can b
+e extended.”。但 PRD 明确要求 MVP 支持图片消息。
+- **影响**: 功能不完整，用户无法发送/接收图片。
+- **修复**:
+  1. 在 `ChatPage` 中根据 `msg.type` 区分文本与图片渲染；
+  2. 在 `SwChatBubble` 中扩展 `_buildContent` 以支持图片预览；
+  3. 在 `SwChatInputBar` 中启用 `onPickImage` 回调（组件已预留，但 `ChatPage` 未
+传入）。
+- **依据**: `prd/v1-mvp.md` 第 154-157 行：“消息类型：MVP 阶段支持：文本、图片”
+。
+
+### 2. IM 模块缺少离线用户推送通知实现
+- **位置**: `apps/api/src/modules/im/im.service.ts:52-126`
+- **问题**: `sendMessage` 中，消息持久化后仅通过 Socket.io 推送给在线用户，没有
+检测接收方是否在线，也没有调用 `PushService` 发送离线推送。
+- **影响**: 离线用户收不到新消息提醒，违反 PRD 非功能需求。
+- **修复**:
+  1. 在 `sendMessage` 中，向接收方房间 emit 后，检查该用户是否在线（可通过 Socke
+t.io `server.fetchSockets()` 或 Redis 维护在线状态）；
+  2. 若不在线，调用 `PushService.sendPush(otherId, title, body, payload)` 触发推
+送。
+- **依据**: `prd/v1-mvp.md` 第 163 行：“离线用户通过极光推送/Firebase 触发新消息
+提醒”。
+
+### 3. `ChatPage` 离开会话时未清理 `ImBloc` 的当前会话上下文
+- **位置**: `apps/mobile/lib/presentation/pages/chat_page.dart:43-47`
+- **问题**: `dispose()` 只释放了 `_scrollController`，没有调用 `bloc.setCurrentC
+onversation(null, null)`。
+- **影响**: 用户离开 `ChatPage` 后，若 Socket 收到新消息，`ImBloc._onMessageRece
+ived` 仍可能匹配到旧的 `_currentConversationId`，导致自动发送 read receipt 给错
+误的会话。
+- **修复**: 在 `dispose()` 中增加 `bloc.setCurrentConversation(null, null)`。
+
+### 4. `im.yaml` OpenAPI 契约与实际 API 返回结构不一致
+- **位置**: `docs/api-contracts/im.yaml`
+- **问题**:
+  - `ConversationDto` 的 `required` 包含 `id`，但 `ImController.getConversations
+` 实际返回的字段名是 `conversation_id`；
+  - `MessageDto.type` 的 `enum: ` 缺少 `system`（系统消息类型）；
+  - `MessageDto.sender_id` 标记为 required，但数据库和 Entity 中该字段为 `nullab
+le`（系统消息无 sender）。
+- **影响**: 契约文档与代码不一致，会导致 OpenAPI 代码生成、前后端联调出错。
+- **修复**:
+  1. `ConversationDto` 将 `id` 改为 `conversation_id`；
+  2. `MessageDto.type` 的 enum 增加 `system`；
+  3. `MessageDto.sender_id` 增加 `nullable: true` 或从 required 中移除。
+- **依据**: `docs/design-docs/nestjs.md` 第 87 行 “DTO 的字段命名必须与 `package
+s/shared-types/` 中的接口定义完全一致”；`docs/api-contracts/INDEX.md` 要求契约文
+件与代码同步。
+
+### 5. `MatchListPage` 类名与职责不符
+- **位置**: `apps/mobile/lib/presentation/pages/match_list_page.dart:10`
+- **问题**: 页面类名为 `MatchListPage`，但实际渲染的是“消息/会话列表”（底部导航 
+Tab 文案为“消息”，AppBar 标题为“消息”）。而真正的“匹配列表”应在 Matching 模块。
+- **影响**: 代码可读性差，维护者极易混淆。
+- **修复**: 将类名和文件名统一重命名为 `ConversationListPage` / `conversation_li
+st_page.dart`，并同步更新 `app.dart` 中的 import 和引用、`docs/modules/im.md` 中
+的文件索引。
+- **依据**: `docs/design-docs/flutter.md` 命名规范：“Widget 类名必须以描述功能结
+尾”；`docs/modules/im.md` 也将该页面索引为 “Conversation List Page”。
+
+### 6. IM BDD 测试的 Step Definitions 为空壳
+- **位置**: `tests/bdd/step-definitions/im_*.steps.js`
+- **问题**: 所有 IM 相关的 step definition 文件（如 `im_real_time_message_delive
+ry.steps.js`）仅执行 `autoBindSteps(feature, )`，没有定义任何 IM 专属步骤（如 `W
+hen Alice sends "..."`）。
+- **影响**: BDD 测试虽然存在 `.feature` 文件，但无法验证 IM 业务行为，失去了验收
+价值。
+- **修复**: 补充 IM step definitions，至少覆盖：
+  - Socket 连接模拟；
+  - 消息发送 REST/Socket 调用；
+  - 消息历史查询断言；
+  - 已读回执断言。
+- **依据**: `docs/design-docs/testing.md` 第 59-66 行 “数据闭环原则” 和 BDD Mock
+规范。
+
+### 7. `ImSocketClient` 缺少自动重连配置
+- **位置**: `apps/mobile/lib/core/network/im_socket_client.dart:30-34`
+- **问题**: `io.io()` 初始化时未配置 `reconnection: true`、重连间隔、最大重试次
+数等参数。
+- **影响**: 网络闪断后 Socket 不会自动恢复，用户必须杀掉 App 重进才能重新连接。
+- **修复**: 在 `io.io()` options 中增加 `reconnection: true`、`reconnectionAttem
+pts: 5`、`reconnectionDelay: 1000` 等配置。
+
+---
+
+## 轻微问题（Minor）
+
+### 1. `SwConversationListItem` 的 `identifier` 硬编码为同一值
+- **位置**: `packages/design-system/lib/src/molecules/conversation_list_item.dar
+t:27`
+- **问题**: 列表中每一项都使用 `identifier: 'conversation_item'`，Maestro 无法区
+分点击第几项。
+- **修复**: 允许外部传入 `identifier`，或在调用处用 `Semantics` 包裹并传入带索引
+的 id。
+
+### 2. `ImBloc._onConversationUpdated` 为空实现
+- **位置**: `apps/mobile/lib/presentation/blocs/im/im_bloc.dart:219-225`
+- **问题**: 收到 `conversation:updated` 事件后没有任何动作（如刷新会话列表）。
+- **修复**: 发射一个状态（如 `ImConversationUpdatedState`），让 `MatchListPage`/
+`ConversationListPage` 监听后刷新列表。
+
+### 3. `docs/modules/im.md` 文件索引存在命名不一致
+- **位置**: `docs/modules/im.md:61`
+- **问题**: 表格中将 `match_list_page.dart` 标注为 “Conversation List Page”，但
+未说明文件实际名称为 `match_list_page.dart`。
+- **修复**: 重命名页面文件后同步更新此索引；若暂不重命名，至少追加备注说明。
+
+---
+
+## 验证结果
+
+| 维度 | 状态 | 说明 |
+|------|------|------|
+| 功能完整性 | ❌ | 文本消息收发链路完整，但 **图片消息未实现**、**离线推送未实
+现**、**Socket 未在 Mobile 连接导致发送不可用**。 |
+| 代码规范性 | ❌ | 后端 `ImService` / `ImController` **直接返回 TypeORM Entity*
+*，违反 NestJS 分层规范；`SendMessageDto` 与 Service 语义矛盾。 |
+| 全链路完整性 | ⚠️ | DB → API → Mobile 文件齐备，但 **Mobile 端 Socket 连接断裂*
+*，导致全链路在发送路径上未跑通。 |
+| 规范符合性 | ⚠️ | Design-System 组件基本合规（使用 `DesignTokens`、Widgetbook 
+已注册、Golden Test 已提交），但 `im.yaml` 契约与实际 API 不符。 |
+| 测试覆盖 | ⚠️ | 后端 Unit Test 覆盖较全（Service/Gateway/Controller），但 **BDD
+Step Definitions 为空壳**；Mobile 端无 Widget/E2E 测试覆盖 Socket 连接和消息发送
+闭环。 |
+| 文档同步 | ⚠️ | `docs/modules/im.md`、`docs/api/socket-events.md`、`docs/api-co
+ntracts/im-events.yaml` 已更新，但 `im.yaml` 契约字段与实际 API 不一致。 |
+
+---
+
+## 风险与建议
+
+1. **核心功能不可用风险（高）**: 由于 `ImConnectRequested` 从未被调用，当前 PR 
+合并后 Mobile 端无法发送任何 Socket 消息。建议在修复后，至少通过以下方式验证：
+   - 在 emulator 上运行 `make test-mobile-e2e`（`send_message.yaml` 流）；
+   - 或本地启动 `make e2e-env-up`，用 Maestro 跑通 `im/send_message.yaml`。
+
+2. **数据一致性风险（中）**: `MessageEntity` 的唯一索引与去重查询不一致，可能导
+致偶发的 500 错误。建议优先修改为复合唯一索引。
+
+3. **技术债务风险（中）**: `MatchListPage` 命名与职责不符，越早重命名成本越低。
+若拖延，后续在导航、路由、埋点、E2E 中会产生更多隐式依赖。
+
+4. **后续迭代建议**:
+   - 补充 `apps/mobile/test` 层的 Widget Test，覆盖 `ChatPage` 在 `ImMessagesLoa
+ded` / `ImError` / `ImMessageSent` 状态下的渲染；
+   - 在 `ImBloc` 中增加连接状态心跳或断线检测，并暴露给 UI（如在 `ChatPage` AppB
+ar 显示“连接中/已断开”提示）；
+   - 考虑将 `ImBloc` 提升为全局状态（放在 `app.dart` 的 `MultiBlocProvider` 中）
+，而非每个 `ChatPage` 独立创建，以便会话列表和聊天页共享 Socket 连接。
+
+
+--- 第 5 次 Review ---
+# PR #58 审查报告
+
+> **PR 主题**: feat: resolve #5 - [IM] V1 Instant Messaging - 实时聊天、已读回执
+与会话列表  
+> **审查分支**: `feat/issue-5`  
+> **审查范围**: DB → API → Mobile 全链路，含 Design-System、E2E、文档  
+> **审查日期**: 2026-04-25
+
+---
+
+## 审查结论
+
+审查结论: **NEEDS_MAJOR_FIX**
+
+本 PR 实现了 IM 模块的核心链路（消息收发、已读回执、会话列表、Design-System 组件
+、Maestro E2E、API 契约文档），整体架构方向正确，测试覆盖较完整。但存在 **1 个阻
+塞问题（实时消息完全不可用）** 和 **4 个严重问题**，必须在合并前修复。
+
+---
+
+## 阻塞问题（Blocking）
+
+### 1. Flutter Socket 从未连接，实时消息功能完全不可用
+- **位置**: `apps/mobile/lib/app.dart:72-82`（ChatPage 路由创建 Bloc 但未连接 So
+cket）
+- **问题**: `ChatPage` 通过 `BlocProvider` 创建 `ImBloc` 后，只调用了 `setCurren
+tConversation()` 和 `add(ImLoadMessages(...))`，**从未发送 `ImConnectRequested` 
+事件**。`ImBloc._onConnect` 因此永远不会执行，`ImSocketClient.connect()` 永远不
+会被调用。
+- **影响**: 用户进入聊天页后，Socket.io 连接未建立，无法实时发送/接收消息；已读
+回执、会话更新推送全部失效。整个 IM 实时链路处于瘫痪状态。
+- **修复**:  
+在 `ChatPage.initState()` 或 `app.dart` 的 ChatPage 路由中，在 Bloc 创建后立即发
+送连接事件：
+  ```dart
+  // apps/mobile/lib/presentation/pages/chat_page.dart
+  @override
+  void initState() {
+    super.initState();
+    final bloc = context.read<ImBloc>();
+    bloc.setCurrentConversation(widget.conversationId, widget.currentUserId);
+    // 新增：连接 Socket
+    final authState = context.read<AuthBloc>().state;
+    if (authState is AuthAuthenticated) {
+      bloc.add(ImConnectRequested(authState.token));
+    }
+    bloc.add(ImLoadMessages(conversationId: widget.conversationId));
+  }
+  ```
+同时需要在 `ChatPage.dispose()`（或 Bloc 关闭前）发送 `ImDisconnectRequested`：
+  ```dart
+  @override
+  void dispose() {
+    context.read<ImBloc>().add(const ImDisconnectRequested());
+    _scrollController.dispose();
+    super.dispose();
+  }
+  ```
+- **依据**: `apps/mobile/lib/presentation/blocs/im/im_bloc.dart:35-69` 中 `_onCo
+nnect` 依赖 `ImConnectRequested` 事件触发；全局搜索确认该事件在代码库中没有任何 
+`add()` 调用点。
+
+---
+
+## 严重问题（Major）
+
+### 2. API 契约文档 `im.yaml` 与实际实现不符
+- **位置**: `docs/api-contracts/im.yaml:7-24`
+- **问题**: `/api/v1/conversations` 的响应契约定义 `data` 为 `ConversationDto` 
+数组：
+  ```yaml
+  data:
+    type: array
+    items:
+      $ref: '#/components/schemas/ConversationDto'
+  ```
+但 `ImController.getConversations` 实际返回的是分页对象 `{ items, next_cursor, h
+as_more }`（与 `common.yaml#/Pagination` 一致）。
+- **影响**: 前端/外部消费者按契约生成客户端时会得到错误类型；OpenAPI 契约失去真
+实性。
+- **修复**:  
+修改 `docs/api-contracts/im.yaml` 第 17-23 行：
+  ```yaml
+  data:
+    $ref: './common.yaml#/components/schemas/Pagination'
+    # 或更精确地定义为包含 items: ConversationDto[] 的分页对象
+  ```
+- **依据**: `apps/api/src/modules/im/im.controller.ts:14-35` 实际返回 `Paginatio
+n` 结构；`docs/api-contracts/im.yaml` 定义为数组。
+
+### 3. Service 层直接返回 TypeORM Entity（违反架构规范）
+- **位置**: `apps/api/src/modules/im/im.service.ts:157-200`
+- **问题**: `getMessages()` 的返回类型中 `items` 为 `MessageEntity[]`，Controlle
+r 直接将 Entity 序列化后返回。NestJS 编码规范明确规定："Service 禁止直接返回 Ent
+ity"。直接返回 Entity 会导致：
+  1. 内部字段（如可能的未来敏感字段）意外暴露；
+  2. API 响应结构与契约不一致（Entity 字段名/类型与 DTO 可能不同）；
+  3. 系统消息的 `sender_id` 为 `null`，但 `im.yaml` 的 `MessageDto` 将 `sender_i
+d` 标记为 `required`。
+- **影响**: API 契约与实际响应存在结构性差异；违反项目分层原则。
+- **修复**:  
+在 `apps/api/src/modules/im/im.service.ts` 中新增 `MessageResponseDto`，`getMess
+ages` 返回 `MessageResponseDto[]`：
+  ```typescript
+  export class MessageResponseDto {
+    id: string;
+    conversation_id: string;
+    sender_id: string | null;
+    type: string;
+    content: string;
+    client_message_id: string | null;
+    sequence_id: number;
+    status: string;
+    created_at: string;
+  }
+  ```
+并在 Service 中显式映射后再返回。同步更新 `im.yaml` 中 `sender_id` 为 `nullable:
+true`。
+- **依据**: `docs/design-docs/nestjs.md` 分层原则表："Service 禁止直接返回 Entit
+y"；`docs/api-contracts/im.yaml:99-102` 将 `sender_id` 标记为 required。
+
+### 4. 发送消息后会话列表排序不更新
+- **位置**: `apps/api/src/modules/im/im.service.ts:52-126`
+- **问题**: `sendMessage()` 将消息写入 `messages` 表并增加 Redis 未读数，但**从
+未更新 `conversation_participants.updated_at`**。`getConversations()` 按 `cp.upd
+ated_at DESC` 排序，因此新消息不会导致会话在列表中置顶。
+- **影响**: 用户收到新消息后，会话列表中的顺序不会变化，最近活跃的对话不会排在最
+前面，严重违背用户预期。
+- **修复**:  
+在 `sendMessage()` 中保存消息后，更新会话参与者的 `updated_at`：
+  ```typescript
+  // apps/api/src/modules/im/im.service.ts ~line 97
+  if (otherId) {
+    await this.redis.incr(`unread_count:${otherId}:${dto.conversation_id}`);
+    // 新增：更新双方 participant 的 updated_at，使会话列表排序正确
+    await this.participantRepo.update(
+      { conversation_id: dto.conversation_id },
+      { updated_at: new Date() },
+    );
+  }
+  ```
+- **依据**: `apps/api/src/modules/im/im.service.ts:230` 使用 `cp.updated_at DESC
+` 排序；MySQL `ON UPDATE CURRENT_TIMESTAMP` 仅在 `conversation_participants` 行
+被 UPDATE 时触发。
+
+### 5. 离线推送未在 IM 模块中集成
+- **位置**: `apps/api/src/modules/im/im.gateway.ts:90-142`
+- **问题**: `handleSendMessage()` 通过 Socket.io 向接收者推送 `message:receive`
+，但未检查接收者是否在线。若接收者离线，消息只会持久化到 DB，**没有任何离线推送
+触发**。PRD `v1-mvp.md` 明确要求："离线用户通过极光推送/Firebase 触发新消息提醒"
+。`PushService` 已存在（`apps/api/src/modules/push/push.service.ts`）且已注入 `M
+atchingModule`，但 `ImModule` 未注入它，也未调用。
+- **影响**: 离线用户收不到新消息提醒，必须主动打开 App 才能看到消息，严重影响 IM
+核心体验。
+- **修复**:  
+  1. 在 `ImModule` 的 `providers` 中注入 `PushService`；
+  2. 在 `ImGateway.handleSendMessage()` 中，若 `this.server.to(\`user:${otherId}
+\`).emit(...)` 后发现对方不在线（可通过 `server.in(\`user:${otherId}\`).fetchSoc
+kets()` 判断），则调用 `pushService.sendPush()` 发送推送。
+- **依据**: `prd/v1-mvp.md` 技术要求章节："离线用户通过极光推送/Firebase 触发新
+消息提醒"；`apps/api/src/modules/push/push.service.ts` 已提供骨架实现。
+
+---
+
+## 轻微问题（Minor）
+
+### 6. `ImBloc._onConversationUpdated` 为空实现
+- **位置**: `apps/mobile/lib/presentation/blocs/im/im_bloc.dart:219-225`
+- **问题**: 收到 `conversation:updated` 事件后无任何处理。虽然不会导致功能崩溃，
+但会话列表无法实时刷新。
+- **修复**: 可选在 `ConversationListCubit` 中监听该事件并触发刷新，或至少添加 TO
+DO 注释说明待实现。
+
+### 7. `ChatPage` 无历史消息分页加载入口
+- **位置**: `apps/mobile/lib/presentation/pages/chat_page.dart`
+- **问题**: `ImMessagesLoaded` 携带 `hasMore` 和 `nextCursor`，但 UI 中没有"下拉
+加载更多"或"滚动到顶部自动加载"的实现。用户只能看到最近 20 条消息。
+- **修复**: 在 `ListView.builder` 中增加 `NotificationListener<ScrollNotificatio
+n>` 或 `ScrollController` 监听，当滚动到顶部且 `hasMore` 为 true 时触发 `ImLoadM
+essages(cursor: nextCursor)`。
+
+### 8. `SendMessageDto.client_message_id` 为必填但服务端写死 fallback
+- **位置**: `apps/api/src/modules/im/dto/send-message.dto.ts:14-15` 与 `apps/api
+/src/modules/im/im.service.ts:76`
+- **问题**: DTO 用 `@IsString()` 将 `client_message_id` 设为必填，但 Service 中
+写了 `dto.client_message_id ?? uuidv7()` 的防御逻辑。由于 DTO 校验会拦截空值，这
+段 fallback 永远不会执行，属于无效防御代码。
+- **修复**: 保持必填即可，删除 Service 中的无意义 fallback，或改为在 Gateway 层
+校验缺失时生成。
+
+### 9. `im-events.yaml` 未在 `im.yaml` 中引用
+- **位置**: `docs/api-contracts/im.yaml`
+- **问题**: `im-events.yaml` 单独维护了 WebSocket 事件契约，但 `im.yaml` 未通过 
+`$ref` 引用它。两个文件处于孤岛状态。
+- **修复**: 在 `im.yaml` 底部增加注释或 `components/schemas` 引用，说明 WebSocke
+t 事件契约见 `im-events.yaml`。
+
+---
+
+## 验证结果
+
+| 维度 | 状态 | 说明 |
+|------|------|------|
+| **功能完整性** | ❌ | 核心实时消息因 Socket 未连接而完全不可用；会话列表排序不
+刷新；离线推送缺失。 |
+| **代码规范性** | ❌ | Service 返回 Entity 违反 NestJS 分层规范；DTO 与契约存在
+不一致。 |
+| **全链路完整性** | ⚠️ | DB ↔ API ↔ Mobile 数据流基本贯通，但 Socket 实时层断裂
+；Push 层未接入 IM。 |
+| **规范符合性** | ❌ | `im.yaml` 契约与实际响应不符；`sender_id` required 与 sy
+stem message 的 null 冲突。 |
+| **测试覆盖** | ✅ | API 单元测试（Controller/Gateway/Service）覆盖核心路径；De
+sign-System Golden Test 和 Widgetbook 用例完整；Maestro E2E 流程存在。 |
+| **文档同步** | ⚠️ | `socket-events.md`、`im-events.yaml`、`im.md` 已更新，但 `i
+m.yaml` REST 契约与实际代码不一致。 |
+
+---
+
+## 详细检查项
+
+### 后端（NestJS）
+
+| 检查项 | 结果 | 备注 |
+|--------|------|------|
+| Migration 文件 | ✅ | `20250425000000-AlterMessagesSenderIdNullable.ts` 已提供
+up/down |
+| Entity 同步 | ✅ | `MessageEntity.sender_id` 已改为 `nullable: true` |
+| DTO 校验 | ✅ | `SendMessageDto`、`ReadReceiptDto` 使用 `class-validator` |
+| JWT Socket 认证 | ✅ | `ImGateway.handleConnection` 校验 token 并加入 `user:{i
+d}` room |
+| 事务后 emit | ✅ | `MatchingService` 在 transaction 返回后才 emit `match:creat
+ed` |
+| 跨模块解耦 | ✅ | IM 通过 `EventEmitter2` 监听 `match:created`，未直接 import 
+MatchingGateway |
+| 原生 SQL 占位符 | ✅ | `getConversations` 使用 `?` 位置参数 |
+| Redis 未读数 | ✅ | `sendMessage` incr、`markAsRead` set 0 |
+| 幂等发送 | ✅ | 捕获 `ER_DUP_ENTRY` 并返回已有消息 |
+
+### 移动端（Flutter）
+
+| 检查项 | 结果 | 备注 |
+|--------|------|------|
+| Design-System 使用 | ✅ | `ChatPage`、`MatchListPage` 均使用 `SwChatBubble`/`S
+wChatInputBar`/`SwConversationListItem` |
+| 硬编码颜色 | ✅ | 统一使用 `DesignTokens` |
+| Accessibility / Maestro | ✅ | 语义属性完整，`onTapDown` 正确，输入框 `addList
+ener` + 全选 |
+| BLoC 状态管理 | ✅ | `ImBloc`、`ConversationListCubit` 分离职责 |
+| 依赖注入 | ✅ | `ImRepository`、`ImBloc`、`ConversationListCubit` 已注册到 `ge
+tIt` |
+| Socket 连接 | ❌ | **从未调用 `ImConnectRequested`** |
+| 输入框规范 | ✅ | `SwChatInputBar` 使用 `controller.addListener`、`FocusNode` 
+全选、`Semantics(identifier)` |
+
+### Design-System
+
+| 检查项 | 结果 | 备注 |
+|--------|------|------|
+| Widgetbook 注册 | ✅ | `SwChatBubble`、`SwChatInputBar`、`SwConversationListIt
+em` 均有用例 |
+| Golden Test | ✅ | `im_components_golden_test.dart` 生成 3 张基准图并已提交 |
+| 组件前缀 | ✅ | 均以 `Sw` 开头 |
+| Token 使用 | ✅ | 无硬编码颜色，使用 `DesignTokens` 和 `Theme.of(context).colo
+rScheme` |
+
+### E2E（Maestro）
+
+| 检查项 | 结果 | 备注 |
+|--------|------|------|
+| Flow 文件 | ✅ | `send_message.yaml`、`view_conversation_list.yaml` |
+| 定位策略 | ✅ | 优先使用 `id:` 定位 |
+| 依赖声明 | ⚠️ | `send_message.yaml` 声明依赖 `includes/login-as-test-user.yaml`
+，该文件存在 |
+| 完整闭环 | ⚠️ | `send_message.yaml` 覆盖发送-断言可见，但未断言接收方收到（单机
+E2E 限制） |
+
+---
+
+## 风险与建议
+
+1. **实时消息是 IM 的生死线**: 阻塞问题 #1 必须在合并前修复并验证。建议在修复后
+，使用两个模拟器同时登录两个测试账号，端到端验证发送→接收→已读回执的全链路。
+
+2. **会话列表排序是体验核心**: 问题 #4 会导致"最新消息不置顶"，用户极易感知。建
+议一并修复，否则上线后用户反馈会很差。
+
+3. **契约一致性需要回归**: 问题 #2 和 #3 涉及 API 契约与代码的一致性。建议引入 `
+make check-docs` 或类似工具，在 CI 中校验 OpenAPI 契约与实际 Controller 返回结构
+的匹配度。
+
+4. **离线推送可作为 follow-up**: 问题 #5 影响体验但属于 MVP 预留能力（`PushServi
+ce` 本身就是 skeleton）。如果工期紧张，可在合并后单独开 Issue 跟进，但建议在本 P
+R 中至少将 `PushService` 注入 `ImModule` 并加上 TODO。
+
+5. **加载历史消息**: 问题 #7 是体验缺口，但 20 条消息的 MVP 场景下风险可控，可作
+为后续迭代优化。
+
+---
+
+## 审查依据索引
+
+- `AGENTS.md` → `docs/design-docs/nestjs.md`（NestJS 分层规范、Gateway emit 规则
+）
+- `AGENTS.md` → `docs/design-docs/flutter.md`（Accessibility/Maestro 规范、Desig
+n-System 规则）
+- `AGENTS.md` → `prd/v1-mvp.md`（IM 功能需求与离线推送要求）
+- `docs/modules/im.md`（模块边界与流程图）
+- `docs/api/socket-events.md`（Socket 事件契约）
+- `docs/api-contracts/im.yaml`（REST API 契约）
+- `docs/api-contracts/im-events.yaml`（WebSocket 事件契约）
+
+
+--- 第 6 次 Review ---
+## 审查结论
+
+审查结论: **NEEDS_MAJOR_FIX**
+
+> **重要说明**：本次审查过程中，**未能获取 PR #58 的任何代码 diff**。经过多维度
+验证（GitHub API、远程分支、本地工作目录），确认 PR 内容不可达。本报告在"无法执
+行逐行 diff 审查"的前提下，基于 Issue #5 的公开需求边界、项目当前代码基线及已读
+取的规范文档，进行**范围审查（Scope Review）**和**合规性预检**。一旦 PR 代码可获
+取，必须进行完整的逐文件 diff 审查。
+
+---
+
+## 阻塞问题（Blocking）
+
+### 1. PR 代码 diff 不可获取，核心审查无法进行
+- **位置**: 工作目录 `/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/review-pr
+-58-3420212270`
+- **问题**: 工作目录中仅包含空的 `.doc-coverage.txt`（无 PR 变更文件记录），无 `
+.git` 历史、无 patch/diff 文件、无源代码。GitHub API 返回 404（`Could not resolv
+e to a PullRequest with the number of 58`）。远程仓库 `origin` 不存在 `feat/issu
+e-5` 分支（`fatal: couldn't find remote ref feat/issue-5`）。
+- **影响**: 无法执行代码规范性检查、功能完整性验证、测试覆盖评估等核心审查维度。
+- **修复**: 
+  1. 确认 PR #58 是否存在于其他 fork 或私有仓库；
+  2. 若 PR 尚未推送，请将 `feat/issue-5` 分支推送至远程；
+  3. 若审查文件生成失败，请重新触发 PR checkout 流程，确保变更文件落入审查工作目
+录。
+- **依据**: `git branch -r` 输出、`gh pr view 58` 输出、工作目录 `find` 结果。
+
+---
+
+## 严重问题（Major）
+
+### 2. 项目当前代码基线中 Issue #5 的两项目标均未实现，若 PR 未覆盖则功能不完整
+- **位置**: `apps/phaser3/vite.config.ts:28-30`、`apps/phaser3/src/services/`、`
+apps/phaser3/src/api/`
+- **问题**: Issue #5 明确要求：
+  1. 修复 `vite.config.ts` 中 `copy-config-to-dist` 插件的 source 路径（`../../p
+ackages/configs` → `../../new-world-configs`）；
+  2. 创建 `src/services/fish-service.ts`、`src/services/fish-types.ts`、`src/api
+/fish-api.ts` 等 Fish 模块前端代码。
+  
+经检查，当前 `main` 分支（`59bf152`）中：
+  - `vite.config.ts` 第 28 行仍为 `const source = resolve(__dirname, '../../pack
+ages/configs');`，bug 未修复；
+  - `src/services/` 下仅存在 `auth-service.ts` 和 `city-service.ts`，无 `fish-se
+rvice.ts` 或 `fish-types.ts`；
+  - `src/api/` 下仅存在 `auth-api.ts` 和 `building-api.ts`，无 `fish-api.ts`。
+- **影响**: 若 PR #58 声称解决 Issue #5，但上述文件缺失，则功能验收不通过。
+- **修复**: PR 必须包含：
+  - `apps/phaser3/vite.config.ts` 中路径修正；
+  - `apps/phaser3/src/api/fish-api.ts`（封装 `new-world-api/v1/fish.proto` 中全
+部 HTTP 接口）；
+  - `apps/phaser3/src/services/fish-service.ts`（管理弟子列表、鱼苗池、缓存更新
+）；
+  - `apps/phaser3/src/services/fish-types.ts`（`Fish`、`FishFry` 核心类型定义）
+；
+  - 接入 `new-world-configs/` 下 6 份 CSV 配置（`fish_level_configs.csv`、`talen
+t_configs.csv`、`personality_configs.csv`、`fish_looks_configs.csv`、`peculiarit
+y_configs.csv`、`ling_gen_configs.csv`）。
+- **依据**: GitHub Issue #5 描述、`apps/phaser3/vite.config.ts` 当前代码、`apps/
+phaser3/src/services/` 目录清单。
+
+### 3. Fish 模块前端必须遵循前端分层 ESLint 约束
+- **位置**: `apps/phaser3/.eslintrc.cjs:61-126`
+- **问题**: 项目通过 `import/no-restricted-paths` 在 CI 级别强制前端分层。新增 `
+fish-api.ts` 和 `fish-service.ts` 时极易违反以下规则：
+  - `api/` 层禁止依赖 `services/`、`scenes/`、`city-builder/`、`configs/`、`even
+ts/`；
+  - `services/` 层禁止依赖 `scenes/`、`plugins/`、`managers/`；
+  - `api/**/*.ts` 和 `services/**/*.ts` 额外开启 `@typescript-eslint/no-explicit
+-any: error` 和 `@typescript-eslint/explicit-function-return-type: warn`。
+- **影响**: 若 PR 中 fish-api 导入了 `events/` 或 fish-service 导入了 `scenes/`
+，CI 将直接失败。
+- **修复**: 
+  - `fish-api.ts` 只允许导入 `../network/http` 和 `../proto/...`；
+  - `fish-service.ts` 只允许导入 `../api/`、`../network/`、`../events/`、`../con
+figs/`、`../city-builder/`；
+  - 所有导出函数必须显式声明返回类型，禁止隐式 `any`。
+- **依据**: `apps/phaser3/.eslintrc.cjs` 中 `zones` 配置与 `overrides` 规则。
+
+---
+
+## 轻微问题（Minor）
+
+### 4. 若 PR 包含 Fish Service，需对齐现有 Service 风格
+- **位置**: 预计 `apps/phaser3/src/services/fish-service.ts`
+- **问题**: 现有 `auth-service.ts` 使用全静态方法 + 静态状态（`private static cu
+rrentUser`），而 `city-service.ts` 使用实例方法 + 构造函数参数（`constructor(cit
+yId: number = 1)`）。两种风格并存，但新模块应优先选择**实例化风格**，以便于多场
+景管理和单元测试 mock。
+- **影响**: 代码风格不一致，增加维护成本。
+- **修复**: 建议 `FishService` 采用实例化风格（参考 `CityService`），避免全局静
+态状态。若使用静态风格，需在模块文档中说明理由。
+- **依据**: `apps/phaser3/src/services/city-service.ts:48-55`（实例化模式）；`ap
+ps/phaser3/src/services/auth-service.ts:24`（静态模式）。
+
+### 5. 模块文档 `docs/modules/client/fish.md` 应同步创建或更新
+- **位置**: `docs/modules/client/INDEX.md`
+- **问题**: `docs/modules/client/INDEX.md` 的"模块覆盖状态"表中，`fish` 状态为 `
+⚠️ 部分`，说明为"仅有 protobuf 类型，无 API 封装和 gameplay Scene"。Issue #5 完成
+后，该文档应更新为 `✅ 完整` 并补充 `fish.md` 子文档。
+- **影响**: 文档与代码状态不同步，违反 `AGENTS.md` 维护规则第 6 条（"新增/修改 p
+roto、ent、配置、架构分层时，必须同步更新对应文档"）。
+- **修复**: PR 合并前补充 `docs/modules/client/fish.md`，并更新 `docs/modules/cl
+ient/INDEX.md` 中 fish 模块的状态和说明。
+- **依据**: `docs/modules/client/INDEX.md:11`、`AGENTS.md:96-103`（维护规则）。
+
+---
+
+## 验证结果
+
+| 维度 | 状态 | 说明 |
+|------|------|------|
+| 功能完整性 | ❌ | **未验证**。Issue #5 要求修复 vite 配置 + Fish 模块前端落地
+，但无法获取 PR 代码确认是否全部实现。项目当前代码基线中两项目标均未实现。 |
+| 代码规范性 | ⚠️ | **部分预检**。已确认 ESLint 分层约束和 `no-explicit-any` / `e
+xplicit-function-return-type` 规则将适用于新增 Fish 模块代码，但无法检查实际代码
+是否合规。 |
+| 全链路完整性 | ⚠️ | **未验证**。Fish 模块不涉及 DB/API/Mobile 全链路（属于前端
+模块），但需确认前端分层（API → Service → Scene）是否贯通。 |
+| 规范符合性 | ⚠️ | **部分预检**。已读取 `agent-design-guide.md`、`testing.md`、`
+onboarding.md`。若 PR 包含 UI 组件，需额外对照 `PRD-004` 的命名规范、资源回退标
+准和动画标准。 |
+| 测试覆盖 | ❌ | **未验证**。Issue #5 未明确要求 Fish 模块测试，但 `onboarding.
+md` 规定新增模块需通过 `pnpm --filter phaser3 test`。无法检查 PR 是否包含测试。 
+|
+| 文档同步 | ⚠️ | **部分预检**。`docs/modules/client/INDEX.md` 尚未更新；若 PR 未
+包含文档更新，视为违规。 |
+
+---
+
+## 风险与建议
+
+### 高优先级（PR 代码可获取后立即验证）
+1. **vite 配置修复的副作用**: `../../new-world-configs` 目录在 monorepo 根目录已
+存在（`new-world-configs/`），路径修正后需验证 `pnpm build:web` 是否成功将配置复
+制到 `dist/config/`。建议 PR 中包含构建验证步骤或截图。
+2. **Fish API 封装完整性**: `fish.proto` 已生成至 `src/proto/new-world-api/v1/fi
+sh.ts`（4737 行，接口众多），`fish-api.ts` 必须覆盖全部核心接口（如弟子列表、鱼
+苗池、移动、战斗、成长、死亡等）。建议对照 proto 中的全部 `Request` / `Result` 
+类型逐项检查，避免遗漏。
+3. **Long 类型处理一致性**: 现有 `building-api.ts` 中大量使用 `Long.fromInt()` 
+和 `Long.fromString()` 进行 proto 字段转换。`fish-api.ts` 必须保持一致，避免直接
+传入 `number` 或 `string` 导致 protobuf 编码错误。
+
+### 中优先级（合并前建议完成）
+4. **配置加载器注册**: `fish-configs-helper.ts` 已存在（261 行），通过 `GlobalCo
+nfigsLoader.instance.getOne/getConfig` 读取 CSV。新增的 `fish-service.ts` 如需读
+取配置，应复用 `fishConfigsHelper` 单例，而非直接操作 `GlobalConfigsLoader`，以
+保持与现有模式一致。
+5. **事件系统兼容性**: `fish-events.ts` 已定义 10 个 Fish 相关事件（如 `FishBegi
+nBattleEvent`、`FishCoreChangeEvent`）。`fish-service.ts` 若需触发或监听这些事件
+，应确保事件类型与 `src/events/events/` 中定义的一致，避免重复定义或类型漂移。
+6. **Personality Configs 接入**: Issue #5 要求接入 `personality_configs.csv`，但
+在 `fish-configs-helper.ts` 当前实现中未找到 `personality` 相关查询方法。若 PR 
+中包含 personality 配置读取逻辑，需确认 helper 已补充对应方法。
+
+### 低优先级（后续迭代）
+7. **测试策略**: 虽然 Issue #5 未强制要求单元测试，但 `docs/design-docs/testing.
+md` 要求关键组件（状态机、数值计算、边界验证）达到 100% 覆盖率。`fish-service.ts
+` 中的缓存更新逻辑、状态筛选逻辑属于"状态机逻辑"范畴，建议在后续迭代中补充测试。
+8. **前端 E2E 验收**: 若 Fish 模块包含 UI Scene，需遵循 `docs/frontend/e2e-testi
+ng.md` 和 `docs/design-docs/visual-qa-sop.md`，产出 Playwright 截图并通过视觉验
+收。
+
+---
+
+## 审查依据文档清单
+
+| 文档 | 路径 | 用途 |
+|------|------|------|
+| AGENTS.md | `/Users/insulate/Desktop/new-world-monorepo/AGENTS.md` | 项目导航
+、维护规则 |
+| PRD-004 | `/Users/insulate/Desktop/new-world-monorepo/prd/PRD-004-ui-component
+-library-redesign.md` | UI 命名规范、动画标准、深度规范（若 PR 涉及 UI 组件） |
+| PRD-003 | `/Users/insulate/Desktop/new-world-monorepo/prd/PRD-003-leaderboard-
+system.md` | 关联参考（本次 PR 不直接涉及） |
+| 前端 UI 开发规范 | `/Users/insulate/Desktop/new-world-monorepo/docs/frontend/a
+gent-design-guide.md` | 前端代码规范、素材检索、截图验收 |
+| 测试规范 | `/Users/insulate/Desktop/new-world-monorepo/docs/design-docs/testin
+g.md` | 测试策略、覆盖率要求 |
+| 新模块开发指南 | `/Users/insulate/Desktop/new-world-monorepo/docs/design-docs/
+onboarding.md` | 前端模块创建流程、分层规范、ESLint 约束 |
+| 客户端模块索引 | `/Users/insulate/Desktop/new-world-monorepo/docs/modules/clie
+nt/INDEX.md` | 模块覆盖状态、验收清单 |
+| 城建模块文档 | `/Users/insulate/Desktop/new-world-monorepo/docs/modules/client
+/city-building.md` | 参考现有模块的文档格式和接口清单 |
+| ESLint 配置 | `/Users/insulate/Desktop/new-world-monorepo/apps/phaser3/.eslint
+rc.cjs` | 分层依赖约束、类型严格规则 |
+| vite 配置 | `/Users/insulate/Desktop/new-world-monorepo/apps/phaser3/vite.conf
+ig.ts` | Issue #5 要求修复的目标文件 |
+| fish proto | `/Users/insulate/Desktop/new-world-monorepo/apps/phaser3/src/prot
+o/new-world-api/v1/fish.ts` | API 封装需对齐的 proto 类型 |
+| fish config helper | `/Users/insulate/Desktop/new-world-monorepo/apps/phaser3/
+src/configs/helpers/fish-configs-helper.ts` | 现有配置读取基础设施 |
+| fish events | `/Users/insulate/Desktop/new-world-monorepo/apps/phaser3/src/eve
+nts/events/fish-events.ts` | 现有事件定义 |
+| auth/building API | `/Users/insulate/Desktop/new-world-monorepo/apps/phaser3/s
+rc/api/auth-api.ts`、`building-api.ts` | API 封装风格参考 |
+| auth/building Service | `/Users/insulate/Desktop/new-world-monorepo/apps/phase
+r3/src/services/auth-service.ts`、`city-service.ts` | Service 层风格参考 |
+
+---
+
+*本报告由 Code Review Agent 基于可用信息生成。由于 PR #58 的代码 diff 不可获取，
+报告中标记为"未验证"的维度需在代码可达后进行补充审查。*
+
+
+--- 第 7 次 Review ---
+# PR #58 代码审查报告
+
+> **分支**: `feat/issue-5`  
+> **范围**: IM（即时通讯）全栈功能 — DB + API + Mobile + Design-System  
+> **审查日期**: 2026-04-25  
+> **审查依据**: `git diff 58d04f3..HEAD`, `AGENTS.md`, `docs/design-docs/flutter
+.md`, `docs/design-docs/nestjs.md`, `prd/v1-mvp.md`, `prd/v1-matching.md`
+
+---
+
+## 审查结论
+
+**审查结论: NEEDS_MAJOR_FIX**
+
+本 PR 实现了 V1 MVP 中 US-4（即时通讯）的核心功能：消息收发、已读回执、会话列表
+、Socket.io 实时推送、Design-System 组件及 E2E 测试。整体架构符合项目规范，全链
+路（DB → API → Mobile）已打通，契约文档同步更新。
+
+但存在 **1 个 Blocking 问题**（分页 UX 完全不可用）和 **4 个 Major 问题**（WebSo
+cket DTO 未校验、Controller 参数未走 DTO、会话列表实时刷新未实现、离线消息丢失）
+，需要在合并前或合并后立即修复。
+
+---
+
+## 阻塞问题（Blocking）
+
+### 1. ChatPage 加载历史消息时自动跳回底部，导致分页功能完全不可用
+- **位置**: `apps/mobile/lib/presentation/pages/chat_page.dart:133-136`
+- **问题**: `BlocConsumer` 的 `listener` 在 `ImMessagesLoaded` 状态时调用 `_scro
+llToBottom()`。当用户上滑到顶部加载更早消息时，`ImLoadMessages` 触发分页请求，返
+回后 emit `ImMessagesLoaded`，listener 立即将列表滚动到最底部。用户无法阅读刚加
+载的历史消息。
+- **影响**: 聊天页面的「加载更多」功能完全不可用，核心 IM 体验断裂。
+- **修复**: 修改 listener，仅在**初始加载**或**新消息到达**时滚动到底部，分页加
+载时不滚动：
+  ```dart
+  // chat_page.dart ~133
+  listener: (context, state) {
+    if (state is ImMessageSent) {
+      _scrollToBottom();
+    }
+    if (state is ImMessagesLoaded && state.nextCursor == null) {
+      // 仅初始加载（无更多历史消息时）滚动到底部
+      _scrollToBottom();
+    }
+  },
+  ```
+更优方案：在 `initState` 中监听首次加载完成，或引入 `isInitialLoad` flag。
+- **依据**: `git diff` 中 `chat_page.dart` 的 `BlocConsumer` 实现；功能完整性验
+证。
+
+---
+
+## 严重问题（Major）
+
+### 2. ImGateway WebSocket DTO 未启用 ValidationPipe，class-validator 装饰器完全
+失效
+- **位置**: `apps/api/src/modules/im/im.gateway.ts:36-37`（类级别）及 `92-95`、`
+155-158`（方法级别）
+- **问题**: `@MessageBody() dto: SendMessageDto` 虽然使用了 DTO 类型，但 Gateway
+类和方法上均未添加 `@UsePipes(new ValidationPipe())`。NestJS WebSocket 默认不继
+承全局 `ValidationPipe`，因此 `SendMessageDto` 上的 `@IsIn(["text", "image"])`、
+`@MaxLength(500)` 等装饰器不会被评估。非法类型、超长内容、空字段可直接透传到 Ser
+vice 层。
+- **影响**: 数据完整性风险；非法消息可被持久化；违反 `nestjs.md` 中「所有入参使
+用 class-validator + class-transformer」的强制规范。
+- **修复**: 在 Gateway 类添加管道：
+  ```typescript
+  import { UsePipes, ValidationPipe } from "@nestjs/common";
+
+  @WebSocketGateway({ namespace: "im" })
+  @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
+  export class ImGateway implements ... {
+  ```
+- **依据**: `docs/design-docs/nestjs.md` 第 81-86 行「DTO 与校验」；`apps/api/sr
+c/modules/im/dto/send-message.dto.ts` 中的校验装饰器；NestJS 官方文档。
+
+### 3. ImController 手动解析 Query 参数，未使用 DTO 校验
+- **位置**: `apps/api/src/modules/im/im.controller.ts:14-67`
+- **问题**: `limit` 参数通过 `parseInt(limit, 10)` 手动解析和 clamp，而非使用带 
+`class-validator` 的 Query DTO。`nestjs.md` 明确要求「所有入参使用 class-validat
+or + class-transformer」。
+- **影响**: 代码风格与项目架构规范不一致；参数校验逻辑散落在 Controller 中，难以
+复用和测试。
+- **修复**: 新增 `GetConversationsQueryDto` 和 `GetMessagesQueryDto`：
+  ```typescript
+  // dto/get-conversations-query.dto.ts
+  export class GetConversationsQueryDto {
+    @IsOptional()
+    @IsInt()
+    @Min(1)
+    @Max(50)
+    @Type(() => Number)
+    limit = 20;
+
+    @IsOptional()
+    @IsString()
+    cursor?: string;
+  }
+  ```
+并在 Controller 方法参数中使用 `@Query() query: GetConversationsQueryDto`。
+- **依据**: `docs/design-docs/nestjs.md` 第 81-86 行「DTO 与校验」。
+
+### 4. 会话列表实时刷新未实现（conversation:updated 事件为空处理）
+- **位置**: `apps/mobile/lib/presentation/blocs/im/im_bloc.dart:219-226`
+- **问题**: `_onConversationUpdated` 方法仅包含 TODO 注释，没有任何实际逻辑。当 
+Socket 收到 `conversation:updated` 事件（如新消息到达）时，`ConversationListCubi
+t` 管理的会话列表不会自动更新，用户必须手动下拉刷新才能看到最新消息或未读数变化
+。
+- **影响**: IM 核心体验的实时性缺失；用户可能错过新消息提示。
+- **修复**: 在 `_onConversationUpdated` 中触发 `ConversationListCubit` 刷新，或
+至少刷新当前会话的未读数：
+  ```dart
+  void _onConversationUpdated(
+    ImConversationUpdated event,
+    Emitter<ImState> emit,
+  ) {
+    // 触发会话列表刷新（可通过 EventBus 或全局状态管理）
+    // 临时方案：emit 一个专用状态供上层监听后调用 cubit.refresh()
+    emit(ImConversationListRefreshRequested(event.conversationId));
+  }
+  ```
+并在 `MatchListPage` 中通过 `BlocListener<ImBloc, ImState>` 监听该状态并调用 `fe
+tchConversations()`。
+- **依据**: `prd/v1-mvp.md` US-4「Real-time message delivery」；`docs/modules/im
+.md` 中「会话管理」职责描述。
+
+### 5. 消息在 Socket 断连时静默丢失，且无重试机制
+- **位置**: `apps/mobile/lib/presentation/blocs/im/im_bloc.dart:99-104`
+- **问题**: `_onSendMessage` 中调用 `_socketClient?.sendMessage(...)`。如果 Sock
+et 未连接（`_socketClient` 为 null 或 `connected == false`），`sendMessage` 不会
+执行任何操作，但 UI 中的临时消息已进入 `_messages` 列表且状态为 `"sending"`，永
+远不会变为 `"sent"` 或 `"failed"`。
+- **影响**: 弱网或断线场景下，用户发送的消息永远卡在「发送中」状态，无失败提示，
+也无法重试。
+- **修复**: 在发送前检查连接状态，未连接时将消息标记为 `"failed"` 或加入本地待发
+队列：
+  ```dart
+  if (_socketClient?.isConnected ?? false) {
+    _socketClient!.sendMessage(...);
+  } else {
+    // 标记失败或入队重试
+    _messages = tempMessage.copyWith(status: 'failed');
+    emit(ImMessageSent(List.unmodifiable(_messages)));
+  }
+  ```
+- **依据**: 功能完整性 / 边界情况处理；`docs/modules/im.md`「边界情况」第 1 条提
+到重复发送处理，但未覆盖断线场景。
+
+---
+
+## 轻微问题（Minor）
+
+### 6. MessageResponseDto 定义在 Service 文件内，未放入 dto/ 目录
+- **位置**: `apps/api/src/modules/im/im.service.ts:15-25`
+- **问题**: `MessageResponseDto` 直接内联在 Service 中，而项目 `nestjs.md` 规范
+要求 DTO 统一放在 `dto/` 目录。
+- **修复**: 将 `MessageResponseDto` 移至 `apps/api/src/modules/im/dto/message-re
+sponse.dto.ts` 并导出。
+- **依据**: `docs/design-docs/nestjs.md` 第 81-86 行。
+
+### 7. SwChatBubble 可能使用了 Legacy Token 别名
+- **位置**: `packages/design-system/lib/src/molecules/chat_bubble.dart:54`、`169
+`、`182`
+- **问题**: 使用了 `DesignTokens.secondaryColor`。根据 `flutter.md` Token 使用指
+南，legacy 别名（如 `surfaceColor`）禁止在新代码中使用。虽然文档未完整列出所有别
+名，但同项目的 `chat_input_bar.dart` 和 `conversation_list_item.dart` 对相似语义
+均使用 `colorScheme.outline`，而 `chat_bubble.dart` 却使用 `DesignTokens.seconda
+ryColor`，存在不一致。
+- **修复**: 确认 `tokens.dart` 中 `secondaryColor` 是否为 legacy 别名；若是，替
+换为 `Theme.of(context).colorScheme.outline` 或提案新增语义 Token。
+- **依据**: `docs/design-docs/flutter.md` 第 163-177 行 Token 使用指南。
+
+### 8. ImGateway afterInit 通过类型强转修改内部 CORS 配置
+- **位置**: `apps/api/src/modules/im/im.gateway.ts:49-58`
+- **问题**: `afterInit` 将 `server` 强转为 `unknown` 再修改 `engine.opts.cors`，
+属于非公开 API 的 hacky 操作，可能在 Socket.io 版本升级后失效。
+- **修复**: 优先通过 NestJS 的 `WebSocketGateway` 构造函数选项或全局 CORS 配置处
+理跨域，而非运行时修改内部引擎对象。
+- **依据**: 代码可维护性最佳实践。
+
+---
+
+## 验证结果
+
+| 维度 | 状态 | 说明 |
+|------|------|------|
+| 功能完整性 | ⚠️ | 核心收发消息、已读回执、会话列表已实现。但历史消息分页 UX 因
+自动滚动完全不可用（Blocking），会话列表无实时刷新（Major），断线消息丢失（Major
+）。 |
+| 代码规范性 | ⚠️ | Flutter 侧整体规范：使用 DesignTokens、Semantics + GestureDet
+ector(onTapDown)、Widgetbook 注册、Golden Test 均符合 `flutter.md`。NestJS 侧：G
+ateway/Controller 的 DTO 校验缺失（Major），MessageResponseDto 位置不规范（Minor
+）。 |
+| 全链路完整性 | ✅ | DB（Migration + Entity）→ API（Controller + Gateway + Serv
+ice）→ Mobile（Repository + BLoC + Page）→ DesignSystem（atoms/molecules）全部连
+通。 |
+| 规范符合性 | ⚠️ | Socket 事件契约（`im-events.yaml`、`docs/api/socket-events.md
+`、`packages/shared-types/src/im-socket-events.ts`）三者一致。但 Gateway 未按 `n
+estjs.md` 要求使用 ValidationPipe。Maestro E2E 流程已覆盖发送消息和查看会话列表
+。 |
+| 测试覆盖 | ✅ | API 层：Controller/Gateway/Service 均有单元测试。Design-System
+：有 Golden Test（`im_components_golden_test.dart`）并提交截图。E2E：新增 `send_
+message.yaml`、`view_conversation_list.yaml`。 |
+| 文档同步 | ✅ | `docs/modules/im.md`、`docs/api/socket-events.md`、`docs/api-c
+ontracts/im.yaml`、`docs/api-contracts/im-events.yaml` 均已更新并与代码一致。 |
+
+---
+
+## 风险与建议
+
+1. **Redis 连接数增长**: `ImModule` 和 `MatchingModule` 各自独立提供 `"REDIS_CLI
+ENT"`，会创建两个 Redis 连接。建议在 `AppModule` 或 `CommonModule` 中统一提供全
+局单例，减少连接开销。
+2. **Message pagination cursor 的鲁棒性**: `getMessages` 使用 `sequence_id < cur
+sor` 做分页，依赖数据库自增 `sequence_id` 的单调性。如果未来出现消息删除或 soft-
+delete，需确认不会影响分页逻辑。
+3. **PushService 仅为骨架**: 当前 `PushService.sendPush` 仅打印日志，MVP 阶段可
+接受，但需在 `docs/exec-plans/tech-debt-tracker.md` 中记录该债务，避免遗漏生产环
+境集成。
+4. **离线补推未实现**: `docs/modules/im.md「边界情况」` 第 4 条提到「离线补推：
+用户重连后，拉取 `last_ack_sequence_id` 之后的所有消息」，但代码中未见该逻辑。建
+议在下个迭代补充，或在技术债务中明确记录。
+
+
+--- 第 8 次 Review ---
+# PR #58 审查报告
+
+> 分支：`feat/issue-5`  
+> 审查范围：IM（即时通讯）模块全栈实现（DB + API + Mobile + Design System + E2E
+）  
+> 审查依据：`AGENTS.md`、`docs/design-docs/` 规范文档、`prd/v1-im.md` / `prd/v1-
+mvp.md` / `prd/v1-matching.md`、PR `git diff`
+
+---
+
+## 审查结论
+
+**审查结论: NEEDS_MAJOR_FIX**
+
+PR 实现了 IM 模块的核心功能（消息收发、已读回执、会话列表、Socket.io 实时推送）
+，整体架构清晰、单元测试覆盖较完整。但存在 **2 个 Blocking 问题**（运行时崩溃 + 
+SQL 查询错误）和 **3 个 Major 问题**（契约不一致、E2E 路径错误、类型不匹配），必
+须在合并前修复。
+
+---
+
+## 阻塞问题（Blocking）
+
+### 1. MatchListPage 中 BlocListener<ImBloc> 缺少 Provider，导致运行时崩溃
+- **位置**: `apps/mobile/lib/presentation/pages/match_list_page.dart:59`
+- **问题**: `MatchListPage` 使用了 `BlocListener<ImBloc, ImState>` 来监听 `ImCon
+versationListRefreshRequested` 事件并刷新会话列表，但 `MainPage`（`apps/mobile/l
+ib/app.dart:139`）的 `MultiBlocProvider` 中只注册了 `MatchingBloc` 和 `MatchList
+Cubit`，**没有注册 `ImBloc`**。`flutter_bloc` 的 `BlocListener` 会通过 `BlocProv
+ider.of<T>(context)` 向上查找 Bloc，找不到时会抛出 `BlocProviderNotFoundExceptio
+n`，导致用户进入「消息」Tab 时直接崩溃。
+- **影响**: 所有用户都无法进入会话列表页面，App 必现崩溃。
+- **修复**:
+在 `app.dart` 的 `MainPage.build` 中 `MultiBlocProvider` 添加 `ImBloc` 注册：
+  ```dart
+  MultiBlocProvider(
+    providers: [
+      BlocProvider(create: (_) => getIt<MatchingBloc>()),
+      BlocProvider(create: (_) => getIt<MatchListCubit>()),
+      BlocProvider(create: (_) => getIt<ImBloc>()), // 新增
+    ],
+    ...
+  )
+  ```
+- **依据**: `flutter_bloc` 官方行为 + 代码 diff 中 `MatchListPage` 对 `ImBloc` 
+的依赖证据。
+
+### 2. 原生 SQL 数组参数绑定错误，导致会话列表查询失败
+- **位置**: `apps/api/src/modules/im/im.service.ts:300-311`
+- **问题**: `getConversations` 方法使用原生 SQL 查询最新消息：
+  ```typescript
+  WHERE conversation_id IN (?)
+  ```
+参数传入的是 ``（`string[]` 数组）。本项目使用 **mysql2 驱动**，其原生 `query()`
+方法**不会自动将单个 `?` 展开为 `IN (?, ?, ?)`**。mysql2 会将整个数组序列化为一
+个字符串值（如 `"id1,id2,id3"`），导致 SQL 语义错误，查询结果为空或直接报错。
+- **影响**: 当用户有 2 个及以上会话时，`getConversations` API 返回的 `last_messa
+ge` 全部为空，会话列表无法显示最后一条消息摘要；在部分 SQL 模式下会直接抛出语法
+错误。
+- **修复**:
+手动生成与数组长度匹配的占位符：
+  ```typescript
+  const placeholders = conversationIds.map(() => '?').join(',');
+  const msgResults = await this.dataSource.query(
+    `
+    SELECT m.* FROM messages m
+    INNER JOIN (
+      SELECT conversation_id, MAX(sequence_id) as max_seq
+      FROM messages
+      WHERE conversation_id IN (${placeholders})
+      GROUP BY conversation_id
+    ) latest ON m.conversation_id = latest.conversation_id AND m.sequence_id = l
+atest.max_seq
+  `,
+    conversationIds,
+  );
+  ```
+- **依据**: `docs/design-docs/db.md` 第 91-152 行「原生 SQL 查询规范」中明确说明
+使用 `?` 位置参数，但未提及数组自动展开；结合 mysql2 驱动实际行为。
+
+---
+
+## 严重问题（Major）
+
+### 3. OpenAPI 契约中 MessageDto.type 枚举不完整
+- **位置**: `docs/api-contracts/im.yaml:103-104`
+- **问题**: `MessageDto` 的 `type` 字段枚举仅定义为 ``，但后端 `ImService.create
+SystemMessage()` 会生成 `type = 'system'` 的消息，且 `GET /messages` 接口会将这
+些 system 消息返回给客户端。`im-events.yaml` 中 `message:receive` 事件的 type 枚
+举已经正确包含 ``，但 REST 契约 `im.yaml` 与之不一致。
+- **影响**: 契约与实际响应不一致，违反「契约优先」原则；`openapi-generator` 生成
+的 Dart/TS 模型会对 `system` 值反序列化失败或丢弃。
+- **修复**:
+在 `docs/api-contracts/im.yaml` 的 `MessageDto.type` 中增加 `system`：
+  ```yaml
+  type:
+    type: string
+    enum: 
+  ```
+同步运行 `make generate-types` 更新生成代码。
+- **依据**: `docs/design-docs/api.md` 第 82-83 行「契约优先：接口变更必须先在 YA
+ML 中定义，再生成代码」；`prd/v1-im.md` 第 52-54 行技术要求中明确 `type` 包含 `t
+ext`/`image`/`system`。
+
+### 4. Maestro E2E runFlow 相对路径错误
+- **位置**: `.maestro/flows/im/send_message.yaml:18`、`.maestro/flows/im/view_co
+nversation_list.yaml:15`
+- **问题**: 两个 IM E2E flow 都包含：
+  ```yaml
+  - runFlow: includes/login-as-test-user.yaml
+  ```
+Maestro 的 `runFlow` 路径**相对于当前 flow 文件所在目录**解析。从 `.maestro/flow
+s/im/send_message.yaml` 出发，该路径指向 `.maestro/flows/im/includes/login-as-te
+st-user.yaml`，但实际文件位于 `.maestro/includes/login-as-test-user.yaml`（少了
+一层 `flows/im/`）。
+- **影响**: Maestro E2E 测试无法找到被引用的子 flow，测试直接失败。
+- **修复**:
+将路径修正为：
+  ```yaml
+  - runFlow: ../../includes/login-as-test-user.yaml
+  ```
+- **依据**: Maestro 官方文档中 `runFlow` 的路径解析规则 + `.maestro/` 目录结构证
+据。
+
+### 5. shared-types 中 MessageReceivedEvent.sender_id 类型不匹配
+- **位置**: `packages/shared-types/src/im-socket-events.ts:13`
+- **问题**: `MessageReceivedEvent` 接口定义 `sender_id: string`，但数据库 `messa
+ges.sender_id` 已改为 `nullable`（`string | null`），且 `im.gateway.ts` 在发送 s
+ystem 消息时实际传递 `message.sender_id`（值为 `null`）。TypeScript 类型与实际运
+行时值不匹配。
+- **影响**: 类型系统失去保护作用，前端消费时若按 `string` 处理可能引发空指针异常
+。
+- **修复**:
+  ```typescript
+  export interface MessageReceivedEvent {
+    id: string;
+    conversation_id: string;
+    sender_id: string | null; // 修正
+    ...
+  }
+  ```
+- **依据**: `apps/api/src/database/entities/message.entity.ts:23-24` 中 `sender_
+id` 已声明为 `string | null` + `im.gateway.ts:113` 实际传递 `message.sender_id`
+（system 消息时为 null）。
+
+---
+
+## 轻微问题（Minor）
+
+### 6. IM BLoC 中消息列表无上限，存在内存泄漏风险
+- **位置**: `apps/mobile/lib/presentation/blocs/im/im_bloc.dart:15`
+- **问题**: `_messages` 是 `ImBloc` 的类级列表，每次加载历史消息时 `insertAll(0,
+result.items)` 会无限增长。长时间聊天或频繁加载历史消息后，内存占用会持续上升。
+- **影响**: 长会话场景下内存占用增加，极端情况下可能导致 OOM。
+- **修复建议**: 限制内存缓存消息数量（如最多保留 500 条），或引入本地数据库（sqf
+lite）缓存，超出部分从本地读取。
+- **依据**: `prd/v1-im.md` 第 196 行提到「客户端本地缓存：Mobile 使用本地数据库
+缓存最近 N 条消息」。
+
+### 7. Socket 客户端缺少显式重连策略配置
+- **位置**: `apps/mobile/lib/core/network/im_socket_client.dart:30-34`
+- **问题**: `socket_io_client` 虽然默认有自动重连，但 PRD `v1-im.md` 明确要求「M
+obile 侧配置 5 次重连，退避策略」。当前代码未显式配置 `reconnectionAttempts` 和 
+`reconnectionDelay`。
+- **影响**: 弱网环境下重连行为不可控，可能导致频繁重连或重连次数不足。
+- **修复建议**:
+  ```dart
+  _socket = io.io(namespaceUrl, <String, dynamic>{
+    'transports': ['websocket'],
+    'autoConnect': true,
+    'auth': <String, dynamic>{'token': token},
+    'reconnectionAttempts': 5,
+    'reconnectionDelay': 1000,
+    'reconnectionDelayMax': 5000,
+  });
+  ```
+- **依据**: `prd/v1-im.md` 第 246 行「Socket.io 连接支持自动重连（Mobile 侧配置 
+5 次重连，退避策略）」。
+
+### 8. Migration down 方法在存在 NULL 数据时会失败
+- **位置**: `apps/api/src/database/migrations/20250425000000-AlterMessagesSender
+IdNullable.ts:17-27`
+- **问题**: `down()` 方法先将 `sender_id` 改回 `NOT NULL`，再重建外键。如果回滚
+时 `messages` 表中已存在 `sender_id = NULL` 的 system 消息，`MODIFY sender_id CH
+AR(36) NOT NULL` 会因数据冲突而失败。
+- **影响**: Migration 无法回滚，违反「Migration 必须可回滚」原则。
+- **修复建议**: 在 `down()` 中先清理或更新 `sender_id IS NULL` 的记录（如设置默
+认值或删除 system 消息），再执行 `MODIFY`。
+- **依据**: `docs/design-docs/db.md` 第 89-90 行「Migration 必须可回滚：每个 Mig
+ration 的 `down()` 方法必须正确实现」。
+
+---
+
+## 验证结果
+
+| 维度 | 状态 | 说明 |
+|------|------|------|
+| 功能完整性 | ❌ | 核心功能已实现，但 **MatchListPage 因缺少 ImBloc Provider 运
+行时崩溃**，且 **会话列表 SQL 查询有 bug** |
+| 代码规范性 | ❌ | 整体符合 NestJS/Flutter 分层规范；但存在 **OpenAPI 契约不一
+致**、**SQL 参数绑定错误**、**shared-types 类型不匹配** |
+| 全链路完整性 | ✅ | DB（messages 表 + Migration）→ API（Controller/Gateway/Ser
+vice）→ Mobile（BLoC/Pages/Repository/Socket）链路已贯通 |
+| 规范符合性 | ❌ | **Maestro E2E runFlow 路径错误**导致测试无法运行；Accessibil
+ity（Semantics + onTapDown）规范执行良好 |
+| 测试覆盖 | ⚠️ | NestJS 单元测试覆盖核心路径（Service/Gateway/Controller）；Flut
+ter Golden Test 和 Widgetbook 已注册；**E2E 测试因路径错误无法运行** |
+| 文档同步 | ⚠️ | `docs/api-contracts/im-events.yaml`、`docs/modules/im.md`、API 
+索引已更新；但 **REST 契约 `im.yaml` 与事件契约/实现不一致** |
+
+---
+
+## 风险与建议
+
+1. **运行时崩溃风险（高）**: `MatchListPage` 的 `BlocListener<ImBloc>` 是必现崩
+溃点，必须优先修复。
+2. **数据查询风险（高）**: `getConversations` 的原生 SQL 数组参数问题会导致生产
+环境会话列表功能异常，需立即修正。
+3. **契约漂移风险（中）**: `im.yaml` 与 `im-events.yaml` 对 `type` 枚举的定义不
+一致，随着 system 消息场景的增多，前后端类型冲突会加剧。建议在修复后重新运行 `ma
+ke generate-types` 并提交生成代码。
+4. **E2E 可维护性（中）**: Maestro flow 的子流程引用路径错误说明 E2E 脚本未经实
+际运行验证。建议在 CI 中增加 Maestro flow 语法检查步骤（如 `maestro test --dry-r
+un`）。
+5. **Migration 回滚风险（低）**: 当前 Migration 的 `down()` 在含有 system 消息时
+无法回滚。MVP 阶段 system 消息量小，风险可控，但应在技术债务中记录。
+
+
+--- 第 9 次 Review ---
+# PR #58 代码审查报告
+
+> **分支**: `feat/issue-5`  
+> **审查日期**: 2025-04-25  
+> **审查范围**: IM（即时通讯）模块全链路实现（DB → API → Mobile）  
+> **关联 PRD**: (../../social-world/prd/v1-mvp.md)、(../../social-world/prd/v1-m
+atching.md)、(../../social-world/prd/v1-profile.md)
+
+---
+
+## 审查结论
+
+审查结论: **NEEDS_MAJOR_FIX**
+
+> 存在一个 **Blocking** 级别的运行时崩溃问题（MainPage 缺少 BlocProvider），必须
+在合并前修复。其余问题集中在用户体验和边缘场景处理上。
+
+---
+
+## 阻塞问题（Blocking）
+
+### 1. MainPage 缺少 ConversationListCubit 的 BlocProvider
+
+- **位置**: `apps/mobile/lib/app.dart:138-143`
+- **问题**: `MainPage` 的 `MultiBlocProvider` 只注册了 `MatchingBloc` 和 `MatchL
+istCubit`，未注册 `ConversationListCubit`。`MatchListPage` 在 `initState()` 中直
+接调用 `context.read<ConversationListCubit>().fetchConversations()`，会因找不到 
+Provider 而抛出 `ProviderNotFoundException`，导致「消息」Tab 页面崩溃。
+- **影响**: 用户无法进入会话列表页面，IM 核心流程完全不可用。
+- **修复**:
+  ```dart
+  // apps/mobile/lib/app.dart:138-143
+  return MultiBlocProvider(
+    providers: [
+      BlocProvider(create: (_) => getIt<MatchingBloc>()),
+      BlocProvider(create: (_) => getIt<MatchListCubit>()),
+      BlocProvider(create: (_) => getIt<ConversationListCubit>()), // 添加此行
+    ],
+    child: Scaffold(...),
+  );
+  ```
+- **依据**: `docs/design-docs/flutter.md` 第 38-41 行规定状态管理使用 `flutter_b
+loc`，且 `MatchListPage` 通过 `context.read<ConversationListCubit>()` 获取 Cubit
+，必须在 Widget Tree 中通过 `BlocProvider` 提供。
+
+---
+
+## 严重问题（Major）
+
+### 2. ChatPage 未实现消息发送失败后的重试机制
+
+- **位置**: `apps/mobile/lib/presentation/pages/chat_page.dart:190-200`
+- **问题**: `SwChatBubble` 组件已支持 `onRetry` 回调（当 `status == 'failed'` 时
+显示错误图标并响应点击），但 `ChatPage` 在构建 `SwChatBubble` 时未传入 `onRetry`
+参数。当 Socket 未连接导致消息发送失败（`ImBloc` 将状态设为 `failed`）后，用户点
+击错误图标无任何反应。
+- **影响**: 消息发送失败后用户必须重新输入内容才能再次发送，体验极差。
+- **修复**:
+  ```dart
+  // apps/mobile/lib/presentation/pages/chat_page.dart
+  SwChatBubble(
+    type: isSelf ? SwChatBubbleType.self : SwChatBubbleType.other,
+    content: msg.content,
+    // ... 其他参数 ...
+    onRetry: msg.status == 'failed' && isSelf
+        ? () => context.read<ImBloc>().add(
+              ImSendMessage(
+                conversationId: msg.conversationId!,
+                content: msg.content,
+                clientMessageId: msg.clientMessageId ?? const Uuid().v4(),
+              ),
+            )
+        : null,
+  );
+  ```
+- **依据**: PRD `v1-mvp.md` US-4 要求消息发送到达时间 < 1s，且 `docs/design-docs
+/flutter.md` 第 449-451 行要求核心页面必须处理加载/错误/空态。
+
+### 3. ImBloc 已读回执使用列表索引而非 sequence_id 比较
+
+- **位置**: `apps/mobile/lib/presentation/blocs/im/im_bloc.dart:174-184`
+- **问题**: `_onReadReceipt` 中通过列表索引 `i <= lastReadIndex` 判断消息是否应
+标记为已读：
+  ```dart
+  final lastReadIndex = _messages.indexWhere((m) => m.id == event.lastReadMessag
+eId);
+  for (var i = 0; i < _messages.length; i++) {
+    if (msg.senderId == _currentUserId) {
+      final shouldMarkRead = lastReadIndex == -1 || i <= lastReadIndex;
+      // ...
+    }
+  }
+  ```
+该逻辑假设 `_messages` 严格按 `sequence_id` 升序排列且连续。若历史消息加载存在间
+隙（例如用户加载了较旧的历史消息，中间跳过了部分消息），则列表索引与消息时间顺序
+不一致，可能导致错误地将较新消息标记为已读，或未将较早消息标记为已读。
+- **影响**: 已读状态显示不正确，用户体验受损。
+- **修复**: 使用 `sequenceId` 比较替代列表索引：
+  ```dart
+  final lastReadSeq = lastReadIndex == -1
+      ? null
+      : _messages.sequenceId;
+  for (var i = 0; i < _messages.length; i++) {
+    final msg = _messages;
+    if (msg.senderId == _currentUserId) {
+      final shouldMarkRead = lastReadSeq == null ||
+          (msg.sequenceId != null && msg.sequenceId! <= lastReadSeq);
+      // ...
+    }
+  }
+  ```
+- **依据**: `docs/modules/im.md` 第 70-73 行明确说明消息顺序使用数据库自增 `sequ
+ence_id`，客户端应按序排列。
+
+### 4. ImSocketClient 缺少连接状态监控与显式重连策略
+
+- **位置**: `apps/mobile/lib/core/network/im_socket_client.dart`
+- **问题**: `ImSocketClient` 仅通过 `autoConnect: true` 建立初始连接，未显式配置
+`reconnection` 参数，也未监听 `connect_error` / `disconnect` 事件向 `ImBloc` 汇
+报。当应用从后台回到前台、或网络切换后，Socket 可能处于断开状态而不被上层感知，`
+isConnected` 返回过时状态。
+- **影响**: 用户在网络恢复后可能无法立即发送消息，或错误地认为消息已发送成功。
+- **修复**: 在 `ImSocketClient.connect()` 中添加显式重连配置和事件监听：
+  ```dart
+  _socket = io.io(namespaceUrl, <String, dynamic>{
+    'transports': ['websocket'],
+    'autoConnect': true,
+    'reconnection': true,
+    'reconnectionAttempts': 5,
+    'reconnectionDelay': 1000,
+    'auth': <String, dynamic>{'token': token},
+  });
+  _socket?.on('disconnect', (_) => onError({'message': 'Disconnected'}));
+  _socket?.on('connect_error', (err) => onError({'message': 'Connect error: $err
+'}));
+  ```
+- **依据**: `docs/design-docs/flutter.md` 第 52-53 行要求网络层使用 Dio + 拦截器
+处理统一错误；Socket 层同样需要统一的连接状态管理。
+
+---
+
+## 轻微问题（Minor）
+
+### 5. ImGateway 连接认证失败无日志记录
+
+- **位置**: `apps/api/src/modules/im/im.gateway.ts:49-68`
+- **问题**: `handleConnection` 中 JWT 验证失败或缺少 token 时直接 `client.discon
+nect(true)`，catch 块为空，未记录任何日志。
+- **修复**: 在 catch 块中添加 `this.logger.warn(...)` 记录断开原因。
+- **依据**: `docs/design-docs/nestjs.md` 第 106-111 行要求错误日志包含 `traceId`
+和用户 ID。
+
+### 6. PushService 在多个模块中重复注册
+
+- **位置**: `apps/api/src/modules/im/im.module.ts:29`、`apps/api/src/modules/mat
+ching/matching.module.ts:35`
+- **问题**: `PushService` 同时在 `ImModule` 和 `MatchingModule` 的 `providers` 
+数组中注册。虽然 `PushService` 无状态，但 NestJS 会为每个模块创建独立实例，违背
+单例预期。
+- **修复**: 将 `PushService` 移至 `common/` 或独立的 `PushModule` 中，通过 `expo
+rts` 共享。
+- **依据**: `docs/design-docs/nestjs.md` 第 68-70 行要求模块间通过 Interface / E
+ventEmitter 解耦，禁止直接 import 其他模块的内部 Service。
+
+### 7. seed-dev.ts 中 preferred_gender 枚举值与 PRD 不一致
+
+- **位置**: `apps/api/src/scripts/seed-dev.ts:78`
+- **问题**: Seed 脚本中使用了 `"all"`，而 `prd/v1-profile.md` 第 139 行明确规定 
+`preferred_gender` 枚举为 `male`、`female`、`both`。
+- **影响**: 可能导致推荐算法中性别过滤逻辑异常（Matching SQL 中判断 `? = 'both'`
+，不会匹配 `"all"`）。
+- **修复**: 将 seed 脚本中的 `"all"` 改为 `"both"`。
+- **依据**: `prd/v1-profile.md` 第 139 行。
+
+### 8. E2E send_message.yaml 的前置依赖说明不够健壮
+
+- **位置**: `.maestro/flows/im/send_message.yaml`
+- **问题**: Flow 使用 `optional: true` 跳过 `conversation_item` 点击，若测试环境
+未预置会话数据，后续 `tapOn: { id: "chat_input_field" }` 将在错误的页面执行导致
+失败。虽然注释说明了前置条件，但 Maestro 执行失败时的错误信息不直观。
+- **修复**: 在 `conversation_item` 步骤后添加 `assertVisible: { id: "chat_input_
+field" }`（非 optional），确保进入聊天页后再继续。
+
+---
+
+## 验证结果
+
+| 维度 | 状态 | 说明 |
+|------|------|------|
+| 功能完整性 | ⚠️ | IM 核心收发、会话列表、已读回执均已实现；**消息重试缺失**、**
+会话列表页面因 BlocProvider 缺失无法打开**。 |
+| 代码规范性 | ✅ | 后端分层清晰（Controller/Service/DTO），Flutter 使用 DesignT
+okens、Semantics、onTapDown 符合规范。 |
+| 全链路完整性 | ✅ | DB Migration（sender_id nullable）→ Entity → Service → Con
+troller → Gateway → Mobile BLoC → Page 全部连通。 |
+| 规范符合性 | ✅ | OpenAPI 契约 `im.yaml` / `im-events.yaml` 已更新；`shared-ty
+pes` 同步；Socket 事件命名符合 `module:action` 规范。 |
+| 测试覆盖 | ⚠️ | 后端单元测试覆盖 Controller/Service/Gateway（>80%）；Mobile 缺
+少 Bloc/Repository 的单元测试；Maestro E2E 已提供但需修复前置条件。 |
+| 文档同步 | ✅ | `docs/modules/im.md`、`docs/api/socket-events.md`、`docs/api-c
+ontracts/INDEX.md` 均已更新。 |
+
+---
+
+## 风险与建议
+
+1. **消息顺序一致性风险**：`ImBloc` 中 `_messages` 列表的维护依赖于服务端返回的
+升序数据和本地追加逻辑。建议在后端 `getMessages` API 中显式保证 `sequence_id` 升
+序返回，并在 Mobile 端添加防御性校验（若发现乱序则触发全量刷新）。
+
+2. **Redis 未读数与 DB 状态不一致风险**：`markAsRead` 同时更新 `conversation_par
+ticipants.last_read_message_id` 和 Redis `unread_count`。若 Redis 故障或重启，未
+读数会丢失。建议增加定时任务从 DB 重新计算未读数作为兜底。
+
+3. **并发重排风险**：`getConversations` 使用 `updated_at` 作为游标，若并发场景下
+`updated_at` 出现相同值，可能导致分页重复或跳过。建议在游标中复合 `conversation_
+id`（如 `"updated_at#conversation_id"`）增强唯一性。
+
+4. **设计资产迁移合规性**：PR 中 `packages/design-system/` 已正确迁移 `designs/i
+ssue-5/` 中的组件（`sw_chat_bubble.dart`、`sw_chat_input_bar.dart`、`sw_conversa
+tion_list_item.dart`），并补充了 Widgetbook 用例和 Golden Test，符合 `AGENTS.md`
+中 Design-Only PR 的迁移规范。
+
+
+--- 第 10 次 Review ---
+## 🤖 Agent Code Review Report
+
+
+【任务】
+1. 分析所有审查报告，识别**反复出现的问题模式**
+2. 判断哪些问题是因为规范缺失、过时或不明确导致的
+3. 读取现有的规范文档（通过 AGENTS.md 发现路径）
+4. **优先更新历史文档**：在已有文档中补充、修改
+5. **禁止创建新文档**，除非现有文档体系确实无法覆盖且你确认有必要
+6. 保持文档风格一致性
+7. 提交变更到分支 docs/spec-evolution-58 并创建 PR
+
+【约束】
+- 只修改 .md 文件
+- 不修改业务代码
+- 重点关注反复出现的问题，偶发问题不需要更新规范
+TurnBegin(
+    user_input='【任务上下文】\n- PR 编号: #58\n- 项目路径: /var/folders/lt/w3sl
+6z8j5v50vt2s6knvf5n00000gn/T/doc-gardener-58-1266463958\n- 项目地图: ../../socia
+l-world/AGENTS.md\n- 关联 PRD: ../../social-world/prd/v1-profile.md,../../social
+-world/prd/v1-mvp.md,../../social-world/prd/v1-matching.md\n- 文档目录: ../../so
+cial-world/docs\n\n你是规范演进 Agent。\n\n【输入】\n- 以下是一个 PR 的多次代码
+审查报告汇总\n- 请读取项目的 AGENTS.md 了解规范文档结构\n\n【PR #58 历史 Review 
+报告汇总（共 10 次）】\n\n--- 第 1 次 Review ---\n## 审查结论\n\n审查结论: **NEE
+DS_MAJOR_FIX**\n\nPR #58 实现了 V1 IM（即时通讯）模块的核心功能：消息收发、已读
+回执、会话列表、系统消息推送。整体架构方向正确，全链路（DB → API → Mobile → Desi
+gn System → E2E）均有覆盖，但存在 **4 个 Blocking 级别的运行时缺陷** 和 **7 个 M
+ajor 级别的规范/架构/测试缺陷**，必须在合并前修复。\n\n---\n\n## 阻塞问题（Block
+ing）\n\n### 1. ImBloc 在 Event Handler 外部调用 `emit`，导致运行时 StateError\n
+- **位置**: `apps/mobile/lib/presentation/blocs/im/im_bloc.dart:61-62`\n- **问题
+**: `onError` 回调在 Socket 发生错误时直接调用 `emit(ImError(...))`。但 `_onConn
+ect` 是同步 event handler，执行完即返回；当 Socket 后续发生错误时，`emit` 已不在
+有效的 handler 上下文中，flutter_bloc 会抛出 `StateError: emit was called after 
+an event handler completed normally.`\n- **影响**: Socket 连接失败或断线时 App 
+直接崩溃\n- **修复**: 将 socket 错误封装为独立 event，通过 `add()` 投递到 Bloc 
+事件循环：\n  ```dart\n  onError: (data) {\n    add(ImSocketErrorReceived(data[\
+'message\'] as String? ?? \'Socket error\'));\n  },\n  ```\n并在 `ImBloc` 中注册
+`on<ImSocketErrorReceived>((event, emit) => emit(ImError(event.message)));`\n- *
+*依据**: `docs/design-docs/flutter.md` 中 BLoC 状态管理规范 + flutter_bloc 官方
+文档约束\n\n### 2. ImBloc 消息未按 Conversation 隔离，跨会话消息会串扰到当前聊天
+\n- **位置**: `apps/mobile/lib/presentation/blocs/im/im_bloc.dart:103-117`, `210
+-213`\n- **问题**: \n  1. `_parseSocketMessage` 未解析并保存 `conversation_id`（
+虽然 Gateway payload 包含该字段）；\n  2. `_getConversationIdForMessage` 直接返
+回 `_currentConversationId` 而非从消息中读取；\n  3. 因此 `_onMessageReceived` 
+中的条件判断永远为 `true`，任何会话的 socket 消息都会被追加到当前显示的消息列表
+。\n- **影响**: 用户在 Conversation A 聊天时，如果收到 Conversation B 的新消息，
+B 的消息会错误显示在 A 的聊天界面中\n- **修复**: \n  1. 在 `MessageItem` 中增加 
+`conversationId` 字段；\n  2. 在 `_parseSocketMessage` 中解析 `data[\'conversati
+on_id\']`；\n  3. `_onMessageReceived` 中严格比对 `event.message.conversationId 
+== _currentConversationId`，不匹配则丢弃或仅更新会话列表\n- **依据**: PRD `v1-mv
+p.md` US-4 中「Alice opens the conversation」的会话隔离要求\n\n### 3. ChatPage 
+在 `ImMessageRead` 状态下返回空消息列表，导致 UI 清空\n- **位置**: `apps/mobile/
+lib/presentation/pages/chat_page.dart:236-244`\n- **问题**: `_getMessagesFromSta
+te` 对 `ImMessageRead` state 返回 `[]`（第 240-243 行注释甚至承认这是故意留空）
+。当对方已读消息时，Socket 触发 `_onReadReceipt`，Bloc emit `ImMessageRead`，Cha
+tPage 重新 build 并调用 `_getMessagesFromState`，消息列表突然变为空，界面显示 "
+你们已匹配成功，开始聊天吧" 系统提示。\n- **影响**: 用户看到对方已读后，自己的消
+息列表瞬间清空，功能完全不可用\n- **修复**: \n  ```dart\n  if (state is ImMessag
+eRead) {\n    return state.messages; // 或从 Bloc 的 _messages 返回\n  }\n  ```\
+n同时需要在 `ImBloc._onReadReceipt` 中维护 `_messages` 列表的已读状态（或至少不
+破坏现有列表）。\n- **依据**: `git diff` 中的代码证据 + PRD 中「Read receipt」功
+能完整性要求\n\n### 4. MatchingService 事务中调用 ImService.createSystemMessage 
+未共用 Transaction Manager\n- **位置**: `apps/api/src/modules/matching/matching.
+service.ts:462-465`, `apps/api/src/modules/im/im.service.ts:369-385`\n- **问题**
+: `MatchingService.checkAndCreateMutualMatch` 在 `dataSource.transaction(async (
+manager) => { ... })` 内部调用 `this.imService.createSystemMessage()`，但 `creat
+eSystemMessage` 使用的是 `this.messageRepo.save(message)`（标准 Repository，不绑
+定事务 manager）。因此 system message 不在同一事务中：若事务回滚，`matches`/`con
+versations`/`participants` 被回滚，但 `messages` 表中仍残留一条指向不存在 conver
+sation 的孤儿记录。\n- **影响**: 数据不一致，极端情况下产生无关联的 system messa
+ge\n- **修复**: 方案 A（推荐）：让 `createSystemMessage` 接受可选的 `EntityManag
+er`：\n  ```typescript\n  async createSystemMessage(\n    conversationId: string
+,\n    content: string,\n    manager?: EntityManager,\n  ): Promise<MessageEntit
+y> {\n    const repo = manager ? manager.getRepository(MessageEntity) : this.mes
+sageRepo;\n    const message = repo.create({ ... });\n    await repo.save(messag
+e);\n    return message;\n  }\n  ```\n并在 `MatchingService` 中传入 `manager`。\
+n- **依据**: `docs/design-docs/nestjs.md` 第 129-142 行事务发射规则中的事务边界
+要求 + PRD `v1-matching.md` US-MATCH-3 中「事务：匹配创建必须使用数据库事务，确
+保 `matches` + `conversations` + `conversation_participants` 原子性」\n\n---\n\n
+## 严重问题（Major）\n\n### 5. Design System 组件命名违反 `Sw` 前缀强制规范\n- *
+*位置**: \n  - `packages/design-system/lib/src/molecules/chat_bubble.dart` (类名
+`ChatBubble`)\n  - `packages/design-system/lib/src/molecules/chat_input_bar.dart
+` (类名 `ChatInputBar`)\n  - `packages/design-system/lib/src/molecules/conversat
+ion_list_item.dart` (类名 `ConversationListItem`)\n- **问题**: 所有新增 design-s
+ystem 组件均未以 `Sw` 为前缀\n- **影响**: 命名空间污染，与 flutter.md 的强制规范
+冲突，未来难以通过 linter 自动识别 design-system 组件\n- **修复**: 重命名为 `SwC
+hatBubble`、`SwChatInputBar`、`SwConversationListItem`，同步修改 `social_world_d
+esign_system.dart` 的 export 语句、所有引用处（`chat_page.dart`、`match_list_pag
+e.dart`、`widgetbook/main.dart`）以及 Maestro flow 中涉及的 id（如有）\n- **依据
+**: `docs/design-docs/flutter.md` 第 48 行："设计系统组件必须以 `Sw` 为前缀"\n\n
+### 6. IM Gateway 直接内联构造 emit Payload，未使用 shared-types 契约类型\n- **
+位置**: `apps/api/src/modules/im/im.gateway.ts` 多处（如第 101-105 行 `message:a
+ck`、第 113-122 行 `message:receive`、第 156 行 `message:read_receipt`）\n- **问
+题**: Gateway 直接手写 `{}` 对象作为 payload，未从 `packages/shared-types` 导入
+类型安全的 DTO/Interface\n- **影响**: 前后端契约不同步风险高，字段命名漂移（如 `
+sequence_id` vs `sequenceId`）难以在编译期发现\n- **修复**: 在 `packages/shared-
+types` 中定义 Socket Event DTO（如 `MessageReceivedEvent`、`MessageAckEvent`、`R
+eadReceiptEvent`），Gateway 中导入并实例化这些类型\n- **依据**: `docs/design-doc
+s/nestjs.md` 第 144-151 行："Payload 类型：必须使用 `shared-types` 中定义的 DTO/
+Interface，禁止内联 `any`"\n\n### 7. MatchingService 直接 import 并注入 ImServic
+e，违反模块间解耦规范\n- **位置**: `apps/api/src/modules/matching/matching.servi
+ce.ts:25`, `matching.module.ts:30`\n- **问题**: Matching 模块直接依赖 Im 模块的
+内部 Service，且引入了 `forwardRef` 循环依赖\n- **影响**: 模块边界模糊，Matching
+模块的单元测试必须 Mock ImService，增加了耦合度\n- **修复**: 通过 `EventEmitter2
+` 发布 `match:created` 事件，在 `ImModule` 中监听该事件并创建 system message。移
+除 `MatchingService` 对 `ImService` 的直接依赖和 `forwardRef`。\n- **依据**: `do
+cs/design-docs/nestjs.md` 第 70 行："模块之间通过 Interface / EventEmitter 解耦
+，禁止直接 import 其他模块的内部 Service"\n\n### 8. ConversationListCubit 分页逻
+辑缺陷，导致无法加载更多或无限重复加载\n- **位置**: `apps/mobile/lib/presentatio
+n/blocs/im/conversation_list_cubit.dart:32-36`\n- **问题**: \n  1. `ImRepository
+.getConversations` 返回类型为 `List<ConversationItem>`，**丢弃了 API 返回的 `nex
+t_cursor` 和 `has_more`**；\n  2. Cubit 中 `nextCursor` 被错误地设为传入的 `curs
+or`（旧值）而非服务端返回的新游标：\n     ```dart\n     nextCursor: result.isNot
+Empty ? cursor : null,\n     ```\n  3. 当首次加载完成后，`nextCursor` 为 `null`
+，但 `hasMore` 可能为 `true`；UI 会触发加载更多，传入 `cursor: null`，导致**重复
+加载第一页**，形成无限循环（或至少无法加载后续页）。\n- **影响**: 会话列表分页功
+能完全不可用；用户超过 20 个会话时只能看到前 20 个\n- **修复**: \n  1. 修改 `ImR
+epository` 接口：\n     ```dart\n     Future<({List<ConversationItem> items, boo
+l hasMore, String? nextCursor})> getConversations(...)\n     ```\n  2. `ImReposi
+toryImpl` 从响应中解析 `data[\'next_cursor\']` 和 `data[\'has_more\']`；\n  3. C
+ubit 中使用服务端返回的 `nextCursor`：\n     ```dart\n     nextCursor: result.ne
+xtCursor,\n     hasMore: result.hasMore,\n     ```\n- **依据**: `docs/api-contra
+cts/im.yaml` 中 `ListConversations` 的响应结构包含 `next_cursor` / `has_more`；P
+RD 功能完整性要求\n\n### 9. Maestro E2E 中 `conversation_item_` 精确匹配无法命中
+动态 id\n- **位置**: `.maestro/flows/im/send_message.yaml:23-24`, `.maestro/flow
+s/im/view_conversation_list.yaml:36-38`\n- **问题**: Maestro 的 `id` 匹配是精确
+匹配 Android `resource-id`。但 `ConversationListItem` 的 `Semantics` identifier 
+是动态生成的 `conversation_item_$nickname`（如 `conversation_item_Alice`），Maes
+tro flow 中写死 `conversation_item_` 永远匹配不到任何元素。\n- **影响**: E2E 测
+试中的会话列表点击步骤永远失败（但因标记了 `optional: true` 被静默跳过）\n- **修
+复**: \n  - 方案 A：将 `ConversationListItem` 的 `identifier` 改为固定值 `conver
+sation_item`，Maestro 通过列表索引或文本匹配定位；\n  - 方案 B：保留动态 id，但 
+Maestro 使用 `tapOn: "Alice"` 通过昵称文本定位（需确保昵称在 semantics 中可访问
+）。\n- **依据**: `docs/design-docs/flutter.md` Accessibility 章节："`identifier
+: \'xxx\'` 生成稳定的 `resource-id`" + Maestro 精确匹配行为\n\n### 10. 新增 Desi
+gn System 组件缺少 Golden Test 与 Widget Test\n- **位置**: `packages/design-syst
+em/lib/src/molecules/chat_bubble.dart`, `chat_input_bar.dart`, `conversation_lis
+t_item.dart`\n- **问题**: PR 新增 3 个 design-system 组件，但 `packages/design-s
+ystem/test/` 下未增加任何对应 golden test 或 widget test\n- **影响**: 无视觉回归
+保护，后续样式变更可能破坏 IM 核心 UI 而无人知晓\n- **修复**: \n  1. 在 `package
+s/design-system/test/im_components_golden_test.dart` 中补充 `SwChatBubble`（self
+/ other / system / sending / failed 状态）、`SwChatInputBar`（empty / typing / o
+ver-limit 状态）、`SwConversationListItem`（default / unread / long-message 状态
+）的 golden test；\n  2. 运行 `flutter test --update-goldens` 生成基准图并提交。
+\n- **依据**: `docs/design-docs/testing.md` 第 333-375 行 Golden File Testing 规
+范："新增/修改的 `packages/design-system` 组件必须编写 Golden Test"\n\n### 11. M
+aestro flow 过度使用 `optional: true`，丧失 E2E 验收价值\n- **位置**: `.maestro/
+flows/im/send_message.yaml`（第 24、29、33、35、40、41、44、45、48、49 行均为 `o
+ptional: true`）\n- **问题**: 核心断言步骤（如点击输入框、输入文本、点击发送、断
+言消息可见）全部被标记为 optional，意味着即使 IM 核心功能完全损坏，E2E 也会全部
+跳过并通过。\n- **影响**: E2E 测试失去回归验证意义\n- **修复**: 仅对「会话可能为
+空」这类条件分支步骤保留 `optional`（如首次进入无会话时的空状态）。以下步骤必须
+移除 `optional`：\n  - 切换消息 Tab (`tab_messages`)\n  - 点击输入框 (`chat_inpu
+t_field`)\n  - 输入消息内容\n  - 点击发送 (`chat_send_button`)\n  - 断言消息可见
+(`assertVisible: "你好"`)\n- **依据**: `docs/design-docs/testing.md` 第 326-331 
+行："涉及 Mobile 用户流程的 PR，必须包含可运行的 Maestro E2E 测试"\n\n---\n\n## 
+轻微问题（Minor）\n\n### 12. `ImBloc._messages` 列表无上限，长会话存在内存泄漏风
+险\n- **位置**: `apps/mobile/lib/presentation/blocs/im/im_bloc.dart:15`\n- **建
+议**: 为 `_messages` 设置上限（如保留最近 500 条），或实现消息淘汰策略\n\n### 13
+. `ImService.sendMessage` 的 `client_message_id` 回退生成逻辑与 DTO 语义不符\n- 
+**位置**: `apps/api/src/modules/im/im.service.ts:75`\n- **问题**: `const clientM
+essageId = dto.client_message_id ?? uuidv7();` 在客户端未传 `client_message_id` 
+时服务端生成一个。但幂等去重逻辑（第 112 行）要求 `dto.client_message_id` 存在才
+查询 existing。如果客户端没传，服务端生成的 id 不会被用于去重查询，但也不会重复
+（因为每次 uuidv7 都不同）。逻辑上无害，但语义上 `client_message_id` 应始终由客
+户端生成。\n- **建议**: 在 `SendMessageDto` 中移除 `@IsOptional()`，强制要求客户
+端提供 `client_message_id`\n\n### 14. `docs/modules/im.md` 关键文件路径与实际文
+件名不一致\n- **位置**: `docs/modules/im.md:62`\n- **问题**: 文档中 "Conversatio
+n List Page" 指向 `apps/mobile/lib/presentation/pages/match_list_page.dart`，但 
+`match_list_page.dart` 现在已被改造为 Conversation List（原来的 MatchList 功能被
+替换），文件名未改。虽然功能正确，但文件名与页面职责不符，增加维护成本。\n- **建
+议**: 在 tech-debt-tracker 中记录，后续将 `match_list_page.dart` 重命名为 `conve
+rsation_list_page.dart`\n\n---\n\n## 验证结果\n\n| 维度 | 状态 | 说明 |\n|------
+|------|------|\n| 功能完整性 | ❌ | 核心 IM 功能存在 4 个 Blocking 运行时缺陷（
+Bloc emit 越界、消息串扰、UI 清空、分页失效），导致功能不可用或数据不一致 |\n| 
+代码规范性 | ❌ | Design System 组件命名未加 `Sw` 前缀（flutter.md 强制规范）；
+模块间直接 Service 依赖违反 nestjs.md 解耦规范；Gateway payload 未使用 shared-ty
+pes |\n| 全链路完整性 | ✅ | DB（Entity + Migration）→ API（Controller + Gateway
++ Service）→ Mobile（Repository + BLoC + Page）→ Design System → Maestro E2E 全
+链路已覆盖 |\n| 规范符合性 | ❌ | 事务边界不符合 nestjs.md 要求；Maestro 兼容性
+存在动态 id 和过度 optional 问题；Accessibility 基本合规（使用了 Semantics + onT
+apDown） |\n| 测试覆盖 | ❌ | MatchingService 单元测试已补充 IM 相关 mock（✅）
+，但新增 Design System 组件完全缺失 Golden Test 和 Widget Test；Maestro E2E 流于
+形式 |\n| 文档同步 | ⚠️ | `docs/modules/im.md` 已更新关键文件索引（✅），但 `docs
+/api/socket-events.md` 未更新 IM 命名空间事件定义（仍只有 `matching` 命名空间的
+事件） |\n\n---\n\n## 风险与建议\n\n1. **循环依赖风险**: `MatchingModule ↔ ImMod
+ule` 通过 `forwardRef` 建立循环依赖，虽然 NestJS 支持，但增加了启动时复杂度和潜
+在的初始化顺序问题。建议通过 EventEmitter 解耦（见 Major-7）。\n\n2. **Socket 连
+接管理风险**: `ChatPage` 每次进入都通过 `getIt<ImBloc>()` 创建新的 Bloc 和 Socke
+t 连接，退出时断开。如果用户在会话列表和聊天页之间频繁切换，会导致 Socket 频繁重
+连。建议在 App 生命周期内维持单一 Socket 连接（如将 `ImBloc` 提升为全局单例或在 
+`MainPage` 层级管理）。\n\n3. **Redis 未读数一致性风险**: `markAsRead` 中 `await
+this.redis.set(..., "0")` 与 `participantRepo.update` 是两个独立操作，无事务。如
+果 Redis 操作成功但 DB update 失败，会导致未读数不一致。建议增加补偿机制或统一在
+DB 事务成功后才清 Redis。\n\n4. **消息顺序风险**: `getMessages` 中 `messages.rev
+erse()` 修改了数组（虽然 TypeScript 中 `slice` 已复制），但如果 `hasMore=false` 
+时 `results` 直接赋值给 `messages` 再 `reverse`，会修改原数组。虽然 `results` 是
+局部变量，不影响外部，但建议改用 `[...messages].reverse()` 保证不可变性。\n\n\n-
+-- 第 2 次 Review ---\n# PR #58 审查报告\n\n> **PR**: feat/issue-5 — [IM] V1 Ins
+tant Messaging - 实时聊天、已读回执与会话列表  \n> **审查范围**: 49 files change
+d, ~3,102 insertions, ~38 deletions  \n> **审查依据**: AGENTS.md, docs/design-do
+cs/{flutter.md, nestjs.md, testing.md, api.md}, prd/v1-mvp.md, prd/v1-matching.m
+d, prd/v1-profile.md, docs/modules/im.md, docs/api/socket-events.md\n\n---\n\n##
+审查结论\n\n**审查结论: NEEDS_MAJOR_FIX**\n\nPR 实现了 IM 模块的核心链路（DB → A
+PI → Mobile），功能骨架完整，设计系统组件规范达标，E2E 流程和 BDD 骨架已建立。但
+存在以下必须修复的严重问题：\n\n1. **新增后端代码零测试覆盖**（~664 行 Service/G
+ateway/Controller 无单元/集成测试）\n2. **缺失 Socket 事件契约 YAML**（违反 api.
+md 强制规范）\n3. **Maestro E2E 发送消息流存在流程断点**（未处理无会话的空状态，
+测试会失败）\n\n---\n\n## 阻塞问题（Blocking）\n\n**无**\n\n---\n\n## 严重问题（
+Major）\n\n### 1. IM 后端新增代码零单元/集成测试覆盖\n- **位置**: `apps/api/src/
+modules/im/im.service.ts` (399 行), `im.gateway.ts` (197 行), `im.controller.ts`
+(68 行)\n- **问题**: PR 新增了 IM 核心后端模块，但没有任何 `.spec.ts` 测试文件。
+`matching.service.spec.ts` 在同期被更新（说明项目有测试传统），但 IM 模块完全缺
+失。\n- **影响**: 无法验证消息幂等去重、已读回执逻辑、会话权限校验、分页 cursor 
+边界、异常处理路径等核心行为。后续重构极易引入回归。\n- **修复**:  \n在 `apps/ap
+i/src/modules/im/tests/` 下新增：\n  - `im.service.spec.ts`：覆盖 `sendMessage`
+（含重复 client_message_id 幂等）、`markAsRead`、`getMessages` 分页、`getConvers
+ations` 聚合、`verifyConversationMembership`\n  - `im.gateway.spec.ts`：覆盖 Soc
+ket 认证拒绝、`message:send` 事件处理、`message:read` 事件处理、错误广播\n  - `i
+m.controller.spec.ts`：覆盖 `GET /conversations` 和 `GET /messages` 的 Guard、参
+数校验、响应结构\n- **依据**: `docs/design-docs/testing.md` 第 17-22 行："后端：
+NestJS 使用 Jest，覆盖率目标 >80%"\n\n### 2. 缺失 IM Socket 事件契约 YAML\n- **
+位置**: `docs/api-contracts/` 目录下无 `im-events.yaml`\n- **问题**: `im.gateway
+.ts` 发射了 5 个服务端事件：`message:ack`、`message:receive`、`message:read_rece
+ipt`、`conversation:updated`、`message:error`。但 `docs/api-contracts/` 下只有 `
+im.yaml`（REST 契约），没有 `im-events.yaml`（WebSocket 事件契约）。\n- **影响**
+: 前后端事件契约不同步时无文档可核对；新 Agent 接入时无法从仓库获知完整事件列表
+和 Payload Schema。\n- **修复**:  \n新建 `docs/api-contracts/im-events.yaml`，定
+义所有事件：\n  - `message:ack` — Payload: `{ client_message_id, sequence_id, id
+}`\n  - `message:receive` — Payload: `{ id, conversation_id, sender_id, type, co
+ntent, sequence_id, client_message_id, created_at }`\n  - `message:read_receipt`
+— Payload: `{ conversation_id, last_read_message_id }`\n  - `conversation:update
+d` — Payload: `{ conversation_id, updated_at }`\n  - `message:error` — Payload: 
+`{ message }`\n- **依据**: `docs/design-docs/api.md` 第 89-118 行（不变量 A）："
+后端每新增一个 `server.emit()` 事件，必须同时满足：`docs/api-contracts/<module>-
+events.yaml` 中定义了该事件的 Schema"\n\n### 3. Maestro E2E `send_message.yaml` 
+存在流程断点\n- **位置**: `.maestro/flows/im/send_message.yaml` 第 22-34 行\n- *
+*问题**: Flow 先 `optional: true` 点击 `conversation_item`，然后 `optional: true
+` 断言 `chat_back_button`，随后**无条件**执行 `tapOn: { id: "chat_input_field" }
+` 和 `inputText: "你好"`。如果测试环境没有预置会话（如首次运行或新 emulator），
+用户仍停留在「消息」列表页，`chat_input_field` 不存在，测试直接失败。\n- **影响*
+*: E2E 无法在干净环境跑通，丧失回归测试价值。\n- **修复**:  \n提供两条路径之一：
+\n  - **路径 A（推荐）**: 在 flow 开头通过 API 预创建 match + conversation（类似
+`e2e-backend` 依赖注入测试数据），确保会话存在；\n  - **路径 B**: 在点击 `chat_i
+nput_field` 前增加条件分支，若仍停留在消息列表页（assertVisible `conversation_it
+em` 失败），则跳过发送测试并标记为 skipped。\n- **依据**: `docs/design-docs/test
+ing.md` 第 60-66 行："涉及数据库状态变更的功能，BDD/Maestro E2E 必须覆盖完整闭环
+：产生数据 → 查询数据 → 断言状态"\n\n### 4. `ImBloc` 已读回执仅标记单条消息为 re
+ad，与 BDD 描述不符\n- **位置**: `apps/mobile/lib/presentation/blocs/im/im_bloc.
+dart` 第 151-174 行\n- **问题**: `_onReadReceipt` 中只有 `msg.id == event.lastRe
+adMessageId` 的那一条消息状态被改为 `\'read\'`。但 BDD feature `im_read_receipts
+.feature` 要求："all unread messages from Alice should be marked as \'read\'"（`
+tests/bdd/step-definitions/common.js` 第 184-185 行）。此外，UI 上虽然只显示最后
+一条消息的状态，但数据模型层面所有更早的已发送消息也应视为已读。\n- **影响**: 若
+用户发送了多条消息，对方打开会话后，只有最后一条状态变为"已读"，前面的仍保持"sen
+t"，与 IM 常规范式不符。\n- **修复**:  \n在 `_onReadReceipt` 中，将所有 `senderI
+d == _currentUserId` 且 `sequenceId <= readMessageSequenceId`（或 `id == lastRea
+dMessageId` 及之前所有消息）的状态均设为 `\'read\'`。\n- **依据**: `tests/bdd/im
+_read_receipts.feature` 隐含需求 + `prd/v1-mvp.md` 第 147-152 行\n\n---\n\n## 轻
+微问题（Minor）\n\n### 5. BDD Step Definitions 为空实现\n- **位置**: `tests/bdd/
+step-definitions/im_*.steps.js`（6 个文件）\n- **问题**: 所有 IM 的 BDD step 文
+件仅导入 `commonSteps`，而 `commonSteps` 中的 IM 相关 step 全为 `() => {}` 空函
+数。BDD 测试会"通过"但不验证任何业务行为。\n- **影响**: BDD 验收测试流于形式，无
+法发现 API 回归。\n- **修复**: 逐步为关键场景（发送消息、已读回执、会话列表）编
+写实际调用 API 的 step 实现。至少为 `im_start_chatting_after_match` 和 `im_real_
+time_message_delivery` 编写可运行的 steps。\n- **依据**: `docs/design-docs/testi
+ng.md` 第 46-56 行："mock 实现必须与真实组件的业务契约一致"、"BDD 测试验证的是业
+务行为"\n\n### 6. `ImBloc` 生命周期与 Socket 连接策略不经济\n- **位置**: `apps/m
+obile/lib/presentation/pages/chat_page.dart` 第 72-81 行 / `app.dart` 第 72-82 
+行\n- **问题**: `ChatPage` 每次进入都通过 `getIt<ImBloc>()`（factory）创建新 `Im
+Bloc`，退出时 `BlocProvider` dispose 导致 `close()` 调用，进而断开 Socket。用户
+从聊天页返回消息列表后 Socket 断开，再次进入又重新连接。消息列表页无法实时收到 `
+conversation:updated` 事件。\n- **影响**: 多设备/多端场景下实时性受损；频繁重连
+增加服务端负载。\n- **修复**: 考虑将 `ImBloc` 提升为应用级单例（或至少在 `MainPa
+ge` 级别提供），在 `MatchListPage` 中监听 `conversation:updated` 以刷新列表。若 
+MVP 明确不追求此优化，可在 `docs/exec-plans/tech-debt-tracker.md` 中记录。\n- **
+依据**: `docs/modules/im.md` 边界情况说明："离线补推：用户重连后，拉取 `last_ack
+_sequence_id` 之后的所有消息" — 暗示应维护长连接。\n\n### 7. `PushService` 未在 
+IM 模块中集成\n- **位置**: `apps/api/src/modules/im/im.gateway.ts`\n- **问题**: 
+`v1-mvp.md` 第 163 行要求"离线用户通过极光推送/Firebase 触发新消息提醒"，且 BDD 
+feature `im_real_time_message_delivery.feature` 第 13-18 行断言离线时应触发推送
+。但 `ImGateway` / `ImService` 从未调用 `PushService.sendPush()`。\n- **影响**: 
+离线用户收不到新消息推送。\n- **修复**: 在 `ImGateway.handleSendMessage` 中，向 
+`user:${otherId}` 发射 `message:receive` 后，若该 room 中无在线 socket（可通过 `
+this.server.in(`user:${otherId}`).fetchSockets()` 判断），调用 `PushService.send
+Push()` 发送离线提醒。\n- **依据**: `prd/v1-mvp.md` 第 163 行 + `tests/bdd/im_re
+al_time_message_delivery.feature`\n\n### 8. `ImModule` 重复创建 Redis 连接\n- **
+位置**: `apps/api/src/modules/im/im.module.ts` 第 28-31 行\n- **问题**: `ImModul
+e` 自行 `new Redis(redisConfig)` 创建 Redis 客户端，而 `MatchingModule` 也做了同
+样的事。这会导致两个独立的 Redis 连接。\n- **影响**: 资源浪费；连接数翻倍。\n- *
+*修复**: 建议统一在 `AppModule` 或独立的 `RedisModule` 中提供 `REDIS_CLIENT`，各
+业务模块 `imports` 共享。若项目现有惯例如此，可列入技术债务。\n- **依据**: `docs
+/design-docs/nestjs.md` 第 68-70 行："模块之间通过 Interface / EventEmitter 解耦
+"\n\n### 9. `SwChatInputBar` 中的 `TextField` 未暴露 `onChanged` 给外部\n- **位
+置**: `packages/design-system/lib/src/molecules/chat_input_bar.dart` 第 109-131 
+行\n- **问题**: 组件内部用 `_controller.addListener` 监听文本变化，但没有向外部
+暴露 `onChanged` 回调。若父组件需要实时校验（如敏感词过滤），无法介入。\n- **影
+响**: 扩展性受限。\n- **修复**: 增加可选参数 `final ValueChanged<String>? onChan
+ged;`，在 `_onTextChanged` 中调用 `widget.onChanged?.call(_controller.text)`。\n
+- **依据**: 设计系统可扩展性最佳实践（非强制规范，属建议）\n\n### 10. `send_mess
+age.yaml` 中 `assertVisible: "你好"` 可能受多条消息干扰\n- **位置**: `.maestro/f
+lows/im/send_message.yaml` 第 41 行\n- **问题**: 若测试环境已存在历史消息包含"你
+好"，Maestro 的 `assertVisible` 可能匹配到旧消息而非刚发送的新消息。\n- **影响**
+: E2E 假阳性。\n- **修复**: 使用唯一测试文本如 `"E2E_TEST_HELLO_{{timestamp}}"`
+，或给最新消息气泡增加 `Semantics(identifier: \'latest_self_message\')`。\n- **
+依据**: `docs/design-docs/testing.md` 第 121-124 行：定位策略应优先使用稳定的 `r
+esource-id`\n\n---\n\n## 验证结果\n\n| 维度 | 状态 | 说明 |\n|------|------|----
+--|\n| 功能完整性 | ✅ | 消息发送、已读回执、会话列表、消息历史拉取、系统消息、
+幂等去重均已实现 |\n| 代码规范性 | ⚠️ | NestJS/Flutter 分层、命名、DTO 校验基本合
+规；但 Redis 客户端未共享、缺失事件契约 YAML |\n| 全链路完整性 | ✅ | DB（Migrat
+ion + Entity）→ API（REST + Socket）→ Mobile（BLoC + Repository + SocketClient）
+链路贯通 |\n| 规范符合性 | ⚠️ | 设计系统组件合规（无硬编码颜色、使用 DesignTokens
+）；但 `im-events.yaml` 缺失，违反 api.md |\n| 测试覆盖 | ❌ | Mobile E2E（Maest
+ro）流已建立但 `send_message.yaml` 有断点；Golden Test 和 Widgetbook 完整；**后
+端 IM 模块零单元/集成测试** |\n| 文档同步 | ✅ | `docs/api/socket-events.md`、`d
+ocs/modules/im.md` 已更新；共享类型已导出 |\n\n---\n\n## 风险与建议\n\n### 高优
+先级修复（建议阻塞合并前完成）\n1. **补充 `im.service.spec.ts` 和 `im.gateway.sp
+ec.ts`**：至少覆盖消息幂等、会话权限拒绝、已读回执 Redis 重置、分页 cursor 边界
+。\n2. **新建 `docs/api-contracts/im-events.yaml`**：补全 5 个服务端事件的 Schem
+a 定义。\n3. **修复 `send_message.yaml` 流程断点**：增加会话预创建或条件跳过逻辑
+，确保干净环境可跑通。\n\n### 中优先级修复（建议后续迭代）\n4. **优化 `ImBloc` 
+生命周期**：考虑将 Socket 连接提升为应用级，避免频繁断连；在消息列表页消费 `conv
+ersation:updated` 实现实时刷新。\n5. **集成 `PushService` 到 IM Gateway**：在接
+收方离线时触发推送，满足 MVP PRD 要求。\n6. **统一 Redis 客户端提供方式**：避免
+各模块重复创建连接。\n\n### 已验证的亮点\n- **设计系统交付规范**：`SwChatBubble`
+、`SwChatInputBar`、`SwConversationListItem` 均已在 Widgetbook 注册，附有 Golden
+Test 截图，无硬编码颜色，Accessibility（Semantics + onTapDown）符合 flutter.md 
+要求。\n- **Migration 合规**：`AlterMessagesSenderIdNullable20250425000000` 存在
+up/down 方法，符合 `nestjs.md` 迁移规范。\n- **共享类型契约同步**：`packages/sha
+red-types/src/im-socket-events.ts` 已定义，并在前后端同时引用。\n- **Makefile 构
+建顺序修复**：`shared-types` 先于 `apps/api` 构建，且新增了结构测试 `test_makefi
+le_build_order.py` 进行守护。\n\n\n--- 第 3 次 Review ---\n# PR #58 代码审查报告
+\n\n## 审查结论\n\n审查结论: **NEEDS_MAJOR_FIX**\n\nPR 实现了 IM（即时通讯）模块
+的核心功能，包含后端 Socket.io Gateway、消息服务、前端聊天页面/会话列表、Design 
+System 组件及 E2E 测试。整体架构方向正确，设计系统组件符合规范，Maestro E2E 测试
+覆盖到位。\n\n但存在 **2 个 Major 问题**：\n1. Mobile 端 ImBloc 的已读回执逻辑存
+在边界 bug，会导致所有己方消息被错误标记为已读；\n2. 后端离线推送未集成 PushServ
+ice，PRD 要求的离线消息推送未实现；\n3. BDD 测试只有 feature 文件，缺少可执行的 
+step 实现。\n\n## 阻塞问题（Blocking）\n\n无。\n\n## 严重问题（Major）\n\n### 1.
+ImBloc 已读回执逻辑错误标记所有己方消息为已读\n- **位置**: `apps/mobile/lib/pres
+entation/blocs/im/im_bloc.dart:153-163`\n- **问题**: 当 `_onReadReceipt` 收到 `l
+astReadMessageId` 且该消息 ID 不在当前内存中的 `_messages` 列表时（`lastReadInde
+x == -1`），条件 `shouldMarkRead = lastReadIndex == -1 || i <= lastReadIndex` 会
+成立，导致**所有己方消息**被标记为 `read`。这在用户未加载全部历史消息时（例如只
+加载了最近 20 条，但对方已读了更早的消息），会错误地将当前可见的较新消息也标为已
+读。\n- **影响**: 消息发送方的 UI 上，未读的新消息会错误显示“已读”状态，用户体验
+受损。\n- **修复**:\n  ```dart\n  // 仅当 lastReadMessageId 存在于当前消息列表时
+才批量标记\n  final shouldMarkRead = lastReadIndex != -1 && i <= lastReadIndex;\
+n  ```\n或者，如果希望在 lastReadMessageId 不在列表时也标记（例如列表中只有更早
+消息），需要更精确地比较 sequence_id 而不是列表索引。\n- **依据**: `prd/v1-mvp.m
+d` US-4 要求“Alice should see the message status change to \'已读\'”，而当前实现
+会导致错误的消息被标记；`tests/bdd/im_read_receipts.feature` 也要求仅已读消息状
+态变化。\n\n### 2. 离线消息推送未实现（PushService 未在 IM Gateway 中调用）\n- *
+*位置**: `apps/api/src/modules/im/im.gateway.ts:90-142`\n- **问题**: `handleSend
+Message` 在消息保存后，仅通过 `this.server.to(\\`user:${otherId}\\`)` 向接收者推
+送 `message:receive` 事件。若接收者不在线（Socket 未连接），消息只会被持久化且 R
+edis unread_count 增加，但**不会触发任何推送通知**。`PushService` 已在 `apps/api
+/src/modules/push/push.service.ts` 中定义，但 `ImGateway` 未注入和使用它。\n- **
+影响**: 离线用户无法收到新消息提醒，违反 PRD 中“离线用户通过极光推送/Firebase 触
+发新消息提醒”的验收标准。\n- **修复**:\n  1. 在 `ImGateway` 构造函数中注入 `Push
+Service`。\n  2. 在 `handleSendMessage` 中，emit 到 `user:${otherId}` 后检查该 r
+oom 内是否有在线 socket，若无则调用 `pushService.sendPush(...)`。\n  ```typescri
+pt\n  // 在 ImGateway 构造函数中添加\n  private readonly pushService: PushServic
+e,\n\n  // 在 handleSendMessage 中 emit 后添加\n  const sockets = await this.ser
+ver.in(`user:${otherId}`).fetchSockets();\n  if (sockets.length === 0) {\n    aw
+ait this.pushService.sendPush(\n      otherId,\n      \'新消息\',\n      \'您收
+到一条新消息\',\n      { conversation_id: dto.conversation_id },\n    );\n  }\n 
+```\n- **依据**: `prd/v1-mvp.md` 中 US-4 技术要求明确提到“离线用户通过极光推送/F
+irebase 触发新消息提醒”；`tests/bdd/im_real_time_message_delivery.feature` 第 13
+-18 行要求“a push notification should be triggered for Bob”。\n\n### 3. BDD 测试
+缺少可执行的 Step 实现\n- **位置**: `tests/bdd/step-definitions/im_*.steps.js`\n
+- **问题**: 所有 IM 相关的 BDD step 定义文件（如 `im_start_chatting_after_match.
+steps.js`、`im_read_receipts.steps.js` 等）均使用 `autoBindSteps(feature, [commo
+nSteps])`，即**仅依赖通用步骤**，没有针对 IM 业务行为（如 Socket.io 连接、消息发
+送、已读回执、未读数验证）编写具体的 Given/When/Then 实现。这意味着这些 `.featur
+e` 文件虽然存在，但无法执行有效的验收测试。\n- **影响**: BDD 测试无法验证 IM 核
+心业务流程的闭环（写 → 读 → 断言），违背 `docs/design-docs/testing.md` 中“数据闭
+环原则”。\n- **修复**: 为每个 IM feature 编写具体的 step 实现，至少覆盖：\n  - 
+建立两个测试用户的 Socket.io 连接（`im` namespace）\n  - 发送消息并断言对方收到 
+`message:receive` 事件\n  - 断言 Redis `unread_count` 变化\n  - 发送 `message:re
+ad` 并断言对方收到 `message:read_receipt`\n- **依据**: `docs/design-docs/testing
+.md` 第 56-67 行强调“数据闭环原则”和“mock 实现必须与真实组件的业务契约一致”；`pr
+d/v1-mvp.md` 中每个用户故事均要求 BDD 覆盖。\n\n## 轻微问题（Minor）\n\n### 4. A
+PI 契约字段名与控制器返回值不一致\n- **位置**: `docs/api-contracts/im.yaml:56-74
+`\n- **问题**: `ConversationDto` 中定义的字段为 `id`，而 `ImController.getConver
+sations` 实际返回的字段名为 `conversation_id`。Mobile 端解析代码 (`im_repository
+_impl.dart:99`) 使用的是 `conversation_id`，与控制器一致，但与 OpenAPI 契约不一
+致。\n- **修复**: 将 `docs/api-contracts/im.yaml` 中 `ConversationDto` 的 `id` 
+改为 `conversation_id`。\n- **依据**: `docs/design-docs/nestjs.md` 第 86 行要求“
+DTO 的字段命名必须与 `packages/shared-types/` 中的接口定义完全一致”。\n\n### 5. 
+ChatPage 空消息列表时固定显示系统提示语\n- **位置**: `apps/mobile/lib/presentati
+on/pages/chat_page.dart:118-124`\n- **问题**: 当消息列表为空时，直接显示固定的系
+统消息“你们已匹配成功，开始聊天吧”。但如果会话有消息后被清空（如未来实现删除功能
+），或用户进入一个有历史消息的会话但加载失败，这个固定文案不准确。\n- **修复**: 
+将系统消息的显示与“消息列表为空”状态解耦，仅在会话确实没有任何消息（包括系统消息
+）时显示该欢迎语，或从后端拉取真正的 system message。\n- **依据**: `prd/v1-mvp.m
+d` US-4 要求“Alice should see the system message”，但并未要求在没有系统消息时也
+显示该文案。\n\n### 6. ImBloc 语义状态混用\n- **位置**: `apps/mobile/lib/present
+ation/blocs/im/im_bloc.dart:117-118`\n- **问题**: 当收到对方消息时（`_onMessageR
+eceived`），emit 的是 `ImMessageSent` 状态。该状态语义上表示“我发送的消息已确认”
+，却被用于“收到新消息”场景，状态语义混乱。\n- **修复**: 建议新增 `ImMessageRecei
+ved` 状态，或在 UI 层统一用 `ImMessagesLoaded` 表示消息列表更新。\n- **依据**: `
+docs/design-docs/flutter.md` 要求状态管理保持可读性。\n\n### 7. `getMessages` 分
+页 next_cursor 逻辑缺少注释\n- **位置**: `apps/api/src/modules/im/im.service.ts:
+189-199`\n- **问题**: `nextCursor` 取的是 `messages[0].sequence_id`，而 `message
+s` 经过 `reverse()` 后 `messages[0]` 是本次返回的最旧消息。该逻辑虽然结果正确，
+但非常反直觉，缺少注释说明，未来维护者容易误改。\n- **修复**: 在 `nextCursor` 赋
+值处添加注释，说明 cursor 是“当前页最旧消息的 sequence_id，用于下一页加载更旧的
+消息”。\n\n## 验证结果\n\n| 维度 | 状态 | 说明 |\n|------|------|------|\n| 功能
+完整性 | ⚠️ | 核心收发消息、已读回执、会话列表已实现。但**离线推送未实现**，与 PR
+D 要求有差距。 |\n| 代码规范性 | ✅ | 后端符合 NestJS 分层规范；Flutter 组件使用
+DesignTokens，无硬编码颜色；Maestro 兼容性良好（使用 `onTapDown`、`Semantics(ide
+ntifier)`）。 |\n| 全链路完整性 | ✅ | DB（messages 表 + migration）→ API（Contr
+oller/Gateway/Service）→ Mobile（BLoC/Repository/SocketClient）→ DesignSystem 已
+贯通。 |\n| 规范符合性 | ✅ | 设计系统组件有 Widgetbook 用例和 Golden Test；API 
+契约文档已更新；Socket 事件命名符合 `模块名:动作` 规范。 |\n| 测试覆盖 | ⚠️ | 后
+端单元测试覆盖核心路径；Mobile Widget Golden Test 覆盖新组件；Maestro E2E 流程已
+添加。**但 BDD 测试缺少可执行 step 实现**。 |\n| 文档同步 | ✅ | `docs/modules/i
+m.md`、`docs/api/socket-events.md`、`docs/api-contracts/im-events.yaml` 均已同步
+。 |\n\n## 风险与建议\n\n1. **推送降级策略**: 当前 `PushService` 是 MVP skeleton
+（仅打印日志）。建议在 `ImGateway` 中集成时，将推送调用包裹在 try/catch 中，确保
+推送失败不影响消息发送主流程。\n\n2. **Socket 房间在线状态检查**: `ImGateway` 中
+判断用户是否在线可使用 `this.server.in(\\`user:${userId}\\`).fetchSockets()`，但
+需注意这会增加一次异步 IO。如果推送是高频场景，可考虑维护一个内存中的在线用户映
+射（如 Redis / 进程内 Map）来优化。\n\n3. **消息加载分页边界**: `ChatPage` 目前
+只在 `initState` 时加载一次消息，未实现下拉加载更多历史消息。虽然当前 PR 范围可
+能不包含，但建议在下个迭代补充 `ListView` 的 `onNotification` 滚动监听以触发分页
+加载。\n\n4. **BDD 测试闭环**: 强烈建议在下个迭代中补齐 IM 相关 BDD 的 step 实现
+，尤其是“发送 → 查询会话列表 → 断言未读数”的完整链路。当前只有 feature 文件无法
+提供回归保护。\n\n5. **Design-Only PR 流程回顾**: 本次 PR 同时包含了 design-syst
+em 组件（`SwChatBubble`、`SwChatInputBar`、`SwConversationListItem`）和业务逻辑
+代码。根据 `AGENTS.md` 中 Flutter 规范，Design-Only PR 应先走且“禁止直接写入 `pa
+ckages/`”。本次 PR 可能是功能开发 PR 直接合入了 design-system 组件（这在执行计划
+允许范围内，因为规范说“后续功能开发 PR 统一迁入”），但建议确认是否已有对应的 `de
+signs/issue-5/MANIFEST.md` 记录此次迁移。\n\n\n--- 第 4 次 Review ---\n## 审查结
+论\n\n审查结论: **NEEDS_MAJOR_FIX**\n\nPR #58 实现了 IM（即时通讯）全链路模块，
+覆盖 DB → API → Mobile → Design-System → 文档，整体架构方向正确，组件封装和 Maes
+tro E2E 流也有配套产出。但存在 **6 个 Blocking 问题**，其中核心消息发送功能在 Mo
+bile 端完全不可用（Socket 未连接），且后端 Service/Controller 层违反了 NestJS 编
+码规范（直接返回 Entity）。这些问题必须在合并前修复。\n\n---\n\n## 阻塞问题（Blo
+cking）\n\n### 1. Mobile 端 Socket 从未连接，消息发送功能完全不可用\n- **位置**:
+`apps/mobile/lib/presentation/pages/chat_page.dart:36-40`\n- **问题**: `ChatPage
+.initState` 中创建了 `ImBloc` 并加载历史消息，但 **从未发送 `ImConnectRequested`
+事件**。全局搜索（`Grep` 验证）确认 `ImConnectRequested` 仅在 `im_event.dart` 和
+`im_bloc.dart` 中存在，没有任何 UI 代码调用它。\n- **影响**: `_socketClient` 始
+终为 `null`，`_onSendMessage` 中的 `_socketClient?.sendMessage(...)` 永远为空操
+作。用户点击发送后消息状态停留在 `sending`，永远不会到达服务端。\n- **修复**:\n 
+1. 在 `ChatPage.initState` 中，从 `AuthBloc` 或 `SecureStorage` 获取当前用户的 J
+WT token，并调用 `bloc.add(ImConnectRequested(token))`。\n  2. 在 `ChatPage.disp
+ose` 中调用 `bloc.add(const ImDisconnectRequested())` 以清理连接。\n- **依据**: 
+`prd/v1-mvp.md` 第 160 行明确要求“使用 Socket.io 实现实时消息收发”；`docs/design
+-docs/nestjs.md` Socket.io Gateway 规范要求客户端必须连接后才能收发事件。\n\n###
+2. `ImBloc` 连接状态会覆盖消息状态，导致 UI 显示加载中并丢失消息列表\n- **位置**
+: `apps/mobile/lib/presentation/blocs/im/im_bloc.dart:68-75`\n- **问题**: `_onCo
+nnect` 发射 `ImConnected()`，`_onDisconnect` 发射 `ImDisconnected()`。这两个状态
+类不包含消息列表。`ChatPage` 的 `BlocConsumer` builder 仅在 `state is ImMessages
+Loaded || state is ImMessageSending || state is ImMessageSent || state is ImMess
+ageRead` 时渲染消息列表，否则回退到 `CircularProgressIndicator`。\n- **影响**: 
+一旦 Socket 连接/断开，聊天页面会从“显示消息”瞬间变成“全屏加载圈”。\n- **修复**:
+\n  - 方案 A：删除 `ImConnected` / `ImDisconnected` 这两个独立状态，改为在现有消
+息状态类中增加 `isConnected` 字段；\n  - 方案 B：在 `ChatPage` builder 中增加对 
+`ImConnected` / `ImDisconnected` 的处理，保持上一状态的消息列表渲染。\n- **依据*
+*: `docs/design-docs/flutter.md` 状态管理规范要求 BLoC 状态应支持 UI 的连续渲染
+，不应因连接状态抖动导致页面骨架重置。\n\n### 3. `ImService.getMessages` 直接返
+回 TypeORM Entity，违反分层规范\n- **位置**: `apps/api/src/modules/im/im.service
+.ts:157-200`\n- **问题**: `getMessages` 的返回类型显式声明为 `Promise<{ items: M
+essageEntity[]; next_cursor: string | null; has_more: boolean }>`，直接返回数据
+库 Entity。\n- **影响**: 违反 NestJS 编码规范，存在泄露内部字段（如未来可能新增
+的敏感 DB 字段）的风险。\n- **修复**:\n  1. 新建 `MessageResponseDto`，字段与 `M
+essageEntity` 对应但显式排除内部字段；\n  2. 在 `getMessages` 中将 `MessageEntit
+y` 数组映射为 `MessageResponseDto[]` 后返回。\n- **依据**: `docs/design-docs/nes
+tjs.md` 第 56 行 “Service 层：禁止直接返回 Entity”；第 85 行 “所有出参使用显式 D
+TO，禁止直接返回 TypeORM Entity”。\n\n### 4. `ImController` API 响应直接包含 Typ
+eORM Entity\n- **位置**: `apps/api/src/modules/im/im.controller.ts:56-66`\n- **
+问题**: `getMessages` 调用 `imService.getMessages(...)` 后，将返回的 `data` 直接
+包装进 `{ code: 0, message: "success", data }`。由于 `ImService` 返回的是 `Messa
+geEntity[]`，Controller 实际上在 HTTP 响应中序列化了 Entity。\n- **影响**: 同 Bl
+ocking-3，违反 Controller 层“禁止直接返回 Entity”的规范。\n- **修复**: 在 `ImSer
+vice` 修复为返回 DTO 后，Controller 自然合规；若需临时修复，可在 Controller 中增
+加一层 `data.items.map(...)` 转换为 DTO。\n- **依据**: `docs/design-docs/nestjs.
+md` 第 56 行 Controller 职责表：“禁止直接操作 Repository”；以及 DTO 规范：“禁止
+使用 Entity 作为接口类型”。\n\n### 5. `MessageEntity` 唯一索引与幂等去重逻辑不一
+致\n- **位置**: `apps/api/src/database/entities/message.entity.ts:13-15`\n- **问
+题**: 唯一索引仅建立在 `client_message_id` 单列上：\n  ```typescript\n  @Index("
+idx_messages_client_message_id", ["client_message_id"], { unique: true })\n  ```
+\n但 `ImService.sendMessage` 的幂等去重查询使用的是 `(conversation_id, client_me
+ssage_id)` 组合条件（`im.service.ts:115-118`）。\n- **影响**: 如果同一用户在不同
+会话中因客户端 bug 产生了相同的 `client_message_id`，DB 层面会报唯一约束冲突（`E
+R_DUP_ENTRY`），但去重查询因限定了 `conversation_id` 而找不到已有记录，导致代码
+进入 `throw err` 分支，返回 500 错误而非幂等成功。\n- **修复**:\n  1. 将 Entity 
+索引改为复合唯一索引：`@Index("idx_messages_conv_client_msg_id", ["conversation_
+id", "client_message_id"], { unique: true })`；\n  2. 同步修改 Migration 文件 `2
+0250425000000-AlterMessagesSenderIdNullable.ts`（或新建 Migration）删除旧索引、
+创建新索引；\n  3. 同步更新 `im.service.ts` 中 `catch (err)` 块的 `err.message.i
+ncludes(...)` 匹配字符串，确保能捕获新的索引名错误信息。\n- **依据**: `docs/modu
+les/im.md` 边界情况第 1 条明确说明“客户端生成 `client_message_id`，服务端幂等去
+重”；幂等去重查询与唯一索引必须语义一致。\n\n### 6. `SendMessageDto.client_messa
+ge_id` 校验规则与服务端 fallback 逻辑矛盾\n- **位置**: `apps/api/src/modules/im/
+dto/send-message.dto.ts:14-15` 与 `apps/api/src/modules/im/im.service.ts:76`\n- 
+**问题**: DTO 中 `client_message_id` 使用了 `@IsString()`（表示必填），但 `ImSer
+vice.sendMessage` 中写了 `const clientMessageId = dto.client_message_id ?? uuidv
+7();`，暗示该字段可选。\n- **影响**: 如果客户端请求体中省略 `client_message_id`
+，`class-validator` 会在 Controller/Guard 阶段拦截并返回 400，不会走到 Service 
+的 fallback 逻辑。两个层面的语义不一致。\n- **修复**:\n  - 方案 A：在 DTO 上增加
+`@IsOptional()`，使 Service 的 fallback 逻辑真正生效；\n  - 方案 B：删除 Service
+中的 `?? uuidv7()` fallback，要求客户端必须提供（更符合当前 DTO 定义）。\n推荐方
+案 A，因为客户端在断网重发场景下需要依赖服务端生成 ID。\n- **依据**: `docs/desig
+n-docs/nestjs.md` 第 83-87 行 DTO 与校验规范：“DTO 的字段命名必须与 `packages/sh
+ared-types/` 中的接口定义完全一致”；接口契约应前后一致。\n\n---\n\n## 严重问题（
+Major）\n\n### 1. `ChatPage` 未实现图片消息，与 PRD 需求不符\n- **位置**: `apps/
+mobile/lib/presentation/pages/chat_page.dart:127-169`；`packages/design-system/l
+ib/src/molecules/chat_bubble.dart:117-118`\n- **问题**: `ChatPage` 的 `itemBuild
+er` 中所有消息都当作文本渲染；`SwChatBubble._buildContent` 明确注释 “For simplic
+ity, treat all as text. Image handling can be extended.”。但 PRD 明确要求 MVP 支
+持图片消息。\n- **影响**: 功能不完整，用户无法发送/接收图片。\n- **修复**:\n  1.
+在 `ChatPage` 中根据 `msg.type` 区分文本与图片渲染；\n  2. 在 `SwChatBubble` 中
+扩展 `_buildContent` 以支持图片预览；\n  3. 在 `SwChatInputBar` 中启用 `onPickIm
+age` 回调（组件已预留，但 `ChatPage` 未传入）。\n- **依据**: `prd/v1-mvp.md` 第 
+154-157 行：“消息类型：MVP 阶段支持：文本、图片”。\n\n### 2. IM 模块缺少离线用户
+推送通知实现\n- **位置**: `apps/api/src/modules/im/im.service.ts:52-126`\n- **问
+题**: `sendMessage` 中，消息持久化后仅通过 Socket.io 推送给在线用户，没有检测接
+收方是否在线，也没有调用 `PushService` 发送离线推送。\n- **影响**: 离线用户收不
+到新消息提醒，违反 PRD 非功能需求。\n- **修复**:\n  1. 在 `sendMessage` 中，向接
+收方房间 emit 后，检查该用户是否在线（可通过 Socket.io `server.fetchSockets()` 
+或 Redis 维护在线状态）；\n  2. 若不在线，调用 `PushService.sendPush(otherId, ti
+tle, body, payload)` 触发推送。\n- **依据**: `prd/v1-mvp.md` 第 163 行：“离线用
+户通过极光推送/Firebase 触发新消息提醒”。\n\n### 3. `ChatPage` 离开会话时未清理 
+`ImBloc` 的当前会话上下文\n- **位置**: `apps/mobile/lib/presentation/pages/chat_
+page.dart:43-47`\n- **问题**: `dispose()` 只释放了 `_scrollController`，没有调用
+`bloc.setCurrentConversation(null, null)`。\n- **影响**: 用户离开 `ChatPage` 后
+，若 Socket 收到新消息，`ImBloc._onMessageReceived` 仍可能匹配到旧的 `_currentCo
+nversationId`，导致自动发送 read receipt 给错误的会话。\n- **修复**: 在 `dispose
+()` 中增加 `bloc.setCurrentConversation(null, null)`。\n\n### 4. `im.yaml` OpenA
+PI 契约与实际 API 返回结构不一致\n- **位置**: `docs/api-contracts/im.yaml`\n- **
+问题**:\n  - `ConversationDto` 的 `required` 包含 `id`，但 `ImController.getConv
+ersations` 实际返回的字段名是 `conversation_id`；\n  - `MessageDto.type` 的 `enu
+m: [text, image]` 缺少 `system`（系统消息类型）；\n  - `MessageDto.sender_id` 标
+记为 required，但数据库和 Entity 中该字段为 `nullable`（系统消息无 sender）。\n-
+**影响**: 契约文档与代码不一致，会导致 OpenAPI 代码生成、前后端联调出错。\n- **
+修复**:\n  1. `ConversationDto` 将 `id` 改为 `conversation_id`；\n  2. `MessageD
+to.type` 的 enum 增加 `system`；\n  3. `MessageDto.sender_id` 增加 `nullable: tr
+ue` 或从 required 中移除。\n- **依据**: `docs/design-docs/nestjs.md` 第 87 行 “D
+TO 的字段命名必须与 `packages/shared-types/` 中的接口定义完全一致”；`docs/api-co
+ntracts/INDEX.md` 要求契约文件与代码同步。\n\n### 5. `MatchListPage` 类名与职责
+不符\n- **位置**: `apps/mobile/lib/presentation/pages/match_list_page.dart:10`\n
+- **问题**: 页面类名为 `MatchListPage`，但实际渲染的是“消息/会话列表”（底部导航 
+Tab 文案为“消息”，AppBar 标题为“消息”）。而真正的“匹配列表”应在 Matching 模块。\
+n- **影响**: 代码可读性差，维护者极易混淆。\n- **修复**: 将类名和文件名统一重命
+名为 `ConversationListPage` / `conversation_list_page.dart`，并同步更新 `app.dar
+t` 中的 import 和引用、`docs/modules/im.md` 中的文件索引。\n- **依据**: `docs/de
+sign-docs/flutter.md` 命名规范：“Widget 类名必须以描述功能结尾”；`docs/modules/i
+m.md` 也将该页面索引为 “Conversation List Page”。\n\n### 6. IM BDD 测试的 Step D
+efinitions 为空壳\n- **位置**: `tests/bdd/step-definitions/im_*.steps.js`\n- **
+问题**: 所有 IM 相关的 step definition 文件（如 `im_real_time_message_delivery.s
+teps.js`）仅执行 `autoBindSteps(feature, [commonSteps])`，没有定义任何 IM 专属步
+骤（如 `When Alice sends "..."`）。\n- **影响**: BDD 测试虽然存在 `.feature` 文
+件，但无法验证 IM 业务行为，失去了验收价值。\n- **修复**: 补充 IM step definitio
+ns，至少覆盖：\n  - Socket 连接模拟；\n  - 消息发送 REST/Socket 调用；\n  - 消息
+历史查询断言；\n  - 已读回执断言。\n- **依据**: `docs/design-docs/testing.md` 第
+59-66 行 “数据闭环原则” 和 BDD Mock 规范。\n\n### 7. `ImSocketClient` 缺少自动重
+连配置\n- **位置**: `apps/mobile/lib/core/network/im_socket_client.dart:30-34`\n
+- **问题**: `io.io()` 初始化时未配置 `reconnection: true`、重连间隔、最大重试次
+数等参数。\n- **影响**: 网络闪断后 Socket 不会自动恢复，用户必须杀掉 App 重进才
+能重新连接。\n- **修复**: 在 `io.io()` options 中增加 `reconnection: true`、`rec
+onnectionAttempts: 5`、`reconnectionDelay: 1000` 等配置。\n\n---\n\n## 轻微问题
+（Minor）\n\n### 1. `SwConversationListItem` 的 `identifier` 硬编码为同一值\n- *
+*位置**: `packages/design-system/lib/src/molecules/conversation_list_item.dart:2
+7`\n- **问题**: 列表中每一项都使用 `identifier: \'conversation_item\'`，Maestro 
+无法区分点击第几项。\n- **修复**: 允许外部传入 `identifier`，或在调用处用 `Seman
+tics` 包裹并传入带索引的 id。\n\n### 2. `ImBloc._onConversationUpdated` 为空实现
+\n- **位置**: `apps/mobile/lib/presentation/blocs/im/im_bloc.dart:219-225`\n- **
+问题**: 收到 `conversation:updated` 事件后没有任何动作（如刷新会话列表）。\n- **
+修复**: 发射一个状态（如 `ImConversationUpdatedState`），让 `MatchListPage`/`Con
+versationListPage` 监听后刷新列表。\n\n### 3. `docs/modules/im.md` 文件索引存在
+命名不一致\n- **位置**: `docs/modules/im.md:61`\n- **问题**: 表格中将 `match_lis
+t_page.dart` 标注为 “Conversation List Page”，但未说明文件实际名称为 `match_list
+_page.dart`。\n- **修复**: 重命名页面文件后同步更新此索引；若暂不重命名，至少追
+加备注说明。\n\n---\n\n## 验证结果\n\n| 维度 | 状态 | 说明 |\n|------|------|---
+---|\n| 功能完整性 | ❌ | 文本消息收发链路完整，但 **图片消息未实现**、**离线推
+送未实现**、**Socket 未在 Mobile 连接导致发送不可用**。 |\n| 代码规范性 | ❌ | 
+后端 `ImService` / `ImController` **直接返回 TypeORM Entity**，违反 NestJS 分层
+规范；`SendMessageDto` 与 Service 语义矛盾。 |\n| 全链路完整性 | ⚠️ | DB → API → 
+Mobile 文件齐备，但 **Mobile 端 Socket 连接断裂**，导致全链路在发送路径上未跑通
+。 |\n| 规范符合性 | ⚠️ | Design-System 组件基本合规（使用 `DesignTokens`、Widget
+book 已注册、Golden Test 已提交），但 `im.yaml` 契约与实际 API 不符。 |\n| 测试
+覆盖 | ⚠️ | 后端 Unit Test 覆盖较全（Service/Gateway/Controller），但 **BDD Step 
+Definitions 为空壳**；Mobile 端无 Widget/E2E 测试覆盖 Socket 连接和消息发送闭环
+。 |\n| 文档同步 | ⚠️ | `docs/modules/im.md`、`docs/api/socket-events.md`、`docs/
+api-contracts/im-events.yaml` 已更新，但 `im.yaml` 契约字段与实际 API 不一致。 |
+\n\n---\n\n## 风险与建议\n\n1. **核心功能不可用风险（高）**: 由于 `ImConnectRequ
+ested` 从未被调用，当前 PR 合并后 Mobile 端无法发送任何 Socket 消息。建议在修复
+后，至少通过以下方式验证：\n   - 在 emulator 上运行 `make test-mobile-e2e`（`sen
+d_message.yaml` 流）；\n   - 或本地启动 `make e2e-env-up`，用 Maestro 跑通 `im/s
+end_message.yaml`。\n\n2. **数据一致性风险（中）**: `MessageEntity` 的唯一索引与
+去重查询不一致，可能导致偶发的 500 错误。建议优先修改为复合唯一索引。\n\n3. **技
+术债务风险（中）**: `MatchListPage` 命名与职责不符，越早重命名成本越低。若拖延，
+后续在导航、路由、埋点、E2E 中会产生更多隐式依赖。\n\n4. **后续迭代建议**:\n   -
+补充 `apps/mobile/test` 层的 Widget Test，覆盖 `ChatPage` 在 `ImMessagesLoaded` 
+/ `ImError` / `ImMessageSent` 状态下的渲染；\n   - 在 `ImBloc` 中增加连接状态心
+跳或断线检测，并暴露给 UI（如在 `ChatPage` AppBar 显示“连接中/已断开”提示）；\n 
+ - 考虑将 `ImBloc` 提升为全局状态（放在 `app.dart` 的 `MultiBlocProvider` 中），
+而非每个 `ChatPage` 独立创建，以便会话列表和聊天页共享 Socket 连接。\n\n\n--- 第
+5 次 Review ---\n# PR #58 审查报告\n\n> **PR 主题**: feat: resolve #5 - [IM] V1 
+Instant Messaging - 实时聊天、已读回执与会话列表  \n> **审查分支**: `feat/issue-
+5`  \n> **审查范围**: DB → API → Mobile 全链路，含 Design-System、E2E、文档  \n>
+**审查日期**: 2026-04-25\n\n---\n\n## 审查结论\n\n审查结论: **NEEDS_MAJOR_FIX**\
+n\n本 PR 实现了 IM 模块的核心链路（消息收发、已读回执、会话列表、Design-System 
+组件、Maestro E2E、API 契约文档），整体架构方向正确，测试覆盖较完整。但存在 **1 
+个阻塞问题（实时消息完全不可用）** 和 **4 个严重问题**，必须在合并前修复。\n\n--
+-\n\n## 阻塞问题（Blocking）\n\n### 1. Flutter Socket 从未连接，实时消息功能完全
+不可用\n- **位置**: `apps/mobile/lib/app.dart:72-82`（ChatPage 路由创建 Bloc 但
+未连接 Socket）\n- **问题**: `ChatPage` 通过 `BlocProvider` 创建 `ImBloc` 后，只
+调用了 `setCurrentConversation()` 和 `add(ImLoadMessages(...))`，**从未发送 `ImC
+onnectRequested` 事件**。`ImBloc._onConnect` 因此永远不会执行，`ImSocketClient.c
+onnect()` 永远不会被调用。\n- **影响**: 用户进入聊天页后，Socket.io 连接未建立，
+无法实时发送/接收消息；已读回执、会话更新推送全部失效。整个 IM 实时链路处于瘫痪
+状态。\n- **修复**:  \n在 `ChatPage.initState()` 或 `app.dart` 的 ChatPage 路由
+中，在 Bloc 创建后立即发送连接事件：\n  ```dart\n  // apps/mobile/lib/presentati
+on/pages/chat_page.dart\n  @override\n  void initState() {\n    super.initState(
+);\n    final bloc = context.read<ImBloc>();\n    bloc.setCurrentConversation(wi
+dget.conversationId, widget.currentUserId);\n    // 新增：连接 Socket\n    final
+authState = context.read<AuthBloc>().state;\n    if (authState is AuthAuthentica
+ted) {\n      bloc.add(ImConnectRequested(authState.token));\n    }\n    bloc.ad
+d(ImLoadMessages(conversationId: widget.conversationId));\n  }\n  ```\n同时需要
+在 `ChatPage.dispose()`（或 Bloc 关闭前）发送 `ImDisconnectRequested`：\n  ```da
+rt\n  @override\n  void dispose() {\n    context.read<ImBloc>().add(const ImDisc
+onnectRequested());\n    _scrollController.dispose();\n    super.dispose();\n  }
+\n  ```\n- **依据**: `apps/mobile/lib/presentation/blocs/im/im_bloc.dart:35-69` 
+中 `_onConnect` 依赖 `ImConnectRequested` 事件触发；全局搜索确认该事件在代码库中
+没有任何 `add()` 调用点。\n\n---\n\n## 严重问题（Major）\n\n### 2. API 契约文档 
+`im.yaml` 与实际实现不符\n- **位置**: `docs/api-contracts/im.yaml:7-24`\n- **问
+题**: `/api/v1/conversations` 的响应契约定义 `data` 为 `ConversationDto` 数组：\
+n  ```yaml\n  data:\n    type: array\n    items:\n      $ref: \'#/components/sch
+emas/ConversationDto\'\n  ```\n但 `ImController.getConversations` 实际返回的是分
+页对象 `{ items, next_cursor, has_more }`（与 `common.yaml#/Pagination` 一致）。
+\n- **影响**: 前端/外部消费者按契约生成客户端时会得到错误类型；OpenAPI 契约失去
+真实性。\n- **修复**:  \n修改 `docs/api-contracts/im.yaml` 第 17-23 行：\n  ```y
+aml\n  data:\n    $ref: \'./common.yaml#/components/schemas/Pagination\'\n    # 
+或更精确地定义为包含 items: ConversationDto[] 的分页对象\n  ```\n- **依据**: `ap
+ps/api/src/modules/im/im.controller.ts:14-35` 实际返回 `Pagination` 结构；`docs/
+api-contracts/im.yaml` 定义为数组。\n\n### 3. Service 层直接返回 TypeORM Entity
+（违反架构规范）\n- **位置**: `apps/api/src/modules/im/im.service.ts:157-200`\n-
+**问题**: `getMessages()` 的返回类型中 `items` 为 `MessageEntity[]`，Controller 
+直接将 Entity 序列化后返回。NestJS 编码规范明确规定："Service 禁止直接返回 Entit
+y"。直接返回 Entity 会导致：\n  1. 内部字段（如可能的未来敏感字段）意外暴露；\n 
+2. API 响应结构与契约不一致（Entity 字段名/类型与 DTO 可能不同）；\n  3. 系统消
+息的 `sender_id` 为 `null`，但 `im.yaml` 的 `MessageDto` 将 `sender_id` 标记为 `
+required`。\n- **影响**: API 契约与实际响应存在结构性差异；违反项目分层原则。\n-
+**修复**:  \n在 `apps/api/src/modules/im/im.service.ts` 中新增 `MessageResponseD
+to`，`getMessages` 返回 `MessageResponseDto[]`：\n  ```typescript\n  export clas
+s MessageResponseDto {\n    id: string;\n    conversation_id: string;\n    sende
+r_id: string | null;\n    type: string;\n    content: string;\n    client_messag
+e_id: string | null;\n    sequence_id: number;\n    status: string;\n    created
+_at: string;\n  }\n  ```\n并在 Service 中显式映射后再返回。同步更新 `im.yaml` 中
+`sender_id` 为 `nullable: true`。\n- **依据**: `docs/design-docs/nestjs.md` 分层
+原则表："Service 禁止直接返回 Entity"；`docs/api-contracts/im.yaml:99-102` 将 `s
+ender_id` 标记为 required。\n\n### 4. 发送消息后会话列表排序不更新\n- **位置**: 
+`apps/api/src/modules/im/im.service.ts:52-126`\n- **问题**: `sendMessage()` 将消
+息写入 `messages` 表并增加 Redis 未读数，但**从未更新 `conversation_participants
+.updated_at`**。`getConversations()` 按 `cp.updated_at DESC` 排序，因此新消息不
+会导致会话在列表中置顶。\n- **影响**: 用户收到新消息后，会话列表中的顺序不会变化
+，最近活跃的对话不会排在最前面，严重违背用户预期。\n- **修复**:  \n在 `sendMessa
+ge()` 中保存消息后，更新会话参与者的 `updated_at`：\n  ```typescript\n  // apps/
+api/src/modules/im/im.service.ts ~line 97\n  if (otherId) {\n    await this.redi
+s.incr(`unread_count:${otherId}:${dto.conversation_id}`);\n    // 新增：更新双方
+participant 的 updated_at，使会话列表排序正确\n    await this.participantRepo.up
+date(\n      { conversation_id: dto.conversation_id },\n      { updated_at: new 
+Date() },\n    );\n  }\n  ```\n- **依据**: `apps/api/src/modules/im/im.service.t
+s:230` 使用 `cp.updated_at DESC` 排序；MySQL `ON UPDATE CURRENT_TIMESTAMP` 仅在 
+`conversation_participants` 行被 UPDATE 时触发。\n\n### 5. 离线推送未在 IM 模块
+中集成\n- **位置**: `apps/api/src/modules/im/im.gateway.ts:90-142`\n- **问题**: 
+`handleSendMessage()` 通过 Socket.io 向接收者推送 `message:receive`，但未检查接
+收者是否在线。若接收者离线，消息只会持久化到 DB，**没有任何离线推送触发**。PRD `
+v1-mvp.md` 明确要求："离线用户通过极光推送/Firebase 触发新消息提醒"。`PushServic
+e` 已存在（`apps/api/src/modules/push/push.service.ts`）且已注入 `MatchingModule
+`，但 `ImModule` 未注入它，也未调用。\n- **影响**: 离线用户收不到新消息提醒，必
+须主动打开 App 才能看到消息，严重影响 IM 核心体验。\n- **修复**:  \n  1. 在 `ImM
+odule` 的 `providers` 中注入 `PushService`；\n  2. 在 `ImGateway.handleSendMessa
+ge()` 中，若 `this.server.to(\\`user:${otherId}\\`).emit(...)` 后发现对方不在线
+（可通过 `server.in(\\`user:${otherId}\\`).fetchSockets()` 判断），则调用 `pushS
+ervice.sendPush()` 发送推送。\n- **依据**: `prd/v1-mvp.md` 技术要求章节："离线用
+户通过极光推送/Firebase 触发新消息提醒"；`apps/api/src/modules/push/push.service
+.ts` 已提供骨架实现。\n\n---\n\n## 轻微问题（Minor）\n\n### 6. `ImBloc._onConver
+sationUpdated` 为空实现\n- **位置**: `apps/mobile/lib/presentation/blocs/im/im_b
+loc.dart:219-225`\n- **问题**: 收到 `conversation:updated` 事件后无任何处理。虽
+然不会导致功能崩溃，但会话列表无法实时刷新。\n- **修复**: 可选在 `ConversationLi
+stCubit` 中监听该事件并触发刷新，或至少添加 TODO 注释说明待实现。\n\n### 7. `Cha
+tPage` 无历史消息分页加载入口\n- **位置**: `apps/mobile/lib/presentation/pages/c
+hat_page.dart`\n- **问题**: `ImMessagesLoaded` 携带 `hasMore` 和 `nextCursor`，
+但 UI 中没有"下拉加载更多"或"滚动到顶部自动加载"的实现。用户只能看到最近 20 条消
+息。\n- **修复**: 在 `ListView.builder` 中增加 `NotificationListener<ScrollNotif
+ication>` 或 `ScrollController` 监听，当滚动到顶部且 `hasMore` 为 true 时触发 `I
+mLoadMessages(cursor: nextCursor)`。\n\n### 8. `SendMessageDto.client_message_id
+` 为必填但服务端写死 fallback\n- **位置**: `apps/api/src/modules/im/dto/send-mes
+sage.dto.ts:14-15` 与 `apps/api/src/modules/im/im.service.ts:76`\n- **问题**: DT
+O 用 `@IsString()` 将 `client_message_id` 设为必填，但 Service 中写了 `dto.clien
+t_message_id ?? uuidv7()` 的防御逻辑。由于 DTO 校验会拦截空值，这段 fallback 永
+远不会执行，属于无效防御代码。\n- **修复**: 保持必填即可，删除 Service 中的无意
+义 fallback，或改为在 Gateway 层校验缺失时生成。\n\n### 9. `im-events.yaml` 未在
+`im.yaml` 中引用\n- **位置**: `docs/api-contracts/im.yaml`\n- **问题**: `im-even
+ts.yaml` 单独维护了 WebSocket 事件契约，但 `im.yaml` 未通过 `$ref` 引用它。两个
+文件处于孤岛状态。\n- **修复**: 在 `im.yaml` 底部增加注释或 `components/schemas`
+引用，说明 WebSocket 事件契约见 `im-events.yaml`。\n\n---\n\n## 验证结果\n\n| 维
+度 | 状态 | 说明 |\n|------|------|------|\n| **功能完整性** | ❌ | 核心实时消息
+因 Socket 未连接而完全不可用；会话列表排序不刷新；离线推送缺失。 |\n| **代码规范
+性** | ❌ | Service 返回 Entity 违反 NestJS 分层规范；DTO 与契约存在不一致。 |\n
+| **全链路完整性** | ⚠️ | DB ↔ API ↔ Mobile 数据流基本贯通，但 Socket 实时层断裂
+；Push 层未接入 IM。 |\n| **规范符合性** | ❌ | `im.yaml` 契约与实际响应不符；`s
+ender_id` required 与 system message 的 null 冲突。 |\n| **测试覆盖** | ✅ | API
+单元测试（Controller/Gateway/Service）覆盖核心路径；Design-System Golden Test 和
+Widgetbook 用例完整；Maestro E2E 流程存在。 |\n| **文档同步** | ⚠️ | `socket-even
+ts.md`、`im-events.yaml`、`im.md` 已更新，但 `im.yaml` REST 契约与实际代码不一致
+。 |\n\n---\n\n## 详细检查项\n\n### 后端（NestJS）\n\n| 检查项 | 结果 | 备注 |\n
+|--------|------|------|\n| Migration 文件 | ✅ | `20250425000000-AlterMessagesS
+enderIdNullable.ts` 已提供 up/down |\n| Entity 同步 | ✅ | `MessageEntity.sender
+_id` 已改为 `nullable: true` |\n| DTO 校验 | ✅ | `SendMessageDto`、`ReadReceipt
+Dto` 使用 `class-validator` |\n| JWT Socket 认证 | ✅ | `ImGateway.handleConnect
+ion` 校验 token 并加入 `user:{id}` room |\n| 事务后 emit | ✅ | `MatchingService
+` 在 transaction 返回后才 emit `match:created` |\n| 跨模块解耦 | ✅ | IM 通过 `E
+ventEmitter2` 监听 `match:created`，未直接 import MatchingGateway |\n| 原生 SQL 
+占位符 | ✅ | `getConversations` 使用 `?` 位置参数 |\n| Redis 未读数 | ✅ | `sen
+dMessage` incr、`markAsRead` set 0 |\n| 幂等发送 | ✅ | 捕获 `ER_DUP_ENTRY` 并返
+回已有消息 |\n\n### 移动端（Flutter）\n\n| 检查项 | 结果 | 备注 |\n|--------|---
+---|------|\n| Design-System 使用 | ✅ | `ChatPage`、`MatchListPage` 均使用 `SwC
+hatBubble`/`SwChatInputBar`/`SwConversationListItem` |\n| 硬编码颜色 | ✅ | 统一
+使用 `DesignTokens` |\n| Accessibility / Maestro | ✅ | 语义属性完整，`onTapDown
+` 正确，输入框 `addListener` + 全选 |\n| BLoC 状态管理 | ✅ | `ImBloc`、`Convers
+ationListCubit` 分离职责 |\n| 依赖注入 | ✅ | `ImRepository`、`ImBloc`、`Convers
+ationListCubit` 已注册到 `getIt` |\n| Socket 连接 | ❌ | **从未调用 `ImConnectRe
+quested`** |\n| 输入框规范 | ✅ | `SwChatInputBar` 使用 `controller.addListener`
+、`FocusNode` 全选、`Semantics(identifier)` |\n\n### Design-System\n\n| 检查项 |
+结果 | 备注 |\n|--------|------|------|\n| Widgetbook 注册 | ✅ | `SwChatBubble`
+、`SwChatInputBar`、`SwConversationListItem` 均有用例 |\n| Golden Test | ✅ | `i
+m_components_golden_test.dart` 生成 3 张基准图并已提交 |\n| 组件前缀 | ✅ | 均以
+`Sw` 开头 |\n| Token 使用 | ✅ | 无硬编码颜色，使用 `DesignTokens` 和 `Theme.of(
+context).colorScheme` |\n\n### E2E（Maestro）\n\n| 检查项 | 结果 | 备注 |\n|----
+----|------|------|\n| Flow 文件 | ✅ | `send_message.yaml`、`view_conversation_
+list.yaml` |\n| 定位策略 | ✅ | 优先使用 `id:` 定位 |\n| 依赖声明 | ⚠️ | `send_me
+ssage.yaml` 声明依赖 `includes/login-as-test-user.yaml`，该文件存在 |\n| 完整闭
+环 | ⚠️ | `send_message.yaml` 覆盖发送-断言可见，但未断言接收方收到（单机 E2E 限
+制） |\n\n---\n\n## 风险与建议\n\n1. **实时消息是 IM 的生死线**: 阻塞问题 #1 必
+须在合并前修复并验证。建议在修复后，使用两个模拟器同时登录两个测试账号，端到端验
+证发送→接收→已读回执的全链路。\n\n2. **会话列表排序是体验核心**: 问题 #4 会导致"
+最新消息不置顶"，用户极易感知。建议一并修复，否则上线后用户反馈会很差。\n\n3. **
+契约一致性需要回归**: 问题 #2 和 #3 涉及 API 契约与代码的一致性。建议引入 `make 
+check-docs` 或类似工具，在 CI 中校验 OpenAPI 契约与实际 Controller 返回结构的匹
+配度。\n\n4. **离线推送可作为 follow-up**: 问题 #5 影响体验但属于 MVP 预留能力（
+`PushService` 本身就是 skeleton）。如果工期紧张，可在合并后单独开 Issue 跟进，但
+建议在本 PR 中至少将 `PushService` 注入 `ImModule` 并加上 TODO。\n\n5. **加载历
+史消息**: 问题 #7 是体验缺口，但 20 条消息的 MVP 场景下风险可控，可作为后续迭代
+优化。\n\n---\n\n## 审查依据索引\n\n- `AGENTS.md` → `docs/design-docs/nestjs.md`
+（NestJS 分层规范、Gateway emit 规则）\n- `AGENTS.md` → `docs/design-docs/flutte
+r.md`（Accessibility/Maestro 规范、Design-System 规则）\n- `AGENTS.md` → `prd/v1
+-mvp.md`（IM 功能需求与离线推送要求）\n- `docs/modules/im.md`（模块边界与流程图
+）\n- `docs/api/socket-events.md`（Socket 事件契约）\n- `docs/api-contracts/im.y
+aml`（REST API 契约）\n- `docs/api-contracts/im-events.yaml`（WebSocket 事件契约
+）\n\n\n--- 第 6 次 Review ---\n## 审查结论\n\n审查结论: **NEEDS_MAJOR_FIX**\n\n
+> **重要说明**：本次审查过程中，**未能获取 PR #58 的任何代码 diff**。经过多维度
+验证（GitHub API、远程分支、本地工作目录），确认 PR 内容不可达。本报告在"无法执
+行逐行 diff 审查"的前提下，基于 Issue #5 的公开需求边界、项目当前代码基线及已读
+取的规范文档，进行**范围审查（Scope Review）**和**合规性预检**。一旦 PR 代码可获
+取，必须进行完整的逐文件 diff 审查。\n\n---\n\n## 阻塞问题（Blocking）\n\n### 1.
+PR 代码 diff 不可获取，核心审查无法进行\n- **位置**: 工作目录 `/var/folders/lt/w
+3sl6z8j5v50vt2s6knvf5n00000gn/T/review-pr-58-3420212270`\n- **问题**: 工作目录中
+仅包含空的 `.doc-coverage.txt`（无 PR 变更文件记录），无 `.git` 历史、无 patch/d
+iff 文件、无源代码。GitHub API 返回 404（`Could not resolve to a PullRequest wit
+h the number of 58`）。远程仓库 `origin` 不存在 `feat/issue-5` 分支（`fatal: cou
+ldn\'t find remote ref feat/issue-5`）。\n- **影响**: 无法执行代码规范性检查、功
+能完整性验证、测试覆盖评估等核心审查维度。\n- **修复**: \n  1. 确认 PR #58 是否
+存在于其他 fork 或私有仓库；\n  2. 若 PR 尚未推送，请将 `feat/issue-5` 分支推送
+至远程；\n  3. 若审查文件生成失败，请重新触发 PR checkout 流程，确保变更文件落入
+审查工作目录。\n- **依据**: `git branch -r` 输出、`gh pr view 58` 输出、工作目录
+`find` 结果。\n\n---\n\n## 严重问题（Major）\n\n### 2. 项目当前代码基线中 Issue 
+#5 的两项目标均未实现，若 PR 未覆盖则功能不完整\n- **位置**: `apps/phaser3/vite.
+config.ts:28-30`、`apps/phaser3/src/services/`、`apps/phaser3/src/api/`\n- **问
+题**: Issue #5 明确要求：\n  1. 修复 `vite.config.ts` 中 `copy-config-to-dist` 
+插件的 source 路径（`../../packages/configs` → `../../new-world-configs`）；\n  
+2. 创建 `src/services/fish-service.ts`、`src/services/fish-types.ts`、`src/api/f
+ish-api.ts` 等 Fish 模块前端代码。\n  \n经检查，当前 `main` 分支（`59bf152`）中
+：\n  - `vite.config.ts` 第 28 行仍为 `const source = resolve(__dirname, \'../..
+/packages/configs\');`，bug 未修复；\n  - `src/services/` 下仅存在 `auth-service
+.ts` 和 `city-service.ts`，无 `fish-service.ts` 或 `fish-types.ts`；\n  - `src/a
+pi/` 下仅存在 `auth-api.ts` 和 `building-api.ts`，无 `fish-api.ts`。\n- **影响**
+: 若 PR #58 声称解决 Issue #5，但上述文件缺失，则功能验收不通过。\n- **修复**: P
+R 必须包含：\n  - `apps/phaser3/vite.config.ts` 中路径修正；\n  - `apps/phaser3/
+src/api/fish-api.ts`（封装 `new-world-api/v1/fish.proto` 中全部 HTTP 接口）；\n 
+- `apps/phaser3/src/services/fish-service.ts`（管理弟子列表、鱼苗池、缓存更新）
+；\n  - `apps/phaser3/src/services/fish-types.ts`（`Fish`、`FishFry` 核心类型定
+义）；\n  - 接入 `new-world-configs/` 下 6 份 CSV 配置（`fish_level_configs.csv`
+、`talent_configs.csv`、`personality_configs.csv`、`fish_looks_configs.csv`、`pe
+culiarity_configs.csv`、`ling_gen_configs.csv`）。\n- **依据**: GitHub Issue #5 
+描述、`apps/phaser3/vite.config.ts` 当前代码、`apps/phaser3/src/services/` 目录
+清单。\n\n### 3. Fish 模块前端必须遵循前端分层 ESLint 约束\n- **位置**: `apps/ph
+aser3/.eslintrc.cjs:61-126`\n- **问题**: 项目通过 `import/no-restricted-paths` 
+在 CI 级别强制前端分层。新增 `fish-api.ts` 和 `fish-service.ts` 时极易违反以下规
+则：\n  - `api/` 层禁止依赖 `services/`、`scenes/`、`city-builder/`、`configs/`
+、`events/`；\n  - `services/` 层禁止依赖 `scenes/`、`plugins/`、`managers/`；\n
+ - `api/**/*.ts` 和 `services/**/*.ts` 额外开启 `@typescript-eslint/no-explicit-
+any: error` 和 `@typescript-eslint/explicit-function-return-type: warn`。\n- **
+影响**: 若 PR 中 fish-api 导入了 `events/` 或 fish-service 导入了 `scenes/`，CI 
+将直接失败。\n- **修复**: \n  - `fish-api.ts` 只允许导入 `../network/http` 和 `.
+./proto/...`；\n  - `fish-service.ts` 只允许导入 `../api/`、`../network/`、`../e
+vents/`、`../configs/`、`../city-builder/`；\n  - 所有导出函数必须显式声明返回类
+型，禁止隐式 `any`。\n- **依据**: `apps/phaser3/.eslintrc.cjs` 中 `zones` 配置与
+`overrides` 规则。\n\n---\n\n## 轻微问题（Minor）\n\n### 4. 若 PR 包含 Fish Serv
+ice，需对齐现有 Service 风格\n- **位置**: 预计 `apps/phaser3/src/services/fish-s
+ervice.ts`\n- **问题**: 现有 `auth-service.ts` 使用全静态方法 + 静态状态（`priva
+te static currentUser`），而 `city-service.ts` 使用实例方法 + 构造函数参数（`con
+structor(cityId: number = 1)`）。两种风格并存，但新模块应优先选择**实例化风格**
+，以便于多场景管理和单元测试 mock。\n- **影响**: 代码风格不一致，增加维护成本。\
+n- **修复**: 建议 `FishService` 采用实例化风格（参考 `CityService`），避免全局静
+态状态。若使用静态风格，需在模块文档中说明理由。\n- **依据**: `apps/phaser3/src/
+services/city-service.ts:48-55`（实例化模式）；`apps/phaser3/src/services/auth-s
+ervice.ts:24`（静态模式）。\n\n### 5. 模块文档 `docs/modules/client/fish.md` 应
+同步创建或更新\n- **位置**: `docs/modules/client/INDEX.md`\n- **问题**: `docs/mo
+dules/client/INDEX.md` 的"模块覆盖状态"表中，`fish` 状态为 `⚠️ 部分`，说明为"仅有
+protobuf 类型，无 API 封装和 gameplay Scene"。Issue #5 完成后，该文档应更新为 `
+✅ 完整` 并补充 `fish.md` 子文档。\n- **影响**: 文档与代码状态不同步，违反 `AGEN
+TS.md` 维护规则第 6 条（"新增/修改 proto、ent、配置、架构分层时，必须同步更新对
+应文档"）。\n- **修复**: PR 合并前补充 `docs/modules/client/fish.md`，并更新 `do
+cs/modules/client/INDEX.md` 中 fish 模块的状态和说明。\n- **依据**: `docs/module
+s/client/INDEX.md:11`、`AGENTS.md:96-103`（维护规则）。\n\n---\n\n## 验证结果\n\
+n| 维度 | 状态 | 说明 |\n|------|------|------|\n| 功能完整性 | ❌ | **未验证**
+。Issue #5 要求修复 vite 配置 + Fish 模块前端落地，但无法获取 PR 代码确认是否全
+部实现。项目当前代码基线中两项目标均未实现。 |\n| 代码规范性 | ⚠️ | **部分预检**
+。已确认 ESLint 分层约束和 `no-explicit-any` / `explicit-function-return-type` 
+规则将适用于新增 Fish 模块代码，但无法检查实际代码是否合规。 |\n| 全链路完整性 |
+⚠️ | **未验证**。Fish 模块不涉及 DB/API/Mobile 全链路（属于前端模块），但需确认前
+端分层（API → Service → Scene）是否贯通。 |\n| 规范符合性 | ⚠️ | **部分预检**。已
+读取 `agent-design-guide.md`、`testing.md`、`onboarding.md`。若 PR 包含 UI 组件
+，需额外对照 `PRD-004` 的命名规范、资源回退标准和动画标准。 |\n| 测试覆盖 | ❌ |
+**未验证**。Issue #5 未明确要求 Fish 模块测试，但 `onboarding.md` 规定新增模块需
+通过 `pnpm --filter phaser3 test`。无法检查 PR 是否包含测试。 |\n| 文档同步 | ⚠️ 
+| **部分预检**。`docs/modules/client/INDEX.md` 尚未更新；若 PR 未包含文档更新，
+视为违规。 |\n\n---\n\n## 风险与建议\n\n### 高优先级（PR 代码可获取后立即验证）\
+n1. **vite 配置修复的副作用**: `../../new-world-configs` 目录在 monorepo 根目录
+已存在（`new-world-configs/`），路径修正后需验证 `pnpm build:web` 是否成功将配置
+复制到 `dist/config/`。建议 PR 中包含构建验证步骤或截图。\n2. **Fish API 封装完
+整性**: `fish.proto` 已生成至 `src/proto/new-world-api/v1/fish.ts`（4737 行，接
+口众多），`fish-api.ts` 必须覆盖全部核心接口（如弟子列表、鱼苗池、移动、战斗、成
+长、死亡等）。建议对照 proto 中的全部 `Request` / `Result` 类型逐项检查，避免遗
+漏。\n3. **Long 类型处理一致性**: 现有 `building-api.ts` 中大量使用 `Long.fromIn
+t()` 和 `Long.fromString()` 进行 proto 字段转换。`fish-api.ts` 必须保持一致，避
+免直接传入 `number` 或 `string` 导致 protobuf 编码错误。\n\n### 中优先级（合并前
+建议完成）\n4. **配置加载器注册**: `fish-configs-helper.ts` 已存在（261 行），通
+过 `GlobalConfigsLoader.instance.getOne/getConfig` 读取 CSV。新增的 `fish-servic
+e.ts` 如需读取配置，应复用 `fishConfigsHelper` 单例，而非直接操作 `GlobalConfigs
+Loader`，以保持与现有模式一致。\n5. **事件系统兼容性**: `fish-events.ts` 已定义 
+10 个 Fish 相关事件（如 `FishBeginBattleEvent`、`FishCoreChangeEvent`）。`fish-s
+ervice.ts` 若需触发或监听这些事件，应确保事件类型与 `src/events/events/` 中定义
+的一致，避免重复定义或类型漂移。\n6. **Personality Configs 接入**: Issue #5 要求
+接入 `personality_configs.csv`，但在 `fish-configs-helper.ts` 当前实现中未找到 `
+personality` 相关查询方法。若 PR 中包含 personality 配置读取逻辑，需确认 helper 
+已补充对应方法。\n\n### 低优先级（后续迭代）\n7. **测试策略**: 虽然 Issue #5 未
+强制要求单元测试，但 `docs/design-docs/testing.md` 要求关键组件（状态机、数值计
+算、边界验证）达到 100% 覆盖率。`fish-service.ts` 中的缓存更新逻辑、状态筛选逻辑
+属于"状态机逻辑"范畴，建议在后续迭代中补充测试。\n8. **前端 E2E 验收**: 若 Fish 
+模块包含 UI Scene，需遵循 `docs/frontend/e2e-testing.md` 和 `docs/design-docs/vi
+sual-qa-sop.md`，产出 Playwright 截图并通过视觉验收。\n\n---\n\n## 审查依据文档
+清单\n\n| 文档 | 路径 | 用途 |\n|------|------|------|\n| AGENTS.md | `/Users/in
+sulate/Desktop/new-world-monorepo/AGENTS.md` | 项目导航、维护规则 |\n| PRD-004 |
+`/Users/insulate/Desktop/new-world-monorepo/prd/PRD-004-ui-component-library-red
+esign.md` | UI 命名规范、动画标准、深度规范（若 PR 涉及 UI 组件） |\n| PRD-003 |
+`/Users/insulate/Desktop/new-world-monorepo/prd/PRD-003-leaderboard-system.md` |
+关联参考（本次 PR 不直接涉及） |\n| 前端 UI 开发规范 | `/Users/insulate/Desktop/
+new-world-monorepo/docs/frontend/agent-design-guide.md` | 前端代码规范、素材检索
+、截图验收 |\n| 测试规范 | `/Users/insulate/Desktop/new-world-monorepo/docs/desi
+gn-docs/testing.md` | 测试策略、覆盖率要求 |\n| 新模块开发指南 | `/Users/insulat
+e/Desktop/new-world-monorepo/docs/design-docs/onboarding.md` | 前端模块创建流程
+、分层规范、ESLint 约束 |\n| 客户端模块索引 | `/Users/insulate/Desktop/new-world
+-monorepo/docs/modules/client/INDEX.md` | 模块覆盖状态、验收清单 |\n| 城建模块文
+档 | `/Users/insulate/Desktop/new-world-monorepo/docs/modules/client/city-buildi
+ng.md` | 参考现有模块的文档格式和接口清单 |\n| ESLint 配置 | `/Users/insulate/De
+sktop/new-world-monorepo/apps/phaser3/.eslintrc.cjs` | 分层依赖约束、类型严格规
+则 |\n| vite 配置 | `/Users/insulate/Desktop/new-world-monorepo/apps/phaser3/vit
+e.config.ts` | Issue #5 要求修复的目标文件 |\n| fish proto | `/Users/insulate/De
+sktop/new-world-monorepo/apps/phaser3/src/proto/new-world-api/v1/fish.ts` | API 
+封装需对齐的 proto 类型 |\n| fish config helper | `/Users/insulate/Desktop/new-w
+orld-monorepo/apps/phaser3/src/configs/helpers/fish-configs-helper.ts` | 现有配
+置读取基础设施 |\n| fish events | `/Users/insulate/Desktop/new-world-monorepo/ap
+ps/phaser3/src/events/events/fish-events.ts` | 现有事件定义 |\n| auth/building A
+PI | `/Users/insulate/Desktop/new-world-monorepo/apps/phaser3/src/api/auth-api.t
+s`、`building-api.ts` | API 封装风格参考 |\n| auth/building Service | `/Users/in
+sulate/Desktop/new-world-monorepo/apps/phaser3/src/services/auth-service.ts`、`c
+ity-service.ts` | Service 层风格参考 |\n\n---\n\n*本报告由 Code Review Agent 基
+于可用信息生成。由于 PR #58 的代码 diff 不可获取，报告中标记为"未验证"的维度需在
+代码可达后进行补充审查。*\n\n\n--- 第 7 次 Review ---\n# PR #58 代码审查报告\n\n
+> **分支**: `feat/issue-5`  \n> **范围**: IM（即时通讯）全栈功能 — DB + API + Mo
+bile + Design-System  \n> **审查日期**: 2026-04-25  \n> **审查依据**: `git diff 
+58d04f3..HEAD`, `AGENTS.md`, `docs/design-docs/flutter.md`, `docs/design-docs/ne
+stjs.md`, `prd/v1-mvp.md`, `prd/v1-matching.md`\n\n---\n\n## 审查结论\n\n**审查
+结论: NEEDS_MAJOR_FIX**\n\n本 PR 实现了 V1 MVP 中 US-4（即时通讯）的核心功能：消
+息收发、已读回执、会话列表、Socket.io 实时推送、Design-System 组件及 E2E 测试。
+整体架构符合项目规范，全链路（DB → API → Mobile）已打通，契约文档同步更新。\n\n
+但存在 **1 个 Blocking 问题**（分页 UX 完全不可用）和 **4 个 Major 问题**（WebSo
+cket DTO 未校验、Controller 参数未走 DTO、会话列表实时刷新未实现、离线消息丢失）
+，需要在合并前或合并后立即修复。\n\n---\n\n## 阻塞问题（Blocking）\n\n### 1. Cha
+tPage 加载历史消息时自动跳回底部，导致分页功能完全不可用\n- **位置**: `apps/mobi
+le/lib/presentation/pages/chat_page.dart:133-136`\n- **问题**: `BlocConsumer` 的
+`listener` 在 `ImMessagesLoaded` 状态时调用 `_scrollToBottom()`。当用户上滑到顶
+部加载更早消息时，`ImLoadMessages` 触发分页请求，返回后 emit `ImMessagesLoaded`
+，listener 立即将列表滚动到最底部。用户无法阅读刚加载的历史消息。\n- **影响**: 
+聊天页面的「加载更多」功能完全不可用，核心 IM 体验断裂。\n- **修复**: 修改 liste
+ner，仅在**初始加载**或**新消息到达**时滚动到底部，分页加载时不滚动：\n  ```dart
+\n  // chat_page.dart ~133\n  listener: (context, state) {\n    if (state is ImM
+essageSent) {\n      _scrollToBottom();\n    }\n    if (state is ImMessagesLoade
+d && state.nextCursor == null) {\n      // 仅初始加载（无更多历史消息时）滚动到
+底部\n      _scrollToBottom();\n    }\n  },\n  ```\n更优方案：在 `initState` 中
+监听首次加载完成，或引入 `isInitialLoad` flag。\n- **依据**: `git diff` 中 `chat
+_page.dart` 的 `BlocConsumer` 实现；功能完整性验证。\n\n---\n\n## 严重问题（Majo
+r）\n\n### 2. ImGateway WebSocket DTO 未启用 ValidationPipe，class-validator 装
+饰器完全失效\n- **位置**: `apps/api/src/modules/im/im.gateway.ts:36-37`（类级别
+）及 `92-95`、`155-158`（方法级别）\n- **问题**: `@MessageBody() dto: SendMessag
+eDto` 虽然使用了 DTO 类型，但 Gateway 类和方法上均未添加 `@UsePipes(new Validati
+onPipe())`。NestJS WebSocket 默认不继承全局 `ValidationPipe`，因此 `SendMessageD
+to` 上的 `@IsIn(["text", "image"])`、`@MaxLength(500)` 等装饰器不会被评估。非法
+类型、超长内容、空字段可直接透传到 Service 层。\n- **影响**: 数据完整性风险；非
+法消息可被持久化；违反 `nestjs.md` 中「所有入参使用 class-validator + class-tran
+sformer」的强制规范。\n- **修复**: 在 Gateway 类添加管道：\n  ```typescript\n  i
+mport { UsePipes, ValidationPipe } from "@nestjs/common";\n\n  @WebSocketGateway
+({ namespace: "im" })\n  @UsePipes(new ValidationPipe({ whitelist: true, transfo
+rm: true }))\n  export class ImGateway implements ... {\n  ```\n- **依据**: `doc
+s/design-docs/nestjs.md` 第 81-86 行「DTO 与校验」；`apps/api/src/modules/im/dto
+/send-message.dto.ts` 中的校验装饰器；NestJS 官方文档。\n\n### 3. ImController 
+手动解析 Query 参数，未使用 DTO 校验\n- **位置**: `apps/api/src/modules/im/im.co
+ntroller.ts:14-67`\n- **问题**: `limit` 参数通过 `parseInt(limit, 10)` 手动解析
+和 clamp，而非使用带 `class-validator` 的 Query DTO。`nestjs.md` 明确要求「所有
+入参使用 class-validator + class-transformer」。\n- **影响**: 代码风格与项目架构
+规范不一致；参数校验逻辑散落在 Controller 中，难以复用和测试。\n- **修复**: 新增
+`GetConversationsQueryDto` 和 `GetMessagesQueryDto`：\n  ```typescript\n  // dto
+/get-conversations-query.dto.ts\n  export class GetConversationsQueryDto {\n    
+@IsOptional()\n    @IsInt()\n    @Min(1)\n    @Max(50)\n    @Type(() => Number)\
+n    limit = 20;\n\n    @IsOptional()\n    @IsString()\n    cursor?: string;\n  
+}\n  ```\n并在 Controller 方法参数中使用 `@Query() query: GetConversationsQueryD
+to`。\n- **依据**: `docs/design-docs/nestjs.md` 第 81-86 行「DTO 与校验」。\n\n#
+## 4. 会话列表实时刷新未实现（conversation:updated 事件为空处理）\n- **位置**: `
+apps/mobile/lib/presentation/blocs/im/im_bloc.dart:219-226`\n- **问题**: `_onCon
+versationUpdated` 方法仅包含 TODO 注释，没有任何实际逻辑。当 Socket 收到 `conver
+sation:updated` 事件（如新消息到达）时，`ConversationListCubit` 管理的会话列表不
+会自动更新，用户必须手动下拉刷新才能看到最新消息或未读数变化。\n- **影响**: IM 
+核心体验的实时性缺失；用户可能错过新消息提示。\n- **修复**: 在 `_onConversationU
+pdated` 中触发 `ConversationListCubit` 刷新，或至少刷新当前会话的未读数：\n  ```
+dart\n  void _onConversationUpdated(\n    ImConversationUpdated event,\n    Emit
+ter<ImState> emit,\n  ) {\n    // 触发会话列表刷新（可通过 EventBus 或全局状态管
+理）\n    // 临时方案：emit 一个专用状态供上层监听后调用 cubit.refresh()\n    em
+it(ImConversationListRefreshRequested(event.conversationId));\n  }\n  ```\n并在 
+`MatchListPage` 中通过 `BlocListener<ImBloc, ImState>` 监听该状态并调用 `fetchCo
+nversations()`。\n- **依据**: `prd/v1-mvp.md` US-4「Real-time message delivery」
+；`docs/modules/im.md` 中「会话管理」职责描述。\n\n### 5. 消息在 Socket 断连时静
+默丢失，且无重试机制\n- **位置**: `apps/mobile/lib/presentation/blocs/im/im_bloc
+.dart:99-104`\n- **问题**: `_onSendMessage` 中调用 `_socketClient?.sendMessage(.
+..)`。如果 Socket 未连接（`_socketClient` 为 null 或 `connected == false`），`se
+ndMessage` 不会执行任何操作，但 UI 中的临时消息已进入 `_messages` 列表且状态为 `
+"sending"`，永远不会变为 `"sent"` 或 `"failed"`。\n- **影响**: 弱网或断线场景下
+，用户发送的消息永远卡在「发送中」状态，无失败提示，也无法重试。\n- **修复**: 在
+发送前检查连接状态，未连接时将消息标记为 `"failed"` 或加入本地待发队列：\n  ```d
+art\n  if (_socketClient?.isConnected ?? false) {\n    _socketClient!.sendMessag
+e(...);\n  } else {\n    // 标记失败或入队重试\n    _messages[index] = tempMessa
+ge.copyWith(status: \'failed\');\n    emit(ImMessageSent(List.unmodifiable(_mess
+ages)));\n  }\n  ```\n- **依据**: 功能完整性 / 边界情况处理；`docs/modules/im.md
+`「边界情况」第 1 条提到重复发送处理，但未覆盖断线场景。\n\n---\n\n## 轻微问题（
+Minor）\n\n### 6. MessageResponseDto 定义在 Service 文件内，未放入 dto/ 目录\n- 
+**位置**: `apps/api/src/modules/im/im.service.ts:15-25`\n- **问题**: `MessageRes
+ponseDto` 直接内联在 Service 中，而项目 `nestjs.md` 规范要求 DTO 统一放在 `dto/`
+目录。\n- **修复**: 将 `MessageResponseDto` 移至 `apps/api/src/modules/im/dto/me
+ssage-response.dto.ts` 并导出。\n- **依据**: `docs/design-docs/nestjs.md` 第 81-
+86 行。\n\n### 7. SwChatBubble 可能使用了 Legacy Token 别名\n- **位置**: `packag
+es/design-system/lib/src/molecules/chat_bubble.dart:54`、`169`、`182`\n- **问题*
+*: 使用了 `DesignTokens.secondaryColor`。根据 `flutter.md` Token 使用指南，legac
+y 别名（如 `surfaceColor`）禁止在新代码中使用。虽然文档未完整列出所有别名，但同
+项目的 `chat_input_bar.dart` 和 `conversation_list_item.dart` 对相似语义均使用 `
+colorScheme.outline`，而 `chat_bubble.dart` 却使用 `DesignTokens.secondaryColor`
+，存在不一致。\n- **修复**: 确认 `tokens.dart` 中 `secondaryColor` 是否为 legacy
+别名；若是，替换为 `Theme.of(context).colorScheme.outline` 或提案新增语义 Token
+。\n- **依据**: `docs/design-docs/flutter.md` 第 163-177 行 Token 使用指南。\n\n
+### 8. ImGateway afterInit 通过类型强转修改内部 CORS 配置\n- **位置**: `apps/api
+/src/modules/im/im.gateway.ts:49-58`\n- **问题**: `afterInit` 将 `server` 强转为
+`unknown` 再修改 `engine.opts.cors`，属于非公开 API 的 hacky 操作，可能在 Socket
+.io 版本升级后失效。\n- **修复**: 优先通过 NestJS 的 `WebSocketGateway` 构造函数
+选项或全局 CORS 配置处理跨域，而非运行时修改内部引擎对象。\n- **依据**: 代码可维
+护性最佳实践。\n\n---\n\n## 验证结果\n\n| 维度 | 状态 | 说明 |\n|------|------|-
+-----|\n| 功能完整性 | ⚠️ | 核心收发消息、已读回执、会话列表已实现。但历史消息分
+页 UX 因自动滚动完全不可用（Blocking），会话列表无实时刷新（Major），断线消息丢
+失（Major）。 |\n| 代码规范性 | ⚠️ | Flutter 侧整体规范：使用 DesignTokens、Seman
+tics + GestureDetector(onTapDown)、Widgetbook 注册、Golden Test 均符合 `flutter.
+md`。NestJS 侧：Gateway/Controller 的 DTO 校验缺失（Major），MessageResponseDto 
+位置不规范（Minor）。 |\n| 全链路完整性 | ✅ | DB（Migration + Entity）→ API（Co
+ntroller + Gateway + Service）→ Mobile（Repository + BLoC + Page）→ DesignSystem
+（atoms/molecules）全部连通。 |\n| 规范符合性 | ⚠️ | Socket 事件契约（`im-events.
+yaml`、`docs/api/socket-events.md`、`packages/shared-types/src/im-socket-events.
+ts`）三者一致。但 Gateway 未按 `nestjs.md` 要求使用 ValidationPipe。Maestro E2E 
+流程已覆盖发送消息和查看会话列表。 |\n| 测试覆盖 | ✅ | API 层：Controller/Gatew
+ay/Service 均有单元测试。Design-System：有 Golden Test（`im_components_golden_te
+st.dart`）并提交截图。E2E：新增 `send_message.yaml`、`view_conversation_list.yam
+l`。 |\n| 文档同步 | ✅ | `docs/modules/im.md`、`docs/api/socket-events.md`、`do
+cs/api-contracts/im.yaml`、`docs/api-contracts/im-events.yaml` 均已更新并与代码
+一致。 |\n\n---\n\n## 风险与建议\n\n1. **Redis 连接数增长**: `ImModule` 和 `Matc
+hingModule` 各自独立提供 `"REDIS_CLIENT"`，会创建两个 Redis 连接。建议在 `AppMod
+ule` 或 `CommonModule` 中统一提供全局单例，减少连接开销。\n2. **Message paginati
+on cursor 的鲁棒性**: `getMessages` 使用 `sequence_id < cursor` 做分页，依赖数据
+库自增 `sequence_id` 的单调性。如果未来出现消息删除或 soft-delete，需确认不会影
+响分页逻辑。\n3. **PushService 仅为骨架**: 当前 `PushService.sendPush` 仅打印日
+志，MVP 阶段可接受，但需在 `docs/exec-plans/tech-debt-tracker.md` 中记录该债务，
+避免遗漏生产环境集成。\n4. **离线补推未实现**: `docs/modules/im.md「边界情况」` 
+第 4 条提到「离线补推：用户重连后，拉取 `last_ack_sequence_id` 之后的所有消息」
+，但代码中未见该逻辑。建议在下个迭代补充，或在技术债务中明确记录。\n\n\n--- 第 8
+次 Review ---\n# PR #58 审查报告\n\n> 分支：`feat/issue-5`  \n> 审查范围：IM（即
+时通讯）模块全栈实现（DB + API + Mobile + Design System + E2E）  \n> 审查依据：`
+AGENTS.md`、`docs/design-docs/` 规范文档、`prd/v1-im.md` / `prd/v1-mvp.md` / `pr
+d/v1-matching.md`、PR `git diff`\n\n---\n\n## 审查结论\n\n**审查结论: NEEDS_MAJO
+R_FIX**\n\nPR 实现了 IM 模块的核心功能（消息收发、已读回执、会话列表、Socket.io 
+实时推送），整体架构清晰、单元测试覆盖较完整。但存在 **2 个 Blocking 问题**（运
+行时崩溃 + SQL 查询错误）和 **3 个 Major 问题**（契约不一致、E2E 路径错误、类型
+不匹配），必须在合并前修复。\n\n---\n\n## 阻塞问题（Blocking）\n\n### 1. MatchLi
+stPage 中 BlocListener<ImBloc> 缺少 Provider，导致运行时崩溃\n- **位置**: `apps/
+mobile/lib/presentation/pages/match_list_page.dart:59`\n- **问题**: `MatchListPa
+ge` 使用了 `BlocListener<ImBloc, ImState>` 来监听 `ImConversationListRefreshRequ
+ested` 事件并刷新会话列表，但 `MainPage`（`apps/mobile/lib/app.dart:139`）的 `Mu
+ltiBlocProvider` 中只注册了 `MatchingBloc` 和 `MatchListCubit`，**没有注册 `ImBl
+oc`**。`flutter_bloc` 的 `BlocListener` 会通过 `BlocProvider.of<T>(context)` 向
+上查找 Bloc，找不到时会抛出 `BlocProviderNotFoundException`，导致用户进入「消息
+」Tab 时直接崩溃。\n- **影响**: 所有用户都无法进入会话列表页面，App 必现崩溃。\n
+- **修复**:\n在 `app.dart` 的 `MainPage.build` 中 `MultiBlocProvider` 添加 `ImBl
+oc` 注册：\n  ```dart\n  MultiBlocProvider(\n    providers: [\n      BlocProvide
+r(create: (_) => getIt<MatchingBloc>()),\n      BlocProvider(create: (_) => getI
+t<MatchListCubit>()),\n      BlocProvider(create: (_) => getIt<ImBloc>()), // 新
+增\n    ],\n    ...\n  )\n  ```\n- **依据**: `flutter_bloc` 官方行为 + 代码 diff
+中 `MatchListPage` 对 `ImBloc` 的依赖证据。\n\n### 2. 原生 SQL 数组参数绑定错误
+，导致会话列表查询失败\n- **位置**: `apps/api/src/modules/im/im.service.ts:300-3
+11`\n- **问题**: `getConversations` 方法使用原生 SQL 查询最新消息：\n  ```typesc
+ript\n  WHERE conversation_id IN (?)\n  ```\n参数传入的是 `[conversationIds]`（`
+string[]` 数组）。本项目使用 **mysql2 驱动**，其原生 `query()` 方法**不会自动将
+单个 `?` 展开为 `IN (?, ?, ?)`**。mysql2 会将整个数组序列化为一个字符串值（如 `"
+id1,id2,id3"`），导致 SQL 语义错误，查询结果为空或直接报错。\n- **影响**: 当用户
+有 2 个及以上会话时，`getConversations` API 返回的 `last_message` 全部为空，会话
+列表无法显示最后一条消息摘要；在部分 SQL 模式下会直接抛出语法错误。\n- **修复**:
+\n手动生成与数组长度匹配的占位符：\n  ```typescript\n  const placeholders = conv
+ersationIds.map(() => \'?\').join(\',\');\n  const msgResults = await this.dataS
+ource.query(\n    `\n    SELECT m.* FROM messages m\n    INNER JOIN (\n      SEL
+ECT conversation_id, MAX(sequence_id) as max_seq\n      FROM messages\n      WHE
+RE conversation_id IN (${placeholders})\n      GROUP BY conversation_id\n    ) l
+atest ON m.conversation_id = latest.conversation_id AND m.sequence_id = latest.m
+ax_seq\n  `,\n    conversationIds,\n  );\n  ```\n- **依据**: `docs/design-docs/d
+b.md` 第 91-152 行「原生 SQL 查询规范」中明确说明使用 `?` 位置参数，但未提及数组
+自动展开；结合 mysql2 驱动实际行为。\n\n---\n\n## 严重问题（Major）\n\n### 3. Op
+enAPI 契约中 MessageDto.type 枚举不完整\n- **位置**: `docs/api-contracts/im.yaml
+:103-104`\n- **问题**: `MessageDto` 的 `type` 字段枚举仅定义为 `[text, image]`，
+但后端 `ImService.createSystemMessage()` 会生成 `type = \'system\'` 的消息，且 `
+GET /messages` 接口会将这些 system 消息返回给客户端。`im-events.yaml` 中 `messag
+e:receive` 事件的 type 枚举已经正确包含 `[text, image, system]`，但 REST 契约 `i
+m.yaml` 与之不一致。\n- **影响**: 契约与实际响应不一致，违反「契约优先」原则；`o
+penapi-generator` 生成的 Dart/TS 模型会对 `system` 值反序列化失败或丢弃。\n- **
+修复**:\n在 `docs/api-contracts/im.yaml` 的 `MessageDto.type` 中增加 `system`：\
+n  ```yaml\n  type:\n    type: string\n    enum: [text, image, system]\n  ```\n
+同步运行 `make generate-types` 更新生成代码。\n- **依据**: `docs/design-docs/api
+.md` 第 82-83 行「契约优先：接口变更必须先在 YAML 中定义，再生成代码」；`prd/v1-
+im.md` 第 52-54 行技术要求中明确 `type` 包含 `text`/`image`/`system`。\n\n### 4.
+Maestro E2E runFlow 相对路径错误\n- **位置**: `.maestro/flows/im/send_message.ya
+ml:18`、`.maestro/flows/im/view_conversation_list.yaml:15`\n- **问题**: 两个 IM 
+E2E flow 都包含：\n  ```yaml\n  - runFlow: includes/login-as-test-user.yaml\n  `
+``\nMaestro 的 `runFlow` 路径**相对于当前 flow 文件所在目录**解析。从 `.maestro/
+flows/im/send_message.yaml` 出发，该路径指向 `.maestro/flows/im/includes/login-a
+s-test-user.yaml`，但实际文件位于 `.maestro/includes/login-as-test-user.yaml`（
+少了一层 `flows/im/`）。\n- **影响**: Maestro E2E 测试无法找到被引用的子 flow，
+测试直接失败。\n- **修复**:\n将路径修正为：\n  ```yaml\n  - runFlow: ../../inclu
+des/login-as-test-user.yaml\n  ```\n- **依据**: Maestro 官方文档中 `runFlow` 的
+路径解析规则 + `.maestro/` 目录结构证据。\n\n### 5. shared-types 中 MessageRecei
+vedEvent.sender_id 类型不匹配\n- **位置**: `packages/shared-types/src/im-socket-
+events.ts:13`\n- **问题**: `MessageReceivedEvent` 接口定义 `sender_id: string`，
+但数据库 `messages.sender_id` 已改为 `nullable`（`string | null`），且 `im.gatew
+ay.ts` 在发送 system 消息时实际传递 `message.sender_id`（值为 `null`）。TypeScri
+pt 类型与实际运行时值不匹配。\n- **影响**: 类型系统失去保护作用，前端消费时若按 
+`string` 处理可能引发空指针异常。\n- **修复**:\n  ```typescript\n  export interf
+ace MessageReceivedEvent {\n    id: string;\n    conversation_id: string;\n    s
+ender_id: string | null; // 修正\n    ...\n  }\n  ```\n- **依据**: `apps/api/src
+/database/entities/message.entity.ts:23-24` 中 `sender_id` 已声明为 `string | nu
+ll` + `im.gateway.ts:113` 实际传递 `message.sender_id`（system 消息时为 null）。
+\n\n---\n\n## 轻微问题（Minor）\n\n### 6. IM BLoC 中消息列表无上限，存在内存泄漏
+风险\n- **位置**: `apps/mobile/lib/presentation/blocs/im/im_bloc.dart:15`\n- **
+问题**: `_messages` 是 `ImBloc` 的类级列表，每次加载历史消息时 `insertAll(0, res
+ult.items)` 会无限增长。长时间聊天或频繁加载历史消息后，内存占用会持续上升。\n- 
+**影响**: 长会话场景下内存占用增加，极端情况下可能导致 OOM。\n- **修复建议**: 限
+制内存缓存消息数量（如最多保留 500 条），或引入本地数据库（sqflite）缓存，超出部
+分从本地读取。\n- **依据**: `prd/v1-im.md` 第 196 行提到「客户端本地缓存：Mobile
+使用本地数据库缓存最近 N 条消息」。\n\n### 7. Socket 客户端缺少显式重连策略配置\
+n- **位置**: `apps/mobile/lib/core/network/im_socket_client.dart:30-34`\n- **问
+题**: `socket_io_client` 虽然默认有自动重连，但 PRD `v1-im.md` 明确要求「Mobile 
+侧配置 5 次重连，退避策略」。当前代码未显式配置 `reconnectionAttempts` 和 `recon
+nectionDelay`。\n- **影响**: 弱网环境下重连行为不可控，可能导致频繁重连或重连次
+数不足。\n- **修复建议**:\n  ```dart\n  _socket = io.io(namespaceUrl, <String, d
+ynamic>{\n    \'transports\': [\'websocket\'],\n    \'autoConnect\': true,\n    
+\'auth\': <String, dynamic>{\'token\': token},\n    \'reconnectionAttempts\': 5,
+\n    \'reconnectionDelay\': 1000,\n    \'reconnectionDelayMax\': 5000,\n  });\n
+ ```\n- **依据**: `prd/v1-im.md` 第 246 行「Socket.io 连接支持自动重连（Mobile 
+侧配置 5 次重连，退避策略）」。\n\n### 8. Migration down 方法在存在 NULL 数据时
+会失败\n- **位置**: `apps/api/src/database/migrations/20250425000000-AlterMessag
+esSenderIdNullable.ts:17-27`\n- **问题**: `down()` 方法先将 `sender_id` 改回 `NO
+T NULL`，再重建外键。如果回滚时 `messages` 表中已存在 `sender_id = NULL` 的 syst
+em 消息，`MODIFY sender_id CHAR(36) NOT NULL` 会因数据冲突而失败。\n- **影响**: 
+Migration 无法回滚，违反「Migration 必须可回滚」原则。\n- **修复建议**: 在 `down
+()` 中先清理或更新 `sender_id IS NULL` 的记录（如设置默认值或删除 system 消息）
+，再执行 `MODIFY`。\n- **依据**: `docs/design-docs/db.md` 第 89-90 行「Migration
+必须可回滚：每个 Migration 的 `down()` 方法必须正确实现」。\n\n---\n\n## 验证结
+果\n\n| 维度 | 状态 | 说明 |\n|------|------|------|\n| 功能完整性 | ❌ | 核心功
+能已实现，但 **MatchListPage 因缺少 ImBloc Provider 运行时崩溃**，且 **会话列表 
+SQL 查询有 bug** |\n| 代码规范性 | ❌ | 整体符合 NestJS/Flutter 分层规范；但存在
+**OpenAPI 契约不一致**、**SQL 参数绑定错误**、**shared-types 类型不匹配** |\n| 
+全链路完整性 | ✅ | DB（messages 表 + Migration）→ API（Controller/Gateway/Servi
+ce）→ Mobile（BLoC/Pages/Repository/Socket）链路已贯通 |\n| 规范符合性 | ❌ | **
+Maestro E2E runFlow 路径错误**导致测试无法运行；Accessibility（Semantics + onTap
+Down）规范执行良好 |\n| 测试覆盖 | ⚠️ | NestJS 单元测试覆盖核心路径（Service/Gate
+way/Controller）；Flutter Golden Test 和 Widgetbook 已注册；**E2E 测试因路径错误
+无法运行** |\n| 文档同步 | ⚠️ | `docs/api-contracts/im-events.yaml`、`docs/module
+s/im.md`、API 索引已更新；但 **REST 契约 `im.yaml` 与事件契约/实现不一致** |\n\n
+---\n\n## 风险与建议\n\n1. **运行时崩溃风险（高）**: `MatchListPage` 的 `BlocLis
+tener<ImBloc>` 是必现崩溃点，必须优先修复。\n2. **数据查询风险（高）**: `getConv
+ersations` 的原生 SQL 数组参数问题会导致生产环境会话列表功能异常，需立即修正。\n
+3. **契约漂移风险（中）**: `im.yaml` 与 `im-events.yaml` 对 `type` 枚举的定义不
+一致，随着 system 消息场景的增多，前后端类型冲突会加剧。建议在修复后重新运行 `ma
+ke generate-types` 并提交生成代码。\n4. **E2E 可维护性（中）**: Maestro flow 的
+子流程引用路径错误说明 E2E 脚本未经实际运行验证。建议在 CI 中增加 Maestro flow 
+语法检查步骤（如 `maestro test --dry-run`）。\n5. **Migration 回滚风险（低）**: 
+当前 Migration 的 `down()` 在含有 system 消息时无法回滚。MVP 阶段 system 消息量
+小，风险可控，但应在技术债务中记录。\n\n\n--- 第 9 次 Review ---\n# PR #58 代码
+审查报告\n\n> **分支**: `feat/issue-5`  \n> **审查日期**: 2025-04-25  \n> **审查
+范围**: IM（即时通讯）模块全链路实现（DB → API → Mobile）  \n> **关联 PRD**: [pr
+d/v1-mvp.md](../../social-world/prd/v1-mvp.md)、[prd/v1-matching.md](../../socia
+l-world/prd/v1-matching.md)、[prd/v1-profile.md](../../social-world/prd/v1-profi
+le.md)\n\n---\n\n## 审查结论\n\n审查结论: **NEEDS_MAJOR_FIX**\n\n> 存在一个 **Bl
+ocking** 级别的运行时崩溃问题（MainPage 缺少 BlocProvider），必须在合并前修复。
+其余问题集中在用户体验和边缘场景处理上。\n\n---\n\n## 阻塞问题（Blocking）\n\n##
+# 1. MainPage 缺少 ConversationListCubit 的 BlocProvider\n\n- **位置**: `apps/mo
+bile/lib/app.dart:138-143`\n- **问题**: `MainPage` 的 `MultiBlocProvider` 只注册
+了 `MatchingBloc` 和 `MatchListCubit`，未注册 `ConversationListCubit`。`MatchLis
+tPage` 在 `initState()` 中直接调用 `context.read<ConversationListCubit>().fetchC
+onversations()`，会因找不到 Provider 而抛出 `ProviderNotFoundException`，导致「
+消息」Tab 页面崩溃。\n- **影响**: 用户无法进入会话列表页面，IM 核心流程完全不可
+用。\n- **修复**:\n  ```dart\n  // apps/mobile/lib/app.dart:138-143\n  return Mu
+ltiBlocProvider(\n    providers: [\n      BlocProvider(create: (_) => getIt<Matc
+hingBloc>()),\n      BlocProvider(create: (_) => getIt<MatchListCubit>()),\n    
+ BlocProvider(create: (_) => getIt<ConversationListCubit>()), // 添加此行\n    ]
+,\n    child: Scaffold(...),\n  );\n  ```\n- **依据**: `docs/design-docs/flutter
+.md` 第 38-41 行规定状态管理使用 `flutter_bloc`，且 `MatchListPage` 通过 `contex
+t.read<ConversationListCubit>()` 获取 Cubit，必须在 Widget Tree 中通过 `BlocProv
+ider` 提供。\n\n---\n\n## 严重问题（Major）\n\n### 2. ChatPage 未实现消息发送失
+败后的重试机制\n\n- **位置**: `apps/mobile/lib/presentation/pages/chat_page.dart
+:190-200`\n- **问题**: `SwChatBubble` 组件已支持 `onRetry` 回调（当 `status == \
+'failed\'` 时显示错误图标并响应点击），但 `ChatPage` 在构建 `SwChatBubble` 时未
+传入 `onRetry` 参数。当 Socket 未连接导致消息发送失败（`ImBloc` 将状态设为 `fail
+ed`）后，用户点击错误图标无任何反应。\n- **影响**: 消息发送失败后用户必须重新输
+入内容才能再次发送，体验极差。\n- **修复**:\n  ```dart\n  // apps/mobile/lib/pre
+sentation/pages/chat_page.dart\n  SwChatBubble(\n    type: isSelf ? SwChatBubble
+Type.self : SwChatBubbleType.other,\n    content: msg.content,\n    // ... 其他
+参数 ...\n    onRetry: msg.status == \'failed\' && isSelf\n        ? () => conte
+xt.read<ImBloc>().add(\n              ImSendMessage(\n                conversati
+onId: msg.conversationId!,\n                content: msg.content,\n             
+  clientMessageId: msg.clientMessageId ?? const Uuid().v4(),\n              ),\n
+           )\n        : null,\n  );\n  ```\n- **依据**: PRD `v1-mvp.md` US-4 要
+求消息发送到达时间 < 1s，且 `docs/design-docs/flutter.md` 第 449-451 行要求核心
+页面必须处理加载/错误/空态。\n\n### 3. ImBloc 已读回执使用列表索引而非 sequence_
+id 比较\n\n- **位置**: `apps/mobile/lib/presentation/blocs/im/im_bloc.dart:174-1
+84`\n- **问题**: `_onReadReceipt` 中通过列表索引 `i <= lastReadIndex` 判断消息是
+否应标记为已读：\n  ```dart\n  final lastReadIndex = _messages.indexWhere((m) =>
+m.id == event.lastReadMessageId);\n  for (var i = 0; i < _messages.length; i++) 
+{\n    if (msg.senderId == _currentUserId) {\n      final shouldMarkRead = lastR
+eadIndex == -1 || i <= lastReadIndex;\n      // ...\n    }\n  }\n  ```\n该逻辑假
+设 `_messages` 严格按 `sequence_id` 升序排列且连续。若历史消息加载存在间隙（例如
+用户加载了较旧的历史消息，中间跳过了部分消息），则列表索引与消息时间顺序不一致，
+可能导致错误地将较新消息标记为已读，或未将较早消息标记为已读。\n- **影响**: 已读
+状态显示不正确，用户体验受损。\n- **修复**: 使用 `sequenceId` 比较替代列表索引：
+\n  ```dart\n  final lastReadSeq = lastReadIndex == -1\n      ? null\n      : _m
+essages[lastReadIndex].sequenceId;\n  for (var i = 0; i < _messages.length; i++)
+{\n    final msg = _messages[i];\n    if (msg.senderId == _currentUserId) {\n   
+  final shouldMarkRead = lastReadSeq == null ||\n          (msg.sequenceId != nu
+ll && msg.sequenceId! <= lastReadSeq);\n      // ...\n    }\n  }\n  ```\n- **依
+据**: `docs/modules/im.md` 第 70-73 行明确说明消息顺序使用数据库自增 `sequence_i
+d`，客户端应按序排列。\n\n### 4. ImSocketClient 缺少连接状态监控与显式重连策略\n
+\n- **位置**: `apps/mobile/lib/core/network/im_socket_client.dart`\n- **问题**: 
+`ImSocketClient` 仅通过 `autoConnect: true` 建立初始连接，未显式配置 `reconnecti
+on` 参数，也未监听 `connect_error` / `disconnect` 事件向 `ImBloc` 汇报。当应用从
+后台回到前台、或网络切换后，Socket 可能处于断开状态而不被上层感知，`isConnected`
+返回过时状态。\n- **影响**: 用户在网络恢复后可能无法立即发送消息，或错误地认为消
+息已发送成功。\n- **修复**: 在 `ImSocketClient.connect()` 中添加显式重连配置和事
+件监听：\n  ```dart\n  _socket = io.io(namespaceUrl, <String, dynamic>{\n    \'t
+ransports\': [\'websocket\'],\n    \'autoConnect\': true,\n    \'reconnection\':
+true,\n    \'reconnectionAttempts\': 5,\n    \'reconnectionDelay\': 1000,\n    \
+'auth\': <String, dynamic>{\'token\': token},\n  });\n  _socket?.on(\'disconnect
+\', (_) => onError({\'message\': \'Disconnected\'}));\n  _socket?.on(\'connect_e
+rror\', (err) => onError({\'message\': \'Connect error: $err\'}));\n  ```\n- **
+依据**: `docs/design-docs/flutter.md` 第 52-53 行要求网络层使用 Dio + 拦截器处理
+统一错误；Socket 层同样需要统一的连接状态管理。\n\n---\n\n## 轻微问题（Minor）\n
+\n### 5. ImGateway 连接认证失败无日志记录\n\n- **位置**: `apps/api/src/modules/i
+m/im.gateway.ts:49-68`\n- **问题**: `handleConnection` 中 JWT 验证失败或缺少 tok
+en 时直接 `client.disconnect(true)`，catch 块为空，未记录任何日志。\n- **修复**:
+在 catch 块中添加 `this.logger.warn(...)` 记录断开原因。\n- **依据**: `docs/desi
+gn-docs/nestjs.md` 第 106-111 行要求错误日志包含 `traceId` 和用户 ID。\n\n### 6.
+PushService 在多个模块中重复注册\n\n- **位置**: `apps/api/src/modules/im/im.modu
+le.ts:29`、`apps/api/src/modules/matching/matching.module.ts:35`\n- **问题**: `P
+ushService` 同时在 `ImModule` 和 `MatchingModule` 的 `providers` 数组中注册。虽
+然 `PushService` 无状态，但 NestJS 会为每个模块创建独立实例，违背单例预期。\n- *
+*修复**: 将 `PushService` 移至 `common/` 或独立的 `PushModule` 中，通过 `exports
+` 共享。\n- **依据**: `docs/design-docs/nestjs.md` 第 68-70 行要求模块间通过 Int
+erface / EventEmitter 解耦，禁止直接 import 其他模块的内部 Service。\n\n### 7. s
+eed-dev.ts 中 preferred_gender 枚举值与 PRD 不一致\n\n- **位置**: `apps/api/src/
+scripts/seed-dev.ts:78`\n- **问题**: Seed 脚本中使用了 `"all"`，而 `prd/v1-profi
+le.md` 第 139 行明确规定 `preferred_gender` 枚举为 `male`、`female`、`both`。\n-
+**影响**: 可能导致推荐算法中性别过滤逻辑异常（Matching SQL 中判断 `? = \'both\'`
+，不会匹配 `"all"`）。\n- **修复**: 将 seed 脚本中的 `"all"` 改为 `"both"`。\n- 
+**依据**: `prd/v1-profile.md` 第 139 行。\n\n### 8. E2E send_message.yaml 的前置
+依赖说明不够健壮\n\n- **位置**: `.maestro/flows/im/send_message.yaml`\n- **问题*
+*: Flow 使用 `optional: true` 跳过 `conversation_item` 点击，若测试环境未预置会
+话数据，后续 `tapOn: { id: "chat_input_field" }` 将在错误的页面执行导致失败。虽
+然注释说明了前置条件，但 Maestro 执行失败时的错误信息不直观。\n- **修复**: 在 `c
+onversation_item` 步骤后添加 `assertVisible: { id: "chat_input_field" }`（非 opt
+ional），确保进入聊天页后再继续。\n\n---\n\n## 验证结果\n\n| 维度 | 状态 | 说明 
+|\n|------|------|------|\n| 功能完整性 | ⚠️ | IM 核心收发、会话列表、已读回执均
+已实现；**消息重试缺失**、**会话列表页面因 BlocProvider 缺失无法打开**。 |\n| 代
+码规范性 | ✅ | 后端分层清晰（Controller/Service/DTO），Flutter 使用 DesignToken
+s、Semantics、onTapDown 符合规范。 |\n| 全链路完整性 | ✅ | DB Migration（sender
+_id nullable）→ Entity → Service → Controller → Gateway → Mobile BLoC → Page 全
+部连通。 |\n| 规范符合性 | ✅ | OpenAPI 契约 `im.yaml` / `im-events.yaml` 已更新
+；`shared-types` 同步；Socket 事件命名符合 `module:action` 规范。 |\n| 测试覆盖 
+| ⚠️ | 后端单元测试覆盖 Controller/Service/Gateway（>80%）；Mobile 缺少 Bloc/Repo
+sitory 的单元测试；Maestro E2E 已提供但需修复前置条件。 |\n| 文档同步 | ✅ | `do
+cs/modules/im.md`、`docs/api/socket-events.md`、`docs/api-contracts/INDEX.md` 均
+已更新。 |\n\n---\n\n## 风险与建议\n\n1. **消息顺序一致性风险**：`ImBloc` 中 `_m
+essages` 列表的维护依赖于服务端返回的升序数据和本地追加逻辑。建议在后端 `getMess
+ages` API 中显式保证 `sequence_id` 升序返回，并在 Mobile 端添加防御性校验（若发
+现乱序则触发全量刷新）。\n\n2. **Redis 未读数与 DB 状态不一致风险**：`markAsRead
+` 同时更新 `conversation_participants.last_read_message_id` 和 Redis `unread_cou
+nt`。若 Redis 故障或重启，未读数会丢失。建议增加定时任务从 DB 重新计算未读数作为
+兜底。\n\n3. **并发重排风险**：`getConversations` 使用 `updated_at` 作为游标，若
+并发场景下 `updated_at` 出现相同值，可能导致分页重复或跳过。建议在游标中复合 `co
+nversation_id`（如 `"updated_at#conversation_id"`）增强唯一性。\n\n4. **设计资产
+迁移合规性**：PR 中 `packages/design-system/` 已正确迁移 `designs/issue-5/` 中的
+组件（`sw_chat_bubble.dart`、`sw_chat_input_bar.dart`、`sw_conversation_list_ite
+m.dart`），并补充了 Widgetbook 用例和 Golden Test，符合 `AGENTS.md` 中 Design-On
+ly PR 的迁移规范。\n\n\n--- 第 10 次 Review ---\n## 🤖 Agent Code Review Report\
+n\n\n【任务】\n1. 分析所有审查报告，识别**反复出现的问题模式**\n2. 判断哪些问题
+是因为规范缺失、过时或不明确导致的\n3. 读取现有的规范文档（通过 AGENTS.md 发现路
+径）\n4. **优先更新历史文档**：在已有文档中补充、修改\n5. **禁止创建新文档**，除
+非现有文档体系确实无法覆盖且你确认有必要\n6. 保持文档风格一致性\n7. 提交变更到分
+支 docs/spec-evolution-58 并创建 PR\n\n【约束】\n- 只修改 .md 文件\n- 不修改业务
+代码\n- 重点关注反复出现的问题，偶发问题不需要更新规范'
+)
+StepBegin(n=1)
+ThinkPart(
+    type='think',
+    think='用户要求我分析 PR #58 的 10 次代码审查报告，识别反复出现的问题模式，
+判断哪些是因为规范缺失/过时/不明确导致的，然后读取现有规范文档，优先更新历史文档
+，禁止创建新文档（除非确实无法覆盖），最后提交变更到分支 docs/spec-evolution-58 
+并创建 PR。\n\n约束：\n- 只修改 .md 文件\n- 不修改业务代码\n- 重点关注反复出现的
+问题，偶发问题不需要更新规范\n\n首先，我需要读取 AGENTS.md 了解项目导航文档结构
+，然后读取 git diff 了解实际变更。\n\n项目路径是 /var/folders/lt/w3sl6z8j5v50vt2
+s6knvf5n00000gn/T/doc-gardener-58-1266463958\n项目地图: ../../social-world/AGENT
+S.md\n文档目录: ../../social-world/docs\n关联 PRD: ../../social-world/prd/v1-pro
+file.md,../../social-world/prd/v1-matching.md,../../social-world/prd/v1-matching
+.md\n\n等等，项目路径是一个临时目录，而 AGENTS.md 和 docs 在 ../../social-world/
+下。\n\n我先读取 AGENTS.md 和 git diff 信息。',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_dA6USVCwwgFXBGSCXs0Br0vJ',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "../../social-world/AGENTS.md"}'
+    ),
+    extras=None
+)
+ToolCall(
+    type='function',
+    id='tool_fTZfm3VBXwiNnYThalV1TOnM',
+    function=FunctionBody(name='Shell', arguments='{"'),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_dA6USVCwwgFXBGSCXs0Br0vJ',
+    return_value=ToolError(
+        is_error=True,
+        output='',
+        message='`../../social-world/AGENTS.md` is not an absolute path. You mus
+t provide an absolute path to read a file outside the working directory.',
+        display=[BriefDisplayBlock(type='brief', text='Invalid path')],
+        extras=None
+    )
+)
+ToolCallPart(
+    arguments_part='command": "cd /var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn
+/T/doc-gardener-58-1266463958 && git diff --name-only origin/main...HEAD 2>/dev/
+null || git diff --name-only main...HEAD 2>/dev/null || echo \\"No git diff avai
+lable\\""}'
+)
+StatusUpdate(
+    context_usage=0.12804031372070312,
+    context_tokens=33565,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=31005,
+        output=373,
+        input_cache_read=2560,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-FBYPhwnnsp56q21joRYKSd9y',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_fTZfm3VBXwiNnYThalV1TOnM',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='.maestro/flows/im/send_message.yaml\n.maestro/flows/im/view_conv
+ersation_list.yaml\n.maestro/scripts/run-e2e.sh\nMakefile\napps/api/package.json
+\napps/api/src/app.module.ts\napps/api/src/database/entities/message.entity.ts\n
+apps/api/src/database/migrations/20250425000000-AlterMessagesSenderIdNullable.ts
+\napps/api/src/modules/im/dto/get-conversations-query.dto.ts\napps/api/src/modul
+es/im/dto/get-messages-query.dto.ts\napps/api/src/modules/im/dto/index.ts\napps/
+api/src/modules/im/dto/message-response.dto.ts\napps/api/src/modules/im/dto/read
+-receipt.dto.ts\napps/api/src/modules/im/dto/send-message.dto.ts\napps/api/src/m
+odules/im/im.controller.ts\napps/api/src/modules/im/im.gateway.ts\napps/api/src/
+modules/im/im.module.ts\napps/api/src/modules/im/im.service.ts\napps/api/src/mod
+ules/im/tests/im.controller.spec.ts\napps/api/src/modules/im/tests/im.gateway.sp
+ec.ts\napps/api/src/modules/im/tests/im.service.spec.ts\napps/api/src/modules/ma
+tching/matching.module.ts\napps/api/src/modules/matching/matching.service.ts\nap
+ps/api/src/modules/matching/tests/matching.service.spec.ts\napps/api/src/modules
+/push/push.service.ts\napps/api/src/scripts/seed-dev.ts\napps/api/tsconfig.json\
+napps/mobile/lib/app.dart\napps/mobile/lib/core/di/di.dart\napps/mobile/lib/core
+/network/im_socket_client.dart\napps/mobile/lib/data/repositories/im_repository_
+impl.dart\napps/mobile/lib/domain/repositories/im_repository.dart\napps/mobile/l
+ib/models/generated/im/.openapi-generator/FILES\napps/mobile/lib/models/generate
+d/im/README.md\napps/mobile/lib/models/generated/im/doc/DefaultApi.md\napps/mobi
+le/lib/models/generated/im/doc/GetMessages200Response.md\napps/mobile/lib/models
+/generated/im/doc/ListConversations200Response.md\napps/mobile/lib/models/genera
+ted/im/lib/api.dart\napps/mobile/lib/models/generated/im/lib/api/default_api.dar
+t\napps/mobile/lib/models/generated/im/lib/api_client.dart\napps/mobile/lib/mode
+ls/generated/im/lib/model/get_messages200_response.dart\napps/mobile/lib/models/
+generated/im/lib/model/list_conversations200_response.dart\napps/mobile/lib/mode
+ls/generated/im/lib/model/message_dto.dart\napps/mobile/lib/models/generated/im/
+test/default_api_test.dart\napps/mobile/lib/models/generated/im/test/get_message
+s200_response_test.dart\napps/mobile/lib/models/generated/im/test/list_conversat
+ions200_response_test.dart\napps/mobile/lib/presentation/blocs/auth/auth_bloc.da
+rt\napps/mobile/lib/presentation/blocs/auth/auth_state.dart\napps/mobile/lib/pre
+sentation/blocs/im/conversation_list_cubit.dart\napps/mobile/lib/presentation/bl
+ocs/im/conversation_list_state.dart\napps/mobile/lib/presentation/blocs/im/im_bl
+oc.dart\napps/mobile/lib/presentation/blocs/im/im_event.dart\napps/mobile/lib/pr
+esentation/blocs/im/im_state.dart\napps/mobile/lib/presentation/pages/chat_page.
+dart\napps/mobile/lib/presentation/pages/match_list_page.dart\napps/mobile/pubsp
+ec.lock\napps/mobile/pubspec.yaml\ndocs/api-contracts/INDEX.md\ndocs/api-contrac
+ts/im-events.yaml\ndocs/api-contracts/im.yaml\ndocs/api/socket-events.md\ndocs/m
+odules/im.md\npackages/design-system/lib/social_world_design_system.dart\npackag
+es/design-system/lib/src/molecules/chat_bubble.dart\npackages/design-system/lib/
+src/molecules/chat_input_bar.dart\npackages/design-system/lib/src/molecules/conv
+ersation_list_item.dart\npackages/design-system/test/goldens/sw_chat_bubble_vari
+ants.png\npackages/design-system/test/goldens/sw_chat_input_bar_variants.png\npa
+ckages/design-system/test/goldens/sw_conversation_list_item_variants.png\npackag
+es/design-system/test/im_components_golden_test.dart\npackages/design-system/wid
+getbook/main.dart\npackages/shared-types/src/generated/im/.openapi-generator/FIL
+ES\npackages/shared-types/src/generated/im/README.md\npackages/shared-types/src/
+generated/im/docs/DefaultApi.md\npackages/shared-types/src/generated/im/docs/Get
+Messages200Response.md\npackages/shared-types/src/generated/im/docs/ListConversa
+tions200Response.md\npackages/shared-types/src/generated/im/src/apis/DefaultApi.
+ts\npackages/shared-types/src/generated/im/src/models/GetMessages200Response.ts\
+npackages/shared-types/src/generated/im/src/models/ListConversations200Response.
+ts\npackages/shared-types/src/generated/im/src/models/MessageDto.ts\npackages/sh
+ared-types/src/generated/im/src/models/index.ts\npackages/shared-types/src/im-so
+cket-events.ts\npackages/shared-types/src/index.ts\npnpm-lock.yaml\nscripts/chec
+k-contract-sync.sh\nscripts/generate-types.sh\ntests/bdd/step-definitions/bdd-se
+tup.js\ntests/structure/test_makefile_build_order.py\n',
+        message='Command executed successfully.',
+        display=[],
+        extras=None
+    )
+)
+StepBegin(n=2)
+ThinkPart(
+    type='think',
+    think='我需要用绝对路径读取 AGENTS.md。项目地图是 ../../social-world/AGENTS.
+md，但我不知道当前工作目录的绝对路径。让我先检查当前目录和 social-world 目录的绝
+对路径。',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_yAYYbe85if6zUCxQ7LtsEF3d',
+    function=FunctionBody(
+        name='Shell',
+        arguments='{"command": "pwd && ls -la ../../social-world/AGENTS.md 2>/de
+v/null || find / -name \\"AGENTS.md\\" -path \\"*/social-world/*\\" 2>/dev/null 
+| head -5"}'
+    ),
+    extras=None
+)
+StatusUpdate(
+    context_usage=0.13338088989257812,
+    context_tokens=34965,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=1429,
+        output=104,
+        input_cache_read=33536,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-1kWSDAAo2On9fJHkLaLISFyR',
+    plan_mode=False,
+    mcp_status=None
+)
+StepInterrupted()
+Unknown error: [Errno 2] No such file or directory
+
+To resume this session: kimi -r ee49a7c7-63bd-4941-b3f0-dfdf959da1c6
+[Errno 2] No such file or directory: '/private/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/doc-gardener-58-1266463958'
+See logs: /Users/insulate/.kimi/logs/kimi.log
+Run with --debug for full traceback, or run kimi export to share diagnostics.
+
+✅ 任务完成

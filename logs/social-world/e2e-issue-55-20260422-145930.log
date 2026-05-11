@@ -1,0 +1,81 @@
+[2026-04-22 14:59:30] E2E 任务启动 (由 rework-55)
+分支: feat/issue-43
+项目: social-world
+日志: /Users/insulate/Desktop/new-world/new-world-ops/logs/social-world/e2e-issue-55-20260422-145930.log
+
+=== E2E 环境检查 ===
+任务类型: <no value>
+✅ adb: Android Debug Bridge version 1.0.41
+✅ maestro: 1.39.13
+
+=== 检查后端正端 ===
+✅ 后端 API 已运行 (localhost:3001)
+✅ Android Emulator 已启动:
+emulator-5554	device
+
+=== 构建 Flutter Debug APK ===
+
+Running Gradle task 'assembleDebug'...                          
+Your project is configured with Android NDK 23.1.7779620, but the following plugin(s) depend on a different Android NDK version:
+- flutter_plugin_android_lifecycle requires Android NDK 26.1.10909125
+- flutter_secure_storage requires Android NDK 26.1.10909125
+- image_picker_android requires Android NDK 26.1.10909125
+- package_info_plus requires Android NDK 26.1.10909125
+- path_provider_android requires Android NDK 26.1.10909125
+- sentry_flutter requires Android NDK 26.1.10909125
+- shared_preferences_android requires Android NDK 26.1.10909125
+- url_launcher_android requires Android NDK 26.1.10909125
+Fix this issue by using the highest Android NDK version (they are backward compatible).
+Add the following to /private/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/rework-pr-55-2469885624/apps/mobile/android/app/build.gradle:
+
+    android {
+        ndkVersion = "26.1.10909125"
+        ...
+    }
+
+Running Gradle task 'assembleDebug'...                           1,812ms
+✓ Built build/app/outputs/flutter-apk/app-debug.apk
+✅ APK 构建完成: apps/mobile/build/app/outputs/flutter-apk/app-debug.apk
+
+=== 安装 APK ===
+bash: line 2: adb: command not found
+✅ APK 安装完成
+
+📱 模拟器中的包列表:
+bash: line 6: adb: command not found
+
+=== 运行 Maestro E2E 测试 ===
+📁 发现 6 个 Maestro flow:
+.maestro/flows/matching/swipe_recommendations.yaml
+.maestro/flows/matching/view_match_list.yaml
+.maestro/flows/auth/login.yaml
+.maestro/flows/profile/setup.yaml
+.maestro/flows/devtools/open_drawer.yaml
+.maestro/flows/devtools/edit_server_url.yaml
+
+Failed to parse file: /private/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/rework-pr-55-2469885624/.maestro/flows/matching/swipe_recommendations.yaml
+Failed to parse file: /private/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/rework-pr-55-2469885624/.maestro/flows/matching/includes/login-as-test-user.yaml
+Flow files must contain a config section and a commands section separated by "---". For example:
+
+appId: com.example
+---
+- launchApp
+
+❌ e2e失败: shell step runE2E failed: exit status 1, output: 
+=== 运行 Maestro E2E 测试 ===
+📁 发现 6 个 Maestro flow:
+.maestro/flows/matching/swipe_recommendations.yaml
+.maestro/flows/matching/view_match_list.yaml
+.maestro/flows/auth/login.yaml
+.maestro/flows/profile/setup.yaml
+.maestro/flows/devtools/open_drawer.yaml
+.maestro/flows/devtools/edit_server_url.yaml
+
+Failed to parse file: /private/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/rework-pr-55-2469885624/.maestro/flows/matching/swipe_recommendations.yaml
+Failed to parse file: /private/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/rework-pr-55-2469885624/.maestro/flows/matching/includes/login-as-test-user.yaml
+Flow files must contain a config section and a commands section separated by "---". For example:
+
+appId: com.example
+---
+- launchApp
+

@@ -1,0 +1,8 @@
+[2026-04-14 09:47:35] PR #16 Review 启动
+分支: feat/issue-3
+项目路径: ../../social-world
+日志文件: logs/social-world/review-pr-16-20260414-094735.log
+
+❌ 加载 workflow 失败: yaml: control characters are not allowed
+
+🛑 任务已停止

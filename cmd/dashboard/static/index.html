@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agent Control Center</title>
+  <script src="/static/marked.min.js"></script>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="min-h-screen bg-background text-foreground antialiased">
+
+  <!-- Header -->
+  <header class="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <div class="mx-auto flex h-14 max-w-[1400px] items-center justify-between px-6">
+      <div class="flex items-center gap-2.5">
+        <span class="inline-flex h-7 w-7 items-center justify-center rounded-md bg-primary text-primary-foreground text-xs font-bold">A</span>
+        <h1 class="text-base font-bold tracking-tight">Agent Control Center</h1>
+      </div>
+      <div class="flex items-center gap-2">
+        <select id="project-selector" class="h-8 rounded-lg border border-border bg-secondary px-3 text-sm outline-none transition-colors hover:border-muted-foreground/30 focus:border-ring cursor-pointer">
+          <option>加载中...</option>
+        </select>
+        <button id="refresh-btn" class="btn btn-ghost h-8 w-8 p-0" title="刷新">刷新</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Stage Nav -->
+  <div class="mx-auto max-w-[1400px] px-6 mb-5">
+    <nav class="stage-nav" id="stage-nav">
+      <button class="stage-btn active" data-stage="all">全部<span class="stage-badge" id="stage-badge-all">0</span></button>
+      <button class="stage-btn" data-stage="triage">待分类<span class="stage-badge" id="stage-badge-triage">0</span></button>
+      <button class="stage-btn" data-stage="plan">Plan<span class="stage-badge" id="stage-badge-plan">0</span></button>
+      <button class="stage-btn" data-stage="prd">PRD<span class="stage-badge" id="stage-badge-prd">0</span></button>
+      <button class="stage-btn" data-stage="dev">开发中<span class="stage-badge" id="stage-badge-dev">0</span></button>
+      <button class="stage-btn" data-stage="review">待 Review<span class="stage-badge" id="stage-badge-review">0</span></button>
+      <button class="stage-btn" data-stage="merged">已合并<span class="stage-badge" id="stage-badge-merged">0</span></button>
+    </nav>
+  </div>
+
+  <!-- Main -->
+  <main class="mx-auto max-w-[1400px] px-6 pb-10">
+    <div class="grid gap-5 lg:grid-cols-[1fr_340px]">
+      <!-- Left: Stages -->
+      <div id="stages-content" class="space-y-6">
+        <!-- Running -->
+        <section id="stage-section-running" class="stage-section" data-stage="running">
+          <h2 class="mb-3 text-sm font-semibold text-muted-foreground uppercase tracking-wider">正在运行</h2>
+          <div id="running-tasks" class="space-y-2.5">
+            <div class="card p-8 text-center text-sm text-muted-foreground">暂无运行中的任务</div>
+          </div>
+        </section>
+
+        <!-- Doc Gardener -->
+        <section id="stage-section-doc" class="stage-section" data-stage="doc">
+          <h2 class="mb-3 text-sm font-semibold text-muted-foreground uppercase tracking-wider">文档检查</h2>
+          <div id="doc-gardener-tasks" class="space-y-2.5">
+            <div class="card p-8 text-center text-sm text-muted-foreground">暂无文档检查任务</div>
+          </div>
+        </section>
+
+        <!-- Triage -->
+        <section id="stage-section-triage" class="stage-section" data-stage="triage">
+          <div class="mb-3 flex items-center justify-between">
+            <h2 class="text-sm font-semibold text-muted-foreground uppercase tracking-wider">待分类</h2>
+            <button id="open-pm-btn" class="btn btn-primary btn-sm">新建需求</button>
+          </div>
+          <div id="triage-issues" class="space-y-2.5">
+            <div class="card p-8 text-center text-sm text-muted-foreground">暂无待分类的 Issue</div>
+          </div>
+        </section>
+
+        <!-- Plan -->
+        <section id="stage-section-plan" class="stage-section" data-stage="plan">
+          <h2 class="mb-3 text-sm font-semibold text-muted-foreground uppercase tracking-wider">Plan Ready</h2>
+          <div id="plan-issues" class="space-y-2.5">
+            <div class="card p-8 text-center text-sm text-muted-foreground">暂无待评审 PLAN 的 Issue</div>
+          </div>
+        </section>
+
+        <!-- PRD -->
+        <section id="stage-section-prd" class="stage-section" data-stage="prd">
+          <h2 class="mb-3 text-sm font-semibold text-muted-foreground uppercase tracking-wider">PRD Ready</h2>
+          <div id="prd-issues" class="space-y-2.5">
+            <div class="card p-8 text-center text-sm text-muted-foreground">暂无 PRD 就绪的 Issue</div>
+          </div>
+        </section>
+
+        <!-- Interrupted -->
+        <section id="stage-section-interrupted" class="stage-section" data-stage="interrupted">
+          <h2 class="mb-3 text-sm font-semibold text-muted-foreground uppercase tracking-wider">可恢复</h2>
+          <div id="interrupted-tasks" class="space-y-2.5">
+            <div class="card p-8 text-center text-sm text-muted-foreground">暂无中断的任务</div>
+          </div>
+        </section>
+
+        <!-- Review -->
+        <section id="stage-section-review" class="stage-section" data-stage="review">
+          <h2 class="mb-3 text-sm font-semibold text-muted-foreground uppercase tracking-wider">待 Review</h2>
+          <div id="pending-prs" class="space-y-2.5">
+            <div class="card p-8 text-center text-sm text-muted-foreground">暂无等待 Review 的 PR</div>
+          </div>
+        </section>
+
+        <!-- Merged -->
+        <section id="stage-section-merged" class="stage-section" data-stage="merged">
+          <h2 class="mb-3 text-sm font-semibold text-muted-foreground uppercase tracking-wider">已合并</h2>
+          <div id="merged-prs" class="space-y-2.5">
+            <div class="card p-8 text-center text-sm text-muted-foreground">暂无最近合并的 PR</div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Right: Sidebar (sticky) -->
+      <aside class="sticky top-[72px] self-start space-y-5">
+        <!-- Prompt Evolution -->
+        <div>
+          <h2 class="mb-3 text-sm font-semibold text-muted-foreground uppercase tracking-wider">Prompt 演进</h2>
+          <div id="prompt-evolution-stats" class="space-y-2.5">
+            <div class="card p-8 text-center text-sm text-muted-foreground">暂无统计数据</div>
+          </div>
+        </div>
+        <!-- Recent Logs -->
+        <div>
+          <h2 class="mb-3 text-sm font-semibold text-muted-foreground uppercase tracking-wider">最近日志</h2>
+          <div id="recent-logs" class="space-y-2.5 max-h-[calc(100vh-320px)] overflow-y-auto pr-1">
+            <div class="card p-8 text-center text-sm text-muted-foreground">暂无日志</div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <!-- Toast -->
+  <div id="toast" class="fixed bottom-5 right-5 z-[2000] hidden animate-slide-in rounded-lg bg-success px-4 py-2.5 text-sm font-medium text-white shadow-lg"></div>
+
+  <!-- Global Loading -->
+  <div id="global-loading" class="fixed inset-0 z-[3000] hidden flex-col items-center justify-center gap-3 bg-background/70 backdrop-blur-sm">
+    <div class="h-6 w-6 animate-spin rounded-full border-2 border-border border-t-primary"></div>
+    <div id="loading-text" class="text-sm font-medium text-muted-foreground">执行中...</div>
+  </div>
+
+  <!-- Terminal Overlay -->
+  <div id="terminal-overlay" class="fixed inset-0 z-[1500] hidden items-center justify-center bg-background/85 p-4 backdrop-blur-sm">
+    <div class="flex h-[90vh] w-full max-w-[1200px] flex-col overflow-hidden rounded-xl border border-border bg-card shadow-2xl">
+      <!-- Terminal Header -->
+      <div class="flex items-center justify-between border-b border-border px-4 py-2.5">
+        <div class="flex items-center gap-3">
+          <span class="text-xs font-mono text-muted-foreground">tail -f</span>
+          <span id="terminal-filename" class="text-xs font-mono text-foreground"></span>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <span id="line-count" class="text-xs text-muted-foreground mr-2">0 lines</span>
+          <button id="render-toggle-btn" class="btn btn-sm btn-outline">渲染</button>
+          <button id="clear-terminal-btn" class="btn btn-sm btn-ghost">清屏</button>
+          <button id="close-terminal-btn" class="btn btn-sm btn-ghost">关闭</button>
+        </div>
+      </div>
+      <!-- Terminal Body -->
+      <div id="terminal-body" class="relative flex-1 overflow-y-auto bg-[#0d1117] p-4 font-mono text-sm leading-relaxed text-foreground"></div>
+      <!-- Scroll to bottom -->
+      <button id="scroll-bottom-btn" class="absolute bottom-12 right-6 z-10 hidden h-8 w-8 items-center justify-center rounded-full border border-border bg-card text-sm shadow-lg hover:bg-secondary" title="滚动到底部">↓</button>
+    </div>
+  </div>
+
+  <!-- PM Modal -->
+  <div id="pm-modal" class="fixed inset-0 z-[1500] hidden items-center justify-center bg-background/85 p-4 backdrop-blur-sm">
+    <div class="w-full max-w-[520px] rounded-xl border border-border bg-card p-6 shadow-2xl">
+      <h3 class="mb-5 text-lg font-bold tracking-tight">新建 Feature 需求</h3>
+      <div class="mb-4">
+        <label class="mb-1.5 block text-xs font-medium text-muted-foreground">标题</label>
+        <input id="pm-title" type="text" placeholder="例如：新增任务系统" class="h-9 w-full rounded-lg border border-border bg-secondary px-3 text-sm outline-none transition-colors focus:border-ring">
+      </div>
+      <div class="mb-6">
+        <label class="mb-1.5 block text-xs font-medium text-muted-foreground">描述</label>
+        <textarea id="pm-desc" rows="4" placeholder="描述业务背景、目标用户、核心场景..." class="w-full resize-y rounded-lg border border-border bg-secondary px-3 py-2 text-sm outline-none transition-colors focus:border-ring"></textarea>
+      </div>
+      <div class="flex justify-end gap-2">
+        <button id="close-pm-btn" class="btn btn-outline btn-sm">取消</button>
+        <button id="start-pm-btn" class="btn btn-primary btn-sm">开始产出 PRD</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirm Dialog -->
+  <div id="confirm-dialog" class="fixed inset-0 z-[1700] hidden items-center justify-center bg-background/80 p-4 backdrop-blur-sm">
+    <div class="w-full max-w-sm overflow-hidden rounded-xl border border-border bg-card shadow-2xl">
+      <div class="px-5 pt-5 pb-2">
+        <h3 id="confirm-title" class="text-base font-semibold text-foreground">确认</h3>
+      </div>
+      <div class="px-5 py-2">
+        <p id="confirm-message" class="text-sm text-muted-foreground whitespace-pre-wrap"></p>
+      </div>
+      <div class="flex items-center justify-end gap-2 px-5 py-4">
+        <button id="confirm-cancel" class="btn btn-sm btn-ghost">取消</button>
+        <button id="confirm-ok" class="btn btn-sm btn-primary">确定</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Report Modal -->
+  <div id="report-modal" class="fixed inset-0 z-[1600] hidden items-center justify-center bg-background/85 p-4 backdrop-blur-sm">
+    <div class="flex h-[85vh] w-full max-w-[900px] flex-col overflow-hidden rounded-xl border border-border bg-card shadow-2xl">
+      <div class="flex items-center justify-between border-b border-border px-5 py-3">
+        <h3 id="report-title" class="text-base font-bold tracking-tight">Review 报告</h3>
+        <button id="close-report-btn" class="btn btn-sm btn-ghost">关闭</button>
+      </div>
+      <div class="flex-1 overflow-y-auto p-5 space-y-4">
+        <!-- Meta -->
+        <div id="report-meta" class="rounded-lg bg-secondary p-4 text-sm space-y-1.5"></div>
+        <!-- Report -->
+        <div id="report-body" class="markdown-body text-sm leading-relaxed"></div>
+        <!-- Log -->
+        <div id="report-log-section" class="hidden">
+          <div class="mb-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">详细日志</div>
+          <pre id="report-log" class="bg-[#0d1117] border border-border p-4 rounded-lg overflow-x-auto text-xs font-mono leading-relaxed whitespace-pre-wrap break-all max-h-[40vh]"></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Design Overlay -->
+  <div id="design-overlay" class="fixed inset-0 z-[1600] hidden items-center justify-center bg-background/90 p-4 backdrop-blur-sm">
+    <div class="flex h-[90vh] w-full max-w-[1200px] overflow-hidden rounded-xl border border-border bg-card shadow-2xl">
+      <div class="flex w-72 flex-col border-r border-border bg-secondary">
+        <div class="border-b border-border px-4 py-3 text-sm font-semibold">设计资产</div>
+        <div id="design-file-list" class="flex-1 overflow-y-auto p-2"></div>
+      </div>
+      <div class="flex flex-1 flex-col">
+        <div class="flex items-center justify-between border-b border-border px-4 py-2.5">
+          <div class="flex items-center gap-3">
+            <span id="design-filename" class="text-xs font-mono text-muted-foreground">选择文件</span>
+            <button id="run-e2e-btn" class="hidden btn btn-xs btn-outline" onclick="window.runE2EFlow()">🧪 运行 E2E</button>
+            <span id="e2e-status" class="hidden text-xs"></span>
+            <button id="build-preview-btn" class="hidden btn btn-xs btn-primary" onclick="window.buildDesignPreviewHandler(window.currentDesignIssue || 0)">🎨 生成预览</button>
+            <span id="preview-status" class="hidden text-xs"></span>
+          </div>
+          <button id="close-design-btn" class="btn btn-sm btn-ghost">关闭</button>
+        </div>
+        <div id="e2e-log-panel" class="hidden flex-1 flex-col overflow-hidden bg-[#0b1120]">
+          <div class="flex items-center justify-between border-b border-border/50 bg-[#0d1117] px-3 py-1.5">
+            <span class="text-[0.7rem] font-mono text-muted-foreground">E2E 日志</span>
+            <button class="text-[0.7rem] text-muted-foreground hover:text-foreground" onclick="document.getElementById('e2e-log-panel').classList.add('hidden');document.getElementById('design-preview-body').classList.remove('hidden')">关闭</button>
+          </div>
+          <pre id="e2e-log-content" class="flex-1 overflow-auto whitespace-pre-wrap p-3 font-mono text-[0.75rem] leading-relaxed text-foreground"></pre>
+        </div>
+        <div id="design-preview-body" class="flex flex-1 items-center justify-center overflow-auto bg-[#0b1120] p-4">
+          <div class="text-sm text-muted-foreground">选择左侧文件预览</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="/static/js/main.js?v=4"></script>
+</body>
+</html>

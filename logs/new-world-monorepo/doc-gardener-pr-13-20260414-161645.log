@@ -1,0 +1,7 @@
+[2026-04-14 16:16:45] PR #13 Doc Gardener 启动
+Merged: false
+Base: main
+Head: feat/issue-7
+日志: logs/new-world-monorepo/doc-gardener-pr-13-20260414-161645.log
+
+❌ 执行失败: shell step createWorktree failed: context canceled, output: 

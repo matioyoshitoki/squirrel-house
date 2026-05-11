@@ -1,0 +1,7 @@
+[2026-04-18 23:39:21] Issue #42: 恢复开发
+Agent类型: rework
+项目路径: ../../social-world
+日志文件: /Users/insulate/Desktop/new-world/new-world-ops/logs/social-world/dev-issue-42-resumed-20260418-233921.log
+
+❌ rework失败: shell step createWorktree failed: exit status 128, output: fatal: 'feat/issue-4' is already used by worktree at '/private/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/dev-issue-42-283994553'
+

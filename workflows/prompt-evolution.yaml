@@ -1,0 +1,28 @@
+name: prompt-evolution
+steps:
+  - id: runAgent
+    label: 运行 prompt-evolution agent
+    type: shell
+    tmux: true
+    dir: '{{ .Vars.projectDir }}'
+    command: |
+      kimi --agent-file {{ .Vars.agentFile | shellquote }} \
+           --max-steps-per-turn 10000 \
+           --print \
+           -p {{ .Vars.prompt | shellquote }}
+    env:
+      AGENT_REPORT_PATH: '{{ .Vars.reportPath }}'
+      AGENT_LOG_FILE: '{{ .Vars.logFileName }}'
+    outputKey: agentOutput
+    logFile: '{{ .Vars.logFileName }}'
+
+  - id: commitChanges
+    label: 提交 prompt/workflow 改进
+    type: shell
+    dir: '{{ .Vars.projectDir }}'
+    isCleanup: true
+    command: |
+      git add -A && \
+      (git diff --cached --quiet || git commit -m "ops: prompt evolution auto-commit") && \
+      git push origin main || true
+    ignoreError: true

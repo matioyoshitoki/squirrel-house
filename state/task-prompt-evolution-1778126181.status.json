@@ -1,0 +1,18 @@
+{
+  "taskID": "prompt-evolution-1778126181",
+  "type": "prompt-evolution",
+  "status": "running",
+  "projectName": "social-world",
+  "startedAt": "2026-05-07T11:56:21.772953+08:00",
+  "lastHeartbeat": "2026-05-07T12:04:17.856221+08:00",
+  "stepResults": {
+    "commitChanges": {
+      "status": "success",
+      "exitCode": 0
+    },
+    "runAgent": {
+      "status": "success",
+      "exitCode": 0
+    }
+  }
+}

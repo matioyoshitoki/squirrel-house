@@ -1,0 +1,5 @@
+docs/api/matching.md|新增 Matching 模块 API 文档，包含推荐和滑动接口的契约定义
+docs/api/socket-events.md|新增 Socket.io 事件文档，记录 match:created 的 Payload 结构
+docs/modules/matching.md|更新 Matching 模块实现文档，补全 Flutter BLoC、Widget、路由映射
+docs/design-docs/flutter.md|补充 Matching 组件的 Widgetbook 用例执行记录（可选）
+prd/v1-matching.md|顶部添加设计资产链接注释 designs/issue-4/

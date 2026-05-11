@@ -1,0 +1,12 @@
+[2026-04-14 09:50:17] PR #16 Review 启动
+分支: feat/issue-3
+项目路径: ../../social-world
+日志文件: logs/social-world/review-pr-16-20260414-095017.log
+Invalid tools: ['kimi_cli.tools.media:ReadMediaFile']
+See logs: /Users/insulate/.kimi/logs/kimi.log
+Run with --debug for full traceback, or run kimi export to share diagnostics.
+
+❌ Review 失败: shell step runAgent failed: exit status 1, output: Invalid tools: ['kimi_cli.tools.media:ReadMediaFile']
+See logs: /Users/insulate/.kimi/logs/kimi.log
+Run with --debug for full traceback, or run kimi export to share diagnostics.
+

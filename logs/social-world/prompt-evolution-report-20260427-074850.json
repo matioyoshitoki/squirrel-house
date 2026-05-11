@@ -1,0 +1,75 @@
+{
+  "generatedAt": "2026-04-27T07:48:50.635215+08:00",
+  "projectName": "social-world",
+  "since": "2026-04-27T03:01:36.139417+08:00",
+  "totalLogs": 4,
+  "agentStats": {
+    "dev": {
+      "count": 2,
+      "avgSteps": 106.5,
+      "avgDuration": 0,
+      "totalToolCalls": {
+        "Grep": 1,
+        "ReadFile": 62,
+        "Shell": 181,
+        "StrReplaceFile": 4
+      },
+      "totalErrors": 4,
+      "totalWrites": 4,
+      "successRate": 0.5,
+      "topGitOp": "a"
+    },
+    "e2e": {
+      "count": 1,
+      "avgSteps": 0,
+      "avgDuration": 0,
+      "totalToolCalls": {},
+      "totalErrors": 0,
+      "totalWrites": 0,
+      "successRate": 0,
+      "topGitOp": ""
+    },
+    "review": {
+      "count": 1,
+      "avgSteps": 32,
+      "avgDuration": 0,
+      "totalToolCalls": {
+        "Grep": 3,
+        "ReadFile": 29,
+        "Shell": 7,
+        "WriteFile": 1
+      },
+      "totalErrors": 2,
+      "totalWrites": 1,
+      "successRate": 1,
+      "topGitOp": "a"
+    }
+  },
+  "topIssues": [
+    {
+      "pattern": "dev_high_error_rate",
+      "count": 2,
+      "description": "dev 任务错误率 100% (2/2)"
+    },
+    {
+      "pattern": "review_high_error_rate",
+      "count": 1,
+      "description": "review 任务错误率 100% (1/1)"
+    },
+    {
+      "pattern": "dev_high_steps",
+      "count": 1,
+      "description": "dev #64 执行了 125 步，可能存在循环或任务理解困难"
+    },
+    {
+      "pattern": "dev_high_steps",
+      "count": 1,
+      "description": "dev #64 执行了 88 步，可能存在循环或任务理解困难"
+    },
+    {
+      "pattern": "dev_no_output",
+      "count": 1,
+      "description": "dev #64 执行了 88 步但没有文件修改产出"
+    }
+  ]
+}

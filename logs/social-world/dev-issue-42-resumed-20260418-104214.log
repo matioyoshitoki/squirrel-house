@@ -1,0 +1,6 @@
+[2026-04-18 10:42:14] Issue #42: 恢复开发
+Agent类型: rework
+项目路径: ../../social-world
+日志文件: /Users/insulate/Desktop/new-world/new-world-ops/logs/social-world/dev-issue-42-resumed-20260418-104214.log
+
+❌ rework失败: render command: template: wf:1:65: executing "wf" at <shellquote>: invalid value; expected string

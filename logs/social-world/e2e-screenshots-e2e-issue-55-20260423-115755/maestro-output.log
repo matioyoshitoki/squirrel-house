@@ -1,0 +1,11 @@
+
+Waiting for flows to complete...
+[Failed] swipe_recommendations (35s) (Assertion is false: id: mode_tab_nearby is visible)
+[Failed] view_match_list (35s) (Element not found: Id matching regex: tab_messages)
+[Passed] login (18s)
+[Failed] setup (18s) (Assertion is false: "完善资料" is visible)
+[Passed] open_drawer (6s)
+[Passed] edit_server_url (43s)
+
+3/6 Flows Failed
+

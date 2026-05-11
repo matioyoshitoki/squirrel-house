@@ -1,0 +1,6 @@
+[2026-04-14 10:53:18] PR #16 Rework 启动
+分支: feat/issue-3
+Issue: #23
+
+❌ 返工失败: shell step createWorktree failed: exit status 128, output: fatal: 'feat/issue-3' is already used by worktree at '/Users/insulate/Desktop/social-world'
+

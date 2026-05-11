@@ -1,0 +1,246 @@
+@import "tailwindcss";
+@source "./index.html";
+@source "./js/**/*.js";
+
+/* ─── Design System ─── */
+:root {
+  --background: #0a0a0a;
+  --foreground: #ededed;
+  --card: #0a0a0a;
+  --card-foreground: #ededed;
+  --popover: #0a0a0a;
+  --popover-foreground: #ededed;
+  --primary: #ededed;
+  --primary-foreground: #171717;
+  --secondary: #262626;
+  --secondary-foreground: #ededed;
+  --muted: #262626;
+  --muted-foreground: #a3a3a3;
+  --accent: #262626;
+  --accent-foreground: #ededed;
+  --destructive: #ef4444;
+  --destructive-foreground: #fafafa;
+  --border: #262626;
+  --input: #262626;
+  --ring: #d4d4d4;
+  --radius: 0.625rem;
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --info: #3b82f6;
+  --info-foreground: #fafafa;
+  --purple: #a855f7;
+  --purple-foreground: #fafafa;
+  --cyan: #06b6d4;
+  --cyan-foreground: #fafafa;
+  --amber: #f59e0b;
+  --amber-foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+  --color-purple: var(--purple);
+  --color-purple-foreground: var(--purple-foreground);
+  --color-cyan: var(--cyan);
+  --color-cyan-foreground: var(--cyan-foreground);
+  --color-amber: var(--amber);
+  --color-amber-foreground: var(--amber-foreground);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --font-sans: ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ─── Scrollbar ─── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--muted-foreground); }
+
+/* ─── Animations ─── */
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-slide-in { animation: slideIn 0.2s ease-out; }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+.animate-spin { animation: spin 1s linear infinite; }
+
+/* ─── Button Component ─── */
+.btn {
+  @apply inline-flex items-center justify-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium transition-all duration-150 cursor-pointer border;
+}
+.btn-primary {
+  @apply bg-primary text-primary-foreground border-primary hover:opacity-90;
+}
+.btn-secondary {
+  @apply bg-secondary text-secondary-foreground border-secondary hover:bg-muted;
+}
+.btn-outline {
+  @apply bg-transparent text-foreground border-border hover:bg-secondary;
+}
+.btn-ghost {
+  @apply bg-transparent text-muted-foreground border-transparent hover:text-foreground hover:bg-secondary;
+}
+.btn-destructive {
+  @apply bg-destructive text-destructive-foreground border-destructive hover:opacity-90;
+}
+.btn-success {
+  @apply bg-success text-background border-success hover:opacity-90;
+}
+.btn-warning {
+  @apply bg-warning text-background border-warning hover:opacity-90;
+}
+.btn-info {
+  @apply bg-info text-info-foreground border-info hover:opacity-90;
+}
+.btn-purple {
+  @apply bg-purple text-purple-foreground border-purple hover:opacity-90;
+}
+.btn-cyan {
+  @apply bg-cyan text-cyan-foreground border-cyan hover:opacity-90;
+}
+.btn-amber {
+  @apply bg-amber text-amber-foreground border-amber hover:opacity-90;
+}
+.btn-sm { @apply px-2.5 py-1.5 text-xs; }
+.btn:disabled { @apply opacity-50 cursor-not-allowed; }
+
+/* Loading spinner overlay on button */
+.btn-loading {
+  @apply relative pointer-events-none;
+  color: transparent !important;
+}
+.btn-loading::after {
+  content: "";
+  @apply absolute w-4 h-4 top-1/2 left-1/2 -ml-2 -mt-2 border-2 rounded-full animate-spin;
+  border-color: currentColor;
+  border-top-color: transparent;
+  opacity: 0.5;
+}
+
+/* ─── Card Component ─── */
+.card {
+  @apply rounded-xl border border-border bg-card text-card-foreground transition-all duration-150;
+}
+.card-hover:hover {
+  @apply border-muted-foreground/20;
+}
+
+/* ─── Badge Component ─── */
+.badge {
+  @apply inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-medium border;
+}
+
+/* ─── Stage Nav ─── */
+.stage-nav {
+  @apply flex flex-wrap gap-1 rounded-xl border border-border bg-card p-1.5;
+}
+.stage-btn {
+  @apply relative inline-flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-sm font-medium text-muted-foreground transition-all cursor-pointer border border-transparent;
+}
+.stage-btn:hover {
+  @apply text-foreground bg-secondary;
+}
+.stage-btn.active {
+  @apply text-foreground bg-secondary border-border shadow-sm;
+}
+.stage-badge {
+  @apply inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1 rounded-full bg-secondary text-xs font-semibold text-muted-foreground;
+}
+.stage-btn.active .stage-badge {
+  @apply bg-primary/10 text-foreground;
+}
+
+/* ─── Pulse Border (Running Tasks) ─── */
+@keyframes pulse-border {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); border-color: rgba(34, 197, 94, 0.5); }
+  50% { box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.1); border-color: rgba(34, 197, 94, 0.8); }
+}
+.pulse-running {
+  animation: pulse-border 2s ease-in-out infinite;
+}
+
+/* ─── Terminal ─── */
+.log-line { @apply py-0.5 whitespace-pre-wrap break-all; }
+.log-line:hover { @apply bg-secondary; }
+
+/* ─── Kimi Markdown in Terminal ─── */
+.kimi-markdown h1 { @apply text-lg font-bold mb-2 mt-3; }
+.kimi-markdown h2 { @apply text-base font-semibold mb-1.5 mt-2; }
+.kimi-markdown h3 { @apply text-sm font-semibold mb-1 mt-1.5; }
+.kimi-markdown p  { @apply mb-1.5 leading-relaxed; }
+.kimi-markdown ul { @apply list-disc pl-5 mb-2; }
+.kimi-markdown ol { @apply list-decimal pl-5 mb-2; }
+.kimi-markdown li { @apply mb-0.5; }
+.kimi-markdown code { @apply bg-secondary px-1 py-0.5 rounded text-xs font-mono; }
+.kimi-markdown pre { @apply bg-secondary p-3 rounded-lg overflow-x-auto mb-2 text-xs font-mono leading-relaxed; }
+.kimi-markdown pre code { @apply bg-transparent p-0; }
+.kimi-markdown blockquote { @apply border-l-2 border-muted-foreground/30 pl-3 italic text-muted-foreground mb-2; }
+.kimi-markdown table { @apply w-full text-xs mb-2 border-collapse; }
+.kimi-markdown th { @apply text-left font-semibold border-b border-border py-1 px-2; }
+.kimi-markdown td { @apply border-b border-border py-1 px-2; }
+
+/* ─── Markdown Body (Design Asset Preview) ─── */
+.markdown-body h1 { @apply text-xl font-bold mb-4 mt-2 pb-2 border-b border-border; }
+.markdown-body h2 { @apply text-lg font-semibold mb-3 mt-4 pb-1.5 border-b border-border; }
+.markdown-body h3 { @apply text-base font-semibold mb-2 mt-3; }
+.markdown-body h4 { @apply text-sm font-semibold mb-2 mt-2; }
+.markdown-body p  { @apply mb-3 leading-relaxed; }
+.markdown-body ul { @apply list-disc pl-5 mb-3; }
+.markdown-body ol { @apply list-decimal pl-5 mb-3; }
+.markdown-body li { @apply mb-1; }
+.markdown-body li > ul,
+.markdown-body li > ol { @apply mt-1 mb-1; }
+.markdown-body code { @apply bg-secondary px-1.5 py-0.5 rounded text-xs font-mono; }
+.markdown-body pre { @apply bg-[#161b22] p-4 rounded-lg overflow-x-auto mb-3 text-xs font-mono leading-relaxed border border-border; }
+.markdown-body pre code { @apply bg-transparent p-0 text-[13px]; }
+.markdown-body blockquote { @apply border-l-2 border-primary/40 pl-4 italic text-muted-foreground mb-3 py-1; }
+.markdown-body blockquote p { @apply mb-0; }
+.markdown-body table { @apply w-full text-sm mb-4 border-collapse; }
+.markdown-body th { @apply text-left font-semibold border-b border-border py-2 px-3 bg-secondary/50; }
+.markdown-body td { @apply border-b border-border py-2 px-3; }
+.markdown-body tr:hover td { @apply bg-secondary/30; }
+.markdown-body hr { @apply border-border my-4; }
+.markdown-body a { @apply text-primary hover:underline; }
+.markdown-body img { @apply max-w-full rounded-lg border border-border my-2; }
+.markdown-body strong { @apply font-semibold text-foreground; }
+.markdown-body em { @apply italic; }
+.markdown-body del { @apply line-through text-muted-foreground; }
+
+/* ─── Design Viewer ─── */
+.design-file-item.active {
+  @apply border-l-[3px] border-l-primary bg-secondary;
+}

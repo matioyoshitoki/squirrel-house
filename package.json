@@ -1,0 +1,19 @@
+{
+  "name": "new-world-ops",
+  "version": "1.0.0",
+  "description": "New-World 项目的运维工具集，包含 Agent Dashboard 用于任务管理和代码审查。",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.2.2",
+    "tailwindcss": "^4.2.2"
+  }
+}

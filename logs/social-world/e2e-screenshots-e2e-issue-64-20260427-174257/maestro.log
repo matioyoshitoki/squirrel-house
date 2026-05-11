@@ -1,0 +1,145 @@
+17:45:55.914 [ INFO] MAESTRO.logSystemInfo: ---- System Info ----
+17:45:55.914 [ INFO] MAESTRO.logSystemInfo: Maestro Version: 1.39.13
+17:45:55.915 [ INFO] MAESTRO.logSystemInfo: CI: Undefined
+17:45:55.915 [ INFO] MAESTRO.logSystemInfo: OS Name: Mac OS X
+17:45:55.915 [ INFO] MAESTRO.logSystemInfo: OS Version: 26.1
+17:45:55.915 [ INFO] MAESTRO.logSystemInfo: Architecture: aarch64
+17:45:55.915 [ INFO] MAESTRO.logSystemInfo: Java Version: 21
+17:45:55.925 [ INFO] MAESTRO.logSystemInfo: Xcode Version: null
+17:45:56.068 [DEBUG] io.micrometer.common.util.internal.logging.InternalLoggerFactory.newDefaultFactory: Using SLF4J as the default logging framework
+17:45:56.709 [ INFO] MAESTRO.logSystemInfo: Flutter Version: 3.24.5
+17:45:57.385 [ INFO] MAESTRO.logSystemInfo: Flutter Channel: stable
+17:45:57.385 [ INFO] MAESTRO.logSystemInfo: ---------------------
+17:45:57.697 [ INFO] maestro.orchestra.workspace.WorkspaceExecutionPlanner.plan: Created execution plan: ExecutionPlan(flowsToRun=[/private/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/rework-pr-64-612497967/.maestro/flows/auth/login.yaml, /private/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/rework-pr-64-612497967/.maestro/flows/profile/setup.yaml, /private/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/rework-pr-64-612497967/.maestro/flows/matching/swipe_recommendations.yaml, /private/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/rework-pr-64-612497967/.maestro/flows/matching/view_match_list.yaml, /private/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/rework-pr-64-612497967/.maestro/flows/im/view_conversation_list.yaml, /private/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/rework-pr-64-612497967/.maestro/flows/im/enter_chat.yaml, /private/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/rework-pr-64-612497967/.maestro/flows/im/send_message.yaml, /private/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/rework-pr-64-612497967/.maestro/flows/devtools/open_drawer.yaml, /private/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/rework-pr-64-612497967/.maestro/flows/devtools/edit_server_url.yaml, /private/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/rework-pr-64-612497967/.maestro/flows/devtools/empty_server_url.yaml, /private/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/rework-pr-64-612497967/.maestro/flows/devtools/invalid_server_url.yaml, /private/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/rework-pr-64-612497967/.maestro/flows/devtools/save_persists_after_reopen.yaml], sequence=FlowSequence(flows=[], continueOnFailure=null))
+17:45:57.759 [ INFO] maestro.cli.command.TestCommand.runShardSuite: [shard 1] Selected device emulator-5554 using port 7001
+17:46:00.452 [ INFO] maestro.Maestro.invoke: Getting device info
+17:46:00.613 [ INFO] maestro.Maestro.invoke: Got device info: DeviceInfo(platform=ANDROID, widthPixels=1080, heightPixels=2400, widthGrid=1080, heightGrid=2400)
+17:46:00.673 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Define variables RUNNING
+17:46:00.675 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Define variables COMPLETED
+17:46:00.675 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Apply configuration RUNNING
+17:46:00.675 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Apply configuration COMPLETED
+17:46:00.675 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Launch app "com.example.mobile" with clear state RUNNING
+17:46:00.675 [ INFO] maestro.Maestro.clearAppState: Clearing app state com.example.mobile
+17:46:01.348 [ INFO] maestro.Maestro.launchApp: Launching app com.example.mobile
+17:46:01.424 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Launch app "com.example.mobile" with clear state COMPLETED
+17:46:01.424 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Run includes/login-as-test-user.yaml RUNNING
+17:46:01.424 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Apply configuration RUNNING
+17:46:01.425 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Apply configuration COMPLETED
+17:46:01.425 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Assert that "欢迎使用 Social World" is visible RUNNING
+17:46:31.565 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Assert that "欢迎使用 Social World" is visible FAILED
+17:46:31.568 [ INFO] maestro.Maestro.takeScreenshot: Taking screenshot
+17:46:31.569 [TRACE] maestro.utils.ScreenshotUtils.takeScreenshot: Taking screenshot to output sink
+17:46:31.788 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Run includes/login-as-test-user.yaml FAILED
+17:46:32.109 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Define variables RUNNING
+17:46:32.110 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Define variables COMPLETED
+17:46:32.110 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Apply configuration RUNNING
+17:46:32.110 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Apply configuration COMPLETED
+17:46:32.110 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Launch app "com.example.mobile" with clear state RUNNING
+17:46:32.110 [ INFO] maestro.Maestro.clearAppState: Clearing app state com.example.mobile
+17:46:34.008 [ INFO] maestro.Maestro.launchApp: Launching app com.example.mobile
+17:46:34.101 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Launch app "com.example.mobile" with clear state COMPLETED
+17:46:34.102 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Run includes/login-as-test-user.yaml RUNNING
+17:46:34.102 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Apply configuration RUNNING
+17:46:34.102 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Apply configuration COMPLETED
+17:46:34.102 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Assert that "欢迎使用 Social World" is visible RUNNING
+17:47:04.175 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Assert that "欢迎使用 Social World" is visible FAILED
+17:47:04.177 [ INFO] maestro.Maestro.takeScreenshot: Taking screenshot
+17:47:04.177 [TRACE] maestro.utils.ScreenshotUtils.takeScreenshot: Taking screenshot to output sink
+17:47:04.448 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Run includes/login-as-test-user.yaml FAILED
+17:47:04.468 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Define variables RUNNING
+17:47:04.469 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Define variables COMPLETED
+17:47:04.470 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Apply configuration RUNNING
+17:47:04.470 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Apply configuration COMPLETED
+17:47:04.470 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Launch app "com.example.mobile" with clear state RUNNING
+17:47:04.470 [ INFO] maestro.Maestro.clearAppState: Clearing app state com.example.mobile
+17:47:05.977 [ INFO] maestro.Maestro.launchApp: Launching app com.example.mobile
+17:47:06.146 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Launch app "com.example.mobile" with clear state COMPLETED
+17:47:06.147 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Run includes/login-as-test-user.yaml RUNNING
+17:47:06.147 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Apply configuration RUNNING
+17:47:06.147 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Apply configuration COMPLETED
+17:47:06.147 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Assert that "欢迎使用 Social World" is visible RUNNING
+17:47:36.217 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Assert that "欢迎使用 Social World" is visible FAILED
+17:47:36.219 [ INFO] maestro.Maestro.takeScreenshot: Taking screenshot
+17:47:36.219 [TRACE] maestro.utils.ScreenshotUtils.takeScreenshot: Taking screenshot to output sink
+17:47:36.299 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Run includes/login-as-test-user.yaml FAILED
+17:47:36.310 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Define variables RUNNING
+17:47:36.311 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Define variables COMPLETED
+17:47:36.311 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Apply configuration RUNNING
+17:47:36.311 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Apply configuration COMPLETED
+17:47:36.311 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Launch app "com.example.mobile" with clear state RUNNING
+17:47:36.311 [ INFO] maestro.Maestro.clearAppState: Clearing app state com.example.mobile
+17:47:37.392 [ INFO] maestro.Maestro.launchApp: Launching app com.example.mobile
+17:47:37.442 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Launch app "com.example.mobile" with clear state COMPLETED
+17:47:37.443 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Run includes/login-as-test-user.yaml RUNNING
+17:47:37.443 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Apply configuration RUNNING
+17:47:37.443 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Apply configuration COMPLETED
+17:47:37.443 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Assert that "欢迎使用 Social World" is visible RUNNING
+17:48:07.737 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Assert that "欢迎使用 Social World" is visible FAILED
+17:48:07.739 [ INFO] maestro.Maestro.takeScreenshot: Taking screenshot
+17:48:07.740 [TRACE] maestro.utils.ScreenshotUtils.takeScreenshot: Taking screenshot to output sink
+17:48:07.946 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Run includes/login-as-test-user.yaml FAILED
+17:48:07.996 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Define variables RUNNING
+17:48:07.999 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Define variables COMPLETED
+17:48:07.999 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Apply configuration RUNNING
+17:48:07.999 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Apply configuration COMPLETED
+17:48:07.999 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Launch app "com.example.mobile" with clear state RUNNING
+17:48:07.999 [ INFO] maestro.Maestro.clearAppState: Clearing app state com.example.mobile
+17:48:10.302 [ INFO] maestro.Maestro.launchApp: Launching app com.example.mobile
+17:48:10.435 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Launch app "com.example.mobile" with clear state COMPLETED
+17:48:10.435 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Run includes/login-as-test-user.yaml RUNNING
+17:48:10.435 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Apply configuration RUNNING
+17:48:10.436 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Apply configuration COMPLETED
+17:48:10.436 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Assert that "欢迎使用 Social World" is visible RUNNING
+17:48:39.417 [ERROR] maestro.drivers.AndroidDriver.callViewHierarchy: Failed to get view hierarchy: Network closed for unknown reason
+io.grpc.StatusRuntimeException: UNAVAILABLE: Network closed for unknown reason
+	at io.grpc.stub.ClientCalls.toStatusRuntimeException(ClientCalls.java:275)
+	at io.grpc.stub.ClientCalls.getUnchecked(ClientCalls.java:256)
+	at io.grpc.stub.ClientCalls.blockingUnaryCall(ClientCalls.java:169)
+	at maestro_android.MaestroDriverGrpc$MaestroDriverBlockingStub.viewHierarchy(MaestroDriverGrpc.java:641)
+	at maestro.drivers.AndroidDriver.callViewHierarchy(AndroidDriver.kt:350)
+	at maestro.drivers.AndroidDriver.callViewHierarchy$default(AndroidDriver.kt:348)
+	at maestro.drivers.AndroidDriver$contentDescriptor$1.invoke(AndroidDriver.kt:313)
+	at maestro.drivers.AndroidDriver$contentDescriptor$1.invoke(AndroidDriver.kt:312)
+	at maestro.utils.Metrics.measured(Metrics.kt:48)
+	at maestro.drivers.AndroidDriver.contentDescriptor(AndroidDriver.kt:312)
+	at maestro.ViewHierarchy$Companion.from-8JJjmZI(ViewHierarchy.kt:29)
+	at maestro.Maestro.viewHierarchy-c1iYVAs(Maestro.kt:426)
+	at maestro.Maestro.viewHierarchy-c1iYVAs$default(Maestro.kt:425)
+	at maestro.Maestro$findElementWithTimeout$element$1.invoke(Maestro.kt:455)
+	at maestro.Maestro$findElementWithTimeout$element$1.invoke(Maestro.kt:454)
+	at maestro.utils.MaestroTimer.withTimeout(MaestroTimer.kt:16)
+	at maestro.Maestro.findElementWithTimeout-AE3g2Tc(Maestro.kt:454)
+	at maestro.Maestro.findElementWithTimeout-AE3g2Tc$default(Maestro.kt:448)
+	at maestro.orchestra.Orchestra.findElement(Orchestra.kt:1027)
+	at maestro.orchestra.Orchestra.evaluateCondition(Orchestra.kt:670)
+	at maestro.orchestra.Orchestra.assertConditionCommand(Orchestra.kt:353)
+	at maestro.orchestra.Orchestra.executeCommand(Orchestra.kt:284)
+	at maestro.orchestra.Orchestra.executeSubflowCommands(Orchestra.kt:748)
+	at maestro.orchestra.Orchestra.runSubFlow(Orchestra.kt:800)
+	at maestro.orchestra.Orchestra.runFlowCommand(Orchestra.kt:647)
+	at maestro.orchestra.Orchestra.executeCommand(Orchestra.kt:299)
+	at maestro.orchestra.Orchestra.executeCommands(Orchestra.kt:205)
+	at maestro.orchestra.Orchestra.runFlow(Orchestra.kt:138)
+	at maestro.cli.runner.TestSuiteInteractor.runFlow(TestSuiteInteractor.kt:237)
+	at maestro.cli.runner.TestSuiteInteractor.runTestSuite(TestSuiteInteractor.kt:95)
+	at maestro.cli.command.TestCommand.runMultipleFlows(TestCommand.kt:416)
+	at maestro.cli.command.TestCommand.access$runMultipleFlows(TestCommand.kt:65)
+	at maestro.cli.command.TestCommand$runShardSuite$2.invoke(TestCommand.kt:344)
+	at maestro.cli.command.TestCommand$runShardSuite$2.invoke(TestCommand.kt:323)
+	at maestro.cli.session.MaestroSessionManager.newSession(MaestroSessionManager.kt:105)
+	at maestro.cli.session.MaestroSessionManager.newSession$default(MaestroSessionManager.kt:53)
+	at maestro.cli.command.TestCommand.runShardSuite(TestCommand.kt:323)
+	at maestro.cli.command.TestCommand.access$runShardSuite(TestCommand.kt:65)
+	at maestro.cli.command.TestCommand$handleSessions$1$results$1$1.invokeSuspend(TestCommand.kt:290)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:104)
+	at kotlinx.coroutines.internal.LimitedDispatcher$Worker.run(LimitedDispatcher.kt:111)
+	at kotlinx.coroutines.scheduling.TaskImpl.run(Tasks.kt:99)
+	at kotlinx.coroutines.scheduling.CoroutineScheduler.runSafely(CoroutineScheduler.kt:585)
+	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.executeTask(CoroutineScheduler.kt:802)
+	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.runWorker(CoroutineScheduler.kt:706)
+	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.run(CoroutineScheduler.kt:693)
+17:50:40.430 [ERROR] maestro.drivers.AndroidDriver.callViewHierarchy: Timeout while fetching view hierarchy
+17:50:40.432 [ INFO] maestro.cli.runner.TestSuiteInteractor.invoke: Assert that "欢迎使用 Social World" is visible FAILED
+17:50:40.433 [ INFO] maestro.Maestro.takeScreenshot: Taking screenshot
+17:50:40.434 [TRACE] maestro.utils.ScreenshotUtils.takeScreenshot: Taking screenshot to output sink

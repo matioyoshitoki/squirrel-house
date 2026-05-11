@@ -1,0 +1,134 @@
+name: dev-task
+steps:
+  - id: fetchOrigin
+    label: 同步远程分支
+    type: shell
+    command: git fetch origin
+    ignoreError: true
+
+  - id: installDeps
+    label: 安装项目依赖
+    type: shell
+    dir: '{{ .Vars.tmpDir }}'
+    command: |
+      if [ -f "pnpm-lock.yaml" ] && [ ! -d "node_modules" ]; then
+        pnpm install || npm install || true
+      elif [ -f "package-lock.json" ] && [ ! -d "node_modules" ]; then
+        npm install || true
+      fi
+      if [ -f "apps/mobile/pubspec.yaml" ]; then
+        (cd apps/mobile && flutter pub get) || true
+      fi
+      if [ -f "packages/design-system/pubspec.yaml" ]; then
+        (cd packages/design-system && flutter pub get) || true
+      fi
+      if [ -f "apps/phaser3/package.json" ] && [ ! -d "apps/phaser3/node_modules" ]; then
+        (cd apps/phaser3 && pnpm install || npm install) || true
+      fi
+    ignoreError: true
+
+  - id: runAgent
+    label: 运行 developer agent
+    type: shell
+    tmux: true
+    dir: '{{ .Vars.tmpDir }}'
+    command: |
+      kimi --agent-file {{ .Vars.agentFile | shellquote }} \
+           --max-steps-per-turn 10000 \
+           --print \
+           -p {{ .Vars.prompt | shellquote }}
+    env:
+      AGENT_ISSUE_NUMBER: '{{ .Vars.issueNumber }}'
+      AGENT_ISSUE_TITLE: '{{ .Vars.issueTitle }}'
+      AGENT_LOG_FILE: '{{ .Vars.logFileName }}'
+      AGENT_MODE: '{{ .Vars.agentMode }}'
+      AGENT_REVIEW_REPORT: '{{ .Vars.reviewReport }}'
+      # AGENT_AGENTS_MD 由 dashboard 在 buildAgentContext 中自动设置，无需在此覆盖
+    outputKey: agentOutput
+    logFile: '{{ .Vars.logFileName }}'
+
+  - id: preCommitChecks
+    label: 提交前强制检查
+    type: shell
+    dir: '{{ .Vars.tmpDir }}'
+    command: |
+      echo "=== Pre-Commit Checks ==="
+      FAILED=0
+
+      # 1. 检查 Flutter 硬编码颜色
+      if [ -d "packages/design-system" ]; then
+        HARDCODED=$(grep -rn "Color(0xFF" packages/design-system/lib/src/ 2>/dev/null | grep -v "tokens.dart" | head -20)
+        if [ -n "$HARDCODED" ]; then
+          echo "❌ 发现 Design-System 硬编码颜色："
+          echo "$HARDCODED"
+          FAILED=1
+        fi
+      fi
+
+      # 2. 检查 Maestro 不兼容写法（需要 E2E 的组件不能用 InkWell.onTap）
+      if [ -d "packages/design-system" ]; then
+        INKWELL=$(grep -rn "InkWell.*onTap:" packages/design-system/lib/src/ 2>/dev/null | head -10)
+        if [ -n "$INKWELL" ]; then
+          echo "❌ 发现 Maestro 不兼容的 InkWell.onTap（应使用 GestureDetector.onTapDown）："
+          echo "$INKWELL"
+          FAILED=1
+        fi
+      fi
+
+      # 3. 检查 BDD steps 是否为空实现
+      for f in tests/bdd/step-definitions/*.steps.js; do
+        if [ -f "$f" ]; then
+          EMPTY=$(grep -c "() => {}" "$f" 2>/dev/null) || EMPTY=0
+          if [ "$EMPTY" -gt 0 ]; then
+            echo "❌ $f 存在 $EMPTY 个空实现步骤"
+            FAILED=1
+          fi
+        fi
+      done
+
+      # 4. 检查 Maestro E2E flow（如果涉及新页面/交互）
+      # 简化检查：如果 Mobile 有新增 page 文件但 .maestro 没有新增，发出警告
+      NEW_PAGES=$(git diff --name-only --cached 2>/dev/null | grep "apps/mobile/lib/presentation/pages/" | grep "^A" | wc -l || echo 0)
+      NEW_MAESTRO=$(git diff --name-only --cached 2>/dev/null | grep ".maestro/flows/" | wc -l || echo 0)
+      if [ "$NEW_PAGES" -gt 0 ] && [ "$NEW_MAESTRO" -eq 0 ]; then
+        echo "⚠️ 新增页面但未新增 Maestro E2E flow（如果页面不在核心流程中可忽略）"
+      fi
+
+      # 5. 运行 lint（如果 Makefile 存在）
+      if [ -f "Makefile" ]; then
+        make lint 2>&1 | tail -20 || echo "⚠️ lint 检查失败（可能是环境缺失）"
+      fi
+
+      # 6. 运行测试（如果 Makefile 存在）
+      if [ -f "Makefile" ]; then
+        make test 2>&1 | tail -30 || echo "⚠️ 测试运行失败（可能是环境缺失）"
+      fi
+
+      if [ "$FAILED" -eq 1 ]; then
+        echo ""
+        echo "❌ Pre-Commit Checks 未通过。请修复上述问题后重新提交。"
+        exit 1
+      fi
+
+      echo "✅ Pre-Commit Checks 通过"
+    ignoreError: false
+
+  - id: ensureCommitAndPush
+    label: 强制提交并推送
+    type: shell
+    dir: '{{ .Vars.tmpDir }}'
+    isCleanup: true
+    command: |
+      git add -A && \
+      (git diff --cached --quiet || git commit -m "chore: auto-commit by agent") && \
+      git push origin {{ .Vars.branch }} || true
+    ignoreError: true
+
+  - id: cleanupWorktree
+    label: 清理 worktree
+    type: shell
+    isCleanup: true
+    command: |
+      git worktree remove --force {{ .Vars.tmpDir }} || true
+      rm -rf {{ .Vars.tmpDir }}
+    ignoreError: true

@@ -1,0 +1,4 @@
+docs/modules/INDEX.md|新增 dev-tools 模块条目，关联 PRD v1-dev-tools-drawer.md
+docs/modules/dev-tools.md|新建模块实现文档，覆盖 Debug 工具全链路（Widget→Cubit→Repository→DioClient）
+docs/design-docs/flutter.md|新增 Debug-Only Widget 条件编译模式规范小节
+docs/design-docs/ui-specs/dev-tools/dev-tools-drawer-wireframe.md|新建 UI 规格归档文档，引用 designs/issue-29 设计资产

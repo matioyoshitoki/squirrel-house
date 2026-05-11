@@ -1,0 +1,22 @@
+name: issue_5_widgets
+description: Design-only widgets for issue #5 IM module
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.4.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  social_world_design_system:
+    path: ../../../packages/design-system
+  widgetbook:
+    ^3.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true

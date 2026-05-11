@@ -1,0 +1,146 @@
+## 审查结论
+
+审查结论: NEEDS_MAJOR_FIX
+
+PR #35 混合交付了 IM（即时消息）后端系统、前端 UI 组件更新及 E2E 测试基础设施。整体功能设计合理，数据库 Schema、Proto 定义、业务逻辑、E2E 覆盖和文档更新较为完整。但存在 **1 个阻塞性编译错误**、**2 个架构层违规（Major）** 以及若干代码规范与 PRD 一致性问题，必须在合并前修复。
+
+---
+
+## 阻塞问题（Blocking）
+
+### 1. Go 编译错误：`uidStr` 在同一作用域内重复短变量声明
+- **位置**: `internal/biz/wapi/im.go:235`
+- **问题**: `GetMessageHistory` 函数内，第 218 行已声明 `uidStr := fmt.Sprintf("%d", uid)`，第 235 行再次使用 `:=` 声明同名变量 `uidStr := fmt.Sprintf("%d", uid)`。Go 编译器会报错：`no new variables on left side of :=`。
+- **影响**: 后端服务无法编译，IM 模块完全不可用。
+- **修复**:
+  ```go
+  // internal/biz/wapi/im.go:235
+  // 将 := 改为 =
+  uidStr = fmt.Sprintf("%d", uid)
+  ```
+- **依据**: `git diff` 中的实际代码 / Go 语言规范
+
+---
+
+## 严重问题（Major）
+
+### 2. Biz 层直接返回 gRPC `status.Error`，违反错误分层规范
+- **位置**: `internal/biz/wapi/im.go:66-67`, `69-70`, `72-73`, `220`, `317`
+- **问题**: Biz 层直接导入 `"google.golang.org/grpc/codes"` 和 `"google.golang.org/grpc/status"`，并在业务逻辑中返回 `status.Error(codes.InvalidArgument, ...)`、`status.Error(codes.PermissionDenied, ...)`。根据项目架构规范，`status.Error` 只能在 **Service 层** 使用；Biz 层应返回 `repo.ErrNotFound`、`exception.Exception` 或自定义业务错误（如 `internal/biz/wapi/auth.go` 中 `exception.New(...)` 的用法）。
+- **影响**: 破坏分层隔离，导致 Biz 层与传输协议（gRPC/HTTP）耦合，后续切换协议或复用业务逻辑时成本增加。
+- **修复**:
+  1. 在 `internal/biz/wapi/im.go` 中移除 `google.golang.org/grpc/codes` 和 `google.golang.org/grpc/status` 的导入。
+  2. 定义 biz 层领域错误：
+     ```go
+     var ErrInvalidArgument = exception.New(400, "invalid argument", "参数错误")
+     var ErrPermissionDenied = exception.New(403, "permission denied", "权限不足")
+     ```
+  3. Biz 层返回这些领域错误。
+  4. 在 `internal/service/wapi/im.go` 中将领域错误转换为 gRPC `status.Error`（参考 `layers.md` 第 10.2 节示例）。
+- **依据**: `docs/architecture/layers.md` 第 10.1 节错误分层定义表、第 10.2 节错误转换规则。`internal/biz/wapi/im.go` 是 `internal/biz/` 下**唯一**导入 gRPC status/codes 的文件。
+
+### 3. Data 层未将 `ent.IsNotFound` 转换为 `repo.ErrNotFound`
+- **位置**: `internal/data/wapi/im.go:74-82` (`GetConversationByID`)，以及 `IncrUnreadCount`、`IncrUnreadCountTx`、`ClearUnreadCount`、`ClearUnreadCountTx` 中使用的 `First()` 查询
+- **问题**: Data 层在 `ent.IsNotFound(err)` 时直接返回原始 ent 错误，未按规范转换为 `repo.ErrNotFound`。这导致上层无法使用 `errors.Is(err, repo.ErrNotFound)` 进行标准错误判断，且 Service 层无法按规范映射到 `codes.NotFound`。
+- **影响**: 错误语义不一致，E2E 测试和客户端可能收到不可预期的内部错误而非 404。
+- **修复**:
+  ```go
+  // internal/data/wapi/im.go:74-82
+  func (r *imRepo) GetConversationByID(ctx context.Context, conversationID string) (*repo.Conversation, error) {
+      conv, err := r.worldDB.Conversation.Query().
+          Where(conversation.ConversationID(conversationID)).
+          First(ctx)
+      if err != nil {
+          if ent.IsNotFound(err) {
+              return nil, repo.ErrNotFound
+          }
+          return nil, err
+      }
+      return r.toRepoConversation(conv), nil
+  }
+  ```
+  同理修复 `IncrUnreadCount`、`IncrUnreadCountTx`、`ClearUnreadCount`、`ClearUnreadCountTx` 中的 `First()` 错误转换。
+- **依据**: `docs/architecture/layers.md` 第 10.2 节 "Data → Repo：转换 ent 错误为领域错误" 示例。
+
+### 4. E2E 测试文件存在 `gofmt` 格式违规，将导致 CI 失败
+- **位置**:
+  - `test/e2e/scenario/auth_flow_test.go:11`
+  - `test/e2e/scenario/im_flow_test.go:10`
+  - `test/e2e/scenario/leaderboard_flow_test.go:10`
+- **问题**: 三个文件的 `import` 块中，`testifySuite` 别名前存在 **Tab + 空格** 的混合缩进（`\t testifySuite ...`），而标准 `gofmt` 要求仅使用 Tab。由于 `.golangci.yaml` 启用了 `gofmt` linter，这些文件在 CI 中会被判定为格式错误。
+- **影响**: CI `golangci-lint` 阶段失败，阻塞合并。
+- **修复**: 对这三个文件执行 `gofmt -w` 修正缩进。
+- **依据**: `.golangci.yaml` 第 96 行启用了 `gofmt` / `git diff` 中可见的缩进变更。
+
+---
+
+## 轻微问题（Minor）
+
+### 5. `src/ui/index.ts` 未导出 `types.ts` 中的新增公共类型
+- **位置**: `apps/phaser3/src/ui/index.ts`
+- **问题**: PR 新增了 `UIDepthLayer`、`UIInteractiveState`、`UITweenConfig` 等公共类型（`types.ts`），但 `index.ts` 未重新导出它们。外部模块无法通过 `import { UIDepthLayer } from './ui'` 使用这些类型。
+- **修复**: 在 `apps/phaser3/src/ui/index.ts` 追加：
+  ```ts
+  export {
+    UIPositionConfig,
+    UISizeConfig,
+    UIEventCallback,
+    UIQualityLevel,
+    UINotificationType,
+    UIDepthLayer,
+    UIInteractiveState,
+    UITweenConfig,
+  } from './types';
+  ```
+- **依据**: PRD-004 第 5.1 节要求 `src/ui/index.ts` 统一导出全部 Layer 1 + Layer 2 组件及公共类型。
+
+### 6. 缺少 `src/ui/__tests__/setup.ts` 测试基础设施文件
+- **位置**: `apps/phaser3/src/ui/__tests__/`
+- **问题**: PRD-004 第 5.1 节及第 7.3 节要求建立 `src/ui/__tests__/setup.ts` 提供组件通用 helper（如 `simulateClick()`、`simulateHover()`）。当前该文件缺失，各测试文件直接依赖 `src/test-setup.ts` 中的 `MockScene`，未建立 UI 组件专属的测试 helper。
+- **修复**: 新增 `apps/phaser3/src/ui/__tests__/setup.ts`，封装 `simulateClick(container)`、`simulateHover(container)` 等 helper，并在 `vitest.config.ts`（或等效配置）中注册为 `setupFiles`。
+- **依据**: PRD-004 第 5.1 节目录结构、第 7.3 节测试基础设施要求。
+
+### 7. `UISegmentedControlConfig.options` 接口与 PRD 不一致
+- **位置**: `apps/phaser3/src/ui/UISegmentedControl.ts:20`
+- **问题**: 实现中 `options?: UISegmentedOption[]` 为可选；PRD-004 第 5.13 节接口设计明确定义为 `options: UISegmentedOption[]`（无 `?`）。空选项数组可通过 `[]` 传入，但不应在类型层面允许 `undefined` 以失去类型安全。
+- **修复**: 移除 `?`，改为 `options: UISegmentedOption[]`。
+- **依据**: PRD-004 第 5.13 节 `UISegmentedControlConfig` 接口定义。
+
+### 8. `GetMessageHistory` 缺少 `page` 参数边界校验
+- **位置**: `internal/biz/wapi/im.go:207`
+- **问题**: `GetConversationList` 对 `page` 做了 `< 1` 的兜底修正，但 `GetMessageHistory` 仅校验了 `pageSize`，未校验 `page`（虽然该接口目前使用游标分页 `beforeMessageId`，不存在 `page` 参数）。实际上该接口逻辑正确，但注释与参数校验风格不一致。
+- **说明**: 该问题影响较低，因为 `GetMessageHistoryRequest` 本身没有 `page` 字段，仅 `page_size`。属于代码风格一致性建议。
+
+### 9. `IMMessage.Status` 使用魔法数字
+- **位置**: `internal/biz/wapi/im.go:92`
+- **问题**: `Status: 1` 缺乏具名常量，降低了可读性。
+- **修复**: 在 `internal/biz/repo/im.go` 中定义常量：
+  ```go
+  const IMMessageStatusNormal = 1
+  const IMMessageStatusRecalled = 2
+  ```
+  并在 Biz 层使用 `Status: repo.IMMessageStatusNormal`。
+- **依据**: 项目代码风格及 `internal/data/world/ent/schema/im_message.go` 的字段注释。
+
+---
+
+## 验证结果
+
+| 维度 | 状态 | 说明 |
+|------|------|------|
+| 功能完整性 | ✅ | IM 核心功能（发消息、会话列表、消息历史、已读回执、WebSocket 推送）均已实现 |
+| 代码规范性 | ❌ | Biz 层直接返回 gRPC 错误（Major）、Data 层未转换 ent 错误（Major）、存在编译错误（Blocking） |
+| 全链路完整性 | ✅ | DB Schema → Ent → Data → Repo → Biz → Service → HTTP 注册 → Proto → OpenAPI 完整贯通 |
+| 规范符合性 | ⚠️ | 前端 UI 组件实现与 PRD-004 基本一致，但 `index.ts` 未导出新增类型、`options` 可选性偏差、`__tests__/setup.ts` 缺失 |
+| 测试覆盖 | ✅ | Biz 层有单元测试（Mock Repo）、E2E 覆盖 IM 完整链路；但缺少 `GetMessageHistory` 成功路径单元测试 |
+| 文档同步 | ✅ | `docs/modules/im/README.md` 和 `docs/modules/INDEX.md` 已同步更新 |
+
+---
+
+## 风险与建议
+
+1. **编译阻塞风险**：`internal/biz/wapi/im.go:235` 的变量重声明是硬编译错误，必须作为最高优先级修复。
+2. **架构漂移风险**：Biz 层引入 gRPC 依赖是项目范围内罕见的分层违规（`internal/biz/` 下仅此一处），若合并将成为不良先例。建议立即重构为 `exception.Exception` 模式，与 `auth.go` 保持一致。
+3. **Data 层错误契约风险**：未转换的 `ent.IsNotFound` 会导致 Service 层错误码映射失效，建议统一在 Data 层收口。
+4. **CI 阻塞风险**：三个 E2E 测试文件的 `gofmt` 违规会导致 `golangci-lint` 失败，修复成本低，建议优先处理。
+5. **前端规范缺口**：本次 PR 的主要目标是 IM 后端（Issue #5）和 E2E（Issue #64），前端 UI 改动（`UIBadge`、`UISegmentedControl`、`types.ts`、`utils.ts`）看似来自 PRD-004（Issue #17）。如果前端改动是附带提交，建议确保 `index.ts` 导出和 `__tests__/setup.ts` 的缺失在后续迭代中补齐；如果 PRD-004 的交付范围包含在本次 PR 中，则需要更严格地对照 PRD 验收清单执行。

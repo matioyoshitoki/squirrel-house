@@ -1,0 +1,2088 @@
+[2026-04-16 08:42:12] PR #34 Doc Gardener 启动
+Merged: false
+Base: main
+Head: feat/issue-32
+日志: /Users/insulate/Desktop/new-world/new-world-ops/logs/social-world/doc-gardener-pr-34-20260416-084212.log
+【任务上下文】
+- PR 编号: #34
+- 项目路径: ../../social-world
+- 项目地图: ../../social-world/AGENTS.md
+- 关联 PRD: ../../social-world/prd/v1-dev-tools-drawer.md,../../social-world/prd
+/v1-auth-login.md,../../social-world/prd/v1-matching.md
+- 文档目录: ../../social-world/docs
+
+请对当前 open 的 PR 进行文档协同检查，并直接补充遗漏的文档。
+
+【上下文】
+- 这是一个尚未合并的 open PR
+- PR 编号: #34
+- 当前分支: feat/issue-32
+- Base 分支: main
+
+【变更文件列表】
+apps/mobile/lib/presentation/widgets/server_url_tool.dart
+apps/mobile/test/dev_tools_widget_test.dart
+
+【必须执行的操作】
+1. 分析上述变更，检查对应文档是否已补充
+2. 对遗漏项，直接创建或修改对应的 .md 文档文件
+3. 检查 CHANGELOG.md：
+   - 如果 PR 包含用户可见的功能变更或接口变更，而 CHANGELOG.md 中尚未记录，必须
+在最新版本区块下追加条目 `- #34`
+4. 如果 PR 包含接口破坏性变更，必须创建或更新迁移指南 docs/migration/README.md
+5. 输出结构化报告到日志
+6. 将文档变更提交：git add -A && git commit -m 'docs: 补充 PR #34 文档 (by PR Do
+c Gardener)'
+7. push 到当前分支：git push origin feat/issue-32
+
+注意：只修改文档文件（.md），不要修改业务代码。
+TurnBegin(
+    user_input="【任务上下文】\n- PR 编号: #34\n- 项目路径: ../../social-world\n
+- 项目地图: ../../social-world/AGENTS.md\n- 关联 PRD: ../../social-world/prd/v1-
+dev-tools-drawer.md,../../social-world/prd/v1-auth-login.md,../../social-world/p
+rd/v1-matching.md\n- 文档目录: ../../social-world/docs\n\n请对当前 open 的 PR 进
+行文档协同检查，并直接补充遗漏的文档。\n\n【上下文】\n- 这是一个尚未合并的 open 
+PR\n- PR 编号: #34\n- 当前分支: feat/issue-32\n- Base 分支: main\n\n【变更文件列
+表】\napps/mobile/lib/presentation/widgets/server_url_tool.dart\napps/mobile/tes
+t/dev_tools_widget_test.dart\n\n【必须执行的操作】\n1. 分析上述变更，检查对应文
+档是否已补充\n2. 对遗漏项，直接创建或修改对应的 .md 文档文件\n3. 检查 CHANGELOG.
+md：\n   - 如果 PR 包含用户可见的功能变更或接口变更，而 CHANGELOG.md 中尚未记录
+，必须在最新版本区块下追加条目 `- #34`\n4. 如果 PR 包含接口破坏性变更，必须创建
+或更新迁移指南 docs/migration/README.md\n5. 输出结构化报告到日志\n6. 将文档变更
+提交：git add -A && git commit -m 'docs: 补充 PR #34 文档 (by PR Doc Gardener)'\
+n7. push 到当前分支：git push origin feat/issue-32\n\n注意：只修改文档文件（.md
+），不要修改业务代码。"
+)
+StepBegin(n=1)
+ThinkPart(
+    type='think',
+    think='让我分析这个任务：\n\n1. PR #34 的变更文件：\n   - `apps/mobile/lib/p
+resentation/widgets/server_url_tool.dart` - 新增了一个 Flutter widget（开发者工
+具）\n   - `apps/mobile/test/dev_tools_widget_test.dart` - 对应的测试文件\n\n2. 
+我需要：\n   - 读取项目地图 AGENTS.md\n   - 读取相关 PRD 文档\n   - 读取当前变更
+文件的内容\n   - 检查 docs/ 下是否有相关文档需要更新\n   - 检查 CHANGELOG.md\n  
+- 创建/修改必要的 .md 文档\n   - 提交并推送\n\n让我先读取必要的文件。',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_jfxw5vGUCLMmBnFr869JIAfo',
+    function=FunctionBody(
+        name='Shell',
+        arguments='{"command": "cd ../../social-world && git diff --name-only or
+igin/main...HEAD"}'
+    ),
+    extras=None
+)
+StatusUpdate(
+    context_usage=0.015384674072265625,
+    context_tokens=4033,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=3521,
+        output=169,
+        input_cache_read=512,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-dEHe5Q9mgJGr2x7i6oGw6SHP',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_jfxw5vGUCLMmBnFr869JIAfo',
+    return_value=ToolReturnValue(
+        is_error=True,
+        output='/bin/bash: line 0: cd: ../../social-world: No such file or direc
+tory\n',
+        message='Command failed with exit code: 1.',
+        display=[
+            BriefDisplayBlock(type='brief', text='Failed with exit code: 1')
+        ],
+        extras=None
+    )
+)
+StepBegin(n=2)
+ThinkPart(
+    type='think',
+    think='看起来路径有问题。让我先检查当前工作目录和实际的项目路径。',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_8oH1ftdImye02Hmq8qVRotEU',
+    function=FunctionBody(
+        name='Shell',
+        arguments='{"command": "pwd && ls -la"}'
+    ),
+    extras=None
+)
+StatusUpdate(
+    context_usage=0.01622772216796875,
+    context_tokens=4254,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=414,
+        output=37,
+        input_cache_read=3840,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-lkQdYDTjcG4vKl5UUuaRkjDl',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_8oH1ftdImye02Hmq8qVRotEU',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='/private/var/folders/lt/w3sl6z8j5v50vt2s6knvf5n00000gn/T/doc-gar
+dener-34-1078990290\ntotal 872\ndrwx------@  30 insulate  staff     960 Apr 16 0
+8:42 .\ndrwx------@ 722 insulate  staff   23104 Apr 16 08:42 ..\n-rw-r--r--@   1
+insulate  staff     694 Apr 16 08:42 .env.example\n-rw-r--r--@   1 insulate  sta
+ff      87 Apr 16 08:42 .git\ndrwxr-xr-x@   4 insulate  staff     128 Apr 16 08:
+42 .github\n-rw-r--r--@   1 insulate  staff     779 Apr 16 08:42 .gitignore\ndrw
+xr-xr-x@   3 insulate  staff      96 Apr 16 08:42 .husky\ndrwxr-xr-x@   4 insula
+te  staff     128 Apr 16 08:42 .kimi\n-rw-r--r--@   1 insulate  staff   18066 Ap
+r 16 08:42 AGENT-FIRST-PROJECT-SEED.md\n-rw-r--r--@   1 insulate  staff    2825 
+Apr 16 08:42 AGENTS.md\ndrwxr-xr-x@   5 insulate  staff     160 Apr 16 08:42 app
+s\n-rw-r--r--@   1 insulate  staff     292 Apr 16 08:42 CHANGELOG.md\ndrwxr-xr-x
+@   3 insulate  staff      96 Apr 16 08:42 designs\n-rw-r--r--@   1 insulate  st
+aff    1991 Apr 16 08:42 docker-compose.yml\ndrwxr-xr-x@   8 insulate  staff    
+256 Apr 16 08:42 docs\n-rw-r--r--@   1 insulate  staff      53 Apr 16 08:42 go.m
+od\ndrwxr-xr-x@   3 insulate  staff      96 Apr 16 08:42 internal\n-rw-r--r--@  
+1 insulate  staff    2509 Apr 16 08:42 Makefile\n-rw-r--r--@   1 insulate  staff
+    253 Apr 16 08:42 melos.yaml\n-rw-r--r--@   1 insulate  staff     154 Apr 16 
+08:42 openapitools.json\n-rw-r--r--@   1 insulate  staff     887 Apr 16 08:42 pa
+ckage.json\ndrwxr-xr-x@   4 insulate  staff     128 Apr 16 08:42 packages\n-rw-r
+--r--@   1 insulate  staff  363710 Apr 16 08:42 pnpm-lock.yaml\n-rw-r--r--@   1 
+insulate  staff      40 Apr 16 08:42 pnpm-workspace.yaml\ndrwxr-xr-x@  10 insula
+te  staff     320 Apr 16 08:42 prd\n-rw-r--r--@   1 insulate  staff     206 Apr 
+16 08:42 pubspec.yaml\n-rw-r--r--@   1 insulate  staff    1670 Apr 16 08:42 READ
+ME.md\ndrwxr-xr-x@  10 insulate  staff     320 Apr 16 08:42 scripts\ndrwxr-xr-x@
+  4 insulate  staff     128 Apr 16 08:42 tests\n-rw-r--r--@   1 insulate  staff 
+   456 Apr 16 08:42 turbo.json\n',
+        message='Command executed successfully.',
+        display=[],
+        extras=None
+    )
+)
+StepBegin(n=3)
+ThinkPart(
+    type='think',
+    think='好的，当前目录就是项目根目录。让我继续读取必要的文件来分析变更。',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_RaYLCnHoajN6hynum3jULwGl',
+    function=FunctionBody(
+        name='Shell',
+        arguments='{"command": "git diff --name-only origin/main...HEAD"}'
+    ),
+    extras=None
+)
+ToolCall(
+    type='function',
+    id='tool_HnUc4SV6xkN3cstuDouGepxA',
+    function=FunctionBody(name='ReadFile', arguments=''),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_RaYLCnHoajN6hynum3jULwGl',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='apps/mobile/lib/presentation/widgets/server_url_tool.dart\napps/
+mobile/test/dev_tools_widget_test.dart\n',
+        message='Command executed successfully.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(arguments_part='{"path": "AGENTS.md"}')
+ToolCall(
+    type='function',
+    id='tool_zvr46d1WsqQt2dTwz5lLoniM',
+    function=FunctionBody(name='ReadFile', arguments='{"path":'),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_HnUc4SV6xkN3cstuDouGepxA',
+    return_value=ToolOk(
+        is_error=False,
+        output='     1\t# Social World 智能体导航地图\n     2\t\n     3\t> 仓库
+即唯一真实来源。不在仓库里的知识等于不存在。\n     4\t\n     5\t## 文档地图\n   
+ 6\t\n     7\t| 你要找什么     | 去哪里                                         
+                                     |\n     8\t| -------------- | -------------
+----------------------------------------------------------------------- |\n     
+9\t| 项目背景       | [README.md](README.md)                                    
+                          |\n    10\t| 编码与架构规范 | [docs/design-docs/INDEX.
+md](docs/design-docs/INDEX.md)                               |\n    11\t| UI 风
+格规范    | [docs/design-docs/ui-style-guide/INDEX.md](docs/design-docs/ui-style
+-guide/INDEX.md) |\n    12\t| 业务术语       | [docs/product-specs/glossary.md](
+docs/product-specs/glossary.md)                     |\n    13\t| 当前需求       
+| [prd/v1-mvp.md](prd/v1-mvp.md)                                                
+      |\n    14\t| 模块实现       | [docs/modules/INDEX.md](docs/modules/INDEX.m
+d)（含 profile）                         |\n    15\t| 技术债务       | [docs/exe
+c-plans/tech-debt-tracker.md](docs/exec-plans/tech-debt-tracker.md)         |\n 
+  16\t| Agent 配置     | `.kimi/agents/`                                        
+                             |\n    17\t| 子 Agent       | `.kimi/agents/subagen
+ts/`（explore / plan / coder）                                  |\n    18\t\n   
+19\t## 目录结构\n    20\t\n    21\t```\n    22\tdocs/design-docs/    # 架构规范
+、编码约定、数据库/API 规范\n    23\tdocs/product-specs/  # 业务术语、领域规则\n
+   24\tdocs/modules/        # 模块实现文档（跨代码层级）\n    25\tprd/          
+      # 产品需求文档\n    26\tapps/                # mobile (Flutter), api (Nest
+JS), admin (Next.js)\n    27\tpackages/            # shared-types, design-system
+\n    28\t```\n    29\t\n    30\t## 黄金原则\n    31\t\n    32\t1. **全链路交付*
+*：一个需求必须同时包含 DB + API + Mobile 的实现\n    33\t2. **契约同步**：`pack
+ages/shared-types/` 是前后端的唯一真实来源\n    34\t3. **约束即代码**：linter、h
+ooks、CI 会强制执行规则，不在规则里的约束等于不存在\n    35\t4. **效果优先**：先
+跑通端到端，再考虑优雅性\n    36\t\n    37\t## 常见任务\n    38\t\n    39\t| 任
+务             | 命令                                                  |\n    40
+\t| ---------------- | ----------------------------------------------------- |\n
+   41\t| 启动开发环境     | `make dev`                                          
+ |\n    42\t| 检查文档健康     | `make check-docs`                              
+      |\n    43\t| 运行测试         | `make test`                               
+           |\n    44\t| 安装 hooks       | `make hooks`                         
+                |\n    45\t| 启动开发 Agent   | `.kimi/agents/start-dev-agent.sh
+`                     |\n    46\t| 启动文档园丁     | `.kimi/agents/start-doc-ga
+rdener.sh`                  |\n    47\t| 启动 PR 文档园丁 | `.kimi/agents/start-
+pr-doc-gardener.sh [base-branch]` |\n',
+        message='47 lines read from file starting from line 1. Total lines in fi
+le: 47. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(arguments_part=' "CHANGELOG.md"}')
+ToolCall(
+    type='function',
+    id='tool_l60zCveg5ulnlLBDRROHqTmn',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "apps/mobile/lib/presentation/widgets/server_url_too
+l.dart'
+    ),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_zvr46d1WsqQt2dTwz5lLoniM',
+    return_value=ToolOk(
+        is_error=False,
+        output='     1\t# Changelog\n     2\t\n     3\tAll notable changes to th
+is project will be documented in this file.\n     4\t\n     5\tThe format is bas
+ed on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),\n     6\tand thi
+s project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+\n     7\t\n     8\t## [Unreleased]\n     9\t\n    10\t### Added\n    11\t- #30\
+n    12\t- #31\n',
+        message='12 lines read from file starting from line 1. Total lines in fi
+le: 12. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(arguments_part='"}')
+ToolCall(
+    type='function',
+    id='tool_IdvACpXnc8L6tZ8C1mlV6Uht',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "apps/mobile/test/dev_tools_widget_test.dart"}'
+    ),
+    extras=None
+)
+StatusUpdate(
+    context_usage=0.019771575927734375,
+    context_tokens=5183,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=1087,
+        output=118,
+        input_cache_read=4096,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-sOmHknof1enqYlbzABMuU0yn',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_l60zCveg5ulnlLBDRROHqTmn',
+    return_value=ToolOk(
+        is_error=False,
+        output="     1\timport 'package:flutter/material.dart';\n     2\timport 
+'package:flutter_bloc/flutter_bloc.dart';\n     3\timport 'package:social_world_
+design_system/social_world_design_system.dart';\n     4\timport '../blocs/dev_to
+ols/dev_tools_cubit.dart';\n     5\timport '../blocs/dev_tools/dev_tools_state.d
+art';\n     6\t\n     7\tclass ServerUrlTool extends StatefulWidget {\n     8\t 
+const ServerUrlTool({super.key});\n     9\t\n    10\t  @override\n    11\t  Stat
+e<ServerUrlTool> createState() => _ServerUrlToolState();\n    12\t}\n    13\t\n 
+  14\tclass _ServerUrlToolState extends State<ServerUrlTool> {\n    15\t  late f
+inal TextEditingController _controller;\n    16\t\n    17\t  @override\n    18\t
+ void initState() {\n    19\t    super.initState();\n    20\t    _controller = T
+extEditingController(\n    21\t      text: context.read<DevToolsCubit>().state.s
+erverBaseUrl,\n    22\t    );\n    23\t    // 处理 load() 异步完成后 state 的同
+步，避免在后续编辑中重置内容\n    24\t    WidgetsBinding.instance.addPostFrameCa
+llback((_) {\n    25\t      if (!mounted) return;\n    26\t      final state = c
+ontext.read<DevToolsCubit>().state;\n    27\t      if (_controller.text.isEmpty 
+&& state.serverBaseUrl.isNotEmpty) {\n    28\t        _controller.text = state.s
+erverBaseUrl;\n    29\t      }\n    30\t    });\n    31\t  }\n    32\t\n    33\t
+ @override\n    34\t  void dispose() {\n    35\t    _controller.dispose();\n    
+36\t    super.dispose();\n    37\t  }\n    38\t\n    39\t  @override\n    40\t  
+Widget build(BuildContext context) {\n    41\t    return BlocBuilder<DevToolsCub
+it, DevToolsState>(\n    42\t      builder: (context, state) {\n    43\t        
+return SwCard(\n    44\t          child: Column(\n    45\t            crossAxisA
+lignment: CrossAxisAlignment.stretch,\n    46\t            mainAxisSize: MainAxi
+sSize.min,\n    47\t            children: [\n    48\t              const Row(\n 
+  49\t                children: [\n    50\t                  Icon(\n    51\t    
+               Icons.public,\n    52\t                    color: DesignTokens.pr
+imary,\n    53\t                    size: 20,\n    54\t                  ),\n   
+55\t                  SizedBox(width: DesignTokens.spacingXs),\n    56\t        
+         Flexible(\n    57\t                    child: Text(\n    58\t          
+           'Server Base URL',\n    59\t                      style: TextStyle(\n
+   60\t                        fontSize: DesignTokens.fontSizeBody,\n    61\t   
+                    fontWeight: FontWeight.w600,\n    62\t                      
+ color: DesignTokens.textPrimary,\n    63\t                      ),\n    64\t   
+                  overflow: TextOverflow.ellipsis,\n    65\t                    
+),\n    66\t                  ),\n    67\t                ],\n    68\t          
+   ),\n    69\t              const SizedBox(height: DesignTokens.spacingSm),\n  
+ 70\t              SwTextField(\n    71\t                controller: _controller
+,\n    72\t                hintText: 'http://localhost:3000/api/v1',\n    73\t  
+             labelText: '服务器地址',\n    74\t                keyboardType: Tex
+tInputType.url,\n    75\t                prefixIcon: const Icon(Icons.link),\n  
+ 76\t                errorText: state.urlError.isEmpty ? null : state.urlError,\
+n    77\t                onChanged: context.read<DevToolsCubit>().onUrlChanged,\
+n    78\t              ),\n    79\t              const SizedBox(height: DesignTo
+kens.spacingMd),\n    80\t              SizedBox(\n    81\t                heigh
+t: 48,\n    82\t                child: SwButton(\n    83\t                  text
+: '保存配置',\n    84\t                  variant: SwButtonVariant.filled,\n    8
+5\t                  isLoading: state.isSaving,\n    86\t                  isDis
+abled: state.urlError.isNotEmpty ||\n    87\t                      state.serverB
+aseUrl.trim().isEmpty,\n    88\t                  onPressed: () async {\n    89\
+t                    try {\n    90\t                      await context.read<Dev
+ToolsCubit>().save();\n    91\t                      if (context.mounted) {\n   
+92\t                        final currentState =\n    93\t                      
+     context.read<DevToolsCubit>().state;\n    94\t                        if (c
+urrentState.saveSuccess) {\n    95\t                          ScaffoldMessenger.
+of(context).showSnackBar(\n    96\t                            const SnackBar(\n
+   97\t                              content: Text('保存成功，新配置已生效'),\n 
+  98\t                            ),\n    99\t                          );\n   1
+00\t                        }\n   101\t                      }\n   102\t        
+           } catch (e) {\n   103\t                      if (context.mounted) {\n
+  104\t                        ScaffoldMessenger.of(context).showSnackBar(\n   1
+05\t                          SnackBar(content: Text('保存失败: $e')),\n   106\t
+                       );\n   107\t                      }\n   108\t            
+       }\n   109\t                  },\n   110\t                ),\n   111\t    
+         ),\n   112\t            ],\n   113\t          ),\n   114\t        );\n 
+ 115\t      },\n   116\t    );\n   117\t  }\n   118\t}\n",
+        message='118 lines read from file starting from line 1. Total lines in f
+ile: 118. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+ToolResult(
+    tool_call_id='tool_IdvACpXnc8L6tZ8C1mlV6Uht',
+    return_value=ToolOk(
+        is_error=False,
+        output="     1\timport 'package:flutter/material.dart';\n     2\timport 
+'package:flutter_bloc/flutter_bloc.dart';\n     3\timport 'package:flutter_test/
+flutter_test.dart';\n     4\timport 'package:social_world_design_system/social_w
+orld_design_system.dart';\n     5\timport 'package:social_world_mobile/core/netw
+ork/dio_client.dart';\n     6\timport 'package:social_world_mobile/domain/reposi
+tories/dev_tools_repository.dart';\n     7\timport 'package:social_world_mobile/
+presentation/blocs/dev_tools/dev_tools_cubit.dart';\n     8\timport 'package:soc
+ial_world_mobile/presentation/widgets/dev_tools_drawer.dart';\n     9\timport 'p
+ackage:social_world_mobile/presentation/widgets/dev_tools_toggle_button.dart';\n
+   10\timport 'package:social_world_mobile/presentation/widgets/server_url_tool.
+dart';\n    11\t\n    12\tclass _MockDevToolsRepository implements DevToolsRepos
+itory {\n    13\t  String _url = 'http://localhost:3000/api/v1';\n    14\t\n    
+15\t  @override\n    16\t  Future<String> getServerBaseUrl() async => _url;\n   
+17\t\n    18\t  @override\n    19\t  Future<void> saveServerBaseUrl(String url) 
+async {\n    20\t    _url = url;\n    21\t  }\n    22\t}\n    23\t\n    24\tclas
+s _MockDioClient extends DioClient {\n    25\t  _MockDioClient() : super();\n   
+26\t}\n    27\t\n    28\tWidget _buildWithCubit(DevToolsCubit cubit, Widget chil
+d) {\n    29\t  return MaterialApp(\n    30\t    home: BlocProvider.value(\n    
+31\t      value: cubit,\n    32\t      child: Scaffold(body: child),\n    33\t  
+ ),\n    34\t  );\n    35\t}\n    36\t\n    37\tvoid main() {\n    38\t  late _M
+ockDevToolsRepository repository;\n    39\t  late _MockDioClient dioClient;\n   
+40\t  late DevToolsCubit cubit;\n    41\t\n    42\t  setUp(() {\n    43\t    rep
+ository = _MockDevToolsRepository();\n    44\t    dioClient = _MockDioClient();\
+n    45\t    cubit = DevToolsCubit(\n    46\t      repository: repository,\n    
+47\t      dioClient: dioClient,\n    48\t    );\n    49\t  });\n    50\t\n    51
+\t  tearDown(() {\n    52\t    cubit.close();\n    53\t  });\n    54\t\n    55\t
+ group('DevToolsToggleButton', () {\n    56\t    testWidgets('tap triggers onTap
+', (tester) async {\n    57\t      var tapped = false;\n    58\t      await test
+er.pumpWidget(\n    59\t        MaterialApp(\n    60\t          home: Scaffold(\
+n    61\t            body: DevToolsToggleButton(\n    62\t              onTap: (
+) => tapped = true,\n    63\t            ),\n    64\t          ),\n    65\t     
+  ),\n    66\t      );\n    67\t      await tester.tap(find.byIcon(Icons.constru
+ction));\n    68\t      await tester.pump();\n    69\t      expect(tapped, true)
+;\n    70\t    });\n    71\t  });\n    72\t\n    73\t  group('DevToolsDrawer', (
+) {\n    74\t    testWidgets('opens and closes with animation', (tester) async {
+\n    75\t      var closed = false;\n    76\t      await tester.pumpWidget(\n   
+77\t        _buildWithCubit(\n    78\t          cubit,\n    79\t          DevToo
+lsDrawer(\n    80\t            isOpen: false,\n    81\t            onClose: () =
+> closed = true,\n    82\t          ),\n    83\t        ),\n    84\t      );\n  
+ 85\t      expect(find.text('开发工具'), findsNothing);\n    86\t\n    87\t     
+await tester.pumpWidget(\n    88\t        _buildWithCubit(\n    89\t          cu
+bit,\n    90\t          DevToolsDrawer(\n    91\t            isOpen: true,\n    
+92\t            onClose: () => closed = true,\n    93\t          ),\n    94\t   
+    ),\n    95\t      );\n    96\t      await tester.pumpAndSettle();\n    97\t 
+    expect(find.text('开发工具'), findsOneWidget);\n    98\t\n    99\t      awai
+t tester.tap(find.byIcon(Icons.close));\n   100\t      await tester.pump();\n   
+101\t      expect(closed, true);\n   102\t    });\n   103\t\n   104\t    testWid
+gets('tap overlay closes drawer', (tester) async {\n   105\t      var closed = f
+alse;\n   106\t      await tester.pumpWidget(\n   107\t        _buildWithCubit(\
+n   108\t          cubit,\n   109\t          DevToolsDrawer(\n   110\t          
+ isOpen: true,\n   111\t            onClose: () => closed = true,\n   112\t     
+    ),\n   113\t        ),\n   114\t      );\n   115\t      await tester.pumpAnd
+Settle();\n   116\t      expect(find.text('开发工具'), findsOneWidget);\n   117\
+t\n   118\t      await tester.tapAt(const Offset(10, 10));\n   119\t      await 
+tester.pump();\n   120\t      expect(closed, true);\n   121\t    });\n   122\t  
+});\n   123\t\n   124\t  group('ServerUrlTool', () {\n   125\t    testWidgets('s
+hows validation error for empty url', (tester) async {\n   126\t      await test
+er.pumpWidget(_buildWithCubit(cubit, const ServerUrlTool()));\n   127\t      awa
+it tester.pump();\n   128\t\n   129\t      final textField = find.byType(TextFie
+ld);\n   130\t      await tester.enterText(textField, 'http://example.com');\n  
+131\t      await tester.pumpAndSettle();\n   132\t      await tester.enterText(t
+extField, '');\n   133\t      await tester.pumpAndSettle();\n   134\t\n   135\t 
+    expect(find.text('请输入服务器地址'), findsOneWidget);\n   136\t    });\n   
+137\t\n   138\t    testWidgets('shows validation error for invalid url', (tester
+) async {\n   139\t      await tester.pumpWidget(_buildWithCubit(cubit, const Se
+rverUrlTool()));\n   140\t      await tester.pump();\n   141\t\n   142\t      fi
+nal textField = find.byType(TextField);\n   143\t      await tester.enterText(te
+xtField, 'not-a-url');\n   144\t      await tester.pumpAndSettle();\n   145\t\n 
+ 146\t      expect(find.text('请输入有效的 HTTP/HTTPS URL'), findsOneWidget);\n 
+ 147\t    });\n   148\t\n   149\t    testWidgets('save button disabled when inva
+lid', (tester) async {\n   150\t      await tester.pumpWidget(_buildWithCubit(cu
+bit, const ServerUrlTool()));\n   151\t      await tester.pump();\n   152\t\n   
+153\t      final saveButton = find.widgetWithText(SwButton, '保存配置');\n   154
+\t      expect(saveButton, findsOneWidget);\n   155\t      expect(tester.widget<
+SwButton>(saveButton).isDisabled, isTrue);\n   156\t\n   157\t      final textFi
+eld = find.byType(TextField);\n   158\t      await tester.enterText(textField, '
+not-a-url');\n   159\t      await tester.pumpAndSettle();\n   160\t\n   161\t   
+  expect(tester.widget<SwButton>(saveButton).isDisabled, isTrue);\n   162\t    }
+);\n   163\t\n   164\t    testWidgets('save button enabled when valid', (tester)
+async {\n   165\t      await tester.pumpWidget(_buildWithCubit(cubit, const Serv
+erUrlTool()));\n   166\t      await tester.pump();\n   167\t\n   168\t      fina
+l textField = find.byType(TextField);\n   169\t      await tester.enterText(text
+Field, 'http://192.168.1.100:3000/api/v1');\n   170\t      await tester.pumpAndS
+ettle();\n   171\t\n   172\t      final saveButton = find.widgetWithText(SwButto
+n, '保存配置');\n   173\t      expect(tester.widget<SwButton>(saveButton).isDisa
+bled, isFalse);\n   174\t    });\n   175\t\n   176\t    testWidgets('entered tex
+t is not reset by state changes', (tester) async {\n   177\t      await tester.p
+umpWidget(_buildWithCubit(cubit, const ServerUrlTool()));\n   178\t      await t
+ester.pump();\n   179\t\n   180\t      final textField = find.byType(TextField);
+\n   181\t      await tester.enterText(textField, 'http://example.com');\n   182
+\t      await tester.pumpAndSettle();\n   183\t\n   184\t      expect(tester.wid
+get<TextField>(textField).controller!.text,\n   185\t          'http://example.c
+om');\n   186\t\n   187\t      // Trigger a state change that does not mutate se
+rverBaseUrl\n   188\t      // to simulate any background emission (e.g. saveSucc
+ess reset).\n   189\t      cubit.onUrlChanged('http://example.com');\n   190\t  
+   await tester.pumpAndSettle();\n   191\t\n   192\t      expect(tester.widget<T
+extField>(textField).controller!.text,\n   193\t          'http://example.com');
+\n   194\t    });\n   195\t  });\n   196\t}\n",
+        message='196 lines read from file starting from line 1. Total lines in f
+ile: 196. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+StepBegin(n=4)
+ThinkPart(
+    type='think',
+    think='让我继续分析现有文档，了解 docs 结构，特别是 mobile 相关文档和 dev_to
+ols 相关文档。',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_nfmIaMd4VrzqhSGVsFlUf8nL',
+    function=FunctionBody(
+        name='Shell',
+        arguments='{"command": "ls -la docs/ && echo \\"---\\" && ls -la docs/mo
+dules/ && echo \\"---\\" && ls -la docs/design-docs/"}'
+    ),
+    extras=None
+)
+ToolCall(
+    type='function',
+    id='tool_DoxjkjGthsW9WtUyG6Re3MAv',
+    function=FunctionBody(name='Grep', arguments='{"pattern":'),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_nfmIaMd4VrzqhSGVsFlUf8nL',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='total 8\ndrwxr-xr-x@  8 insulate  staff   256 Apr 16 08:42 .\ndr
+wx------@ 30 insulate  staff   960 Apr 16 08:42 ..\ndrwxr-xr-x@  9 insulate  sta
+ff   288 Apr 16 08:42 api-contracts\ndrwxr-xr-x@ 14 insulate  staff   448 Apr 16
+08:42 design-docs\ndrwxr-xr-x@ 10 insulate  staff   320 Apr 16 08:42 exec-plans\
+ndrwxr-xr-x@ 11 insulate  staff   352 Apr 16 08:42 modules\ndrwxr-xr-x@  7 insul
+ate  staff   224 Apr 16 08:42 product-specs\n-rw-r--r--@  1 insulate  staff  155
+7 Apr 16 08:42 QUALITY_SCORE.md\n---\ntotal 88\ndrwxr-xr-x@ 11 insulate  staff  
+352 Apr 16 08:42 .\ndrwxr-xr-x@  8 insulate  staff   256 Apr 16 08:42 ..\n-rw-r-
+-r--@  1 insulate  staff  2346 Apr 16 08:42 admin.md\n-rw-r--r--@  1 insulate  s
+taff  5684 Apr 16 08:42 auth.md\n-rw-r--r--@  1 insulate  staff  3187 Apr 16 08:
+42 blocks-reports.md\n-rw-r--r--@  1 insulate  staff  3077 Apr 16 08:42 content-
+moderation.md\n-rw-r--r--@  1 insulate  staff  7272 Apr 16 08:42 dev-tools.md\n-
+rw-r--r--@  1 insulate  staff  1882 Apr 16 08:42 im.md\n-rw-r--r--@  1 insulate 
+staff  2001 Apr 16 08:42 INDEX.md\n-rw-r--r--@  1 insulate  staff  2018 Apr 16 0
+8:42 matching.md\n-rw-r--r--@  1 insulate  staff  2292 Apr 16 08:42 profile.md\n
+---\ntotal 112\ndrwxr-xr-x@ 14 insulate  staff   448 Apr 16 08:42 .\ndrwxr-xr-x@
+ 8 insulate  staff   256 Apr 16 08:42 ..\n-rw-r--r--@  1 insulate  staff  1920 A
+pr 16 08:42 ADR-001-monorepo.md\n-rw-r--r--@  1 insulate  staff  2553 Apr 16 08:
+42 api.md\n-rw-r--r--@  1 insulate  staff  1671 Apr 16 08:42 core-beliefs.md\n-r
+w-r--r--@  1 insulate  staff  4969 Apr 16 08:42 db.md\n-rw-r--r--@  1 insulate  
+staff  9708 Apr 16 08:42 flutter.md\n-rw-r--r--@  1 insulate  staff  1911 Apr 16
+08:42 INDEX.md\n-rw-r--r--@  1 insulate  staff  4155 Apr 16 08:42 nestjs.md\n-rw
+-r--r--@  1 insulate  staff  1300 Apr 16 08:42 observability.md\n-rw-r--r--@  1 
+insulate  staff  2144 Apr 16 08:42 readability.md\n-rw-r--r--@  1 insulate  staf
+f  2623 Apr 16 08:42 testing.md\ndrwxr-xr-x@  5 insulate  staff   160 Apr 16 08:
+42 ui-specs\ndrwxr-xr-x@ 10 insulate  staff   320 Apr 16 08:42 ui-style-guide\n'
+,
+        message='Command executed successfully.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(
+    arguments_part=' "dev.?tool|server.?url|开发工具", "path": "docs", "-i": tru
+e, "output_mode": "files_with_matches"}'
+)
+ToolCall(
+    type='function',
+    id='tool_bZlalmdAdMWfP37bVFUoWos1',
+    function=FunctionBody(name='ReadFile', arguments=''),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_DoxjkjGthsW9WtUyG6Re3MAv',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='docs/modules/dev-tools.md\ndocs/modules/INDEX.md\ndocs/design-do
+cs/ui-specs/dev-tools/dev-tools-drawer-wireframe.md\ndocs/design-docs/testing.md
+\ndocs/design-docs/flutter.md',
+        message='',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(arguments_part='{"path": "prd/v1-dev-tools-drawer.md"}')
+StatusUpdate(
+    context_usage=0.036548614501953125,
+    context_tokens=9581,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=4461,
+        output=134,
+        input_cache_read=5120,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-3FYUlKGwlbso5PHLzEWgR6G1',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_bZlalmdAdMWfP37bVFUoWos1',
+    return_value=ToolOk(
+        is_error=False,
+        output='     1\t# V1 Dev Tools Drawer 产品需求文档\n     2\t\n     3\t> 
+状态：待评审  \n     4\t> 版本：1.0  \n     5\t> 日期：2026-04-10  \n     6\t> 
+关联 Issue：#29\n     7\t\n     8\t## 1. 背景与目标\n     9\t\n    10\t### 背景\
+n    11\tSocial World 采用前后端分离架构，开发/测试阶段需要频繁切换后端服务器地
+址（如本地 `localhost`、内网测试环境、Staging 环境）。当前修改 `baseUrl` 需要重
+新编译 App，效率较低。\n    12\t\n    13\t### 目标\n    14\t1. 在 Debug 模式下提
+供常驻悬浮入口，快速唤起开发工具抽屉。\n    15\t2. 支持在运行时修改 Server Base 
+URL，并持久化到本地存储。\n    16\t3. 确保 Release 模式下完全排除调试代码，不影
+响包体积与用户体验。\n    17\t\n    18\t---\n    19\t\n    20\t## 2. 用户故事与
+验收标准\n    21\t\n    22\t### US-DEVTOOLS-1：Debug 模式悬浮抽屉\n    23\t\n   
+24\t**作为** 移动开发者，  \n    25\t**我希望** 在 Debug 模式下从任意页面唤起开
+发工具抽屉，  \n    26\t**以便** 快速查看和修改调试配置。\n    27\t\n    28\t###
+# 验收标准\n    29\t\n    30\t```gherkin\n    31\tFeature: Dev Tools Drawer\n   
+32\t  Scenario: Debug mode shows the toggle button\n    33\t    Given the app is
+running in debug mode\n    34\t    Then a semi-transparent toggle button should 
+be visible on the right edge of the screen\n    35\t\n    36\t  Scenario: Releas
+e mode hides the toggle button\n    37\t    Given the app is running in release 
+mode\n    38\t    Then the dev tools toggle button should not exist in the widge
+t tree\n    39\t\n    40\t  Scenario: Open and close the drawer\n    41\t    Giv
+en the app is running in debug mode\n    42\t    When the user taps the toggle b
+utton\n    43\t    Then the dev tools drawer should slide in from the right\n   
+44\t    When the user taps the overlay mask or the close button\n    45\t    The
+n the drawer should slide out and disappear\n    46\t```\n    47\t\n    48\t####
+技术要求\n    49\t- 悬浮按钮位置：`Alignment.centerRight`，右侧距边 `8.0`。\n   
+50\t- 按钮尺寸：`56.0 × 56.0`，圆形，背景色 `DesignTokens.primary.withOpacity(0.
+85)`。\n    51\t- 抽屉宽度：屏幕宽度的 80%，最大 `320.0`。\n    52\t- 进入/退出
+动画：`SlideTransition`，时长 `250ms / 200ms`，曲线 `easeOutCubic / easeInCubic`
+。\n    53\t\n    54\t---\n    55\t\n    56\t### US-DEVTOOLS-2：运行时修改 Serve
+r Base URL\n    57\t\n    58\t**作为** 移动开发者，  \n    59\t**我希望** 在抽屉
+内修改 Server Base URL 并立即生效，  \n    60\t**以便** 在不重新编译的情况下切换
+后端环境。\n    61\t\n    62\t#### 验收标准\n    63\t\n    64\t```gherkin\n    6
+5\tFeature: Server Base URL Tool\n    66\t  Scenario: Save a valid URL\n    67\t
+   Given the dev tools drawer is open\n    68\t    And the current server base u
+rl is "http://localhost:3000/api/v1"\n    69\t    When the user enters "http://1
+92.168.1.100:3000/api/v1"\n    70\t    And the user taps the save button\n    71
+\t    Then the URL should be persisted to local storage\n    72\t    And a succe
+ss message should be shown\n    73\t    And the DioClient baseUrl should be upda
+ted\n    74\t\n    75\t  Scenario: Invalid URL shows error\n    76\t    Given th
+e dev tools drawer is open\n    77\t    When the user enters "not-a-url"\n    78
+\t    Then the input border should turn red\n    79\t    And an error caption sh
+ould appear\n    80\t    And the save button should be disabled\n    81\t\n    8
+2\t  Scenario: Empty URL shows error\n    83\t    Given the dev tools drawer is 
+open\n    84\t    When the user clears the input field\n    85\t    Then the inp
+ut border should turn red\n    86\t    And an error caption "请输入服务器地址" s
+hould appear\n    87\t    And the save button should be disabled\n    88\t```\n 
+  89\t\n    90\t#### 技术要求\n    91\t- 默认值：`const String.fromEnvironment(\
+'API_BASE_URL\', defaultValue: \'http://localhost:3000/api/v1\')`。\n    92\t- 
+校验规则：非空；必须以 `http://` 或 `https://` 开头。\n    93\t- 持久化键：`dev_
+tools_server_base_url`，使用 `SharedPreferences`。\n    94\t- 保存成功后通过 `Sn
+ackBar` 提示 "保存成功，新配置已生效"。\n    95\t\n    96\t---\n    97\t\n    98
+\t## 3. 非功能需求\n    99\t\n   100\t### 性能\n   101\t- 抽屉开闭动画必须保持 6
+0fps，不得引起页面掉帧。\n   102\t- SharedPreferences 读写为异步操作，保存按钮需
+进入 `isLoading` 状态防止重复提交。\n   103\t\n   104\t### 安全\n   105\t- Relea
+se 模式下调试代码必须完全不可见，且不得编译进产物（使用 `kDebugMode` 条件编译）
+。\n   106\t- 本地保存的 URL 仅用于开发/测试，不进入生产环境。\n   107\t\n   108
+\t### 兼容性\n   109\t- 支持 Android 10+ 和 iOS 14+。\n   110\t- 抽屉布局需适配 
+360dp ~ 414dp 屏幕宽度。\n   111\t\n   112\t---\n   113\t\n   114\t## 4. 里程碑\
+n   115\t\n   116\t| 阶段 | 目标 | 预计工期 |\n   117\t|------|------|----------
+|\n   118\t| M-DEVTOOLS-0 | UI 设计评审与 Design-Only PR | 1 天 |\n   119\t| M-D
+EVTOOLS-1 | DevTools Widget + Cubit + Repository 实现 | 1 天 |\n   120\t| M-DEVT
+OOLS-2 | DioClient 热重载 + Widget 测试 + BDD 测试 | 1 天 |\n   121\t\n   122\t*
+*总预计工期：3 天。**\n   123\t\n   124\t---\n   125\t\n   126\t## 5. 风险与回滚
+策略\n   127\t\n   128\t| 风险 | 影响 | 缓解措施 |\n   129\t|------|------|-----
+-----|\n   130\t| `kDebugMode` 使用不当导致 Release 包包含调试代码 | 高 | Code R
+eview 中强制检查所有新增调试 Widget 是否包裹在 `if (kDebugMode)` 中 |\n   131\t|
+非法 URL 导致 Dio 请求失败 | 低 | 保存前进行格式校验，错误时禁止保存 |\n   132\t
+| SharedPreferences 写入失败 | 低 | 捕获异常并显示错误提示，不影响主业务 |\n   1
+33\t\n   134\t### 回滚策略\n   135\t- **URL 配置错误**：开发者可随时重新打开抽屉
+修改回正确的 URL。\n   136\t- **调试代码误合入**：立即回滚 PR，并在 `docs/design
+-docs/flutter.md` 的 Debug-Only 规范中补充拦截规则。\n',
+        message='136 lines read from file starting from line 1. Total lines in f
+ile: 136. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+StepBegin(n=5)
+ThinkPart(
+    type='think',
+    think='好的，我已经了解了基本情况。让我继续读取相关文档来评估遗漏项。\n\n需
+要读取的文件：\n1. `docs/modules/dev-tools.md` - 已有 dev-tools 模块文档\n2. `do
+cs/modules/INDEX.md` - 模块索引\n3. `docs/design-docs/flutter.md` - Flutter 设计
+文档\n4. `docs/design-docs/testing.md` - 测试文档\n\n变更分析：\n- `apps/mobile/
+lib/presentation/widgets/server_url_tool.dart` - 新增 ServerUrlTool widget，用于
+在开发工具抽屉中修改服务器基础 URL\n- `apps/mobile/test/dev_tools_widget_test.da
+rt` - 新增开发工具相关 widget 测试\n\n这是一个用户可见的功能变更（开发者功能），
+需要在 CHANGELOG.md 中添加 #34。\n\n需要检查：\n1. `docs/modules/dev-tools.md` 
+是否记录了 `ServerUrlTool` widget\n2. `docs/design-docs/flutter.md` 是否需要更新
+关于 debug-only widget 的规范\n3. `docs/design-docs/testing.md` 是否需要更新关于
+dev_tools 测试的内容\n4. `CHANGELOG.md` 是否需要添加 #34',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_JCUqi8OKN4rF2vkhx9ztqXBb',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "docs/modules/dev-tools.md"}'
+    ),
+    extras=None
+)
+ToolCall(
+    type='function',
+    id='tool_ahc0A29zNiIGnTOjp5h285U8',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "docs/modules/INDEX.md'
+    ),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_JCUqi8OKN4rF2vkhx9ztqXBb',
+    return_value=ToolOk(
+        is_error=False,
+        output='     1\t# Dev Tools 模块实现\n     2\t\n     3\t## 职责\n     4\
+t\n     5\tDebug 专用工具模块，仅在开发模式下可见。提供悬浮抽屉入口，支持运行时
+修改 Server Base URL 并持久化到本地存储，用于开发/测试环境快速切换后端地址。\n  
+  6\t\n     7\t## 关联文档\n     8\t\n     9\t- **PRD**: [prd/v1-dev-tools-drawe
+r.md](../../prd/v1-dev-tools-drawer.md)\n    10\t- **BDD Feature**: [tests/bdd/d
+ev_tools_drawer.feature](../../tests/bdd/dev_tools_drawer.feature)\n    11\t- **
+BDD Step Definitions**: [tests/bdd/step-definitions/dev_tools_drawer.steps.js](.
+./../tests/bdd/step-definitions/dev_tools_drawer.steps.js)\n    12\t- **设计规范
+**: [design-spec.md](../../designs/issue-29/design-spec.md)\n    13\t- **高保真
+原型**: [mockup.html](../../designs/issue-29/mockup.html)\n    14\t- **低保真线
+框图**: [wireframe.svg](../../designs/issue-29/wireframe.svg)\n    15\t\n    16\
+t## 流程图\n    17\t\n    18\t```mermaid\n    19\tsequenceDiagram\n    20\t    p
+articipant U as 开发者\n    21\t    participant T as DevToolsToggleButton\n    2
+2\t    participant D as DevToolsDrawer\n    23\t    participant S as ServerUrlTo
+ol\n    24\t    participant C as DevToolsCubit\n    25\t    participant R as Dev
+ToolsRepository\n    26\t    participant P as SharedPreferences\n    27\t    par
+ticipant Dio as DioClient\n    28\t\n    29\t    U->>T: 点击悬浮按钮\n    30\t  
+ T->>D: 触发 onToggle\n    31\t    D->>S: 展开抽屉，显示 URL 编辑卡片\n    32\t 
+  U->>S: 输入新的 Server Base URL\n    33\t    S->>C: onUrlChanged(url)\n    34\
+t    C->>C: 校验 URL 格式\n    35\t    alt URL 格式非法\n    36\t        C-->>S:
+urlError = "请输入有效的 HTTP/HTTPS URL"\n    37\t        S->>S: 输入框边框变红
+，保存按钮置灰\n    38\t    else URL 格式合法\n    39\t        C-->>S: urlError 
+= ""\n    40\t        S->>S: 保存按钮可用\n    41\t        U->>S: 点击保存\n    
+42\t        S->>C: save()\n    43\t        C->>R: saveServerBaseUrl(url)\n    44
+\t        R->>P: setString(\'dev_tools_server_base_url\', url)\n    45\t        
+P-->>R: 写入成功\n    46\t        R-->>C: 完成\n    47\t        C-->>S: saveSucc
+ess = true\n    48\t        S->>Dio: 更新 baseUrl\n    49\t        S->>S: 显示 S
+nackBar "保存成功，新配置已生效"\n    50\t    end\n    51\t```\n    52\t\n    53
+\t## 关键文件\n    54\t\n    55\t| 文件 | 路径 |\n    56\t|------|------|\n    5
+7\t| DevToolsWrapper | `apps/mobile/lib/presentation/widgets/dev_tools_wrapper.d
+art` |\n    58\t| DevToolsToggleButton | `apps/mobile/lib/presentation/widgets/d
+ev_tools_toggle_button.dart` |\n    59\t| DevToolsDrawer | `apps/mobile/lib/pres
+entation/widgets/dev_tools_drawer.dart` |\n    60\t| ServerUrlTool | `apps/mobil
+e/lib/presentation/widgets/server_url_tool.dart` |\n    61\t| Cubit | `apps/mobi
+le/lib/presentation/blocs/dev_tools/dev_tools_cubit.dart` |\n    62\t| State | `
+apps/mobile/lib/presentation/blocs/dev_tools/dev_tools_state.dart` |\n    63\t| 
+Repository 接口 | `apps/mobile/lib/domain/repositories/dev_tools_repository.dart
+` |\n    64\t| Repository 实现 | `apps/mobile/lib/data/repositories/dev_tools_re
+pository_impl.dart` |\n    65\t| DioClient 热更新 | `apps/mobile/lib/core/networ
+k/dio_client.dart` |\n    66\t| DI 注册 | `apps/mobile/lib/core/di/di.dart` |\n 
+  67\t| Widgetbook Demo | `packages/design-system/widgetbook/main.dart` |\n    6
+8\t| Cubit 单元测试 | `apps/mobile/test/dev_tools_cubit_test.dart` |\n    69\t| 
+Widget 测试 | `apps/mobile/test/dev_tools_widget_test.dart` |\n    70\t| Golden 
+截图 | `apps/mobile/test/dev_tools_golden_test.dart` |\n    71\t| Golden 基准图 
+| `apps/mobile/test/goldens/dev_tools_drawer_default.png` |\n    72\t| Golden 错
+误态 | `apps/mobile/test/goldens/server_url_tool_error.png` |\n    73\t\n    74\
+t## 依赖注入（DI）\n    75\t\n    76\t`DioClient` 已注册为全局单例，所有 Reposit
+ory 通过 `getIt<DioClient>()` 获取同一实例，以确保 `updateBaseUrl()` 的变更对所
+有网络请求生效：\n    77\t\n    78\t```dart\n    79\t// apps/mobile/lib/core/di/
+di.dart\n    80\tvoid configureDependencies() {\n    81\t  getIt\n    82\t    ..
+registerLazySingleton<DioClient>(DioClient.new)\n    83\t    ..registerLazySingl
+eton<AuthRepository>(AuthRepositoryImpl.new)\n    84\t    ..registerLazySingleto
+n<ProfileRepository>(ProfileRepositoryImpl.new);\n    85\t\n    86\t  if (kDebug
+Mode) {\n    87\t    getIt\n    88\t      ..registerLazySingleton<DevToolsReposi
+tory>(\n    89\t        () => DevToolsRepositoryImpl(),\n    90\t      )\n    91
+\t      ..registerFactory<DevToolsCubit>(\n    92\t        () => DevToolsCubit(\
+n    93\t          repository: getIt<DevToolsRepository>(),\n    94\t          d
+ioClient: getIt<DioClient>(),\n    95\t        ),\n    96\t      );\n    97\t  }
+\n    98\t}\n    99\t```\n   100\t\n   101\t- `AuthRepositoryImpl` / `ProfileRep
+ositoryImpl` 从 `DioClient()` 直接构造改为 `getIt<DioClient>().dio`。\n   102\t-
+调试相关的 `DevToolsRepository` 和 `DevToolsCubit` 仅在 `kDebugMode` 下注册，Rel
+ease 产物中完全排除。\n   103\t\n   104\t## 网络层热更新\n   105\t\n   106\t`Dio
+Client` 提供 `updateBaseUrl` 方法，保存 URL 后即时生效，无需重启 App：\n   107\t
+\n   108\t```dart\n   109\t// apps/mobile/lib/core/network/dio_client.dart\n   1
+10\tclass DioClient {\n   111\t  final Dio dio;\n   112\t  // ...\n   113\t  voi
+d updateBaseUrl(String url) {\n   114\t    dio.options.baseUrl = url;\n   115\t 
+}\n   116\t}\n   117\t```\n   118\t\n   119\t## 条件编译说明\n   120\t\n   121\t
+为避免调试代码进入 Release 产物，必须在 `MaterialApp.router` 的 `builder` 中通过
+`kDebugMode` 条件注入 `DevToolsWrapper`：\n   122\t\n   123\t```dart\n   124\t//
+apps/mobile/lib/app.dart\n   125\tWidget build(BuildContext context) {\n   126\t
+ return MaterialApp.router(\n   127\t    // ...\n   128\t    builder: (context, 
+child) {\n   129\t      if (kDebugMode) {\n   130\t        return DevToolsWrappe
+r(child: child!);\n   131\t      }\n   132\t      return child!;\n   133\t    },
+\n   134\t  );\n   135\t}\n   136\t```\n   137\t\n   138\t- `DevToolsWrapper` 负
+责在 Debug 模式下挂载 `DevToolsToggleButton` 与 `DevToolsDrawer`。\n   139\t- Re
+lease 模式下该分支被编译器排除，`DevToolsWrapper` 不会被打包进产物。\n   140\t- 
+与调试相关的 Repository、Cubit 注册同样建议在 `kDebugMode` 分支下完成，以减小组
+包体积。\n   141\t\n   142\t## Widgetbook 与视觉验收\n   143\t\n   144\tDevTools
+相关 UI 已在 `packages/design-system/widgetbook/main.dart` 的 `Features` Folder 
+下注册：\n   145\t\n   146\t| 组件 | UseCase | 说明 |\n   147\t|------|---------
+|------|\n   148\t| `ServerUrlTool` | Normal | 默认 URL 展示态 |\n   149\t| `Ser
+verUrlTool` | Error | 非法 URL 错误态 |\n   150\t| `ServerUrlTool` | Saving | 保
+存中 loading 态 |\n   151\t| `DevToolsDrawer` | Default | 抽屉展开默认态 |\n   1
+52\t\n   153\t所有新增/修改的 UI 必须通过 Golden Test 生成基准截图，供 Code Revi
+ew 时直接查看视觉产物。\n   154\t\n   155\t## 边界情况\n   156\t\n   157\t1. **R
+elease 模式排除**：所有调试 Widget 必须包裹在 `if (kDebugMode) ...` 中，Release 
+模式下不编译进产物。\n   158\t2. **URL 校验失败**：空值或格式错误时，输入框显示
+红色错误边框与文案，保存按钮禁用。\n   159\t3. **SharedPreferences 异常**：读写
+失败时静默捕获，避免阻塞主流程；保存失败时显示错误提示。\n   160\t4. **抽屉关闭
+后状态保留**：再次打开抽屉时保留上次输入内容（未保存），避免误操作丢失编辑内容。
+\n   161\t\n   162\t## 全链路变更清单\n   163\t\n   164\t修改本模块时，Agent 需
+要同时检查并更新以下文件：\n   165\t\n   166\t1. **移动端 Widget**：`apps/mobile
+/lib/presentation/widgets/dev_tools_*.dart`\n   167\t2. **移动端状态管理**：`app
+s/mobile/lib/presentation/blocs/dev_tools/`\n   168\t3. **移动端 Repository**：`
+apps/mobile/lib/data/repositories/dev_tools_repository_impl.dart`\n   169\t4. **
+DioClient**：`apps/mobile/lib/core/network/dio_client.dart`\n   170\t5. **DI 注
+册**：`apps/mobile/lib/core/di/di.dart`\n   171\t6. **BDD 测试**：`tests/bdd/dev
+_tools_drawer.feature` 及 `tests/bdd/step-definitions/dev_tools_drawer.steps.js`
+\n   172\t7. **Widgetbook**：`packages/design-system/widgetbook/main.dart`\n   1
+73\t8. **Flutter 测试**：`apps/mobile/test/dev_tools_*_test.dart` 与 `apps/mobil
+e/test/goldens/`\n   174\t9. **模块文档**：`docs/modules/dev-tools.md`\n   175\t
+10. **Flutter 规范文档**：`docs/design-docs/flutter.md`\n   176\t11. **测试规范
+文档**：`docs/design-docs/testing.md`\n',
+        message='176 lines read from file starting from line 1. Total lines in f
+ile: 176. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(arguments_part='"}')
+ToolCall(
+    type='function',
+    id='tool_rYJuky8ihdQRACm5BpGeRJHt',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "docs/design-docs/flutter.md'
+    ),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_ahc0A29zNiIGnTOjp5h285U8',
+    return_value=ToolOk(
+        is_error=False,
+        output='     1\t# 模块实现文档索引\n     2\t\n     3\t> 本目录按业务模块
+组织实现文档，跨越代码层级（DB / API / Mobile / BLoC / Widget）描述模块全貌。\n 
+   4\t> \n     5\t> **注意**：本仓库采用单一全栈 Agent 模式，一个模块的文档应覆
+盖后端到前端的完整链路。\n     6\t\n     7\t## 模块清单\n     8\t\n     9\t| 模
+块 | 说明 | 关联 PRD |\n    10\t|------|------|----------|\n    11\t| [auth.md](
+auth.md) | 注册、登录、Token 刷新、登出（DB → API → Mobile） | [prd/v1-mvp.md](.
+./../prd/v1-mvp.md) |\n    12\t| [profile.md](profile.md) | 个人资料、头像相册、
+年龄校验（DB → API → Mobile） | [prd/v1-profile.md](../../prd/v1-profile.md) |\n
+   13\t| [matching.md](matching.md) | 推荐、滑动、匹配成功（DB → API → Mobile） 
+| [docs/product-specs/matching.md](../product-specs/matching.md) |\n    14\t| [d
+ev-tools.md](dev-tools.md) | Debug 专用工具模块（Dev Tools Drawer） | [prd/v1-de
+v-tools-drawer.md](../../prd/v1-dev-tools-drawer.md) |\n    15\t| [im.md](im.md)
+| 会话、消息、已读回执、推送（DB → API → Mobile） | [docs/product-specs/im.md](.
+./product-specs/im.md) |\n    16\t| [admin.md](admin.md) | Admin Dashboard、用户
+列表管理 | [prd/v1-infrastructure-bootstrap.md](../../prd/v1-infrastructure-boot
+strap.md) |\n    17\t| [blocks-reports.md](blocks-reports.md) | 拉黑、举报基础 A
+PI | [prd/v1-infrastructure-bootstrap.md](../../prd/v1-infrastructure-bootstrap.
+md) |\n    18\t| [content-moderation.md](content-moderation.md) | 内容审核 Webho
+ok、照片状态管理 | [prd/v1-infrastructure-bootstrap.md](../../prd/v1-infrastruct
+ure-bootstrap.md) |\n    19\t\n    20\t## 写作规范\n    21\t\n    22\t每个模块文
+档应包含：\n    23\t1. **时序图/流程图**：Mermaid 描述核心流程（覆盖 API 和 Mobi
+le 的交互）\n    24\t2. **关键文件索引**：代码仓库中的关键文件路径（DB / API / M
+obile 三层）\n    25\t3. **状态机/数据结构**：核心实体状态转换\n    26\t4. **边
+界情况**：异常流程、权限校验、幂等性设计\n    27\t5. **全链路变更清单**：修改该
+模块时，Agent 需要同时改哪些文件\n',
+        message='27 lines read from file starting from line 1. Total lines in fi
+le: 27. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(arguments_part='"}')
+ToolCall(
+    type='function',
+    id='tool_D2BzELPi5hA0kdantOKBsiq2',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "docs/design-docs/testing.md'
+    ),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_rYJuky8ihdQRACm5BpGeRJHt',
+    return_value=ToolOk(
+        is_error=False,
+        output="     1\t# Flutter 编码规范\n     2\t\n     3\t## 定位\n     4\t\
+n     5\tFlutter 是本项目的**移动端 App**，由全栈 Agent 在实现需求时统一维护。Ag
+ent 在修改 Flutter 代码时，必须保证与 `apps/api/` 的 API 契约和 `packages/design
+-system/` 的设计规范一致。\n     6\t\n     7\t## 项目结构（apps/mobile）\n     8
+\t\n     9\t```\n    10\tlib/\n    11\t├── main.dart\n    12\t├── app.dart\n    
+13\t├── core/\n    14\t│   ├── di/                 # GetIt / injectable 依赖注入
+\n    15\t│   ├── network/            # Dio 封装、拦截器\n    16\t│   ├── storag
+e/            # SharedPreferences / SecureStorage\n    17\t│   └── utils/       
+      # 工具函数\n    18\t├── data/\n    19\t│   ├── models/             # 由 Op
+enAPI 生成或手写的数据模型\n    20\t│   │   └── generated/      # openapi-genera
+tor 自动生成的模型\n    21\t│   │       └── auth/       # Auth 模块生成模型\n   
+22\t│   ├── repositories/       # 仓库实现\n    23\t│   └── datasources/        
+# 远程/本地数据源\n    24\t├── domain/\n    25\t│   ├── entities/           # 纯
+业务实体（手写）\n    26\t│   ├── repositories/       # 仓库接口\n    27\t│   └─
+─ usecases/           # 用例（可选）\n    28\t├── presentation/\n    29\t│   ├──
+pages/              # 页面\n    30\t│   ├── widgets/            # 可复用组件\n  
+ 31\t│   ├── blocs/              # BLoC / Cubit 状态管理\n    32\t│   └── routes
+.dart         # GoRouter 路由表\n    33\t└── design_system/          # 引用 pack
+ages/design-system 中的组件\n    34\t```\n    35\t\n    36\t## 状态管理\n    37\
+t\n    38\t- **全局状态**：使用 `flutter_bloc`（Cubit 为主，BLoC 为辅）\n    39\
+t- **局部状态**：`StatefulWidget` 或 `ValueNotifier`\n    40\t- **依赖注入**：`g
+et_it` + `injectable`\n    41\t\n    42\t## 命名规范\n    43\t\n    44\t- 文件名
+：`snake_case.dart`\n    45\t- 类名：`PascalCase`\n    46\t- Widget 类名必须以描
+述功能结尾（如 `HomePage`, `UserCardWidget`）\n    47\t- BLoC 相关：`xxx_bloc.da
+rt`, `xxx_event.dart`, `xxx_state.dart`\n    48\t- **设计系统组件必须以 `Sw` 为
+前缀**，如 `SwButton`, `SwAvatar`\n    49\t\n    50\t## 网络层\n    51\t\n    52
+\t- 使用 **Dio** + 拦截器处理统一错误、Token 刷新、日志\n    53\t- API 响应统一
+封装为 `Result<T>` 或 `Either<Failure, T>`\n    54\t- 所有 Model 使用 `freezed` 
++ `json_serializable`\n    55\t- Model 字段命名必须与后端 DTO 完全一致\n    56\t
+- **OpenAPI 生成模型**存放在 `apps/mobile/lib/models/generated/<module>/`，禁止
+手动修改生成文件\n    57\t\n    58\t### DioClient 单例模式\n    59\t\n    60\t`D
+ioClient` 必须在 `get_it` 中注册为 **全局单例**（`registerLazySingleton`），确保
+所有 Repository 共享同一 `Dio` 实例。这样当 DevTools 等模块需要热更新 `baseUrl` 
+时，变更对所有网络请求即时生效。\n    61\t\n    62\t```dart\n    63\t// apps/mob
+ile/lib/core/di/di.dart\n    64\tvoid configureDependencies() {\n    65\t  getIt
+.registerLazySingleton<DioClient>(DioClient.new);\n    66\t  // ...\n    67\t}\n
+   68\t```\n    69\t\n    70\tRepository 实现中禁止直接 `DioClient().dio`，应通
+过依赖注入获取：\n    71\t\n    72\t```dart\n    73\t// ✅ 正确\n    74\tclass A
+uthRepositoryImpl implements AuthRepository {\n    75\t  final Dio _dio;\n    76
+\t  AuthRepositoryImpl({Dio? dio}) : _dio = dio ?? getIt<DioClient>().dio;\n    
+77\t}\n    78\t\n    79\t// ❌ 错误（会导致多个 Dio 实例，baseUrl 热更新失效）\n
+   80\tAuthRepositoryImpl({Dio? dio}) : _dio = dio ?? DioClient().dio;\n    81\t
+```\n    82\t\n    83\t## UI 规范\n    84\t\n    85\t- 不使用硬编码颜色/字号，统
+一从 `packages/design-system` 的 `AppTheme` 读取\n    86\t- 页面之间使用 `go_rou
+ter` 导航\n    87\t- 图片资源使用 `flutter_gen` 自动生成引用\n    88\t- 字符串使
+用 `intl` / `flutter_localizations` 管理（优先中文）\n    89\t\n    90\t## 页面
+级 UI 开发前置规范\n    91\t\n    92\t任何涉及**新页面、新核心交互模式、新组件**
+的功能开发，必须严格遵守以下前置流程。Issue #2（Auth Login）因跳过该流程导致 Log
+inPage 未使用 design-system 组件、无 Widgetbook 用例、无原型图 review，已产生技
+术债务。\n    93\t\n    94\t### 强制前置条件（Must Have）\n    95\t\n    96\t1. 
+**低保真原型图评审通过**\n    97\t   - PM Agent 必须产出至少包含关键页面布局、交
+互状态、异常状态的低保真线框图（可存放于 `docs/design-docs/ui-specs/<feature>/`
+）。\n    98\t   - 人类确认原型图通过 review 后，才能进入 design-system 组件开发
+。\n    99\t\n   100\t2. **Design-Only PR 先走，且必须附带可查看的视觉产物**\n  
+101\t   - 在写后端 API、数据库 Entity、Dio 网络请求之前，先提交独立的 Design-Onl
+y PR。\n   102\t   - Design-Only PR 的变更范围仅限于：\n   103\t     - `packages
+/design-system/`（新增/修改组件）\n   104\t     - `packages/design-system/widget
+book/main.dart`（注册展示用例）\n   105\t     - `apps/mobile/lib/presentation/` 
+中的纯 UI 骨架（无 BLoC、无网络请求、无业务逻辑）\n   106\t   - **PR 中必须包含
+至少一张视觉产物**，供人类在不运行代码的情况下快速 review。推荐方式（按优先级排
+序）：\n   107\t     - **方案 A（推荐）**：提交 Golden File 截图测试。运行 `flut
+ter test --update-goldens` 生成 `*.png`，将生成的 golden 图片一并提交到 PR 中。
+人类可直接在 GitHub 上查看组件渲染效果。\n   108\t     - **方案 B**：若 golden f
+ile 暂时无法生成，PR 描述中必须包含运行命令，由人类在本地运行 `flutter run -d ch
+rome -t lib/widgetbook/main.dart` 或模拟器后，**截图并作为 PR review comment 贴
+回**，确认后方可合并。\n   109\t     - **方案 C（仅作补充）**：可用 Markdown / M
+ermaid / ASCII art 绘制线框逻辑图，但**不能替代**方案 A 或 B 的视觉验收。\n   11
+0\t\n   111\t3. **组件原子化评审**\n   112\t   - 页面中的任何可复用元素（按钮、
+输入框、卡片、列表项、弹窗）若 design-system 中不存在，必须先按 `atom → molecule
+→ organism` 层级在 design-system 中实现。\n   113\t   - **禁止**在 `pages/` 中直
+接使用原生 Material 组件（如 `TextField`、`ElevatedButton`、`OutlineInputBorder`
+）替代 design-system 组件。\n   114\t\n   115\t### 验收 Checklist\n   116\t\n   
+117\t在提交任何包含 Mobile UI 的 PR 前，PR 描述中必须勾选：\n   118\t\n   119\t-
+[ ] 该功能已产出低保真/高保真原型图，且已通过人类 review\n   120\t- [ ] 所有新增
+/修改的组件已在 `widgetbook/main.dart` 中注册\n   121\t- [ ] PR 中附带 Golden Fi
+le 截图或 Widgetbook 运行截图，供人类直接查看视觉产物\n   122\t- [ ] `pages/` 中
+未使用 `Color(0xFF...)`、`TextField`、`ElevatedButton` 等硬编码或原生 Material 
+组件替代 design-system\n   123\t- [ ] 页面中的状态（加载、空态、错误、禁用）在原
+型图中有明确定义\n   124\t\n   125\t### 违规回滚策略\n   126\t\n   127\t若发现已
+进入代码合并的页面存在未使用 design-system 组件、未走 Design-Only PR 的情况：\n 
+ 128\t- 标记为 **技术债务**，录入 `docs/exec-plans/tech-debt-tracker.md`\n   129
+\t- 在下一个迭代中优先安排 **Redesign-Only PR** 进行重构，不得在旧基础上继续堆叠
+业务逻辑。\n   130\t\n   131\t## 设计系统（Widgetbook）\n   132\t\n   133\t`pack
+ages/design-system/` 是本项目的**唯一设计源文件**。\n   134\t\n   135\t### 结构\
+n   136\t\n   137\t```\n   138\tpackages/design-system/\n   139\t├── lib/\n   14
+0\t│   ├── src/\n   141\t│   │   ├── theme/          # tokens + app_theme\n   14
+2\t│   │   ├── atoms/          # 原子组件（按钮、头像、标签）\n   143\t│   │   ├
+── molecules/      # 分子组件（输入框组合、用户卡片）\n   144\t│   │   └── organ
+isms/      # 有机体组件（底部导航、匹配弹窗）\n   145\t│   ├── widgetbook/      
+  # 组件展示平台\n   146\t│   │   └── main.dart       # 所有组件的可交互展示\n  
+147\t│   └── social_world_design_system.dart\n   148\t└── pubspec.yaml\n   149\t
+```\n   150\t\n   151\t### 强制规范\n   152\t\n   153\t1. **新增组件必须在 Widge
+tbook 注册**：每个 `atom`/`molecule`/`organism` 类都必须在 `widgetbook/main.dart
+` 中有至少一个展示用例\n   154\t2. **禁止在 page 中写死设计 Token**：所有颜色、
+字号、间距、圆角必须从 `DesignTokens` 读取\n   155\t3. **组件分类规则**：\n   15
+6\t   - `atoms/`：不可再分的最小 UI 元素\n   157\t   - `molecules/`：多个 atom 
+的组合\n   158\t   - `organisms/`：包含业务语义的复杂组件\n   159\t\n   160\t###
+Design-Only PR 流程\n   161\t\n   162\t当需求涉及不确定的设计方向时，Agent 可以
+先提交 **Design-Only PR**：\n   163\t\n   164\t1. 只修改 `packages/design-system
+/` 和 `apps/mobile/lib/presentation/`\n   165\t2. 所有新组件必须在 `widgetbook/m
+ain.dart` 中注册\n   166\t3. **不得包含**后端 API、数据库 Entity、Dio 网络请求\n
+  167\t4. PR 中必须附带 **Golden File 截图** 或 **Widgetbook 运行截图**，人类通
+过视觉产物验收设计方向\n   168\t5. 设计方向确定后，再提交 Full-Stack PR 完成 DB 
+→ API → Mobile 全链路\n   169\t\n   170\t## Debug-Only Widget 条件编译模式\n   1
+71\t\n   172\t当实现开发/调试专用 Widget（如 Dev Tools Drawer）时，必须遵守以下
+规范：\n   173\t\n   174\t1. **所有调试工具 Widget 必须包裹在 `if (kDebugMode) .
+..` 中**\n   175\t   - 入口注入示例：\n   176\t     ```dart\n   177\t     Widget
+build(BuildContext context) {\n   178\t       return MaterialApp.router(\n   179
+\t         // ...\n   180\t         builder: (context, child) {\n   181\t       
+   if (kDebugMode) {\n   182\t             return DevToolsWrapper(child: child!)
+;\n   183\t           }\n   184\t           return child!;\n   185\t         },\
+n   186\t       );\n   187\t     }\n   188\t     ```\n   189\t\n   190\t2. **禁
+止在 Release 模式下将调试 Widget 编译进产物**\n   191\t   - 通过 `const bool.fro
+mEnvironment('dart.vm.product')` 或 `kDebugMode` 进行编译期/运行期隔离。\n   192
+\t   - 与调试相关的路由、Repository、Cubit 注册同样应在 `kDebugMode` 分支下完成
+，避免增加 Release 包体积。\n   193\t\n   194\t3. **调试工具状态管理建议**\n   1
+95\t   - 允许使用 `StatefulWidget` / `ValueNotifier`（因仅开发期使用，逻辑通常较
+简单）。\n   196\t   - **建议统一使用 Cubit**，保持与生产代码一致的可读性和可维
+护性。\n   197\t\n   198\t## 禁止事项\n   199\t\n   200\t1. 禁止在 Widget 中直接
+调用 Dio/http\n   201\t2. 禁止在 BLoC 中直接操作 `BuildContext`\n   202\t3. 禁止
+使用 `dynamic` 传递 API 数据\n   203\t4. 禁止在 `presentation/` 中使用 `Color(0x
+FF...)` 硬编码\n",
+        message='203 lines read from file starting from line 1. Total lines in f
+ile: 203. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(arguments_part='"}')
+StatusUpdate(
+    context_usage=0.04792022705078125,
+    context_tokens=12562,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=3090,
+        output=303,
+        input_cache_read=9472,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-tDEj3LttAwEellOxSlskFXW1',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_D2BzELPi5hA0kdantOKBsiq2',
+    return_value=ToolOk(
+        is_error=False,
+        output="     1\t# 测试规范\n     2\t\n     3\t## 测试金字塔\n     4\t\n 
+   5\t```\n     6\t      /\\\n     7\t     /  \\     E2E（少量）\n     8\t    /_
+___\\\n     9\t   /      \\   集成测试（中等）\n    10\t  /________\\\n    11\t 
+/          \\ 单元测试（大量）\n    12\t/____________\\\n    13\t```\n    14\t\n
+   15\t## 各层测试职责\n    16\t\n    17\t### 1. 单元测试\n    18\t- **后端**：N
+estJS 使用 Jest，覆盖率目标 >80%\n    19\t- **前端**：Flutter 使用 `flutter_test
+`，Widget 使用 `WidgetTester`\n    20\t- **范围**：Service 层纯逻辑、Utils、类型
+转换、校验规则\n    21\t\n    22\t### 2. 集成测试\n    23\t- **后端**：数据库真
+实连接，测试 Repository + Service 组合\n    24\t- **范围**：API 端到端（使用 `su
+pertest`），覆盖关键路径\n    25\t\n    26\t### 3. E2E 验收测试（BDD）\n    27\t
+- 使用 **Gherkin** 语法编写 `.feature` 文件\n    28\t- 存放在 `tests/bdd/` 目录\
+n    29\t- 每个 feature 对应一个 PRD 中的用户故事\n    30\t\n    31\t示例：\n   
+32\t```gherkin\n    33\tFeature: User Swipe Matching\n    34\t  Scenario: Mutual
+like creates a match\n    35\t    Given Alice and Bob both have valid profiles\n
+   36\t    When Alice swipes right on Bob\n    37\t    And Bob swipes right on A
+lice\n    38\t    Then a match should be created between Alice and Bob\n    39\t
+   And both should receive a match notification\n    40\t```\n    41\t\n    42\t
+## 测试命名规范\n    43\t\n    44\t- 文件名：`.spec.ts`（NestJS）、`_test.dart`
+（Flutter）\n    45\t- 测试描述：使用 `should ... when ...` 格式\n    46\t- 示例
+：`should return 401 when token is expired`\n    47\t\n    48\t## 自动化要求\n  
+ 49\t\n    50\t- `make test` 必须在本地通过才能 push\n    51\t- CI 中全量运行 `m
+ake test`\n    52\t- 测试失败时，错误信息必须包含**修复指令**（因为 reader 可能
+是 Agent）\n    53\t\n    54\t## Golden File Testing（Flutter UI 截图基准）\n   
+55\t\n    56\t对于视觉关键组件或页面，必须编写 Golden Test，生成 `.png` 基准图并
+提交到仓库，供 PR Review 时直接查看渲染效果。\n    57\t\n    58\t### 适用范围\n 
+  59\t\n    60\t- 新增/修改的 `packages/design-system` 组件\n    61\t- 核心页面
+骨架（Login、Profile、DevToolsDrawer 等）\n    62\t- 多状态 UI（正常态、错误态、
+加载态、空态）\n    63\t\n    64\t### 目录规范\n    65\t\n    66\t- 基准图统一存
+放在 `apps/mobile/test/goldens/`\n    67\t- 命名规范：`<feature>_<state>.png`，
+如 `dev_tools_drawer_default.png`\n    68\t\n    69\t### 示例\n    70\t\n    71\
+t```dart\n    72\t// apps/mobile/test/dev_tools_golden_test.dart\n    73\tawait 
+tester.pumpWidget(\n    74\t  MaterialApp(\n    75\t    home: Scaffold(\n    76\
+t      body: DevToolsDrawer(isOpen: true, onClose: () {}),\n    77\t    ),\n    
+78\t  ),\n    79\t);\n    80\tawait tester.pumpAndSettle();\n    81\t\n    82\ta
+wait expectLater(\n    83\t  find.byType(Scaffold),\n    84\t  matchesGoldenFile
+('goldens/dev_tools_drawer_default.png'),\n    85\t);\n    86\t```\n    87\t\n  
+ 88\t### 更新基准图\n    89\t\n    90\t当 UI 发生预期变更时，运行以下命令重新生
+成：\n    91\t\n    92\t```bash\n    93\tflutter test --update-goldens\n    94\t
+```\n    95\t\n    96\t**注意**：Golden 文件变更必须作为 PR 的一部分提交，否则 C
+I 会失败。\n",
+        message='96 lines read from file starting from line 1. Total lines in fi
+le: 96. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+StepBegin(n=6)
+ThinkPart(
+    type='think',
+    think='现在我已经读取了所有相关文档。让我分析一下遗漏项：\n\n1. **CHANGELOG.
+md** - 当前只有 #30、#31，缺少 #34。这个 PR 新增了 `ServerUrlTool` widget 和测试
+，是用户可见的功能变更（开发者工具），需要在 CHANGELOG.md 中添加 `- #34`。\n\n2.
+**docs/modules/dev-tools.md** - 看起来这个文档已经比较完整了，包含了 `ServerUrlT
+ool` 的关键文件索引、流程图、边界情况等。不过让我检查一下是否遗漏了什么：\n   - 
+文档中已经提到了 `ServerUrlTool` widget\n   - 文档中已经提到了 `apps/mobile/test
+/dev_tools_widget_test.dart`\n   - 看起来模块文档已经同步了\n\n3. **docs/design-
+docs/flutter.md** - 已经包含了 Debug-Only Widget 条件编译模式的规范，看起来已经
+比较完善。\n\n4. **docs/design-docs/testing.md** - 已经包含了 Golden File Testin
+g 和 Widget 测试的规范，也有 `dev_tools_golden_test.dart` 的示例。\n\n等等，让我
+再仔细看看。这个 PR 新增了 `server_url_tool.dart`，而文档中确实已经提到了这个文
+件。但是 PR 是新增的这两个文件，而文档似乎已经存在。这说明文档可能是预先写好的，
+或者是这个 PR 之前的 PR 就已经有了相关文档。\n\n让我检查一下 git 历史，确认这些
+文档文件是否在这个 PR 之前就已经存在。',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_yikX8siXEkPGWMEsVMm2fQNR',
+    function=FunctionBody(
+        name='Shell',
+        arguments='{"command": "git log --oneline origin/main...HEAD"}'
+    ),
+    extras=None
+)
+ToolCall(
+    type='function',
+    id='tool_FTncB8pDUzk4lAYfw3ZuPgth',
+    function=FunctionBody(name='Shell', arguments=''),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_yikX8siXEkPGWMEsVMm2fQNR',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='cff1f8f feat: resolve #32 - [Bug] Dev Tools Drawer 服务器地址输
+入框内容被重置且无法复制粘贴\n',
+        message='Command executed successfully.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(
+    arguments_part='{"command": "git diff origin/main...HEAD -- apps/mobile/lib/
+presentation/widgets/server_url_tool.dart | head -50"}'
+)
+StatusUpdate(
+    context_usage=0.07781219482421875,
+    context_tokens=20398,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=7854,
+        output=349,
+        input_cache_read=12544,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-Tzqk8CxOd5czXmxpdS4KRuxT',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_FTncB8pDUzk4lAYfw3ZuPgth',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='diff --git a/apps/mobile/lib/presentation/widgets/server_url_too
+l.dart b/apps/mobile/lib/presentation/widgets/server_url_tool.dart\nindex 87299e
+d..e427497 100644\n--- a/apps/mobile/lib/presentation/widgets/server_url_tool.da
+rt\n+++ b/apps/mobile/lib/presentation/widgets/server_url_tool.dart\n@@ -20,6 +2
+0,14 @@ class _ServerUrlToolState extends State<ServerUrlTool> {\n     _controll
+er = TextEditingController(\n       text: context.read<DevToolsCubit>().state.se
+rverBaseUrl,\n     );\n+    // 处理 load() 异步完成后 state 的同步，避免在后续编
+辑中重置内容\n+    WidgetsBinding.instance.addPostFrameCallback((_) {\n+      if
+(!mounted) return;\n+      final state = context.read<DevToolsCubit>().state;\n+
+     if (_controller.text.isEmpty && state.serverBaseUrl.isNotEmpty) {\n+       
+_controller.text = state.serverBaseUrl;\n+      }\n+    });\n   }\n \n   @overri
+de\n@@ -30,92 +38,81 @@ class _ServerUrlToolState extends State<ServerUrlTool> {
+\n \n   @override\n   Widget build(BuildContext context) {\n-    return BlocList
+ener<DevToolsCubit, DevToolsState>(\n-      listenWhen: (previous, current) =>\n
+-          previous.serverBaseUrl != current.serverBaseUrl &&\n-          _contr
+oller.text != current.serverBaseUrl,\n-      listener: (context, state) {\n-    
+   _controller.text = state.serverBaseUrl;\n-        _controller.selection = Tex
+tSelection.collapsed(\n-          offset: state.serverBaseUrl.length,\n-        
+);\n-      },\n-      child: BlocBuilder<DevToolsCubit, DevToolsState>(\n-      
+ builder: (context, state) {\n-          return SwCard(\n-            child: Col
+umn(\n-              crossAxisAlignment: CrossAxisAlignment.stretch,\n-         
+    mainAxisSize: MainAxisSize.min,\n-              children: [\n-              
+ const Row(\n-                  children: [\n-                    Icon(\n-      
+               Icons.public,\n-                      color: DesignTokens.primary
+,\n-                      size: 20,\n-                    ),\n-                 
+  SizedBox(width: DesignTokens.spacingXs),\n-                    Flexible(\n-   
+                  child: Text(\n',
+        message='Command executed successfully.',
+        display=[],
+        extras=None
+    )
+)
+StepBegin(n=7)
+ThinkPart(
+    type='think',
+    think='啊，我明白了。这个 PR 不是新增 `server_url_tool.dart`，而是修改它。让
+我看完整的 diff。',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_EINjkGlYz8bV3M8khlJO0I54',
+    function=FunctionBody(
+        name='Shell',
+        arguments='{"command": "git diff origin/main...HEAD -- apps/mobile/lib/p
+resentation/widgets/server_url_tool.dart"}'
+    ),
+    extras=None
+)
+ToolCall(
+    type='function',
+    id='tool_WElqIs9MvWvEBKxuvaJ6Rh3r',
+    function=FunctionBody(
+        name='Shell',
+        arguments='{"command": "git diff origin/main...'
+    ),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_EINjkGlYz8bV3M8khlJO0I54',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output="diff --git a/apps/mobile/lib/presentation/widgets/server_url_too
+l.dart b/apps/mobile/lib/presentation/widgets/server_url_tool.dart\nindex 87299e
+d..e427497 100644\n--- a/apps/mobile/lib/presentation/widgets/server_url_tool.da
+rt\n+++ b/apps/mobile/lib/presentation/widgets/server_url_tool.dart\n@@ -20,6 +2
+0,14 @@ class _ServerUrlToolState extends State<ServerUrlTool> {\n     _controll
+er = TextEditingController(\n       text: context.read<DevToolsCubit>().state.se
+rverBaseUrl,\n     );\n+    // 处理 load() 异步完成后 state 的同步，避免在后续编
+辑中重置内容\n+    WidgetsBinding.instance.addPostFrameCallback((_) {\n+      if
+(!mounted) return;\n+      final state = context.read<DevToolsCubit>().state;\n+
+     if (_controller.text.isEmpty && state.serverBaseUrl.isNotEmpty) {\n+       
+_controller.text = state.serverBaseUrl;\n+      }\n+    });\n   }\n \n   @overri
+de\n@@ -30,92 +38,81 @@ class _ServerUrlToolState extends State<ServerUrlTool> {
+\n \n   @override\n   Widget build(BuildContext context) {\n-    return BlocList
+ener<DevToolsCubit, DevToolsState>(\n-      listenWhen: (previous, current) =>\n
+-          previous.serverBaseUrl != current.serverBaseUrl &&\n-          _contr
+oller.text != current.serverBaseUrl,\n-      listener: (context, state) {\n-    
+   _controller.text = state.serverBaseUrl;\n-        _controller.selection = Tex
+tSelection.collapsed(\n-          offset: state.serverBaseUrl.length,\n-        
+);\n-      },\n-      child: BlocBuilder<DevToolsCubit, DevToolsState>(\n-      
+ builder: (context, state) {\n-          return SwCard(\n-            child: Col
+umn(\n-              crossAxisAlignment: CrossAxisAlignment.stretch,\n-         
+    mainAxisSize: MainAxisSize.min,\n-              children: [\n-              
+ const Row(\n-                  children: [\n-                    Icon(\n-      
+               Icons.public,\n-                      color: DesignTokens.primary
+,\n-                      size: 20,\n-                    ),\n-                 
+  SizedBox(width: DesignTokens.spacingXs),\n-                    Flexible(\n-   
+                  child: Text(\n-                        'Server Base URL',\n-  
+                     style: TextStyle(\n-                          fontSize: Des
+ignTokens.fontSizeBody,\n-                          fontWeight: FontWeight.w600,
+\n-                          color: DesignTokens.textPrimary,\n-                
+       ),\n-                        overflow: TextOverflow.ellipsis,\n+    retur
+n BlocBuilder<DevToolsCubit, DevToolsState>(\n+      builder: (context, state) {
+\n+        return SwCard(\n+          child: Column(\n+            crossAxisAlig
+nment: CrossAxisAlignment.stretch,\n+            mainAxisSize: MainAxisSize.min,
+\n+            children: [\n+              const Row(\n+                children
+: [\n+                  Icon(\n+                    Icons.public,\n+            
+       color: DesignTokens.primary,\n+                    size: 20,\n+          
+       ),\n+                  SizedBox(width: DesignTokens.spacingXs),\n+       
+          Flexible(\n+                    child: Text(\n+                      '
+Server Base URL',\n+                      style: TextStyle(\n+                  
+     fontSize: DesignTokens.fontSizeBody,\n+                        fontWeight: 
+FontWeight.w600,\n+                        color: DesignTokens.textPrimary,\n   
+                   ),\n+                      overflow: TextOverflow.ellipsis,\n
+                    ),\n-                  ],\n-                ),\n-           
+    const SizedBox(height: DesignTokens.spacingSm),\n-                SwTextFiel
+d(\n-                  controller: _controller,\n-                  hintText: 'h
+ttp://localhost:3000/api/v1',\n-                  labelText: '服务器地址',\n-   
+              keyboardType: TextInputType.url,\n-                  prefixIcon: c
+onst Icon(Icons.link),\n-                  errorText: state.urlError.isEmpty ? n
+ull : state.urlError,\n-                  onChanged: context.read<DevToolsCubit>
+().onUrlChanged,\n-                ),\n-                const SizedBox(height: D
+esignTokens.spacingMd),\n-                SizedBox(\n-                  height: 
+48,\n-                  child: SwButton(\n-                    text: '保存配置',
+\n-                    variant: SwButtonVariant.filled,\n-                    is
+Loading: state.isSaving,\n-                    isDisabled: state.urlError.isNotE
+mpty ||\n-                        state.serverBaseUrl.trim().isEmpty,\n-        
+           onPressed: () async {\n-                      try {\n-               
+        await context.read<DevToolsCubit>().save();\n-                        if
+(context.mounted) {\n-                          final currentState =\n-         
+                    context.read<DevToolsCubit>().state;\n-                     
+    if (currentState.saveSuccess) {\n-                            ScaffoldMessen
+ger.of(context).showSnackBar(\n-                              const SnackBar(\n-
+                               content: Text('保存成功，新配置已生效'),\n-      
+                       ),\n-                            );\n-                   
+      }\n-                        }\n-                      } catch (e) {\n-    
+                   if (context.mounted) {\n+                  ),\n+             
+  ],\n+              ),\n+              const SizedBox(height: DesignTokens.spac
+ingSm),\n+              SwTextField(\n+                controller: _controller,\
+n+                hintText: 'http://localhost:3000/api/v1',\n+                la
+belText: '服务器地址',\n+                keyboardType: TextInputType.url,\n+    
+           prefixIcon: const Icon(Icons.link),\n+                errorText: stat
+e.urlError.isEmpty ? null : state.urlError,\n+                onChanged: context
+.read<DevToolsCubit>().onUrlChanged,\n+              ),\n+              const Si
+zedBox(height: DesignTokens.spacingMd),\n+              SizedBox(\n+            
+   height: 48,\n+                child: SwButton(\n+                  text: '保
+存配置',\n+                  variant: SwButtonVariant.filled,\n+                
+ isLoading: state.isSaving,\n+                  isDisabled: state.urlError.isNot
+Empty ||\n+                      state.serverBaseUrl.trim().isEmpty,\n+         
+        onPressed: () async {\n+                    try {\n+                    
+ await context.read<DevToolsCubit>().save();\n+                      if (context
+.mounted) {\n+                        final currentState =\n+                   
+        context.read<DevToolsCubit>().state;\n+                        if (curre
+ntState.saveSuccess) {\n                           ScaffoldMessenger.of(context)
+.showSnackBar(\n-                            SnackBar(content: Text('保存失败: $
+e')),\n+                            const SnackBar(\n+                          
+   content: Text('保存成功，新配置已生效'),\n+                            ),\n  
+                        );\n                         }\n                       }
+\n-                    },\n-                  ),\n+                    } catch (
+e) {\n+                      if (context.mounted) {\n+                        Sc
+affoldMessenger.of(context).showSnackBar(\n+                          SnackBar(c
+ontent: Text('保存失败: $e')),\n+                        );\n+                  
+   }\n+                    }\n+                  },\n                 ),\n-     
+        ],\n-            ),\n-          );\n-        },\n-      ),\n+           
+  ),\n+            ],\n+          ),\n+        );\n+      },\n     );\n   }\n }\
+n",
+        message='Command executed successfully.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(
+    arguments_part='HEAD -- apps/mobile/test/dev_tools_widget_test.dart"}'
+)
+StatusUpdate(
+    context_usage=0.08125686645507812,
+    context_tokens=21301,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=1077,
+        output=86,
+        input_cache_read=20224,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-T9QPkffmuJ77Lr7IOdHiPj4O',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_WElqIs9MvWvEBKxuvaJ6Rh3r',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output="diff --git a/apps/mobile/test/dev_tools_widget_test.dart b/apps/
+mobile/test/dev_tools_widget_test.dart\nindex 7cd0277..eb39330 100644\n--- a/app
+s/mobile/test/dev_tools_widget_test.dart\n+++ b/apps/mobile/test/dev_tools_widge
+t_test.dart\n@@ -152,13 +152,13 @@ void main() {\n \n       final saveButton = f
+ind.widgetWithText(SwButton, '保存配置');\n       expect(saveButton, findsOneWid
+get);\n-      expect(tester.widget<SwButton>(saveButton).onPressed, isNull);\n+ 
+    expect(tester.widget<SwButton>(saveButton).isDisabled, isTrue);\n \n       f
+inal textField = find.byType(TextField);\n       await tester.enterText(textFiel
+d, 'not-a-url');\n       await tester.pumpAndSettle();\n \n-      expect(tester.
+widget<SwButton>(saveButton).onPressed, isNull);\n+      expect(tester.widget<Sw
+Button>(saveButton).isDisabled, isTrue);\n     });\n \n     testWidgets('save bu
+tton enabled when valid', (tester) async {\n@@ -170,7 +170,27 @@ void main() {\n
+      await tester.pumpAndSettle();\n \n       final saveButton = find.widgetWit
+hText(SwButton, '保存配置');\n-      expect(tester.widget<SwButton>(saveButton).
+onPressed, isNotNull);\n+      expect(tester.widget<SwButton>(saveButton).isDisa
+bled, isFalse);\n+    });\n+\n+    testWidgets('entered text is not reset by sta
+te changes', (tester) async {\n+      await tester.pumpWidget(_buildWithCubit(cu
+bit, const ServerUrlTool()));\n+      await tester.pump();\n+\n+      final text
+Field = find.byType(TextField);\n+      await tester.enterText(textField, 'http:
+//example.com');\n+      await tester.pumpAndSettle();\n+\n+      expect(tester.
+widget<TextField>(textField).controller!.text,\n+          'http://example.com')
+;\n+\n+      // Trigger a state change that does not mutate serverBaseUrl\n+    
+ // to simulate any background emission (e.g. saveSuccess reset).\n+      cubit.
+onUrlChanged('http://example.com');\n+      await tester.pumpAndSettle();\n+\n+ 
+    expect(tester.widget<TextField>(textField).controller!.text,\n+          'ht
+tp://example.com');\n     });\n   });\n }\n",
+        message='Command executed successfully.',
+        display=[],
+        extras=None
+    )
+)
+StepBegin(n=8)
+ThinkPart(
+    type='think',
+    think='现在我理解了完整的变更：\n\n1. **`server_url_tool.dart`**:\n   - 移除
+了 `BlocListener`，改为在 `initState` 中使用 `WidgetsBinding.instance.addPostFra
+meCallback` 处理 `load()` 异步完成后的 state 同步\n   - 修复了 bug：输入框内容被
+state 变化重置，导致无法复制粘贴\n   - 现在只在 `_controller.text.isEmpty && sta
+te.serverBaseUrl.isNotEmpty` 时才更新 controller 的 text\n\n2. **`dev_tools_widg
+et_test.dart`**:\n   - 更新了测试断言，从检查 `onPressed` 改为检查 `isDisabled`\
+n   - 新增了一个测试用例：`entered text is not reset by state changes`，验证输入
+内容不会被 state 变化重置\n\n这是一个 bug fix PR（Issue #32），修复了 Dev Tools 
+Drawer 中服务器地址输入框内容被重置的问题。\n\n需要检查的文档遗漏：\n\n1. **CHAN
+GELOG.md** - 必须添加 `- #34`。虽然是 bug fix，但包含了用户可见的功能变更（修复
+了开发者工具中的输入框行为）和测试变更。\n\n2. **docs/modules/dev-tools.md** - 
+需要检查是否需要更新边界情况或关键实现细节。当前文档提到了"抽屉关闭后状态保留"，
+但没有提到输入框内容被 state 变化重置的具体问题。应该补充这个边界情况的说明。\n\
+n3. **docs/design-docs/flutter.md** - 可能需要补充关于 `TextEditingController` 
+与 `BlocBuilder` 共用时避免 state 重置输入内容的最佳实践。\n\n4. **docs/design-d
+ocs/testing.md** - 已经包含了 Widget 测试规范，但这个 PR 新增了关于输入框不被 st
+ate 重置的测试，这是比较特殊的边界情况测试。不过 testing.md 是通用规范，不一定需
+要针对每个具体测试用例更新。\n\n让我更仔细地思考一下：\n\n- 这个 PR 是 **bug fix
+**，不是新增功能\n- 变更范围只在 mobile 端的 widget 和测试\n- 没有接口破坏性变更
+，不需要迁移指南\n\n需要更新的文档：\n1. **CHANGELOG.md** - 在 `[Unreleased]` 下
+添加 `- #34`（Bug fix 通常在 `### Fixed` 下，但当前只有 `### Added`，我可以添加 
+`### Fixed` 小节）\n2. **docs/modules/dev-tools.md** - 在边界情况中补充"输入框内
+容不被 Bloc state 变化重置"的说明，以及相关的实现细节\n\n让我看看 CHANGELOG.md 
+的当前结构，然后决定如何添加。',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_5tXo0Mvdagm8Hx7QbVFh7yQ8',
+    function=FunctionBody(
+        name='SetTodoList',
+        arguments='{"todos": [{"title":"分析 PR 变更并识别文档遗漏项","status":"
+done"},{"title":"更新 CHANGELOG.md 追加 #34","status":"in_progress"},{"title":"
+检查并更新 docs/modules/dev-tools.md 边界情况","status":"pending"},{"title":"检
+查 docs/design-docs/flutter.md 是否需要补充 StatefulWidget + Bloc 最佳实践","sta
+tus":"pending"},{"title":"提交文档变更并 push 到 feat/issue-32","status":"pendin
+g"},{"title":"输出结构化报告","status":"pending"}]}'
+    ),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_5tXo0Mvdagm8Hx7QbVFh7yQ8',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='Todo list updated',
+        message='Todo list updated',
+        display=[
+            TodoDisplayBlock(
+                type='todo',
+                items=[
+                    TodoDisplayItem(
+                        title='分析 PR 变更并识别文档遗漏项',
+                        status='done'
+                    ),
+                    TodoDisplayItem(
+                        title='更新 CHANGELOG.md 追加 #34',
+                        status='in_progress'
+                    ),
+                    TodoDisplayItem(
+                        title='检查并更新 docs/modules/dev-tools.md 边界情况',
+                        status='pending'
+                    ),
+                    TodoDisplayItem(
+                        title='检查 docs/design-docs/flutter.md 是否需要补充 Sta
+tefulWidget + Bloc 最佳实践',
+                        status='pending'
+                    ),
+                    TodoDisplayItem(
+                        title='提交文档变更并 push 到 feat/issue-32',
+                        status='pending'
+                    ),
+                    TodoDisplayItem(title='输出结构化报告', status='pending')
+                ]
+            )
+        ],
+        extras=None
+    )
+)
+StatusUpdate(
+    context_usage=0.08918380737304688,
+    context_tokens=23379,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=2131,
+        output=639,
+        input_cache_read=21248,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-dfHjzVHtlQbrR26ceTGOBN07',
+    plan_mode=False,
+    mcp_status=None
+)
+StepBegin(n=9)
+ThinkPart(
+    type='think',
+    think='让我继续执行文档更新。首先更新 CHANGELOG.md，然后检查其他文档。\n\nCH
+ANGELOG.md 当前结构：\n```\n## [Unreleased]\n\n### Added\n- #30\n- #31\n```\n\n
+我需要添加 `### Fixed` 小节并放入 `- #34`。',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_F8ihkdjaqmF3eZFXNOH4XlbJ',
+    function=FunctionBody(
+        name='Shell',
+        arguments='{"command": "cat > /tmp/changelog_update.py << \'EOF\'\\nimpo
+rt re\\n\\nwith open(\'CHANGELOG.md\', \'r\') as f:\\n    content = f.read()\\n\
+\n# 在 ### Added 区块之后添加 ### Fixed 区块\\nif \'### Fixed\' not in content:\
+\n    content = content.rstrip() + \'\\\\n\\\\n### Fixed\\\\n- #34\\\\n\'\\nelse
+:\\n    # 如果已有 Fixed 区块，在最后一个 Fixed 条目后追加\\n    lines = content
+.split(\'\\\\n\')\\n    fixed_idx = None\\n    for i, line in enumerate(lines):\
+\n        if line.strip() == \'### Fixed\':\\n            fixed_idx = i\\n    if
+fixed_idx is not None:\\n        # 找到 Fixed 区块的结束位置（下一个 ### 或文件
+尾）\\n        insert_idx = fixed_idx + 1\\n        for i in range(fixed_idx + 1
+, len(lines)):\\n            if lines[i].startswith(\'### \'):\\n               
+break\\n            insert_idx = i\\n        lines.insert(insert_idx, \'- #34\')
+\\n        content = \'\\\\n\'.join(lines)\\n\\nwith open(\'CHANGELOG.md\', \'w\
+') as f:\\n    f.write(content)\\nEOF\\npython3 /tmp/changelog_update.py"}'
+    ),
+    extras=None
+)
+StatusUpdate(
+    context_usage=0.09173583984375,
+    context_tokens=24048,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=752,
+        output=347,
+        input_cache_read=23296,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-HiYTlzeh0QHuLXPK64SxDi8p',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_F8ihkdjaqmF3eZFXNOH4XlbJ',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='',
+        message='Command executed successfully.',
+        display=[],
+        extras=None
+    )
+)
+StepBegin(n=10)
+ThinkPart(
+    type='think',
+    think='好的，CHANGELOG.md 已更新。让我验证一下，然后继续更新其他文档。',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_by1kG9cCyZUZLtSPAUo1nCic',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "CHANGELOG.md"}'
+    ),
+    extras=None
+)
+StatusUpdate(
+    context_usage=0.09315872192382812,
+    context_tokens=24421,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=613,
+        output=37,
+        input_cache_read=23808,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-Bs63VCHGOnt0ZZnoV2It0pIv',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_by1kG9cCyZUZLtSPAUo1nCic',
+    return_value=ToolOk(
+        is_error=False,
+        output='     1\t# Changelog\n     2\t\n     3\tAll notable changes to th
+is project will be documented in this file.\n     4\t\n     5\tThe format is bas
+ed on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),\n     6\tand thi
+s project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+\n     7\t\n     8\t## [Unreleased]\n     9\t\n    10\t### Added\n    11\t- #30\
+n    12\t- #31\n    13\t\n    14\t### Fixed\n    15\t- #34\n',
+        message='15 lines read from file starting from line 1. Total lines in fi
+le: 15. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+StepBegin(n=11)
+ThinkPart(
+    type='think',
+    think='CHANGELOG.md 更新完成。现在我需要检查并更新 `docs/modules/dev-tools.m
+d`。\n\n从 PR 变更来看，核心的 bug fix 是：\n1. 移除了 `BlocListener`，避免了每
+次 `serverBaseUrl` state 变化时重置 `_controller.text`\n2. 改为在 `initState` 中
+使用 `addPostFrameCallback` 来处理异步加载完成后的初始值同步\n3. 测试新增了验证
+输入内容不会被 state 变化重置的用例\n\n当前 `docs/modules/dev-tools.md` 的边界情
+况部分：\n```\n1. **Release 模式排除**：...\n2. **URL 校验失败**：...\n3. **Shar
+edPreferences 异常**：...\n4. **抽屉关闭后状态保留**：再次打开抽屉时保留上次输入
+内容（未保存），避免误操作丢失编辑内容。\n```\n\n我需要补充一个新的边界情况，说
+明 `TextEditingController` 与 `BlocBuilder` 配合时，如何避免 state 变化重置用户
+输入内容。同时，在流程图或关键实现细节部分，可能需要更新 `ServerUrlTool` 的实现
+说明。\n\n让我看看 docs/modules/dev-tools.md 中是否有需要更新的地方。我觉得应该
+在边界情况中增加第5条：\n\n```\n5. **输入框内容与 Bloc state 解耦**：`ServerUrlT
+ool` 使用 `TextEditingController` 管理输入，避免 `BlocBuilder` 每次 rebuild 或 `
+BlocListener` 响应 `serverBaseUrl` 变化时重置用户已输入的内容。仅在初始化时（且 
+controller 为空时）通过 `addPostFrameCallback` 同步异步加载的初始 URL。\n```\n\n
+另外，关键实现细节或流程图部分，当前文档中的流程图已经比较完整了，不需要大改。但
+是边界情况需要补充。\n\n我还需要检查 `docs/design-docs/flutter.md` 是否需要补充
+。这是一个比较通用的 Flutter 编码规范文档。这个 bug 反映了一个通用的 Flutter + B
+loc 模式问题：`TextEditingController` 与 `BlocListener/BlocBuilder` 配合时，stat
+e 变化会重置用户输入。这确实是一个值得在编码规范中补充的最佳实践。\n\n让我给 flu
+tter.md 的 "状态管理" 或 "禁止事项" 附近补充一个关于 `TextEditingController` 与 
+Bloc 共用的最佳实践。\n\n不过等等，我需要评估这是否"必须"更新。根据任务要求，我
+只需要对"遗漏项"进行补充。这个 PR 主要是 bug fix，变更范围小。\n\n从任务说明来看
+：\n- `apps/mobile/` → `docs/modules/`、`docs/design-docs/flutter.md`\n- 需要检
+查对应文档是否已补充\n\n让我做出判断：\n1. `docs/modules/dev-tools.md` 需要补充
+边界情况（与 PR 变更直接相关）\n2. `docs/design-docs/flutter.md` 可以补充一个关
+于 `TextEditingController` 与 Bloc 共用的最佳实践（这是从本次 bug 中提炼的通用规
+范）\n3. `docs/design-docs/testing.md` 这个 PR 只是新增了一个具体的 widget 测试
+用例，属于正常开发流程，testing.md 已经有足够的规范说明，不需要专门更新。\n\n让
+我执行这两个文档的更新。',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_7so2wGsFedzrraYtIgD6AvJ8',
+    function=FunctionBody(
+        name='Shell',
+        arguments='{"command": "python3 << \'EOF\'\\nwith open(\'docs/modules/de
+v-tools.md\', \'r\') as f:\\n    content = f.read()\\n\\n# 在边界情况第4条后添加
+第5条\\nold_text = \\"\\"\\"4. **抽屉关闭后状态保留**：再次打开抽屉时保留上次输
+入内容（未保存），避免误操作丢失编辑内容。\\"\\"\\"\\nnew_text = \\"\\"\\"4. **
+抽屉关闭后状态保留**：再次打开抽屉时保留上次输入内容（未保存），避免误操作丢失编
+辑内容。\\n5. **输入框内容与 Bloc state 解耦**：`ServerUrlTool` 使用 `TextEditin
+gController` 管理输入，避免 `BlocBuilder` 每次 rebuild 或 `BlocListener` 响应 `s
+erverBaseUrl` 变化时重置用户已输入的内容。仅在初始化时（且 controller 为空时）通
+过 `addPostFrameCallback` 同步异步加载的初始 URL。\\"\\"\\"\\n\\nif old_text in 
+content:\\n    content = content.replace(old_text, new_text)\\n    with open(\'d
+ocs/modules/dev-tools.md\', \'w\') as f:\\n        f.write(content)\\n    print(
+\\"Updated docs/modules/dev-tools.md\\")\\nelse:\\n    print(\\"Target text not 
+found, skipping dev-tools.md update\\")\\nEOF"}'
+    ),
+    extras=None
+)
+StatusUpdate(
+    context_usage=0.0940399169921875,
+    context_tokens=24652,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=332,
+        output=948,
+        input_cache_read=24320,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-U8xHWG779GmdY4k6z6EQ9FOr',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_7so2wGsFedzrraYtIgD6AvJ8',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='Updated docs/modules/dev-tools.md\n',
+        message='Command executed successfully.',
+        display=[],
+        extras=None
+    )
+)
+StepBegin(n=12)
+ThinkPart(
+    type='think',
+    think='好的，docs/modules/dev-tools.md 已更新。现在让我考虑是否更新 docs/des
+ign-docs/flutter.md。\n\n这个 bug 的核心教训是：当使用 `TextEditingController` 
+与 `BlocBuilder`/`BlocListener` 配合时，如果直接通过 Bloc state 来驱动 controlle
+r 的 text，会导致每次 state 变化（即使是无关字段变化触发的 rebuild）都可能重置用
+户输入，影响复制粘贴和编辑体验。\n\n这确实是一个值得在 flutter.md 中补充的最佳实
+践。让我在 "状态管理" 或 "UI 规范" 附近补充一个小节。\n\n看看 flutter.md 的结构
+，"状态管理" 部分在后面，我可以补充一个 "StatefulWidget + Bloc 输入组件最佳实践"
+。',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_xmgYSJAVH8OPE9kEAXFFcsxO',
+    function=FunctionBody(
+        name='Shell',
+        arguments='{"command": "python3 << \'EOF\'\\nwith open(\'docs/design-doc
+s/flutter.md\', \'r\') as f:\\n    content = f.read()\\n\\n# 在 \\"禁止事项\\" 
+之前插入一个新的最佳实践小节\\nold_text = \\"## 禁止事项\\"\\nnew_text = \\"\\"\
+\"## StatefulWidget 输入组件与 Bloc 配合最佳实践\\n\\n当 `TextEditingController`
+与 `BlocBuilder`/`BlocListener` 配合使用时，需避免 Bloc state 变化直接覆盖用户正
+在编辑的内容，导致输入框重置、光标跳转或复制粘贴失效。\\n\\n### 推荐做法\\n\\n1.
+**由 `TextEditingController` 持有输入的单一真实来源**\\n   - 使用 `controller.te
+xt` 作为当前输入值的来源。\\n   - `onChanged` 仅用于通知 Cubit 做校验或派生状态
+计算，**不反向覆盖 controller**。\\n\\n2. **仅在初始化时同步 Bloc 的初始值**\\n 
+ - 若初始值来自异步加载（如 SharedPreferences），在 `initState` 中通过 `addPostF
+rameCallback` 安全同步：\\n     ```dart\\n     @override\\n     void initState()
+{\\n       super.initState();\\n       _controller = TextEditingController(\\n  
+      text: context.read<MyCubit>().state.initialValue,\\n       );\\n       Wid
+getsBinding.instance.addPostFrameCallback((_) {\\n         if (!mounted) return;
+\\n         final state = context.read<MyCubit>().state;\\n         if (_control
+ler.text.isEmpty && state.initialValue.isNotEmpty) {\\n           _controller.te
+xt = state.initialValue;\\n         }\\n       });\\n     }\\n     ```\\n\\n3. *
+*避免使用 `BlocListener` 监听并覆盖 controller.text**\\n   - 不要通过 `BlocListe
+ner` 在 `serverBaseUrl` 等字段变化时执行 `_controller.text = state.xxx`。\\n   -
+如果需要响应外部重置指令，应通过独立事件（如 `resetToDefault`）并在 handler 中显
+式更新 controller。\\n\\n### 反例\\n\\n```dart\\n// ❌ 错误：BlocListener 会在每
+次 state.serverBaseUrl 变化时重置输入内容\\nBlocListener<MyCubit, MyState>(\\n  
+listener: (context, state) {\\n    _controller.text = state.serverBaseUrl; // 导
+致用户输入被覆盖\\n  },\\n  child: ...\\n)\\n```\\n\\n## 禁止事项\\"\\"\\"\\n\\n
+if \\"## StatefulWidget 输入组件与 Bloc 配合最佳实践\\" not in content:\\n    if
+old_text in content:\\n        content = content.replace(old_text, new_text)\\n 
+      with open(\'docs/design-docs/flutter.md\', \'w\') as f:\\n            f.wr
+ite(content)\\n        print(\\"Updated docs/design-docs/flutter.md\\")\\n    el
+se:\\n        print(\\"Target text not found, skipping flutter.md update\\")\\ne
+lse:\\n    print(\\"Section already exists, skipping flutter.md update\\")\\nEOF
+"}'
+    ),
+    extras=None
+)
+StatusUpdate(
+    context_usage=0.09778213500976562,
+    context_tokens=25633,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=1057,
+        output=820,
+        input_cache_read=24576,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-TvSX4N6i9sSQGR2Iq5IimfXT',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_xmgYSJAVH8OPE9kEAXFFcsxO',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='Updated docs/design-docs/flutter.md\n',
+        message='Command executed successfully.',
+        display=[],
+        extras=None
+    )
+)
+StepBegin(n=13)
+ThinkPart(
+    type='think',
+    think='好的，让我验证一下更新的文档，然后检查是否还有其他遗漏。',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_E8b67Mle3ViBTqHQcMR9KKUb',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "docs/modules/dev-tools.md", "line_offset": 155, "n_
+lines": 25}'
+    ),
+    extras=None
+)
+ToolCall(
+    type='function',
+    id='tool_xQzZtm9L2EeKOBKOpv8OhKWp',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "docs/design-docs/flutter.md'
+    ),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_E8b67Mle3ViBTqHQcMR9KKUb',
+    return_value=ToolOk(
+        is_error=False,
+        output='   155\t## 边界情况\n   156\t\n   157\t1. **Release 模式排除**：
+所有调试 Widget 必须包裹在 `if (kDebugMode) ...` 中，Release 模式下不编译进产物
+。\n   158\t2. **URL 校验失败**：空值或格式错误时，输入框显示红色错误边框与文案
+，保存按钮禁用。\n   159\t3. **SharedPreferences 异常**：读写失败时静默捕获，避
+免阻塞主流程；保存失败时显示错误提示。\n   160\t4. **抽屉关闭后状态保留**：再次
+打开抽屉时保留上次输入内容（未保存），避免误操作丢失编辑内容。\n   161\t5. **输
+入框内容与 Bloc state 解耦**：`ServerUrlTool` 使用 `TextEditingController` 管理
+输入，避免 `BlocBuilder` 每次 rebuild 或 `BlocListener` 响应 `serverBaseUrl` 变
+化时重置用户已输入的内容。仅在初始化时（且 controller 为空时）通过 `addPostFrame
+Callback` 同步异步加载的初始 URL。\n   162\t\n   163\t## 全链路变更清单\n   164\
+t\n   165\t修改本模块时，Agent 需要同时检查并更新以下文件：\n   166\t\n   167\t1
+. **移动端 Widget**：`apps/mobile/lib/presentation/widgets/dev_tools_*.dart`\n  
+168\t2. **移动端状态管理**：`apps/mobile/lib/presentation/blocs/dev_tools/`\n   
+169\t3. **移动端 Repository**：`apps/mobile/lib/data/repositories/dev_tools_repo
+sitory_impl.dart`\n   170\t4. **DioClient**：`apps/mobile/lib/core/network/dio_c
+lient.dart`\n   171\t5. **DI 注册**：`apps/mobile/lib/core/di/di.dart`\n   172\t
+6. **BDD 测试**：`tests/bdd/dev_tools_drawer.feature` 及 `tests/bdd/step-definit
+ions/dev_tools_drawer.steps.js`\n   173\t7. **Widgetbook**：`packages/design-sys
+tem/widgetbook/main.dart`\n   174\t8. **Flutter 测试**：`apps/mobile/test/dev_to
+ols_*_test.dart` 与 `apps/mobile/test/goldens/`\n   175\t9. **模块文档**：`docs/
+modules/dev-tools.md`\n   176\t10. **Flutter 规范文档**：`docs/design-docs/flutt
+er.md`\n   177\t11. **测试规范文档**：`docs/design-docs/testing.md`\n',
+        message='23 lines read from file starting from line 155. Total lines in 
+file: 177. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(arguments_part='", "line_offset": 195, "n_lines": 60}')
+StatusUpdate(
+    context_usage=0.10103607177734375,
+    context_tokens=26486,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=886,
+        output=82,
+        input_cache_read=25600,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-o5lN7RKFSmC5hYTijjYIBtcG',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_xQzZtm9L2EeKOBKOpv8OhKWp',
+    return_value=ToolOk(
+        is_error=False,
+        output='   195\t   - 允许使用 `StatefulWidget` / `ValueNotifier`（因仅开
+发期使用，逻辑通常较简单）。\n   196\t   - **建议统一使用 Cubit**，保持与生产代
+码一致的可读性和可维护性。\n   197\t\n   198\t## StatefulWidget 输入组件与 Bloc 
+配合最佳实践\n   199\t\n   200\t当 `TextEditingController` 与 `BlocBuilder`/`Blo
+cListener` 配合使用时，需避免 Bloc state 变化直接覆盖用户正在编辑的内容，导致输
+入框重置、光标跳转或复制粘贴失效。\n   201\t\n   202\t### 推荐做法\n   203\t\n  
+204\t1. **由 `TextEditingController` 持有输入的单一真实来源**\n   205\t   - 使用
+`controller.text` 作为当前输入值的来源。\n   206\t   - `onChanged` 仅用于通知 Cu
+bit 做校验或派生状态计算，**不反向覆盖 controller**。\n   207\t\n   208\t2. **仅
+在初始化时同步 Bloc 的初始值**\n   209\t   - 若初始值来自异步加载（如 SharedPref
+erences），在 `initState` 中通过 `addPostFrameCallback` 安全同步：\n   210\t    
+```dart\n   211\t     @override\n   212\t     void initState() {\n   213\t      
+super.initState();\n   214\t       _controller = TextEditingController(\n   215\
+t         text: context.read<MyCubit>().state.initialValue,\n   216\t       );\n
+  217\t       WidgetsBinding.instance.addPostFrameCallback((_) {\n   218\t      
+  if (!mounted) return;\n   219\t         final state = context.read<MyCubit>().
+state;\n   220\t         if (_controller.text.isEmpty && state.initialValue.isNo
+tEmpty) {\n   221\t           _controller.text = state.initialValue;\n   222\t  
+      }\n   223\t       });\n   224\t     }\n   225\t     ```\n   226\t\n   227\
+t3. **避免使用 `BlocListener` 监听并覆盖 controller.text**\n   228\t   - 不要通
+过 `BlocListener` 在 `serverBaseUrl` 等字段变化时执行 `_controller.text = state.
+xxx`。\n   229\t   - 如果需要响应外部重置指令，应通过独立事件（如 `resetToDefaul
+t`）并在 handler 中显式更新 controller。\n   230\t\n   231\t### 反例\n   232\t\n
+  233\t```dart\n   234\t// ❌ 错误：BlocListener 会在每次 state.serverBaseUrl 变
+化时重置输入内容\n   235\tBlocListener<MyCubit, MyState>(\n   236\t  listener: (
+context, state) {\n   237\t    _controller.text = state.serverBaseUrl; // 导致用
+户输入被覆盖\n   238\t  },\n   239\t  child: ...\n   240\t)\n   241\t```\n   242
+\t\n   243\t## 禁止事项\n   244\t\n   245\t1. 禁止在 Widget 中直接调用 Dio/http\
+n   246\t2. 禁止在 BLoC 中直接操作 `BuildContext`\n   247\t3. 禁止使用 `dynamic`
+传递 API 数据\n   248\t4. 禁止在 `presentation/` 中使用 `Color(0xFF...)` 硬编码\
+n',
+        message='54 lines read from file starting from line 195. Total lines in 
+file: 248. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+StepBegin(n=14)
+ThinkPart(
+    type='think',
+    think='文档更新看起来都很好。现在我需要：\n\n1. 检查是否有迁移指南需要创建（
+没有接口破坏性变更，不需要）\n2. 提交文档变更\n3. push 到当前分支\n4. 输出结构化
+报告\n\n让我继续执行提交和推送。',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_ILBDrmwCJMLSDgPqlOjl5jGL',
+    function=FunctionBody(
+        name='SetTodoList',
+        arguments='{"todos": [{"title":"分析 PR 变更并识别文档遗漏项","status":"
+done"},{"title":"更新 CHANGELOG.md 追加 #34","status":"done"},{"title":"检查并更
+新 docs/modules/dev-tools.md 边界情况","status":"done"},{"title":"检查 docs/desi
+gn-docs/flutter.md 是否需要补充 StatefulWidget + Bloc 最佳实践","status":"done"}
+,{"title":"提交文档变更并 push 到 feat/issue-32","status":"in_progress"},{"title
+":"输出结构化报告","status":"pending"}]}'
+    ),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_ILBDrmwCJMLSDgPqlOjl5jGL',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='Todo list updated',
+        message='Todo list updated',
+        display=[
+            TodoDisplayBlock(
+                type='todo',
+                items=[
+                    TodoDisplayItem(
+                        title='分析 PR 变更并识别文档遗漏项',
+                        status='done'
+                    ),
+                    TodoDisplayItem(
+                        title='更新 CHANGELOG.md 追加 #34',
+                        status='done'
+                    ),
+                    TodoDisplayItem(
+                        title='检查并更新 docs/modules/dev-tools.md 边界情况',
+                        status='done'
+                    ),
+                    TodoDisplayItem(
+                        title='检查 docs/design-docs/flutter.md 是否需要补充 Sta
+tefulWidget + Bloc 最佳实践',
+                        status='done'
+                    ),
+                    TodoDisplayItem(
+                        title='提交文档变更并 push 到 feat/issue-32',
+                        status='in_progress'
+                    ),
+                    TodoDisplayItem(title='输出结构化报告', status='pending')
+                ]
+            )
+        ],
+        extras=None
+    )
+)
+StatusUpdate(
+    context_usage=0.10651779174804688,
+    context_tokens=27923,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=1555,
+        output=175,
+        input_cache_read=26368,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-wqTPX9NttFI07xcSqrw0hRCp',
+    plan_mode=False,
+    mcp_status=None
+)
+StepBegin(n=15)
+ThinkPart(type='think', think='让我提交并推送变更。', encrypted=None)
+ToolCall(
+    type='function',
+    id='tool_POugJdpqf5K6IHKt31qtkAcq',
+    function=FunctionBody(name='Shell', arguments='{"command": "git status"}'),
+    extras=None
+)
+StatusUpdate(
+    context_usage=0.1072998046875,
+    context_tokens=28128,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=224,
+        output=25,
+        input_cache_read=27904,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-xHZWOvJBg0LzO5COflMEBb8e',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_POugJdpqf5K6IHKt31qtkAcq',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='On branch feat/issue-32\nYour branch is up to date with \'origin
+/feat/issue-32\'.\n\nChanges not staged for commit:\n  (use "git add <file>..." 
+to update what will be committed)\n  (use "git restore <file>..." to discard cha
+nges in working directory)\n\tmodified:   CHANGELOG.md\n\tmodified:   docs/desig
+n-docs/flutter.md\n\tmodified:   docs/modules/dev-tools.md\n\nno changes added t
+o commit (use "git add" and/or "git commit -a")\n',
+        message='Command executed successfully.',
+        display=[],
+        extras=None
+    )
+)
+StepBegin(n=16)
+ThinkPart(
+    type='think',
+    think='变更正确，只有文档文件。让我提交并推送。',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_kt1QQR12P9fCOyDJiYojT5fT',
+    function=FunctionBody(
+        name='Shell',
+        arguments='{"command": "git add -A && git commit -m \'docs: 补充 PR #34 
+文档 (by PR Doc Gardener)\' && git push origin feat/issue-32"}'
+    ),
+    extras=None
+)
+StatusUpdate(
+    context_usage=0.10791015625,
+    context_tokens=28288,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=384,
+        output=63,
+        input_cache_read=27904,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-fgCukeYiZIIr9B5Y29DkGOnd',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_kt1QQR12P9fCOyDJiYojT5fT',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='[feat/issue-32 905ee23] docs: 补充 PR #34 文档 (by PR Doc Garden
+er)\n 3 files changed, 49 insertions(+)\nTo github.com:MatioYoshitoki/social-wor
+ld.git\n   cff1f8f..905ee23  feat/issue-32 -> feat/issue-32\n',
+        message='Command executed successfully.',
+        display=[],
+        extras=None
+    )
+)
+StepBegin(n=17)
+ThinkPart(
+    type='think',
+    think='提交和推送成功。现在我需要输出结构化报告。让我更新 todo 列表并输出报
+告。',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_YkAih9kPlwAxJG1L2zLTrdjU',
+    function=FunctionBody(
+        name='SetTodoList',
+        arguments='{"todos": [{"title":"分析 PR 变更并识别文档遗漏项","status":"
+done"},{"title":"更新 CHANGELOG.md 追加 #34","status":"done"},{"title":"检查并更
+新 docs/modules/dev-tools.md 边界情况","status":"done"},{"title":"检查 docs/desi
+gn-docs/flutter.md 是否需要补充 StatefulWidget + Bloc 最佳实践","status":"done"}
+,{"title":"提交文档变更并 push 到 feat/issue-32","status":"done"},{"title":"输出
+结构化报告","status":"done"}]}'
+    ),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_YkAih9kPlwAxJG1L2zLTrdjU',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='Todo list updated',
+        message='Todo list updated',
+        display=[
+            TodoDisplayBlock(
+                type='todo',
+                items=[
+                    TodoDisplayItem(
+                        title='分析 PR 变更并识别文档遗漏项',
+                        status='done'
+                    ),
+                    TodoDisplayItem(
+                        title='更新 CHANGELOG.md 追加 #34',
+                        status='done'
+                    ),
+                    TodoDisplayItem(
+                        title='检查并更新 docs/modules/dev-tools.md 边界情况',
+                        status='done'
+                    ),
+                    TodoDisplayItem(
+                        title='检查 docs/design-docs/flutter.md 是否需要补充 Sta
+tefulWidget + Bloc 最佳实践',
+                        status='done'
+                    ),
+                    TodoDisplayItem(
+                        title='提交文档变更并 push 到 feat/issue-32',
+                        status='done'
+                    ),
+                    TodoDisplayItem(title='输出结构化报告', status='done')
+                ]
+            )
+        ],
+        extras=None
+    )
+)
+StatusUpdate(
+    context_usage=0.10852432250976562,
+    context_tokens=28449,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=289,
+        output=140,
+        input_cache_read=28160,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-cTiF1L80CoqHS12WRd2jXMMR',
+    plan_mode=False,
+    mcp_status=None
+)
+StepBegin(n=18)
+ThinkPart(
+    type='think',
+    think='用户要求我输出结构化报告到日志。让我生成一个完整的结构化报告，总结本
+次 PR 文档协同检查的结果。',
+    encrypted=None
+)
+TextPart(
+    type='text',
+    text='## PR #34 文档协同检查报告\n\n### 基本信息\n| 项目 | 内容 |\n|------|-
+-----|\n| PR 编号 | #34 |\n| 当前分支 | `feat/issue-32` |\n| Base 分支 | `main` 
+|\n| 变更类型 | Bug Fix（修复 Dev Tools Drawer 输入框被重置问题） |\n\n### 变更
+文件分析\n\n| 变更文件 | 变更性质 | 影响范围 |\n|----------|----------|---------
+-|\n| `apps/mobile/lib/presentation/widgets/server_url_tool.dart` | 修改 | 移除 
+`BlocListener`，改为 `initState + addPostFrameCallback` 同步初始值，避免 state 
+变化重置用户输入 |\n| `apps/mobile/test/dev_tools_widget_test.dart` | 修改 | 更
+新断言（`onPressed` → `isDisabled`），新增"输入内容不被 state 重置"测试用例 |\n\
+n### 文档遗漏项与补充操作\n\n#### 1. ✅ CHANGELOG.md — 已补充\n- **遗漏原因**：P
+R 包含用户可见的功能修复，但 CHANGELOG 中未记录 #34\n- **补充内容**：在 `[Unrele
+ased]` 下新增 `### Fixed` 小节，追加条目 `- #34`\n\n#### 2. ✅ docs/modules/dev-
+tools.md — 已补充\n- **遗漏原因**：模块文档的边界情况未涵盖本次 bug fix 的核心实
+现细节\n- **补充内容**：在"边界情况"中新增第 5 条：\n  > **输入框内容与 Bloc sta
+te 解耦**：`ServerUrlTool` 使用 `TextEditingController` 管理输入，避免 `BlocBuil
+der` 每次 rebuild 或 `BlocListener` 响应 `serverBaseUrl` 变化时重置用户已输入的
+内容。仅在初始化时（且 controller 为空时）通过 `addPostFrameCallback` 同步异步加
+载的初始 URL。\n\n#### 3. ✅ docs/design-docs/flutter.md — 已补充\n- **遗漏原因*
+*：本次 bug 反映了一个通用 Flutter + Bloc 模式问题，值得提炼为编码规范\n- **补充
+内容**：新增"**StatefulWidget 输入组件与 Bloc 配合最佳实践**"小节，包含：\n  - `
+TextEditingController` 作为输入单一真实来源的推荐做法\n  - 异步初始值通过 `addPo
+stFrameCallback` 安全同步的代码示例\n  - 禁止使用 `BlocListener` 覆盖 `controlle
+r.text` 的反例说明\n\n#### 4. ⏭️ docs/migration/README.md — 无需创建\n- **原因**
+：本次 PR 为纯 bug fix，无接口破坏性变更，无需迁移指南\n\n### 提交记录\n- **Comm
+it**: `905ee23`\n- **Message**: `docs: 补充 PR #34 文档 (by PR Doc Gardener)`\n-
+**已 Push**: `feat/issue-32` → `origin/feat/issue-32`\n\n### 总结\n本次 PR 文档
+协同检查完成，共识别并补充 **3 处文档遗漏**，均已创建/修改并推送至远程分支。无接
+口破坏性变更，无需迁移指南。'
+)
+StatusUpdate(
+    context_usage=0.10917282104492188,
+    context_tokens=28619,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=203,
+        output=683,
+        input_cache_read=28416,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-a9nKW1flJLwsu6Cq2N3Dmyw2',
+    plan_mode=False,
+    mcp_status=None
+)
+TurnEnd()
+
+To resume this session: kimi -r 2907452d-529d-4338-8abb-765551677246
+
+✅ 任务完成

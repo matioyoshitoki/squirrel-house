@@ -1,0 +1,178 @@
+# CTX Prompt 模板
+# 用于替代 handler 代码中硬编码的 prompt 片段
+# 使用 Go text/template 语法渲染
+
+templates:
+  # 替代 handlers.go:formatAgentContextPrompt
+  agent_context: |
+    【任务上下文】
+    {{- if gt .IssueNumber 0 }}
+    - Issue 编号: #{{ .IssueNumber }}
+    {{- end }}
+    {{- if gt .PRNumber 0 }}
+    - PR 编号: #{{ .PRNumber }}
+    {{- end }}
+    {{- if .ProjectPath }}
+    - 项目路径: {{ .ProjectPath }}
+    {{- end }}
+    {{- if .AgentsMd }}
+    - 项目地图: {{ .AgentsMd }}
+    {{- else }}
+    - 项目地图: 未找到 AGENTS.md
+    {{- end }}
+    {{- if .PRDFiles }}
+    - 关联 PRD: {{ .PRDFiles }}
+    {{- end }}
+    {{- if .ExecPlans }}
+    - 执行计划: {{ .ExecPlans }}
+    {{- end }}
+    {{- if .DesignDir }}
+    - 设计资产目录: {{ .DesignDir }}{{ if .DesignAssets }}，包含: {{ .DesignAssets }}{{ else }}，目录为空{{ end }}
+    {{- else if gt .IssueNumber 0 }}
+    - 设计资产: 未找到
+    {{- end }}
+    {{- if .DocsDir }}
+    - 文档目录: {{ .DocsDir }}
+    {{- end }}
+    {{- if .PrevReviewReport }}
+    - 上一轮 review report: {{ .PrevReviewReport }}
+      **这是后续审查，你必须先读取该文件，验证上一轮 Blocking/Major 问题是否已修复，再执行轻量级全量检查。**
+    {{- end }}
+
+  # 替代 handlers_pr.go:210 review 主 prompt
+  review_main: |
+    {{ .ContextPrompt }}
+    **你的任务类型：代码审查任务（Code Review Agent）**
+    目标：对 PR 进行全面代码审查，产出审查报告。
+
+    Review PR #{{ .PRNumber }}, branch: {{ .Branch }}. After completing the review, you MUST write the full markdown report to logs/review-report-{{ .PRNumber }}.md
+
+  # 替代 handlers_pr.go:196-207 review 辅助文件提示
+  review_aux_files: |
+    【辅助审查文件】
+    以下文件已在工作目录中生成，请在审查时按需读取（若文件不存在或为空则跳过）：
+    {{- if .DocCoverage }}
+    - 文档覆盖信息: {{ .DocCoverage }}
+    {{- end }}
+    {{- if .DesignAssetsList }}
+    - 设计资产列表: {{ .DesignAssetsList }}
+    {{- end }}
+    {{- if .FigmaLinks }}
+    - Figma 链接: {{ .FigmaLinks }}
+    {{- end }}
+
+  # 替代 handlers_pr.go:497 返工评论 body
+  rework_comment: |
+    ## 🔧 返工通知
+
+    此 PR 已被标记为需要返工。
+
+    {{ .BlockingIssues }}
+
+    ---
+    *由 Agent Control Center 自动标记*
+
+  # 替代 handlers_pr.go:481-495 返工 prompt
+  rework_prompt: |
+    {{ .ContextPrompt }}Issue #{{ .IssueNumber }}: {{ .IssueTitle }}
+
+    **你的任务类型：返工修复任务（Rework Agent）**
+    目标：根据审查报告修复 PR 中的代码问题，修复后重新提交。
+
+    这是 PR #{{ .PRNumber }} 的返工任务。
+    分支: {{ .Branch }}
+
+    请严格按照以下步骤执行修复：
+    1. 先执行：git checkout {{ .Branch }}
+    2. 根据审查报告中的问题进行代码修改。修复范围控制：优先修复所有 Blocking 问题，最多再修复 3 个 Major 问题，其余明确报告为"留待后续迭代"。
+    3. 修改完成后，**仅从以下命令中选择 1 个与修改最直接相关的命令执行验证**。如果验证环境不具备、命令未找到或超时，跳过验证直接提交。**严禁顺序执行多个命令或运行全量测试。**
+    {{ .TestCommands }}
+    4. 提交并推送：git add -A && git commit -m "fix: 修复 PR #{{ .PRNumber }} review 问题" && git push origin {{ .Branch }}
+       注意：如果 git commit 触发 pre-commit hook 失败，必须阅读错误输出并修复后重新 commit。同一 hook 错误不要重复 commit 超过 2 次。
+
+    审查报告：
+    {{ .ReviewReport }}
+
+  # 替代 handlers_dev.go:265-277 开发任务 prompt
+  dev_task: |
+    {{ .ContextPrompt }}{{ .TypePrompt }}Issue #{{ .IssueNumber }}: {{ .IssueTitle }}
+
+    **你的任务类型：开发任务（Developer Agent）**
+    目标：根据 Issue 需求编写代码实现，完成后提交 PR。
+
+    请在临时 worktree 中完成开发。
+    工作目录: {{ .TmpDir }}
+    基础分支: {{ .BaseBranch }}
+
+    开发完成后，你必须自己执行以下操作：
+    1. git add -A — 暂存所有变更（包括新文件）
+    2. git commit -m "{{ .CommitPrefix }}: resolve #{{ .IssueNumber }} - {{ .IssueTitle }}" — 不允许使用 `--no-verify` 跳过 hook
+    3. git push origin {{ .BranchName }} — 推送到远程分支
+    {{ if gt .ExistingPR 0 }}
+    4. 当前分支已有 PR #{{ .ExistingPR }}，请只 push 代码，**不要创建新的 Pull Request**。push 会自动更新已有 PR。
+    {{ else }}
+    4. 使用 gh pr create 创建 Pull Request（标题包含 "{{ .CommitPrefix }}: resolve #{{ .IssueNumber }}"）
+    {{ end }}
+
+    注意：
+    - 不要离开当前工作目录
+    - 如果 git commit 遇到 pre-commit hook 失败，必须阅读错误输出，修复后重新 commit
+    - 任务结束前必须确认 git status 是 clean 的
+
+  # 替代 handlers_dev.go:284-295 resume 恢复提示
+  resume_hint: |
+    **你的任务类型：恢复任务（Resume）**
+    说明：之前的工作因步骤限制中断。代码可能已经部分实现并 push 到分支。
+    {{- if .ReviewReport }}
+
+    【审查报告】
+    {{ .ReviewReport }}
+    {{- end }}
+
+    【恢复工作指引】
+    1. 先检查当前工作目录中的代码状态（git status, git log）
+    2. 查看已实现的代码，了解已完成的工作
+    3. 继续完成剩余未实现的功能
+    4. 不要重复已经实现和 commit 的工作
+    5. 完成后执行 git add -A && git commit && git push
+
+  # 替代 handlers_design.go:101-116 设计任务 prompt
+  design_task: |
+    {{ .ContextPrompt }}Issue #{{ .IssueNumber }}: {{ .IssueTitle }}
+
+    **你的任务类型：设计任务（UI Designer Agent）**
+    目标：根据需求产出完整的设计资产（设计规范、线框图/原型等），不编写业务逻辑代码。
+
+    请为该需求产出完整的设计资产。
+
+    开始前，先阅读项目导航文档（AGENTS.md / README.md），通过文档地图发现：
+    1. 项目的设计规范路径
+    2. 设计系统组件库位置
+    3. 设计资产应该保存到哪个目录（通常是 designs/issue-{{ .IssueNumber }}/）
+    4. 项目期望的设计资产类型（线框图、原型、设计规范文档等）
+
+    设计完成后，你必须按顺序执行：
+    1. git add -A
+    2. git commit -m "design: add assets for issue #{{ .IssueNumber }}" — 不允许使用 `--no-verify` 跳过 hook
+    3. git push origin {{ .Branch }}
+    4. gh pr create --title "design: add assets for issue #{{ .IssueNumber }}" --body "由 ui-designer agent 自动生成。\n\n- 相关 Issue: #{{ .IssueNumber }}\n- 设计资产目录: designs/issue-{{ .IssueNumber }}/"
+    5. 如果 git commit 遇到 hook 失败，必须修复后重新 commit
+    6. 任务结束前确认 git status 是 clean 的
+
+  # 替代 handlers_pm.go:153-157 PM 任务 prompt
+  pm_task: |
+    {{ .ContextPrompt }}
+    **你的任务类型：产品需求任务（Product Manager Agent）**
+    目标：根据需求描述产出完整的产品需求文档（PRD）。
+
+    需求标题: {{ .IssueTitle }}
+    需求描述: {{ .IssueDesc }}
+
+    请为该需求产出 PRD。
+
+    完成后必须执行：
+    1. git add -A
+    2. git commit -m "docs: add PRD for issue #{{ .IssueNumber }}" — 不允许使用 `--no-verify` 跳过 hook
+    3. git push origin HEAD
+    4. 如果 git commit 遇到 hook 失败，必须修复后重新 commit
+    5. 任务结束前确认 git status 是 clean 的

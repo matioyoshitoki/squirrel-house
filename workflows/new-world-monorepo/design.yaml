@@ -1,0 +1,265 @@
+name: design-task
+steps:
+  - id: fetchOrigin
+    label: 同步远程分支
+    type: shell
+    command: git fetch origin
+    ignoreError: true
+
+  - id: makeDesignsDir
+    label: 创建 designs 目录
+    type: shell
+    command: mkdir -p {{ .Vars.tmpDir }}/designs/issue-{{ .Vars.issueNumber }}
+
+  - id: runAgent
+    label: 运行 ui-designer agent
+    type: shell
+    tmux: true
+    dir: '{{ .Vars.tmpDir }}'
+    command: |
+      kimi --agent-file {{ .Vars.agentFile | shellquote }} \
+           --max-steps-per-turn 10000 \
+           --print \
+           -p {{ .Vars.prompt | shellquote }}
+    env:
+      AGENT_ISSUE_NUMBER: '{{ .Vars.issueNumber }}'
+      AGENT_ISSUE_TITLE: '{{ .Vars.issueTitle }}'
+      AGENT_LOG_FILE: '{{ .Vars.logFileName }}'
+    outputKey: agentOutput
+    logFile: '{{ .Vars.logFileName }}'
+
+  - id: createDocPlaceholders
+    label: 创建文档占位文件
+    type: shell
+    dir: '{{ .Vars.tmpDir }}'
+    command: |
+      DOC_FILE="designs/issue-{{ .Vars.issueNumber }}/docs-to-update.txt"
+      if [ -f "$DOC_FILE" ]; then
+        while IFS='|' read -r path desc; do
+          [ -z "$path" ] && continue
+          dir=$(dirname "$path")
+          mkdir -p "$dir"
+          if [ ! -f "$path" ]; then
+            {
+              echo "# $desc"
+              echo ""
+              echo "> TODO: 由设计任务自动生成，待开发阶段补充。"
+              echo ""
+              echo "## 相关设计"
+              echo "- 设计规范: [design-spec.md](../designs/issue-{{ .Vars.issueNumber }}/design-spec.md)"
+            } > "$path"
+          fi
+        done < "$DOC_FILE"
+      fi
+    ignoreError: true
+
+  - id: ensureCommitAndPush
+    label: 提交并推送设计资产
+    type: shell
+    dir: '{{ .Vars.tmpDir }}'
+    command: |
+      git add -A && \
+      (git diff --cached --quiet || git commit -m "design: add assets for issue #{{ .Vars.issueNumber }}") && \
+      git push origin {{ .Vars.branch }} || true
+
+  - id: buildPreview
+    label: 构建设计预览
+    type: shell
+    dir: '{{ .Vars.tmpDir }}'
+    command: |
+      DESIGN_DIR="designs/issue-{{ .Vars.issueNumber }}"
+      mkdir -p "$DESIGN_DIR/preview"
+
+      # 1. 如果 agent 已产出 preview.html / mockup.html，直接使用
+      if [ -f "$DESIGN_DIR/preview.html" ]; then
+        cp "$DESIGN_DIR/preview.html" "$DESIGN_DIR/preview/index.html"
+        echo "Using agent-provided preview.html"
+        exit 0
+      fi
+      if [ -f "$DESIGN_DIR/mockup.html" ]; then
+        cp "$DESIGN_DIR/mockup.html" "$DESIGN_DIR/preview/index.html"
+        echo "Using agent-provided mockup.html"
+        exit 0
+      fi
+
+      # 2. 检查是否有 React 组件示例（usage-example.tsx）
+      if [ -f "$DESIGN_DIR/examples/usage-example.tsx" ]; then
+        echo "Building React component preview with esbuild..."
+
+        # 设计资产中的 utils/setup 文件只有 declare 声明没有实现，
+        # 需要临时注入 mock 实现才能打包出可运行的预览
+        if [ -f "$DESIGN_DIR/index.ts" ]; then
+          cp "$DESIGN_DIR/index.ts" "$DESIGN_DIR/index.ts.bak"
+          cat > "$DESIGN_DIR/index.ts" << 'TSEOF'
+import * as React from 'react';
+
+export const cx = (...inputs: any[]) => {
+  return inputs.flat().filter(Boolean).map((x: any) => {
+    if (typeof x === 'string') return x;
+    if (typeof x === 'object' && x !== null && !Array.isArray(x)) {
+      return Object.entries(x).filter(([_, v]) => v).map(([k]) => k).join(' ');
+    }
+    return String(x);
+  }).join(' ');
+};
+
+export const mergeProps = (a: any, b: any) => {
+  const result = { ...a };
+  for (const [k, v] of Object.entries(b || {})) {
+    if (typeof v === 'function' && typeof result[k] === 'function') {
+      const orig = result[k];
+      result[k] = (...args: any[]) => { orig(...args); (v as any)(...args); };
+    } else if (typeof v === 'object' && v !== null && typeof result[k] === 'object' && result[k] !== null && !Array.isArray(v)) {
+      result[k] = { ...result[k], ...v };
+    } else {
+      result[k] = v;
+    }
+  }
+  return result;
+};
+
+export const useId = (prefix = 'nw') => {
+  const [id] = React.useState(() => prefix + '-' + Math.random().toString(36).slice(2, 9));
+  return id;
+};
+
+export const callAllHandlers = (...fns: any[]) => (event: any) => fns.forEach(fn => fn?.(event));
+
+export const getValidChildren = (children: any) => React.Children.toArray(children).filter((c: any) => React.isValidElement(c));
+
+export const canUseDOM = () => typeof window !== 'undefined' && !!(window.document && window.document.createElement);
+
+export const UIConfigContext = React.createContext<any>({ prefixCls: 'nw', locale: 'zh-CN', theme: { colorMode: 'light', cssVarPrefix: 'nw' }, autoInjectCSS: true });
+export const ConfigProvider = ({ config, children }: any) => {
+  const parent = React.useContext(UIConfigContext);
+  const value = mergeProps(parent, config || {});
+  return React.createElement(UIConfigContext.Provider, { value }, children);
+};
+export const useConfig = () => React.useContext(UIConfigContext);
+export const createUI = (initialConfig: any) => ({
+  config: initialConfig || {},
+  setConfig: () => {},
+  getTheme: () => 'light'
+});
+export const DEFAULT_CONFIG = {};
+
+export const registerComponent = () => {};
+export const getComponent = () => null;
+
+export const ThemeContext = React.createContext<any>({ colorMode: 'light', setColorMode: () => {}, toggleColorMode: () => {} });
+export const ThemeProvider = ({ initialColorMode = 'light', children }: any) => {
+  const [colorMode, setColorMode] = React.useState(initialColorMode);
+  const toggleColorMode = () => setColorMode((m: string) => m === 'light' ? 'dark' : 'light');
+  React.useEffect(() => {
+    if (typeof document !== 'undefined') {
+      document.documentElement.setAttribute('data-theme', colorMode);
+    }
+  }, [colorMode]);
+  return React.createElement(ThemeContext.Provider, { value: { colorMode, setColorMode, toggleColorMode } }, children);
+};
+export const useTheme = () => React.useContext(ThemeContext);
+export const setTheme = () => {};
+TSEOF
+        fi
+
+        npx esbuild "$DESIGN_DIR/examples/usage-example.tsx" \
+          --bundle \
+          --format=esm \
+          --outfile="$DESIGN_DIR/preview/bundle.js" \
+          --loader:.tsx=tsx \
+          --external:react \
+          --external:react-dom \
+          --jsx=automatic 2>&1 || echo "esbuild failed"
+
+        # 恢复原始 index.ts
+        if [ -f "$DESIGN_DIR/index.ts.bak" ]; then
+          mv "$DESIGN_DIR/index.ts.bak" "$DESIGN_DIR/index.ts"
+        fi
+
+        if [ -f "$DESIGN_DIR/preview/bundle.js" ]; then
+          cat > "$DESIGN_DIR/preview/index.html" << 'HTMLEOF'
+      <!DOCTYPE html>
+      <html lang="zh-CN">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Design Preview</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script type="importmap">
+        {
+          "imports": {
+            "react": "https://esm.sh/react@18",
+            "react/": "https://esm.sh/react@18/",
+            "react-dom/client": "https://esm.sh/react-dom@18/client"
+          }
+        }
+        </script>
+        <style>body { background: #f8fafc; padding: 2rem; }</style>
+      </head>
+      <body>
+        <div id="root"></div>
+        <script type="module">
+          import * as React from 'react';
+          import { createRoot } from 'react-dom/client';
+          import App from './bundle.js';
+          createRoot(document.getElementById('root')).render(React.createElement(App));
+        </script>
+      </body>
+      </html>
+      HTMLEOF
+          echo "React preview built"
+          exit 0
+        fi
+      fi
+
+      # 3. 检查是否有 Phaser3 src/ 代码可供构建
+      if [ -d "$DESIGN_DIR/src" ] && [ -f "apps/phaser3/vite.config.ts" ] && [ -d "apps/phaser3/node_modules" ]; then
+        echo "Building Phaser3 preview with Vite..."
+        cd apps/phaser3
+        PREVIEW_DIR="src/_design-preview-{{ .Vars.issueNumber }}"
+        mkdir -p "$PREVIEW_DIR"
+        cp -R "../../$DESIGN_DIR/src/"* "$PREVIEW_DIR/"
+        mkdir -p preview
+        cat > preview/index.html << 'HTMLEOF'
+      <!DOCTYPE html>
+      <html lang="zh-CN">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Design Preview - Issue #{{ .Vars.issueNumber }}</title>
+        <style>
+          body { margin: 0; padding: 0; background: #0f0f1a; overflow: hidden; }
+          #game-container { width: 100vw; height: 100vh; }
+        </style>
+      </head>
+      <body>
+        <div id="game-container"></div>
+        <script type="module" src="../src/_design-preview-{{ .Vars.issueNumber }}/main.ts"></script>
+      </body>
+      </html>
+      HTMLEOF
+        npx vite build --outDir "../../$DESIGN_DIR/preview" --emptyOutDir preview/index.html 2>&1 || \
+        npx vite build --mode development --outDir "../../$DESIGN_DIR/preview" --emptyOutDir preview/index.html 2>&1 || \
+        echo "Vite build failed"
+        rm -rf "$PREVIEW_DIR" preview
+      fi
+    ignoreError: true
+
+  - id: copyDesignAssets
+    label: 复制设计资产到日志目录
+    type: shell
+    isCleanup: true
+    command: |
+      mkdir -p {{ .Vars.logsDir }}/designs && \
+      rm -rf {{ .Vars.logsDir }}/designs/issue-{{ .Vars.issueNumber }} && \
+      cp -R {{ .Vars.tmpDir }}/designs/issue-{{ .Vars.issueNumber }} {{ .Vars.logsDir }}/designs/issue-{{ .Vars.issueNumber }}
+    ignoreError: true
+
+  - id: cleanupWorktree
+    label: 清理 worktree
+    type: shell
+    isCleanup: true
+    command: |
+      git worktree remove --force {{ .Vars.tmpDir }} || true
+      rm -rf {{ .Vars.tmpDir }}
+    ignoreError: true

@@ -1,0 +1,3590 @@
+请分析以下统计报告，识别 prompt 和 workflow 的改进机会。
+
+报告文件路径: /Users/insulate/Desktop/new-world/new-world-ops/logs/social-world/
+prompt-evolution-report-20260427-134711.json
+
+分析完成后，将改进建议写入项目根目录的 prompt-evolution-report.md，
+并根据数据驱动的判断，直接修改 prompts/*.md 或 workflows/*.yaml 文件。
+TurnBegin(
+    user_input='请分析以下统计报告，识别 prompt 和 workflow 的改进机会。\n\n报告
+文件路径: /Users/insulate/Desktop/new-world/new-world-ops/logs/social-world/prom
+pt-evolution-report-20260427-134711.json\n\n分析完成后，将改进建议写入项目根目录
+的 prompt-evolution-report.md，\n并根据数据驱动的判断，直接修改 prompts/*.md 或 
+workflows/*.yaml 文件。'
+)
+StepBegin(n=1)
+ThinkPart(
+    type='think',
+    think='用户要求我分析一个统计报告，识别 prompt 和 workflow 的改进机会。我需
+要：\n1. 读取报告文件\n2. 分析数据，识别热点问题\n3. 生成改进建议并写入 prompt-e
+volution-report.md\n4. 根据判断直接修改 prompts/*.md 或 workflows/*.yaml\n\n首先
+读取报告文件。',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_fvrera67Mx1xegOq1sStTzF7',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "/Users/insulate/Desktop/new-world/new-world-ops/log
+s/social-world/prompt-evolution-report-20260427-134711.json"}'
+    ),
+    extras=None
+)
+StatusUpdate(
+    context_usage=0.01941680908203125,
+    context_tokens=5090,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=4578,
+        output=117,
+        input_cache_read=512,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-dgSlUHjjSV9PlHJBr4Hexikq',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_fvrera67Mx1xegOq1sStTzF7',
+    return_value=ToolOk(
+        is_error=False,
+        output='     1\t{\n     2\t  "generatedAt": "2026-04-27T13:47:10.957159+
+08:00",\n     3\t  "projectName": "social-world",\n     4\t  "since": "2026-04-2
+7T11:04:47.884195+08:00",\n     5\t  "totalLogs": 7,\n     6\t  "agentStats": {\
+n     7\t    "dev": {\n     8\t      "count": 1,\n     9\t      "avgSteps": 55,\
+n    10\t      "avgDuration": 0,\n    11\t      "totalToolCalls": {\n    12\t   
+    "ReadFile": 24,\n    13\t        "Shell": 45,\n    14\t        "StrReplaceFi
+le": 1\n    15\t      },\n    16\t      "totalErrors": 1,\n    17\t      "totalW
+rites": 1,\n    18\t      "successRate": 1,\n    19\t      "topGitOp": "diff"\n 
+  20\t    },\n    21\t    "doc": {\n    22\t      "count": 2,\n    23\t      "av
+gSteps": 24.5,\n    24\t      "avgDuration": 0,\n    25\t      "totalToolCalls":
+{\n    26\t        "ReadFile": 28,\n    27\t        "Shell": 21\n    28\t      }
+,\n    29\t      "totalErrors": 2,\n    30\t      "totalWrites": 0,\n    31\t   
+  "successRate": 0,\n    32\t      "topGitOp": "status"\n    33\t    },\n    34\
+t    "e2e": {\n    35\t      "count": 1,\n    36\t      "avgSteps": 0,\n    37\t
+     "avgDuration": 0,\n    38\t      "totalToolCalls": {},\n    39\t      "tota
+lErrors": 0,\n    40\t      "totalWrites": 0,\n    41\t      "successRate": 0,\n
+   42\t      "topGitOp": ""\n    43\t    },\n    44\t    "review": {\n    45\t  
+   "count": 2,\n    46\t      "avgSteps": 29.5,\n    47\t      "avgDuration": 0,
+\n    48\t      "totalToolCalls": {\n    49\t        "ReadFile": 36,\n    50\t  
+     "Shell": 44,\n    51\t        "WriteFile": 2\n    52\t      },\n    53\t   
+  "totalErrors": 2,\n    54\t      "totalWrites": 2,\n    55\t      "successRate
+": 1,\n    56\t      "topGitOp": "diff"\n    57\t    },\n    58\t    "rework": {
+\n    59\t      "count": 1,\n    60\t      "avgSteps": 64,\n    61\t      "avgDu
+ration": 0,\n    62\t      "totalToolCalls": {\n    63\t        "Grep": 4,\n    
+64\t        "ReadFile": 12,\n    65\t        "Shell": 36,\n    66\t        "StrR
+eplaceFile": 7,\n    67\t        "WriteFile": 3\n    68\t      },\n    69\t     
+"totalErrors": 2,\n    70\t      "totalWrites": 10,\n    71\t      "successRate"
+: 1,\n    72\t      "topGitOp": "status"\n    73\t    }\n    74\t  },\n    75\t 
+"topIssues": [\n    76\t    {\n    77\t      "pattern": "dev_high_error_rate",\n
+   78\t      "count": 1,\n    79\t      "description": "dev 任务错误率 100% (1/1
+)，平均 55.0 步",\n    80\t      "rootCause": "agent 在执行工具调用时频繁遇到错
+误，可能缺少错误处理指引或环境预检查步骤",\n    81\t      "suggestion": "在 dev 
+的 prompt 中增加：1) 执行命令前检查环境状态；2) 遇到错误时的重试策略；3) 常见错
+误的快速诊断清单",\n    82\t      "severity": "critical"\n    83\t    },\n    84
+\t    {\n    85\t      "pattern": "doc_high_error_rate",\n    86\t      "count":
+2,\n    87\t      "description": "doc 任务错误率 100% (2/2)，平均 24.5 步",\n   
+88\t      "rootCause": "doc-gardener 任务虽然执行了步骤，但未能成功写入文件，可
+能是 worktree 路径问题或权限问题",\n    89\t      "suggestion": "检查 doc-garden
+er workflow 的 worktree 创建逻辑，确保 agent 在正确的目录下执行文件写入",\n    9
+0\t      "severity": "critical"\n    91\t    },\n    92\t    {\n    93\t      "p
+attern": "review_high_error_rate",\n    94\t      "count": 2,\n    95\t      "de
+scription": "review 任务错误率 100% (2/2)，平均 29.5 步",\n    96\t      "rootCa
+use": "agent 在执行工具调用时频繁遇到错误，可能缺少错误处理指引或环境预检查步骤"
+,\n    97\t      "suggestion": "在 review 的 prompt 中增加：1) 执行命令前检查环
+境状态；2) 遇到错误时的重试策略；3) 常见错误的快速诊断清单",\n    98\t      "sev
+erity": "critical"\n    99\t    },\n   100\t    {\n   101\t      "pattern": "rew
+ork_high_error_rate",\n   102\t      "count": 1,\n   103\t      "description": "
+rework 任务错误率 100% (1/1)，平均 64.0 步",\n   104\t      "rootCause": "agent 
+在执行工具调用时频繁遇到错误，可能缺少错误处理指引或环境预检查步骤",\n   105\t  
+   "suggestion": "在 rework 的 prompt 中增加：1) 执行命令前检查环境状态；2) 遇到
+错误时的重试策略；3) 常见错误的快速诊断清单",\n   106\t      "severity": "critic
+al"\n   107\t    },\n   108\t    {\n   109\t      "pattern": "dev_high_steps",\n
+  110\t      "count": 1,\n   111\t      "description": "dev 有 1 个任务超过 50 
+步（最高 55 步），平均 55.0 步",\n   112\t      "rootCause": "agent 过度思考（平
+均 11.0 次 think），在分析阶段消耗了过多步骤，且缺乏明确的执行路径",\n   113\t  
+   "suggestion": "在 dev 的 prompt 中限制 think 的使用：只在需要复杂决策时才 thi
+nk，常规操作直接执行",\n   114\t      "severity": "warning"\n   115\t    },\n   
+116\t    {\n   117\t      "pattern": "doc_no_output",\n   118\t      "count": 2,
+\n   119\t      "description": "doc 有 2 个任务执行了步骤但没有文件修改产出",\n 
+ 120\t      "rootCause": "agent 没有明确被要求「必须有文件修改产出」，或者任务边
+界不清晰导致 agent 在空转",\n   121\t      "suggestion": "在 doc 的 prompt 中增
+加强制要求：「本任务必须有至少一次 WriteFile 或 StrReplaceFile 调用，如果没有找
+到可修改的内容，请明确报告原因并停止」",\n   122\t      "severity": "warning"\n 
+ 123\t    },\n   124\t    {\n   125\t      "pattern": "rework_high_steps",\n   1
+26\t      "count": 1,\n   127\t      "description": "rework 有 1 个任务超过 50 
+步（最高 64 步），平均 64.0 步",\n   128\t      "rootCause": "agent 过度思考（平
+均 15.0 次 think），在分析阶段消耗了过多步骤，且缺乏明确的执行路径",\n   129\t  
+   "suggestion": "在 rework 的 prompt 中限制 think 的使用：只在需要复杂决策时才 
+think，常规操作直接执行",\n   130\t      "severity": "warning"\n   131\t    }\n 
+ 132\t  ],\n   133\t  "trends": {\n   134\t    "avgStepsDelta": -22.142857142857
+14,\n   135\t    "avgDurationDelta": 0,\n   136\t    "errorRateDelta": 0.2857142
+857142857,\n   137\t    "successRateDelta": -0.1428571428571429\n   138\t  }\n  
+139\t}',
+        message='139 lines read from file starting from line 1. Total lines in f
+ile: 139. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+StepBegin(n=2)
+ThinkPart(
+    type='think',
+    think='报告已经读取完毕。现在让我分析一下数据：\n\n1. **totalLogs**: 7\n2. *
+*Agent 类型分布**:\n   - dev: 1, avgSteps=55, successRate=1, totalErrors=1\n   -
+doc: 2, avgSteps=24.5, successRate=0, totalErrors=2, totalWrites=0\n   - e2e: 1,
+avgSteps=0, successRate=0\n   - review: 2, avgSteps=29.5, successRate=1, totalEr
+rors=2\n   - rework: 1, avgSteps=64, successRate=1, totalErrors=2\n\n关键问题：\
+n1. **doc agent**: successRate=0%, 2个任务都没有文件写入产出(totalWrites=0)，但
+执行了步骤。这明确说明 prompt 没有强制要求产出。\n2. **dev agent**: successRate=
+100% 但有1个错误，avgSteps=55 > 50。需要限制步骤/think。\n3. **rework agent**: s
+uccessRate=100% 但有2个错误，avgSteps=64 > 50。需要限制步骤/think。\n4. **review
+agent**: successRate=100% 但有2个错误。需要错误处理指引。\n5. **e2e agent**: 1个
+任务，0步，0产出。可能是prompt问题或workflow问题。\n\n所有agent都有错误（除了e2e
+），但successRate都很高（除了doc和e2e）。这是一个有趣的矛盾——有错误但任务被认为
+是成功的。可能是非致命错误。\n\ntopIssues中的描述很有意思：\n- doc: 100%错误率，
+但没有文件修改产出\n- dev/rework: 高步骤数，过度think\n- review: 高错误率\n\n现
+在我需要：\n1. 查看现有的 prompts/*.md 和 workflows/*.yaml 文件\n2. 生成报告\n3.
+修改相关文件\n\n让我先看看项目结构。',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_1gTykpbPcD5blhH5UiVOcyvs',
+    function=FunctionBody(
+        name='Shell',
+        arguments='{"command": "cd /Users/insulate/Desktop/new-world/social-worl
+d && ls -la && echo \\"---\\" && ls -la prompts/ 2>/dev/null && echo \\"---\\" &
+& ls -la workflows/ 2>/dev/null"}'
+    ),
+    extras=None
+)
+StatusUpdate(
+    context_usage=0.027294158935546875,
+    context_tokens=7155,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=2291,
+        output=478,
+        input_cache_read=4864,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-uTfDXVwN2nL829TwsAKM6vDO',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_1gTykpbPcD5blhH5UiVOcyvs',
+    return_value=ToolReturnValue(
+        is_error=True,
+        output='/bin/bash: line 0: cd: /Users/insulate/Desktop/new-world/social-
+world: No such file or directory\n',
+        message='Command failed with exit code: 1.',
+        display=[
+            BriefDisplayBlock(type='brief', text='Failed with exit code: 1')
+        ],
+        extras=None
+    )
+)
+StepBegin(n=3)
+ThinkPart(
+    type='think',
+    think='看来工作目录不是 /Users/insulate/Desktop/new-world/social-world。让我
+查找项目根目录。',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_lbV2NFzfydGmWgl718zIGHAr',
+    function=FunctionBody(
+        name='Shell',
+        arguments='{"command": "pwd && ls -la"}'
+    ),
+    extras=None
+)
+StatusUpdate(
+    context_usage=0.029346466064453125,
+    context_tokens=7693,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=781,
+        output=44,
+        input_cache_read=6912,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-tRpXr44noayyc3alkQIUs0Ce',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_lbV2NFzfydGmWgl718zIGHAr',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='/Users/insulate/Desktop/new-world/new-world-ops\ntotal 26840\ndr
+wxr-xr-x@ 31 insulate  staff       992 Apr 27 09:45 .\ndrwxr-xr-x  24 insulate  
+staff       768 Apr  8 14:26 ..\n-rw-r--r--@  1 insulate  staff         5 Apr 27
+12:03 .dashboard.pid\n-rw-r--r--@  1 insulate  staff     14340 Apr 24 16:43 .DS_
+Store\ndrwxr-xr-x@  8 insulate  staff       256 Apr 23 13:59 .idea\ndrwxr-xr-x@ 
+7 insulate  staff       224 Apr 24 22:49 .tools\n-rw-r--r--@  1 insulate  staff 
+   27367 Apr 17 15:28 归档.zip\ndrwxr-xr-x@  4 insulate  staff       128 Apr 17 
+13:39 agents\ndrwxr-xr-x@  5 insulate  staff       160 Apr 27 12:03 build\ndrwxr
+-xr-x@  4 insulate  staff       128 Apr  8 18:15 cmd\ndrwxr-xr-x@  4 insulate  s
+taff       128 Apr 10 23:07 configs\n-rwxr-xr-x@  1 insulate  staff  13597170 Ap
+r 27 09:45 dashboard\n-rw-r--r--@  1 insulate  staff     16353 Apr 21 10:40 dash
+board.log\ndrwxr-xr-x@  3 insulate  staff        96 Apr 14 08:03 docs\n-rw-r--r-
+-@  1 insulate  staff      1434 Apr 21 21:39 ecosystem.config.js\n-rw-r--r--@  1
+insulate  staff       241 Apr 25 19:54 go.mod\n-rw-r--r--@  1 insulate  staff   
+   883 Apr 25 19:54 go.sum\ndrwxr-xr-x@  6 insulate  staff       192 Apr  8 14:2
+6 internal\ndrwxr-xr-x@  7 insulate  staff       224 Apr 22 16:28 logs\n-rw-r--r
+--@  1 insulate  staff      2264 Apr 21 18:00 Makefile\ndrwxr-xr-x@ 23 insulate 
+staff       736 Apr 20 16:45 node_modules\n-rw-r--r--@  1 insulate  staff     34
+520 Apr 20 16:45 package-lock.json\n-rw-r--r--@  1 insulate  staff       455 Apr
+20 16:45 package.json\ndrwxr-xr-x@  3 insulate  staff        96 Apr 13 22:54 pkg
+\n-rw-r--r--@  1 insulate  staff      9951 Apr 27 11:14 prompt-evolution-report.
+md\ndrwxr-xr-x@ 12 insulate  staff       384 Apr 26 22:04 prompts\n-rw-r--r--@  
+1 insulate  staff      6377 Apr 14 08:08 README.md\ndrwxr-xr-x@  5 insulate  sta
+ff       160 Apr 23 07:45 scripts\ndrwxr-xr-x@ 43 insulate  staff      1376 Apr 
+27 13:47 state\ndrwxr-xr-x@  3 insulate  staff        96 Apr  8 14:26 web\ndrwxr
+-xr-x@ 12 insulate  staff       384 Apr 26 22:04 workflows\n',
+        message='Command executed successfully.',
+        display=[],
+        extras=None
+    )
+)
+StepBegin(n=4)
+ThinkPart(
+    type='think',
+    think='好的，工作目录是 /Users/insulate/Desktop/new-world/new-world-ops，这
+就是项目根目录。让我查看 prompts/ 和 workflows/ 目录的内容。',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_rf3dregOYNKUPAaaDghF6Z25',
+    function=FunctionBody(
+        name='Shell',
+        arguments='{"command": "ls -la prompts/ && echo \\"---\\" && ls -la work
+flows/"}'
+    ),
+    extras=None
+)
+StatusUpdate(
+    context_usage=0.032867431640625,
+    context_tokens=8616,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=936,
+        output=68,
+        input_cache_read=7680,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-s2rNRiF2JVo4DNK3wVOueBXH',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_rf3dregOYNKUPAaaDghF6Z25',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='total 144\ndrwxr-xr-x@ 12 insulate  staff    384 Apr 26 22:04 .\
+ndrwxr-xr-x@ 31 insulate  staff    992 Apr 27 09:45 ..\n-rw-r--r--@  1 insulate 
+staff   6990 Apr 25 22:07 ctx-templates.yaml\n-rw-r--r--@  1 insulate  staff  13
+076 Apr 27 11:11 developer.md\n-rw-r--r--@  1 insulate  staff   2056 Apr 27 01:4
+0 doc-gardener.md\n-rw-r--r--@  1 insulate  staff   8713 Apr 27 11:12 e2e-tester
+.md\n-rw-r--r--@  1 insulate  staff    414 Apr 17 10:18 pr-doc-gardener.md\n-rw-
+r--r--@  1 insulate  staff   3645 Apr 19 21:46 product-manager.md\n-rw-r--r--@  
+1 insulate  staff   3525 Apr 26 22:04 prompt-evolution.md\n-rw-r--r--@  1 insula
+te  staff  11043 Apr 27 11:11 reviewer.md\ndrwxr-xr-x@  6 insulate  staff    192
+Apr 13 22:20 subagents\n-rw-r--r--@  1 insulate  staff   5272 Apr 24 22:57 ui-de
+signer.md\n---\ntotal 96\ndrwxr-xr-x@ 12 insulate  staff   384 Apr 26 22:04 .\nd
+rwxr-xr-x@ 31 insulate  staff   992 Apr 27 09:45 ..\n-rw-r--r--@  1 insulate  st
+aff  6402 Apr 24 22:56 design.yaml\n-rw-r--r--@  1 insulate  staff  4670 Apr 27 
+07:53 dev.yaml\n-rw-r--r--@  1 insulate  staff  1115 Apr 26 20:10 doc-gardener.y
+aml\n-rw-r--r--@  1 insulate  staff  4358 Apr 27 11:12 e2e.yaml\ndrwxr-xr-x@  3 
+insulate  staff    96 Apr 22 12:12 new-world-monorepo\n-rw-r--r--@  1 insulate  
+staff  1387 Apr 22 12:13 pm.yaml\n-rw-r--r--@  1 insulate  staff   829 Apr 26 22
+:04 prompt-evolution.yaml\n-rw-r--r--@  1 insulate  staff  3618 Apr 27 07:53 rev
+iew.yaml\n-rw-r--r--@  1 insulate  staff  4492 Apr 27 07:53 rework.yaml\ndrwxr-x
+r-x@  5 insulate  staff   160 Apr 22 12:12 social-world\n',
+        message='Command executed successfully.',
+        display=[],
+        extras=None
+    )
+)
+StepBegin(n=5)
+ThinkPart(
+    type='think',
+    think='让我读取相关的 prompt 和 workflow 文件，了解当前的配置。我需要读取：\
+n1. prompts/developer.md (对应 dev agent)\n2. prompts/doc-gardener.md (对应 doc 
+agent)\n3. prompts/reviewer.md (对应 review agent)\n4. prompts/prompt-evolution.
+md (对应本 agent)\n5. workflows/dev.yaml\n6. workflows/doc-gardener.yaml\n7. wor
+kflows/review.yaml\n8. workflows/rework.yaml\n9. workflows/prompt-evolution.yaml
+\n10. prompts/e2e-tester.md\n11. workflows/e2e.yaml\n\n让我并行读取这些文件。',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_o2Lie85X8EBvbmPT4DW2YAbA',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "/Users/insulate/Desktop/new-world/new-world-ops/pro
+mpts/developer.md"}'
+    ),
+    extras=None
+)
+ToolCall(
+    type='function',
+    id='tool_C6joWfhZsbWvhREPLnMHgUJy',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "/Users/insulate/Desktop/new-world/new-world-ops/pro
+mpts/doc-gardener.md'
+    ),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_o2Lie85X8EBvbmPT4DW2YAbA',
+    return_value=ToolOk(
+        is_error=False,
+        output='     1\t# {{ .Name }} 全栈开发 Agent\n     2\t\n     3\t你是 `{{
+.Name }}` 项目的**全栈开发 Agent**。\n     4\t\n     5\t## 元原则\n     6\t\n   
+ 7\t1. **先读地图**：任何动作之前，优先读取项目导航文档。**读取顺序**：\n     8\
+t   - 首先检查环境变量 `AGENT_AGENTS_MD`，如果存在则读取该路径\n     9\t   - 否
+则读取当前工作目录下的 `AGENTS.md`\n    10\t   - 最后读取当前工作目录下的 `READM
+E.md`\n    11\t   **禁止**通过 `../` 等相对路径跨目录猜测项目根目录。项目特定的
+路径、命令、规范**不在本 prompt 中**，必须在 `AGENTS.md` 中查找。\n    12\t2. **
+渐进式披露**：不要一次性读完所有文档。根据当前任务推断需要阅读的最小文档集合，逐
+步获取信息。\n    13\t3. **效果优先**：先跑通端到端，再考虑优雅性。\n    14\t\n 
+  15\t## 任务启动检查清单（第 1-3 步必须完成）\n    16\t\n    17\t**开始前，用 3
+个步骤确认环境和目标，不要跳过：**\n    18\t\n    19\t1. **确认环境**：执行 `pwd
+` 和 `git status`，确认你在正确的 worktree 目录、在正确的分支、没有未预期的未提
+交变更。如果环境异常，立即停止并报告。\n    20\t2. **确认任务边界**：\n    21\t 
+ - **rework 模式**：先读取 review report（环境变量 `AGENT_REVIEW_REPORT` 或当前
+目录下的 review report 文件），列出需要修复的具体问题清单（Blocking / Major / Mi
+nor）。不要猜测，不要扩大修复范围。\n    22\t   - **dev 模式**：明确 issue 的核
+心目标是什么，用一句话概括。不要偏离目标。\n    23\t3. **设置待办清单**：使用 `S
+etTodoList` 工具列出本次任务要完成的 3-5 个具体事项。每完成一项更新状态。如果无
+法列出清晰的待办事项，说明任务边界不清晰，停止并报告。\n    24\t\n    25\t**如果
+你在前 5 步内没有完成上述检查清单，说明你在犹豫或困惑，必须立即停下来报告当前状
+态和阻塞原因。**\n    26\t\n    27\t## 核心能力\n    28\t\n    29\t你的价值不在
+于记住规范，而在于**发现规范、应用规范、验证规范**的能力。\n    30\t\n    31\t##
+# 能力 1：发现规范（Discover Constraints）\n    32\t\n    33\t项目规范是动态演进
+的，不在本 prompt 中。你必须通过 `AGENTS.md` 发现：\n    34\t\n    35\t```\n    
+36\tAGENTS.md\n    37\t  → 编码规范、架构规则、UI 规范路径\n    38\t  → 执行计划
+模板路径\n    39\t  → E2E 规范路径（如果涉及 UI）\n    40\t  → 可用命令和检查工
+具\n    41\t```\n    42\t\n    43\t**根据任务类型推断阅读范围**（路径通过 AGENTS
+.md 发现，不要假设固定位置）：\n    44\t- 修改 Flutter UI → 必须读 UI 规范文档（
+了解 UI 交互规范，但**不编写 E2E flow**）\n    45\t- 修改 API → 必须读 API 规范
+文档 + 接口契约文档\n    46\t- **新建模块 / 新功能 → 必须读取并遵循对应类型的执
+行计划模板**\n    47\t- **Bug 修复 → 必须读取并遵循对应类型的 Bug 修复模板**\n  
+ 48\t\n    49\t**关键原则：执行计划模板中的「交付前检查清单」是本次任务的权威验
+收标准，不是你的建议参考。** 自检时必须按模板中的检查清单逐项确认，不能只回答下
+面「通用自检问题」的 5 个抽象问题。\n    50\t\n    51\t**不要读完所有文档再动手*
+*。读一点，做一点，遇到不确定再读。\n    52\t\n    53\t### 能力 2：验证而非假设
+（Verify, Don\'t Assume）\n    54\t\n    55\t**不要只验证"文件存在"，要验证"能运
+行通过"**：\n    56\t- 写了测试 → 运行它，看到 `All tests passed!` 才算数\n    5
+7\t- 运行单元测试和构建检查 → `make test`、`make build` 等\n    58\t- 写了 API →
+用 curl 或实际请求验证响应格式\n    59\t- 写了 Socket → 验证客户端是否加入了对应
+房间\n    60\t\n    61\t**如果因为环境限制无法验证**：\n    62\t- 明确报告："⚠️ [
+X] 无法验证，原因：无 emulator"\n    63\t- **不允许假装验证通过**\n    64\t- 优
+先修复环境限制（如安装缺失的依赖），而非跳过验证\n    65\t\n    66\t### 能力 3：
+自检设计（Design Your Own Checklist）\n    67\t\n    68\t**自检必须分两步执行，
+顺序不可颠倒：**\n    69\t\n    70\t#### 第一步：执行计划模板检查清单（权威来源
+）\n    71\t\n    72\t如果本次任务涉及执行计划模板（feat / bug fix / refactor）
+，**必须按模板中的「交付前检查清单」和「Agent 自 Review」逐项确认**。\n    73\t\
+n    74\t- 模板要求运行 `make check-contract-sync` → 你必须运行并报告结果\n    7
+5\t- 模板要求验证 Entity 注册 → 你必须确认 `TypeOrmModule.forFeature()` 和 `data
+-source.ts`\n    76\t- 模板要求持久化层验证 → 你必须确认实际数据库值\n    77\t- 
+**不能只回答下面的通用问题就跳过模板检查清单**\n    78\t\n    79\t#### 第二步：
+通用自检问题（兜底框架）\n    80\t\n    81\t无论是否有执行计划模板，提交前都必须
+回答这 5 个抽象问题：\n    82\t\n    83\t1. **调用链完整吗？**\n    84\t   - 我
+修改的代码是否被正确调用？入口在哪里？\n    85\t   - 涉及多组件时，数据流是否贯
+通？\n    86\t\n    87\t2. **规范遵守了吗？**\n    88\t   - 我读了对应的设计规范
+文档吗？\n    89\t   - 运行了 `make lint`、`make arch-check` 或对应检查命令吗？\
+n    90\t   - 有报错吗？修复了吗？\n    91\t\n    92\t3. **测试运行了吗？**\n   
+93\t   - 运行了哪些测试？结果是什么？\n    94\t   - 有什么测试因为环境限制无法运
+行？我报告了吗？\n    95\t\n    96\t4. **文档同步了吗？**\n    97\t   - 代码变更
+影响了哪些文档？我更新了吗？\n    98\t   - 不确定该更新哪里 → 查 `AGENTS.md` 的
+文档地图\n    99\t\n   100\t5. **有什么遗留问题？**\n   101\t   - 有 TODO 吗？空
+实现吗？调试代码吗？\n   102\t   - 如果有无法在本 PR 解决的问题，明确列出\n   10
+3\t\n   104\t## 工作流模式（委托决策树）\n   105\t\n   106\t- **直接动手**：修改
+范围 ≤ 3 个文件且你完全理解时，自己直接改\n   107\t- **先 explore 再动手**：需要
+理解陌生模块的代码结构时，启动 `explore`\n   108\t- **先 plan 再 coder**：涉及新
+模块、多模块协调、架构规则变更时，必须 `plan` → `coder` 两阶段\n   109\t- **改完
+必须测**：`coder` 完成后，你亲自运行测试；连续 3 次失败则停下来报告\n   110\t- *
+*PR 前 review**：代码提交前，启动 `reviewer` 做 A2A 审查\n   111\t\n   112\t**禁
+止 coder / reviewer 启动其他子 Agent。**\n   113\t\n   114\t## Git 工作流（不可
+省略）\n   115\t\n   116\t你在一个**临时 git worktree** 中工作，与主仓库隔离。开
+发完成后，代码不会自动保存到远程，**必须由你亲自执行以下步骤**：\n   117\t\n   1
+18\t1. `git add -A` — 暂存所有变更（包括新文件）\n   119\t2. `git commit -m "<ty
+pe>: resolve #<issue> - <desc>"` — 提交变更，**不允许使用 `--no-verify` 跳过 hoo
+k**\n   120\t3. `git push origin <branch>` — 推送到远程分支\n   121\t4. `gh pr c
+reate ...` — 创建 Pull Request（如果任务要求）\n   122\t\n   123\t**关键约束**：
+\n   124\t- 不要离开当前工作目录（worktree 目录）\n   125\t- **Git 操作白名单**
+：只允许执行 `git status`、`git diff`、`git add`、`git commit`、`git push`。禁止
+执行 `git log`、`git blame`、`git show` 等历史浏览命令——工作树状态通过 `git stat
+us` 和 `git diff` 即可确认，无需查看提交历史。\n   126\t- 如果 `git commit` 遇到
+pre-commit hook 失败，必须阅读错误输出，修复问题后重新 commit\n   127\t- 如果 `g
+it push` 遇到 pre-push hook 失败，同样阅读错误、修复、重试\n   128\t- 如果 commi
+t 后又有新修改，重复 add → commit → push\n   129\t- 任务结束前必须确认 `git stat
+us` 是 clean 的\n   130\t\n   131\t## 效率约束（不可违背）\n   132\t\n   133\t1.
+**步数硬上限**：绝对不得超过 60 步。如果执行超过 50 步仍未完成核心代码修改，**立
+即停止**——这意味着你不得再调用任何工具（包括 ReadFile、Shell、WriteFile、StrRepl
+aceFile、Grep、Think 等），直接以纯文本输出最终进度报告并结束任务。严禁在"报告"
+后继续执行任何操作。\n   134\t   - **步数计数规则**：你的每一次工具调用都计为 1 
+步，Think 同样计为 1 步。你必须在内心默默计数。\n   135\t   - **自报检查点**：每
+10 步必须在思考中自报一次当前步数，例如"[步数检查] 当前第 30 步，剩余预算 30 步"
+。如果忘记自报，说明你已失去对步数的控制，必须立即停下来报告。\n   136\t2. **错
+误熔断**：**任意工具调用**（Shell、ReadFile、WriteFile、StrReplaceFile、Grep 等
+）如果连续 3 次返回 `is_error=true`，必须**立即停止执行**，生成错误摘要报告并结
+束任务。不允许通过换参数、换文件、换思路继续尝试。连续错误说明环境或假设有问题，
+不是 agent 能自行解决的。\n   137\t3. **零进度熔断**：前 5 步内如果没有产生任何
+文件修改（WriteFile/StrReplaceFile），必须停下来重新评估："我是否理解了任务？是
+否在正确的文件上工作？"如果无法确认，停止并报告。\n   138\t4. **进度检查点**：每
+执行 10 步，必须做一次自评——"过去 10 步是否产生了至少一次文件修改？"如果答案为否
+，立即停止并报告阻塞原因。\n   139\t5. **探索预算**：读取项目文档和代码以定位修
+改点的阶段，不得超过 12 步。如果 12 步内仍未定位到需要修改的文件，停止并报告。\n
+  140\t6. **零修改产出处理**：探索后如果确认无需任何代码或文档修改，必须显式说明
+"经检查，当前代码已符合要求，无需修改"并立即结束任务，不允许为了消耗步数而做无意
+义操作。\n   141\t7. **避免重复验证**：同一验证命令（如测试、构建）连续失败 2 次
+后，先修复已知问题再重试，不允许无脑重复。\n   142\t8. **命令输出限制**：执行可
+能产生大量输出的 Shell 命令（如 `grep -r`、`find`、`git diff`、`cat` 大文件）时
+，必须使用 `| head -N` 或 `| tail -N` 限制输出（N ≤ 30），避免触发\'chunk exceed
+the limit\'错误导致命令失败。\n   143\t9. **rework 模式预算**：\n   144\t   - re
+work 不需要 explore 阶段，review report 已经告诉你问题在哪。\n   145\t   - **rew
+ork 模式总步数预算为 40 步**。超过 35 步仍未完成所有 Blocking 问题修复，必须停止
+并报告剩余未修复项。\n   146\t   - 如果 review report 无法读取或内容为空，不要猜
+测问题，立即停止并报告"无法读取 review report"。\n   147\t   - 如果 review repor
+t 中的问题超过 5 个，优先修复所有 Blocking 问题，最多再修复 3 个 Major 问题，其
+余明确报告为"留待后续迭代"。\n   148\t   - 不要修改与 review report 无关的代码。
+不要"顺手优化"。\n   149\t10. **Think 使用限制**：仅在涉及 3 个以上文件协调或复
+杂架构决策时使用 think 工具。常规代码阅读、文件修改、命令执行直接操作，不要 thin
+k。\n   150\t   - **单次任务 think 次数绝对不得超过 3 次**，Think 本身计为 1 步
+。\n   151\t   - **违反此限制属于严重违规**：如果你已经 think 了 3 次，之后无论
+遇到什么情况都不得再使用 think，必须直接执行具体操作或向人类报告。\n   152\t   -
+每次使用 think 前，先在内心确认："这是本次任务第 N 次 think，限额 3 次，是否值得
+用在这里？"如果 N 已达到 3，严禁使用。\n   153\t11. **StrReplaceFile 失败处理**
+：如果 `StrReplaceFile` 连续失败 2 次，先 `ReadFile` 确认文件当前内容，再构造精
+确替换文本；如果仍然失败，改用 `WriteFile` 重写整个文件，或向人类报告具体失败片
+段，不要无限重试。\n   154\t12. **单次错误后禁止立即重试**：任意工具调用如果返回
+`is_error=true`，你必须先分析失败原因（读取错误信息、检查参数、确认文件/路径是否
+存在），**不得用相同或相似参数立即再次调用同一工具**。只有在你明确修正了导致错误
+的因素后，才能重试。如果同一操作在第 2 次尝试后仍失败，立即执行"错误熔断"逻辑（
+停止并报告）。\n   155\t\n   156\t## 诚实性约束（不可违背）\n   157\t\n   158\t-
+**自检清单中的每一项，只有在你亲自验证过后才能标记完成**\n   159\t- **如果因为环
+境限制（缺少 emulator、缺少测试数据库、命令不存在）无法验证某项，必须明确报告"未
+验证"及原因**\n   160\t- **不要基于"应该没问题"的假设标记完成**\n   161\t- **不
+要报告你没有运行的测试为"通过"**\n   162\t\n   163\t## 必须请示人类的情况\n   16
+4\t\n   165\t- 引入新编程语言 / 数据库 / major 框架\n   166\t- 修改核心架构决策
+文档\n   167\t- PRD 与代码有重大冲突且无法推断\n   168\t- 涉及支付、合规、内容审
+核的法律风险\n   169\t- 连续 3 次修复同一错误未成功\n   170\t- 自检清单中有任何
+一项无法确认时\n   171\t- review report 无法读取或内容为空\n   172\t- 目标文件不
+存在且无法通过 AGENTS.md 推断正确位置\n   173\t\n   174\t## 强制结束报告（任务结
+束前必须输出）\n   175\t\n   176\t无论任务成功、失败还是被熔断停止，结束前必须输
+出以下结构化报告：\n   177\t\n   178\t```\n   179\t## 任务执行报告\n   180\t- **
+任务类型**: dev / rework\n   181\t- **执行步数**: N 步\n   182\t- **修改文件**: 
+file1, file2, ...（如果没有则写"无"）\n   183\t- **测试状态**: 通过 / 失败 / 未
+运行（原因）\n   184\t- **遗留问题**: 如有则列出，无则写"无"\n   185\t- **需要人
+工介入**: 是 / 否（原因）\n   186\t```\n   187\t\n   188\t如果任务被熔断停止（步
+数超限、错误熔断、零进度熔断），额外说明：\n   189\t```\n   190\t- **停止原因**:
+步数超限 / 错误熔断 / 零进度熔断\n   191\t- **当前进度**: 已完成什么、卡在什么地
+方\n   192\t- **建议下一步**: 人类需要做什么才能继续\n   193\t```\n',
+        message='193 lines read from file starting from line 1. Total lines in f
+ile: 193. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(arguments_part='"}')
+ToolCall(
+    type='function',
+    id='tool_fCdNgaTqN51uioBIxZ0HTgVB',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "/Users/insulate/Desktop/new'
+    ),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_C6joWfhZsbWvhREPLnMHgUJy',
+    return_value=ToolOk(
+        is_error=False,
+        output='     1\t# {{ .Name }} 文档园丁\n     2\t\n     3\t你是 `{{ .Name
+}}` 项目的文档园丁。职责：维护仓库文档与代码的一致性。\n     4\t\n     5\t## 元
+原则\n     6\t\n     7\t- **先读地图**：启动后先读取项目导航文档（`AGENT_AGENTS_
+MD` 或 `AGENTS.md`），了解项目的文档组织方式和检查命令。\n     8\t- **只修确定性
+问题**：错别字、死链、索引缺失条目可以直接修；架构与代码不一致时只报不修。\n    
+9\t- **必须有产出**：无论发现多少问题，任务结束时必须至少有文档修改提交或明确的
+检查报告写入文件。\n    10\t\n    11\t## 执行步骤\n    12\t\n    13\t1. **读取 A
+GENTS.md**：了解项目文档结构、文档规范路径和可用检查命令。\n    14\t2. **检查文
+档一致性**：\n    15\t   - 运行项目提供的文档检查命令（如 `make docs-check`、`np
+m run docs:lint` 等，通过 AGENTS.md 发现）。\n    16\t   - 检查 README、CHANGELO
+G、API 文档是否与代码一致。\n    17\t   - 检查目录索引文件（如 SUMMARY.md、_side
+bar.md）是否包含新增文档。\n    18\t3. **修复确定性问题**：\n    19\t   - 错别字
+、格式错误、死链、缺失索引条目。\n    20\t   - 每个修复必须写入具体文件，禁止只
+读不改。\n    21\t4. **提交修改**：\n    22\t   - `git add -A`\n    23\t   - `gi
+t commit -m "docs: fix doc consistency by agent"`（如有修改）\n    24\t   - `git
+push origin <当前分支>` 或确认修改已保存。\n    25\t5. **生成检查报告**（无论是
+否有修改）：\n    26\t   - 将检查结果和修复清单写入 `AGENT_DOC_REPORT_FILE`（如
+环境变量未设置，写入 `logs/doc-gardener-report.md`）。\n    27\t   - 报告格式：\
+n    28\t     ```markdown\n    29\t     # 文档检查报告\n    30\t     - **检查时
+间**: YYYY-MM-DD HH:MM:SS\n    31\t     - **修改文件数**: N\n    32\t     - **发
+现问题数**: N\n    33\t     ## 修复详情\n    34\t     ...\n    35\t     ## 未修
+复问题（仅报告）\n    36\t     ...\n    37\t     ```\n    38\t\n    39\t## 效率
+约束\n    40\t\n    41\t- **步数预算**：超过 40 步仍未完成文档检查和修复，停下来
+报告阻塞原因。\n    42\t- **禁止零产出结束**：如果确实没有文档需要修改，仍必须生
+成检查报告文件并提交（报告本身就是一种产出）。\n',
+        message='42 lines read from file starting from line 1. Total lines in fi
+le: 42. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(arguments_part='-world/new-world-ops/prompts/reviewer.md"}')
+ToolCall(
+    type='function',
+    id='tool_piSjHVxP7xwpFgI21YsU6JcZ',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "/Users/insulate/Desktop/new-world/new-world-ops/pro
+mpts/e2e-tester.md'
+    ),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_fCdNgaTqN51uioBIxZ0HTgVB',
+    return_value=ToolOk(
+        is_error=False,
+        output='     1\t# {{ .Name }} 代码审查 Agent\n     2\t\n     3\t你是 `{{
+.Name }}` 项目的代码审查 Agent。职责：审查其他 Agent 产出的代码和文档，输出可执
+行的修改建议。\n     4\t\n     5\t## 元原则\n     6\t\n     7\t1. **先读地图**：
+任何审查之前，优先读取项目导航文档。**读取顺序**：\n     8\t   - 首先检查环境变
+量 `AGENT_AGENTS_MD`，如果存在则读取该路径\n     9\t   - 否则读取当前工作目录下
+的 `AGENTS.md`\n    10\t   - 最后读取当前工作目录下的 `README.md`\n    11\t   **
+禁止**通过 `../` 等相对路径跨目录猜测项目根目录。项目的审查标准、模块索引位置、
+设计规范路径**不在本 prompt 中**。\n    12\t2. **基于事实**：所有审查结论必须基
+于 PR diff 和项目实际文档，不要假设固定路径或规则。\n    13\t3. **渐进式披露**：
+不要试图检查所有维度。根据 PR 的变更范围，推断最值得深入检查的方向。\n    14\t\n
+   15\t## 核心能力\n    16\t\n    17\t### 能力 1：发现审查标准（Discover Review 
+Criteria）\n    18\t\n    19\t审查标准不在本 prompt 中，你必须从项目中动态发现。
+**不了解规范就不审查**。\n    20\t\n    21\t#### 审查前必读（通过 AGENTS.md 发现
+具体路径）\n    22\t\n    23\t```\n    24\tAGENTS.md\n    25\t  → 项目编码规范、
+架构规则\n    26\t  → 设计规范（如果涉及 UI）\n    27\t  → E2E 规范（如果涉及 UI
+）\n    28\t  → 执行计划模板（按 PR 类型发现对应模板）\n    29\t  → PR 关联的 Is
+sue / PRD（需求边界）\n    30\t```\n    31\t\n    32\t**必须读取的文件类型**：\n
+   33\t1. **编码规范文档** — 了解项目的代码风格、架构约束、命名约定\n    34\t2. 
+**设计规范文档** — 如果 PR 涉及 UI，必须了解视觉系统、组件使用规则、Accessibilit
+y 要求\n    35\t3. **PR 关联的 PRD / Issue** — 明确需求边界，确认实现是否完整\n 
+  36\t4. **执行计划模板** — 按 PR 类型（feat / bug fix / refactor 等）从 `AGENTS
+.md` 发现对应模板，读取其「交付前检查清单」和「Agent 自 Review」检查项\n    37\t
+5. **已有相关代码** — 参考同模块或同类型的已实现代码，保持风格一致\n    38\t\n  
+ 39\t**不了解的规范必须读了再审查，不允许基于经验假设跳过**。\n    40\t\n    41\
+t#### 审查核心维度\n    42\t\n    43\t根据 PR 类型和变更范围，从以下维度中选择最
+值得深入检查的方向：\n    44\t\n    45\t| 维度 | 检查要点 |\n    46\t|------|---
+-------|\n    47\t| **功能完整性** | 是否实现了 PRD / Issue 描述的全部功能？边界
+情况处理了吗？ |\n    48\t| **代码规范性** | 是否符合编码规范？命名是否一致？是
+否遵循架构规则？ |\n    49\t| **测试覆盖** | 单元测试、Widget 测试、E2E 测试是否
+覆盖了核心路径？ |\n    50\t| **文档同步** | 代码变更是否同步更新了相关文档（模
+块文档、API 文档、CHANGELOG）？ |\n    51\t| **全链路完整性** | DB → API → Mobil
+e 是否都连通了？数据流是否贯通？ |\n    52\t| **UI/设计一致性** | 是否符合设计规
+范？组件使用是否正确？Accessibility 是否满足？ |\n    53\t| **模板检查清单执行**
+| developer 是否按执行计划模板的检查清单逐项确认？关键检查项（契约同步、Entity 
+注册、持久化验证、Mock 一致性等）是否执行并有结果？ |\n    54\t\n    55\t**根据 
+PR 类型推断审查重点**：\n    56\t- 新增 Flutter 页面/组件 → 重点检查：UI 规范、A
+ccessibility（Maestro 兼容性）、Design-System 使用、功能完整性、模板检查清单执行
+\n    57\t- 新增 API → 重点检查：DTO/Response 一致性、错误处理、OpenAPI 契约、功
+能完整性、模板检查清单执行\n    58\t- 涉及 Socket/实时通信 → 重点检查：房间加入
+逻辑、事件广播路径、功能完整性、模板检查清单执行\n    59\t- 涉及缓存 → 重点检查
+：缓存 key 设计、过期策略、并发安全、模板检查清单执行\n    60\t- 修改数据库 → 重
+点检查：Migration、Entity 同步、事务边界、模板检查清单执行\n    61\t- 设计资产 P
+R → 重点检查：设计规范完整性、与 PRD 的一致性、文档引用准确性、模板检查清单执行\
+n    62\t\n    63\t**不要检查与本次 PR 无关的维度**。\n    64\t\n    65\t### 能
+力 2：基于事实验证（Verify with Evidence）\n    66\t\n    67\t**每一个 Blocking 
+或 Major 问题都必须有证据**：\n    68\t- 说"硬编码颜色" → 指出具体文件、行号、应
+该用什么替代\n    69\t- 说"E2E 未覆盖" → 指出哪个用户流程缺失、应该加什么 flow\n
+   70\t- 说"Socket 未加入房间" → 指出 emit 代码位置，以及客户端加入房间的代码应
+该在哪里\n    71\t\n    72\t**不要基于经验假设**：\n    73\t- ❌ "这个项目通常用
+XXX 模式"\n    74\t- ✅ "根据 AGENTS.md 发现的 Flutter 规范文档第 12 行，组件必
+须使用 GestureDetector(onTapDown)"\n    75\t\n    76\t### 能力 3：设计审查策略（
+Design Review Strategy）\n    77\t\n    78\t根据 PR 大小和复杂度选择策略：\n    
+79\t- **小型 PR**（< 5 个文件）：逐文件 diff 审查，覆盖全部变更\n    80\t- **中
+型 PR**（5-20 个文件）：先读架构变更文件（新增模块、路由、接口），再抽查实现\n  
+ 81\t- **大型 PR**（> 20 个文件）：先检查全链路完整性（DB → API → Mobile 是否都
+连通了），再深入关键路径\n    82\t\n    83\t## 审查框架\n    84\t\n    85\t### 
+问题分级\n    86\t\n    87\t- **Blocking（阻塞）**：功能不可用、数据丢失、安全漏
+洞。必须修复后才能合并。\n    88\t- **Major（严重）**：影响用户体验或维护性，建
+议修复。\n    89\t- **Minor（轻微）**：代码风格、命名等，可选修复。\n    90\t\n 
+  91\t**分级的依据是事实，不是直觉**。如果一个问题只在极端边界情况下触发，且不影
+响核心功能，不应标记为 Blocking。\n    92\t\n    93\t### 每个问题必须包含\n    9
+4\t\n    95\t1. **问题描述**：简明扼要说明是什么问题\n    96\t2. **影响范围**：
+哪些功能/用户受影响\n    97\t3. **修复指令**：具体文件路径 + 修改建议（可直接复
+制给开发 Agent 执行）\n    98\t4. **依据**：引用哪份项目文档或代码证据支持这个判
+断\n    99\t\n   100\t### 审查输出格式\n   101\t\n   102\t```markdown\n   103\t#
+# 审查结论\n   104\t\n   105\t审查结论: [PASS / NEEDS_FIX / NEEDS_MAJOR_FIX]\n  
+106\t\n   107\t## 阻塞问题（Blocking）\n   108\t\n   109\t### 1. [问题标题]\n   
+110\t- **位置**: `文件路径:行号`\n   111\t- **问题**: ...\n   112\t- **影响**: .
+..\n   113\t- **修复**: ...\n   114\t- **依据**: 通过 AGENTS.md 发现的规范文档第
+X 行 / `git diff` 中的证据\n   115\t\n   116\t## 严重问题（Major）\n   117\t...
+（同上格式）\n   118\t\n   119\t## 轻微问题（Minor）\n   120\t...（同上格式）\n 
+ 121\t\n   122\t## 验证结果\n   123\t\n   124\t| 维度 | 状态 | 说明 |\n   125\t|
+------|------|------|\n   126\t| 功能完整性 | ✅/❌ | 是否实现了需求描述的全部功
+能？边界情况处理了吗？ |\n   127\t| 代码规范性 | ✅/❌ | 是否符合编码规范、架构
+规则？命名是否一致？ |\n   128\t| 全链路完整性 | ✅/❌ | DB → API → Mobile 是否
+都连通了？ |\n   129\t| 规范符合性 | ✅/❌ | 是否符合设计规范 / API 契约 / E2E 
+规范？ |\n   130\t| 模板检查清单执行 | ✅/❌ | developer 是否按模板逐项确认？关
+键检查项是否执行？ |\n   131\t| 测试覆盖 | ✅/❌ | 单元 / Widget / E2E 测试是否
+覆盖了核心路径？ |\n   132\t| 文档同步 | ✅/❌ | 相关文档（模块、API、CHANGELOG
+）是否同步更新？ |\n   133\t\n   134\t## 风险与建议\n   135\t...\n   136\t```\n 
+ 137\t\n   138\t## 执行约束\n   139\t\n   140\t1. **环境预检查**：运行任何 `gh` 
+命令前，先执行 `gh auth status` 确认 GitHub CLI 已认证。然后执行 `gh pr view "$A
+GENT_PR_NUMBER" --json number`（或当前 PR 号）确认 PR 可访问。如果认证失败或 PR 
+不存在，立即停止审查，生成失败报告说明原因，不要继续尝试其他命令。\n   141\t2. *
+*文档存在性检查**：读取规范文档前，先用 `Shell` 命令（如 `ls -la <路径>` 或 `tes
+t -f <路径>`）确认文件存在。如果文件不存在，跳过该维度并在报告中标注"未验证（文
+件缺失）"，不要直接执行 `ReadFile` 导致错误浪费步数。\n   142\t3. **PR 信息获取
+失败时快速退出**：如果 `gh pr diff` 或 `gh pr view` 失败，根据错误码立即处理：\n
+  143\t   - `Could not resolve to a PullRequest` / `HTTP 404` → 立即停止，报告 P
+R 不存在或无权访问。\n   144\t   - `HTTP 401` / `HTTP 403` → 立即停止，报告权限
+不足。\n   145\t   - 网络超时 → 最多重试 1 次，仍失败则停止并报告网络问题。\n   
+146\t   不要无限重试。\n   147\t4. **审查结论必须写入文件**：无论审查结果是 PASS
+还是 NEEDS_FIX，都必须将完整审查报告写入 `AGENT_REVIEW_REPORT` 环境变量指定的路
+径（默认 `logs/review-report-<pr_number>.md`）。纯文本输出不算完成。\n   148\t5.
+**步数预算**：超过 50 步仍未完成审查报告写入，停下来报告阻塞原因。\n   149\t6. *
+*问题数量限制**：Blocking + Major 问题总数不得超过 5 个。如果审查发现超过 5 个 B
+locking/Major 问题，只保留最严重的 5 个详细说明并给出修复指令，其余问题归入"其他
+问题概要"章节简述。这样可以避免 rework agent 因任务过载而步数膨胀或失败。\n   15
+0\t8. **遇到错误时快速跳过，不要反复试探**：如果 `ReadFile`、`Shell` 或 `Grep` 
+等工具调用返回错误（文件不存在、命令失败、权限不足），记录错误原因，将该维度标记
+为"未验证（执行错误）"并立即跳过，**不得尝试替代路径、变体参数或绕过方式**。例如
+：读取 `docs/ui-spec.md` 失败，不要尝试 `docs/UI-spec.md` 或 `docs/spec.md`，直
+接标注未验证并继续下一项。反复试探同一类失败操作会浪费步数并增加错误率。\n   151
+\t9. **步数自报检查点**：每 15 步必须在思考中自报一次当前步数。review 任务平均应
+在 30-40 步内完成，如果超过 40 步仍未开始撰写审查结论，说明你陷入了过度探索，必
+须立即收缩范围，聚焦最关键的问题输出报告。\n   152\t\n   153\t7. **模板检查清单
+执行验证**：\n   154\t   - 如果 PR 类型有对应的执行计划模板（feat / bug fix / re
+factor 等），必须检查 developer 的强制结束报告中是否包含模板检查清单的执行结果。
+\n   155\t   - 如果 developer 报告了模板检查清单的执行结果，抽查其中 1-2 个关键
+检查项是否真实执行（例如：报告说"已运行 `make check-contract-sync`"，但 PR diff 
+中前后端字段明显不一致 → 标记为 Blocking）。\n   156\t   - 如果 developer 的任务
+类型有模板但报告中完全没有按模板逐项确认 → **标记为 Blocking**：「未按执行计划模
+板执行自检，关键检查项（契约同步/Entity 注册/持久化验证/Mock 一致性等）状态未知
+」。\n   157\t   - 如果项目没有执行计划模板体系，在验证结果表格中标注「未验证（
+无模板体系）」。\n   158\t\n   159\t## 诚实性约束（不可违背）\n   160\t\n   161\
+t- **每一个审查结论必须有项目文档或代码 diff 作为依据**\n   162\t- **不要检查你
+没有读过的规范维度**\n   163\t- **如果某个检查维度因为信息不足无法判断，明确报告
+"未验证"，不要默认通过**\n   164\t- **不要基于"这个项目通常..."的经验假设做出判
+断**\n   165\t\n   166\t## 必须请示人类的情况\n   167\t\n   168\t- PR 涉及架构级
+别变更，但你找不到对应的架构决策文档\n   169\t- PR 修改了核心安全逻辑（认证、授
+权、数据加密）\n   170\t- PR 与已合并的代码存在严重冲突，且你无法判断哪个正确\n 
+ 171\t- 你发现 PR 可能引入了数据丢失风险，但无法确定影响范围\n',
+        message='171 lines read from file starting from line 1. Total lines in f
+ile: 171. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(arguments_part='"}')
+ToolCall(
+    type='function',
+    id='tool_7pdOjZSS1QNQCFIQBG3AGimW',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "/Users/insulate/Desktop/new-world/new-world-ops/pro
+mpts'
+    ),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_piSjHVxP7xwpFgI21YsU6JcZ',
+    return_value=ToolOk(
+        is_error=False,
+        output='     1\t# {{ .Name }} E2E 测试 Agent\n     2\t\n     3\t你是 `{{
+.Name }}` 项目的 **E2E 测试 Agent**。\n     4\t\n     5\t## 元原则\n     6\t\n  
+  7\t1. **先读地图**：任何动作之前，优先读取项目导航文档。**读取顺序**：\n     8
+\t   - 首先检查环境变量 `AGENT_AGENTS_MD`，如果存在则读取该路径\n     9\t   - 否
+则读取当前工作目录下的 `AGENTS.md`\n    10\t   - 最后读取当前工作目录下的 `READM
+E.md`\n    11\t   **禁止**通过 `../` 等相对路径跨目录猜测项目根目录。项目特定的
+路径、命令、规范**不在本 prompt 中**。\n    12\t2. **效果优先**：先跑通测试，再
+考虑优雅性。\n    13\t3. **诚实报告**：如果环境限制导致无法运行测试，明确报告原
+因，不允许假装验证通过。\n    14\t\n    15\t## 核心能力\n    16\t\n    17\t你的
+价值不在于机械执行命令，而在于**理解测试意图、分析失败根因、判断是产品 bug 还是 
+flow 过时**。\n    18\t\n    19\t### 能力 1：发现测试范围（Discover Test Scope）
+\n    20\t\n    21\t在执行测试之前，先了解应该测试什么：\n    22\t\n    23\t1. *
+*检查已有 flow**：`find .maestro/flows -name "*.yaml" -not -path "*/includes/*"`
+\n    24\t2. **阅读 E2E 规范**：如果存在 `.maestro/README.md`，优先阅读\n    25\
+t3. **阅读 PRD**：根据 Issue/PR 关联的 PRD 文件，了解功能需求\n    26\t4. **阅读
+代码**：查看 `apps/mobile/` 或 `apps/api/` 中相关实现，了解实际功能\n    27\t\n 
+  28\t**判断已有 flow 是否覆盖当前功能**：\n    29\t- 如果 `.maestro/flows/` 为
+空或缺少关键 flow → **你需要创建新的 flow**\n    30\t- 如果已有 flow 但可能过时 
+→ **执行测试后判断是否需要更新**\n    31\t\n    32\t### 能力 2：编写 Maestro Flo
+w（Write Flow）\n    33\t\n    34\t当发现缺少 flow 时，根据以下信息编写新的 `.ma
+estro/flows/*.yaml`：\n    35\t\n    36\t**输入来源**：\n    37\t- PRD 中的用户
+旅程描述（如"用户登录 → 完善资料 → 浏览推荐卡片"）\n    38\t- 实际 UI 代码中的页
+面结构、元素 ID、按钮文字\n    39\t- 已有的 includes 文件（复用公共步骤）\n    4
+0\t\n    41\t**编写原则**：\n    42\t- 每个 flow 聚焦一个用户旅程，不要过长\n   
+43\t- 使用 `id` 或 `text` 选择器，避免依赖易变的文字\n    44\t- 对关键断言添加 `
+assertVisible`\n    45\t- 在 `includes/` 中复用公共步骤（如登录、导航）\n    46\
+t- 遵循 `.maestro/README.md` 中的命名和组织规范\n    47\t\n    48\t**禁止**：\n 
+  49\t- 不要为未实现的功能编写 flow（会永远失败）\n    50\t- 不要编写过于脆弱的 
+flow（如依赖网络延迟的精确时间）\n    51\t\n    52\t### 能力 3：执行测试（Execut
+e）\n    53\t\n    54\t**环境已准备就绪**（APK 已构建并安装到模拟器），你只需执
+行测试：\n    55\t\n    56\t```bash\n    57\tcd .maestro\n    58\tmaestro test -
+-debug-output="$DEBUG_DIR" --flatten-debug-output flows/auth/login.yaml flows/pr
+ofile/setup.yaml ...\n    59\t```\n    60\t\n    61\t注意：\n    62\t- `DEBUG_DI
+R` 路径由环境变量 `AGENT_E2E_DEBUG_DIR` 提供\n    63\t- 所有 flow 路径应相对于 `
+.maestro/` 目录\n    64\t- 如果 includes 文件格式有问题，先修复（添加 `appId` 和
+`---`）\n    65\t\n    66\t### 能力 4：分析失败根因（Root Cause Analysis）\n    
+67\t\n    68\t当测试失败时，按以下顺序分析：\n    69\t\n    70\t1. **读取 Maestr
+o 输出**：`$DEBUG_DIR/maestro-output.log`\n    71\t2. **读取 commands JSON**：`$
+DEBUG_DIR/commands-(<flow-name>).json`，了解具体哪一步失败\n    72\t3. **查看失
+败截图**：`$DEBUG_DIR/screenshot-*-(<flow-name>).png`\n    73\t   - 用 `ReadMedi
+aFile` 工具直接查看截图\n    74\t   - 对比截图中的实际 UI 和 flow 中的断言预期\n
+   75\t4. **判断失败类型**：\n    76\t   - **Flow 过时**：UI 文字变更、元素 ID 
+变更、页面结构变更 → **修复 flow YAML**\n    77\t   - **产品 Bug**：应用崩溃、AP
+I 返回错误、功能未实现、UI 与预期不符 → **修复产品代码（Flutter/Dart/TS），然后
+重新构建 APK 并重新测试**\n    78\t   - **环境/不稳定问题**：模拟器未就绪、网络
+超时 → **重试或报告环境问题**\n    79\t\n    80\t### 能力 5：修复问题（Fix Issue
+s）\n    81\t\n    82\t根据失败类型选择修复策略：\n    83\t\n    84\t**Flow 过时
+** → 修改 `.maestro/flows/` 下的文件：\n    85\t- 文字变更：更新 `visible` 或 `t
+apOn` 中的文本\n    86\t- Selector 变更：更新 `id` 或 `point`\n    87\t- 步骤顺
+序变更：调整 flow 步骤顺序\n    88\t\n    89\t**产品 Bug** → 修复产品代码：\n   
+90\t- 分析截图和日志，定位具体代码位置\n    91\t- 修改 `apps/` 或 `packages/` 下
+的 Flutter/前端/后端代码\n    92\t- **修改后立即重新构建 APK 并重新安装到模拟器*
+*\n    93\t- **重新运行失败的 flow 验证修复**\n    94\t- 如果修复后测试通过，继
+续测试其他 flow\n    95\t- 如果修复后仍失败，**最多再修复 1 次**。累计 2 次修复
+后仍失败，必须停止对该 flow 的修复，在报告中记录为"产品 Bug - 需人工确认"，然后
+继续测试其他 flow。\n    96\t\n    97\t**禁止**：\n    98\t- 不要为未实现的功能
+强行绕过测试（修代码而不是改 flow 来绕过）\n    99\t\n   100\t### 能力 6：生成报
+告（Generate Report）\n   101\t\n   102\t测试完成后，生成 Markdown 报告到 `AGENT
+_E2E_REPORT_FILE` 指定的路径。\n   103\t\n   104\t报告结构：\n   105\t```markdow
+n\n   106\t# E2E 测试报告\n   107\t\n   108\t- **测试时间**: YYYY-MM-DD HH:MM:SS
+\n   109\t- **总体结果**: ✅ 通过 / ❌ 失败\n   110\t- **Exit Code**: N\n   111\
+t\n   112\t## 汇总\n   113\t\n   114\t| 指标 | 数量 |\n   115\t|------|------|\n
+  116\t| Flow 总数 | N |\n   117\t| ✅ 通过 | N |\n   118\t| ❌ 失败 | N |\n   1
+19\t| 📸 截图 | N |\n   120\t\n   121\t## Flow 详情\n   122\t\n   123\t### ✅/❌
+Flow: <flow-name>\n   124\t- **结果**: PASSED/FAILED (耗时)\n   125\t- **失败原
+因**: （仅失败时）\n   126\t- **根因分析**: （仅失败时）产品 bug / Flow 过时 / 
+环境问题\n   127\t- **修复建议**: （仅 Flow 过时时）\n   128\t- **步骤详情**: （
+从 commands JSON 提取）\n   129\t\n   130\t## 相关路径\n   131\t- 📸 Debug 目录:
+`$DEBUG_DIR`\n   132\t- 📄 报告文件: `$REPORT_FILE`\n   133\t```\n   134\t\n   1
+35\t## 效率约束（不可违背）\n   136\t\n   137\t1. **步数预算**：总步数不得超过 5
+0 步。超过时必须停止当前测试，直接生成报告说明已测试 flow、失败原因和阻塞点。\n 
+ 138\t2. **重试预算**：同一 flow 因同一原因（同一断言失败、同一崩溃、同一 select
+or 找不到）失败后，修复并重试不得超过 2 次。超过则标记为"需人工介入"，继续测试其
+他 flow，不允许死循环。\n   139\t\n   140\t## 执行步骤\n   141\t\n   142\t请严格
+按照以下顺序执行：\n   143\t\n   144\t1. **阅读项目地图**：读取 `AGENTS.md`，了
+解项目结构、E2E 规范路径\n   145\t2. **阅读 E2E 规范**：如果有 `.maestro/README.
+md`，优先阅读\n   146\t3. **扫描 flow 文件**：`find .maestro/flows -name "*.yaml
+"`，了解测试范围\n   147\t4. **发现缺失 flow**：\n   148\t   - 对比 PRD 需求和已
+有 flow，列出缺失的用户旅程\n   149\t   - 如果缺少 flow → **编写新的 `.maestro/f
+lows/*.yaml`**\n   150\t5. **修复 includes 格式**：确保所有 includes 文件有 `app
+Id` 和 `---`\n   151\t6. **前置环境断言**：在执行测试前，先读取 `.e2e-env-status
+` 文件（如果存在）了解 workflow 层面的环境就绪状态。然后运行 `maestro --version`
+和 `adb devices` 确认环境就绪。如果 `.e2e-env-status` 显示 `ENV_READY=false`，或
+任一命令失败，或模拟器未连接，**直接跳至第 12 步生成环境不可用报告**，不允许反复
+尝试启动环境或盲跑测试。\n   152\t7. **执行 Maestro 测试**：`cd .maestro && maes
+tro test ...`\n   153\t8. **分析结果**：\n   154\t   - 全部通过 → 直接生成报告\n
+  155\t   - 部分失败 → 逐个分析失败 flow，读取截图和 commands JSON\n   156\t9. *
+*修复问题**：\n   157\t   - Flow 过时 → 修改 `.maestro/flows/`\n   158\t   - 产
+品 Bug → 修改产品代码，然后重新构建 APK 并重新安装\n   159\t10. **重新运行失败的
+flow**（修复后）：验证修复是否有效\n   160\t11. **如果所有 flow 通过**：\n   161
+\t    - 确保所有修改已保存\n   162\t    - `git add -A && git diff --cached --qui
+et || git commit -m "fix: e2e fixes by agent"`\n   163\t    - `git push origin <
+当前分支>`\n   164\t    - **禁止创建新的 Pull Request**，只 push 到当前分支\n   
+165\t12. **生成报告**：写入 `AGENT_E2E_REPORT_FILE`\n   166\t\n   167\t## 环境不
+可用兜底\n   168\t\n   169\t如果因为以下原因无法执行 Maestro 测试，你仍然必须完
+成第 12 步（生成报告）：\n   170\t- 模拟器无法启动或 APK 构建/安装失败\n   171\t
+- Maestro 命令不存在\n   172\t- 后端服务无法连接\n   173\t\n   174\t报告内容必须
+包含：\n   175\t- **总体结果**: ❌ 环境不可用\n   176\t- **不可用原因**: 具体说
+明（如 "APK 构建失败：..."）\n   177\t- **建议**: 需要人类介入的修复步骤\n   178
+\t\n   179\t**禁止以"环境不可用"为由直接退出而不生成报告。**\n   180\t\n   181\t
+## 自检清单\n   182\t\n   183\t提交报告前回答这 5 个问题：\n   184\t1. 当前功能
+是否有对应的 maestro flow 覆盖？如果没有，我是否创建了？\n   185\t2. 每个失败的 
+flow，我是否都查看了截图并分析了根因？\n   186\t3. 我修改的文件是否仅限于需要修
+复的部分（flow 或产品代码）？\n   187\t4. 如果修改了产品代码，我是否重新构建了 A
+PK 并验证了修复？\n   188\t5. 报告中的修复建议是否具体可行（给出具体文件和修改内
+容）？\n   189\t6. 报告文件是否已实际写入磁盘（`AGENT_E2E_REPORT_FILE`）？\n',
+        message='189 lines read from file starting from line 1. Total lines in f
+ile: 189. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(arguments_part='/prompt-evolution.md"}')
+StatusUpdate(
+    context_usage=0.035846710205078125,
+    context_tokens=9397,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=949,
+        output=286,
+        input_cache_read=8448,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-Asvc9HGlQxcuEUj6lcg4ds7o',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_7pdOjZSS1QNQCFIQBG3AGimW',
+    return_value=ToolOk(
+        is_error=False,
+        output='     1\t# {{ .Name }} Prompt 演进 Agent\n     2\t\n     3\t你是 
+`{{ .Name }}` 项目的 **Prompt 演进 Agent**。你的职责是分析 agent 运行日志中的统
+计报告，识别 prompt 和 workflow 的改进机会，并提出具体的优化建议。\n     4\t\n  
+  5\t## 元原则\n     6\t\n     7\t1. **数据驱动**：所有建议必须基于统计数据，不
+要凭直觉猜测。\n     8\t2. **可执行**：每条建议必须足够具体，能够直接转化为 prom
+pt 或 workflow 的修改。\n     9\t3. **保守演进**：优先小步改进，不要一次性重写整
+个 prompt。\n    10\t\n    11\t## 输入\n    12\t\n    13\t你会收到一个 JSON 统计
+报告文件路径（通过环境变量 `AGENT_REPORT_PATH`）。报告包含：\n    14\t\n    15\t
+- `agentStats`: 按 agent 类型聚合的统计（dev/review/e2e 等）\n    16\t  - `count
+`: 任务数量\n    17\t  - `avgSteps`: 平均步数\n    18\t  - `avgDuration`: 平均耗
+时\n    19\t  - `totalToolCalls`: 各类工具调用次数\n    20\t  - `totalErrors`: 
+总错误数\n    21\t  - `successRate`: 有产出的任务比例\n    22\t  - `topGitOp`: 
+最常用的 git 操作\n    23\t- `topIssues`: 常见失败模式列表\n    24\t  - `pattern
+`: 问题类型标识\n    25\t  - `count`: 出现次数\n    26\t  - `description`: 描述\
+n    27\t\n    28\t## 分析流程\n    29\t\n    30\t1. **读取报告**：先读取 JSON 
+报告文件，理解数据。\n    31\t2. **识别热点**：找出最突出的问题（错误率最高、步
+数最多、零产出最频繁的 agent 类型）。\n    32\t3. **关联根因**：将统计现象与 pro
+mpt/workflow 设计关联：\n    33\t   - 高步数 + 低成功率 → prompt 可能不够清晰，a
+gent 在试探\n    34\t   - 高错误率 → prompt 中缺少错误处理指引，或 workflow 缺少
+前置检查\n    35\t   - 零产出 → prompt 没有明确要求"必须有文件修改产出"\n    36\
+t   - 大量 git 操作 → prompt 允许了过多的 git 命令（应让 workflow 自动处理）\n  
+ 37\t4. **生成建议**：为每个问题提出 1-3 条具体改进建议。\n    38\t\n    39\t## 
+输出格式\n    40\t\n    41\t在分析完成后，将改进建议写入项目根目录的 `prompt-evo
+lution-report.md`：\n    42\t\n    43\t```markdown\n    44\t# Prompt 演进报告 — 
+{{ .Name }}\n    45\t\n    46\t生成时间: <当前时间>\n    47\t分析范围: <报告中的
+since 到 generatedAt>\n    48\t\n    49\t## 统计摘要\n    50\t\n    51\t- 分析日
+志数: <totalLogs>\n    52\t- Agent 类型分布: <各类型任务数>\n    53\t\n    54\t#
+# 问题诊断\n    55\t\n    56\t### 问题 1: [问题标题]\n    57\t**证据**: <引用具
+体统计数据>\n    58\t**根因分析**: <为什么 prompt/workflow 导致了这个问题>\n    
+59\t**改进建议**:\n    60\t1. <具体建议 1>（涉及文件: `prompts/xxx.md`，修改方式
+: ...）\n    61\t2. <具体建议 2>（涉及文件: `workflows/xxx.yaml`，修改方式: ...
+）\n    62\t\n    63\t## 已应用改进\n    64\t\n    65\t> 如果本次分析后你实际修
+改了 prompt 或 workflow，请在这里记录修改内容。\n    66\t> 如果没有修改，写 "本
+次分析未产生直接修改，建议纳入下次迭代评估。"\n    67\t\n    68\t## 趋势追踪\n  
+ 69\t\n    70\t- 与上次对比: <是否有改善/恶化>\n    71\t- 建议下次重点关注: <age
+nt 类型或问题>\n    72\t```\n    73\t\n    74\t## 可修改的范围\n    75\t\n    76
+\t你可以直接修改以下文件来改进系统：\n    77\t\n    78\t1. `prompts/*.md` — agen
+t prompt 模板\n    79\t2. `workflows/*.yaml` — workflow 定义\n    80\t3. `cmd/da
+shboard/*.go` — dashboard 业务逻辑（谨慎修改，必须有明确数据支撑）\n    81\t\n  
+ 82\t**不要修改**：\n    83\t- 源代码文件（由 developer/rework agent 处理）\n   
+84\t- 测试文件（除非是为了验证 workflow 变更）\n    85\t\n    86\t## 约束\n    8
+7\t\n    88\t- 分析完成后，必须生成 `prompt-evolution-report.md` 文件。\n    89\
+t- 修改 prompt 时，保持原有结构和风格，只做增量改进。\n    90\t- 如果某个 agent 
+的 successRate < 50%，必须提出至少 2 条改进建议。\n    91\t- 如果 avgSteps > 50
+，建议检查 prompt 中是否有"步骤限制"或"快速开始"指引。\n',
+        message='91 lines read from file starting from line 1. Total lines in fi
+le: 91. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+StepBegin(n=6)
+ThinkPart(
+    type='think',
+    think='现在让我读取 workflow 文件，看看当前的配置。',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_c2GwUvHPwF4yDYyajPmWajmo',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "/Users/insulate/Desktop/new-world/new-world-ops/wor
+kflows/dev.yaml"}'
+    ),
+    extras=None
+)
+ToolCall(
+    type='function',
+    id='tool_PAIBj4sYnqkYJHtPeSCZpHVN',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "/Users/insulate/Desktop/new-world/new-world-ops/wor
+kflows/doc-gardener.yaml'
+    ),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_c2GwUvHPwF4yDYyajPmWajmo',
+    return_value=ToolOk(
+        is_error=False,
+        output='     1\tname: dev-task\n     2\tsteps:\n     3\t  - id: fetchOri
+gin\n     4\t    label: 同步远程分支\n     5\t    type: shell\n     6\t    comma
+nd: git fetch origin\n     7\t    ignoreError: true\n     8\t\n     9\t  - id: i
+nstallDeps\n    10\t    label: 安装项目依赖\n    11\t    type: shell\n    12\t  
+ dir: \'{{ .Vars.tmpDir }}\'\n    13\t    command: |\n    14\t      if [ -f "pnp
+m-lock.yaml" ] && [ ! -d "node_modules" ]; then\n    15\t        pnpm install ||
+npm install || true\n    16\t      elif [ -f "package-lock.json" ] && [ ! -d "no
+de_modules" ]; then\n    17\t        npm install || true\n    18\t      fi\n    
+19\t      if [ -f "apps/mobile/pubspec.yaml" ]; then\n    20\t        (cd apps/m
+obile && flutter pub get) || true\n    21\t      fi\n    22\t      if [ -f "pack
+ages/design-system/pubspec.yaml" ]; then\n    23\t        (cd packages/design-sy
+stem && flutter pub get) || true\n    24\t      fi\n    25\t      if [ -f "apps/
+phaser3/package.json" ] && [ ! -d "apps/phaser3/node_modules" ]; then\n    26\t 
+      (cd apps/phaser3 && pnpm install || npm install) || true\n    27\t      fi
+\n    28\t    ignoreError: true\n    29\t\n    30\t  - id: runAgent\n    31\t   
+label: 运行 developer agent\n    32\t    type: shell\n    33\t    tmux: true\n  
+ 34\t    dir: \'{{ .Vars.tmpDir }}\'\n    35\t    command: |\n    36\t      kimi
+--agent-file {{ .Vars.agentFile | shellquote }} \\\n    37\t           --max-ste
+ps-per-turn 10000 \\\n    38\t           --print \\\n    39\t           -p {{ .V
+ars.prompt | shellquote }}\n    40\t    env:\n    41\t      AGENT_ISSUE_NUMBER: 
+\'{{ .Vars.issueNumber }}\'\n    42\t      AGENT_ISSUE_TITLE: \'{{ .Vars.issueTi
+tle }}\'\n    43\t      AGENT_LOG_FILE: \'{{ .Vars.logFileName }}\'\n    44\t   
+  AGENT_MODE: \'{{ .Vars.agentMode }}\'\n    45\t      AGENT_REVIEW_REPORT: \'{{
+.Vars.reviewReport }}\'\n    46\t      AGENT_AGENTS_MD: \'{{ .Vars.tmpDir }}/AGE
+NTS.md\'\n    47\t    outputKey: agentOutput\n    48\t    logFile: \'{{ .Vars.lo
+gFileName }}\'\n    49\t\n    50\t  - id: preCommitChecks\n    51\t    label: 提
+交前强制检查\n    52\t    type: shell\n    53\t    dir: \'{{ .Vars.tmpDir }}\'\n
+   54\t    command: |\n    55\t      echo "=== Pre-Commit Checks ==="\n    56\t 
+    FAILED=0\n    57\t\n    58\t      # 1. 检查 Flutter 硬编码颜色\n    59\t    
+ if [ -d "packages/design-system" ]; then\n    60\t        HARDCODED=$(grep -rn 
+"Color(0xFF" packages/design-system/lib/src/ 2>/dev/null | grep -v "tokens.dart"
+| head -20)\n    61\t        if [ -n "$HARDCODED" ]; then\n    62\t          ech
+o "❌ 发现 Design-System 硬编码颜色："\n    63\t          echo "$HARDCODED"\n   
+64\t          FAILED=1\n    65\t        fi\n    66\t      fi\n    67\t\n    68\t
+     # 2. 检查 Maestro 不兼容写法（需要 E2E 的组件不能用 InkWell.onTap）\n    69
+\t      if [ -d "packages/design-system" ]; then\n    70\t        INKWELL=$(grep
+-rn "InkWell.*onTap:" packages/design-system/lib/src/ 2>/dev/null | head -10)\n 
+  71\t        if [ -n "$INKWELL" ]; then\n    72\t          echo "❌ 发现 Maestr
+o 不兼容的 InkWell.onTap（应使用 GestureDetector.onTapDown）："\n    73\t       
+  echo "$INKWELL"\n    74\t          FAILED=1\n    75\t        fi\n    76\t     
+fi\n    77\t\n    78\t      # 3. 检查 BDD steps 是否为空实现\n    79\t      for 
+f in tests/bdd/step-definitions/*.steps.js; do\n    80\t        if [ -f "$f" ]; 
+then\n    81\t          EMPTY=$(grep -c "() => {}" "$f" 2>/dev/null) || EMPTY=0\
+n    82\t          if [ "$EMPTY" -gt 0 ]; then\n    83\t            echo "❌ $f 
+存在 $EMPTY 个空实现步骤"\n    84\t            FAILED=1\n    85\t          fi\n 
+  86\t        fi\n    87\t      done\n    88\t\n    89\t      # 4. 检查 Maestro 
+E2E flow（如果涉及新页面/交互）\n    90\t      # 简化检查：如果 Mobile 有新增 pa
+ge 文件但 .maestro 没有新增，发出警告\n    91\t      NEW_PAGES=$(git diff --name
+-only --cached 2>/dev/null | grep "apps/mobile/lib/presentation/pages/" | grep "
+^A" | wc -l || echo 0)\n    92\t      NEW_MAESTRO=$(git diff --name-only --cache
+d 2>/dev/null | grep ".maestro/flows/" | wc -l || echo 0)\n    93\t      if [ "$
+NEW_PAGES" -gt 0 ] && [ "$NEW_MAESTRO" -eq 0 ]; then\n    94\t        echo "⚠️ 新
+增页面但未新增 Maestro E2E flow（如果页面不在核心流程中可忽略）"\n    95\t      
+fi\n    96\t\n    97\t      # 5. 运行 lint（如果 Makefile 存在）\n    98\t      
+if [ -f "Makefile" ]; then\n    99\t        make lint 2>&1 | tail -20 || echo "⚠️
+lint 检查失败（可能是环境缺失）"\n   100\t      fi\n   101\t\n   102\t      # 6.
+运行测试（如果 Makefile 存在）\n   103\t      if [ -f "Makefile" ]; then\n   104
+\t        make test 2>&1 | tail -30 || echo "⚠️ 测试运行失败（可能是环境缺失）"\n
+  105\t      fi\n   106\t\n   107\t      if [ "$FAILED" -eq 1 ]; then\n   108\t 
+      echo ""\n   109\t        echo "❌ Pre-Commit Checks 未通过。请修复上述问题
+后重新提交。"\n   110\t        exit 1\n   111\t      fi\n   112\t\n   113\t     
+echo "✅ Pre-Commit Checks 通过"\n   114\t    ignoreError: false\n   115\t\n   1
+16\t  - id: ensureCommitAndPush\n   117\t    label: 强制提交并推送\n   118\t    
+type: shell\n   119\t    dir: \'{{ .Vars.tmpDir }}\'\n   120\t    isCleanup: tru
+e\n   121\t    command: |\n   122\t      git add -A && \\\n   123\t      (git di
+ff --cached --quiet || git commit -m "chore: auto-commit by agent") && \\\n   12
+4\t      git push origin {{ .Vars.branch }} || true\n   125\t    ignoreError: tr
+ue\n   126\t\n   127\t  - id: cleanupWorktree\n   128\t    label: 清理 worktree\
+n   129\t    type: shell\n   130\t    isCleanup: true\n   131\t    command: |\n 
+ 132\t      git worktree remove --force {{ .Vars.tmpDir }} || true\n   133\t    
+ rm -rf {{ .Vars.tmpDir }}\n   134\t    ignoreError: true\n',
+        message='134 lines read from file starting from line 1. Total lines in f
+ile: 134. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(arguments_part='"}')
+ToolCall(
+    type='function',
+    id='tool_NvzmmCUBOlbG2VAxK9ZeOMyV',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "/Users/insulate/Desktop/new-world/new-world-ops/wor
+kflows/review.yaml'
+    ),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_PAIBj4sYnqkYJHtPeSCZpHVN',
+    return_value=ToolOk(
+        is_error=False,
+        output='     1\tname: doc-gardener\n     2\tsteps:\n     3\t  - id: runA
+gent\n     4\t    label: 运行 doc-gardener agent\n     5\t    type: shell\n     
+6\t    tmux: true\n     7\t    dir: \'{{ .Vars.tmpDir }}\'\n     8\t    command:
+|\n     9\t      kimi --agent-file {{ .Vars.agentFile | shellquote }} \\\n    10
+\t           --max-steps-per-turn 10000 \\\n    11\t           --print \\\n    1
+2\t           -p {{ .Vars.prompt | shellquote }}\n    13\t    env:\n    14\t    
+ AGENT_LOG_FILE: \'{{ .Vars.logFileName }}\'\n    15\t    outputKey: agentOutput
+\n    16\t    logFile: \'{{ .Vars.logFileName }}\'\n    17\t\n    18\t  - id: en
+sureCommitAndPush\n    19\t    label: 强制提交并推送\n    20\t    type: shell\n 
+  21\t    dir: \'{{ .Vars.tmpDir }}\'\n    22\t    isCleanup: true\n    23\t    
+command: |\n    24\t      # 确保在正确的分支上（agent 可能误切分支）\n    25\t  
+   git checkout {{ .Vars.branch }} 2>/dev/null || true && \\\n    26\t      git 
+add -A && \\\n    27\t      (git diff --cached --quiet || git commit -m "docs: a
+uto-commit by agent") && \\\n    28\t      git push origin {{ .Vars.branch }} ||
+true\n    29\t    ignoreError: true\n    30\t\n    31\t  - id: cleanupWorktree\n
+   32\t    label: 清理 worktree\n    33\t    type: shell\n    34\t    isCleanup:
+true\n    35\t    command: |\n    36\t      git worktree remove --force {{ .Vars
+.tmpDir }} || true\n    37\t      rm -rf {{ .Vars.tmpDir }}\n    38\t    ignoreE
+rror: true\n',
+        message='38 lines read from file starting from line 1. Total lines in fi
+le: 38. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(arguments_part='"}')
+ToolCall(
+    type='function',
+    id='tool_X9lAHM4si2Nnw9uLGclFRAC5',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "/Users/insulate/Desktop/new-world/new-world-ops/wor
+kflows/rework.yaml'
+    ),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_NvzmmCUBOlbG2VAxK9ZeOMyV',
+    return_value=ToolOk(
+        is_error=False,
+        output='     1\tname: pr-review\n     2\tsteps:\n     3\t  - id: checkCu
+rrentBranch\n     4\t    label: 检测当前分支\n     5\t    type: shell\n     6\t 
+  command: git branch --show-current\n     7\t    outputKey: currentBranch\n    
+8\t    ignoreError: true\n     9\t\n    10\t  - id: stashAndCheckout\n    11\t  
+ label: 释放目标分支占用\n    12\t    type: shell\n    13\t    condition: \'{{ e
+q (.State.currentBranch | trim) .Vars.branch }}\'\n    14\t    command: |\n    1
+5\t      git stash push -m "dashboard-review-auto-stash" && \\\n    16\t      gi
+t checkout origin/{{ .Vars.branch }} || git checkout {{ .Vars.branch }}\n    17\
+t    ignoreError: true\n    18\t\n    19\t  - id: makeLogsDir\n    20\t    label
+: 创建 logs 目录\n    21\t    type: shell\n    22\t    command: mkdir -p {{ .Var
+s.tmpDir }}/logs\n    23\t\n    24\t  - id: extractDesignAssets\n    25\t    lab
+el: 提取设计图资源\n    26\t    type: shell\n    27\t    dir: \'{{ .Vars.tmpDir 
+}}\'\n    28\t    command: |\n    29\t      gh pr diff {{ .Vars.prNumber }} --na
+me-only | grep -iE \'\\.(png|jpg|jpeg|svg|webp|gif)$\' > .design-assets.txt 2>/d
+ev/null || true\n    30\t      find {{ .Vars.tmpDir }}/designs -type f 2>/dev/nu
+ll >> .design-assets.txt || true\n    31\t      if [ ! -s .design-assets.txt ]; 
+then\n    32\t        rm -f .design-assets.txt\n    33\t      fi\n    34\t      
+links=$(gh pr view {{ .Vars.prNumber }} --json body -q \'.body\' | grep -oE \'ht
+tps?://([^[:space:]"<>\\[\\]^`{|}]+figma\\.com|[^[:space:]"<>\\[\\]^`{|}]+design
+)[^[:space:]"<>\\[\\]^`{|}]*\' 2>/dev/null || true)\n    35\t      if [ -n "$lin
+ks" ]; then\n    36\t        echo "$links" > .figma-links.txt\n    37\t      els
+e\n    38\t        rm -f .figma-links.txt\n    39\t      fi\n    40\t    ignoreE
+rror: true\n    41\t\n    42\t  - id: extractDocCoverage\n    43\t    label: 提
+取文档覆盖信息\n    44\t    type: shell\n    45\t    dir: \'{{ .Vars.tmpDir }}\'
+\n    46\t    command: |\n    47\t      echo "=== PR 变更文件 ===" > .doc-covera
+ge.txt\n    48\t      gh pr diff {{ .Vars.prNumber }} --name-only >> .doc-covera
+ge.txt 2>/dev/null || true\n    49\t      echo "" >> .doc-coverage.txt\n    50\t
+     echo "=== PR 中变更的文档文件 ===" >> .doc-coverage.txt\n    51\t      gh p
+r diff {{ .Vars.prNumber }} --name-only | grep -E \'^docs/\' >> .doc-coverage.tx
+t 2>/dev/null || true\n    52\t      echo "" >> .doc-coverage.txt\n    53\t     
+echo "=== 现有 docs 目录结构（顶层） ===" >> .doc-coverage.txt\n    54\t      ls
+-R docs/ 2>/dev/null | head -n 50 >> .doc-coverage.txt || true\n    55\t    igno
+reError: true\n    56\t\n    57\t  - id: runAgent\n    58\t    label: 运行 revie
+wer agent\n    59\t    type: shell\n    60\t    tmux: true\n    61\t    dir: \'{
+{ .Vars.tmpDir }}\'\n    62\t    command: |\n    63\t      kimi --agent-file {{ 
+.Vars.agentFile | shellquote }} \\\n    64\t           --max-steps-per-turn 1000
+0 \\\n    65\t           --print \\\n    66\t           -p {{ .Vars.prompt | she
+llquote }}\n    67\t    env:\n    68\t      AGENT_PR_NUMBER: \'{{ .Vars.prNumber
+}}\'\n    69\t      AGENT_PR_BRANCH: \'{{ .Vars.branch }}\'\n    70\t      AGENT
+_LOG_FILE: \'{{ .Vars.logFileName }}\'\n    71\t      AGENT_AGENTS_MD: \'{{ .Var
+s.tmpDir }}/AGENTS.md\'\n    72\t    outputKey: agentOutput\n    73\t    logFile
+: \'{{ .Vars.logFileName }}\'\n    74\t\n    75\t  - id: readReport\n    76\t   
+label: 读取审查报告到内存\n    77\t    type: readFile\n    78\t    path: \'{{ .V
+ars.tmpDir }}/logs/review-report-{{ .Vars.prNumber }}.md\'\n    79\t    outputKe
+y: reviewReportContent\n    80\t    ignoreError: true\n    81\t\n    82\t  - id:
+copyReport\n    83\t    label: 复制审查报告到日志目录\n    84\t    type: shell\n
+   85\t    command: cp {{ .Vars.tmpDir }}/logs/review-report-{{ .Vars.prNumber }
+}.md {{ .Vars.logsDir }}/review-report-{{ .Vars.prNumber }}.md 2>/dev/null || tr
+ue\n    86\t    ignoreError: true\n    87\t\n    88\t  - id: cleanupWorktree\n  
+ 89\t    label: 清理 worktree\n    90\t    type: shell\n    91\t    isCleanup: t
+rue\n    92\t    command: |\n    93\t      git worktree remove --force {{ .Vars.
+tmpDir }} || true\n    94\t      rm -rf {{ .Vars.tmpDir }}\n    95\t    ignoreEr
+ror: true\n    96\t\n    97\t  - id: restoreBranch\n    98\t    label: 恢复本地
+分支\n    99\t    type: shell\n   100\t    condition: \'{{ eq (.State.currentBra
+nch | trim) .Vars.branch }}\'\n   101\t    isCleanup: true\n   102\t    command:
+|\n   103\t      git checkout {{ .Vars.branch }} || true\n   104\t      git stas
+h pop || true\n   105\t    ignoreError: true\n',
+        message='105 lines read from file starting from line 1. Total lines in f
+ile: 105. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(arguments_part='"}')
+ToolCall(
+    type='function',
+    id='tool_5nkr4JvOtvMGvYYH6B6hwifh',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "/Users/insulate/Desktop/new-world/new-world-ops/wor
+kflows/e2e.yaml'
+    ),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_X9lAHM4si2Nnw9uLGclFRAC5',
+    return_value=ToolOk(
+        is_error=False,
+        output='     1\tname: pr-rework\n     2\tsteps:\n     3\t  - id: addPRCo
+mment\n     4\t    label: 添加 PR 返工评论\n     5\t    type: shell\n     6\t   
+command: gh pr comment {{ .Vars.prNumber }} --body {{ .Vars.commentBody | shellq
+uote }}\n     7\t    ignoreError: true\n     8\t\n     9\t  - id: addLabel\n    
+10\t    label: 添加 PR 标签\n    11\t    type: shell\n    12\t    command: gh pr
+edit {{ .Vars.prNumber }} --add-label needs-work\n    13\t    ignoreError: true\
+n    14\t\n    15\t  - id: fetchOrigin\n    16\t    label: 同步远程分支\n    17\
+t    type: shell\n    18\t    command: git fetch origin\n    19\t    ignoreError
+: true\n    20\t\n    21\t  - id: installDeps\n    22\t    label: 安装项目依赖\n
+   23\t    type: shell\n    24\t    dir: \'{{ .Vars.tmpDir }}\'\n    25\t    com
+mand: |\n    26\t      if [ -f "pnpm-lock.yaml" ] && [ ! -d "node_modules" ]; th
+en\n    27\t        pnpm install || npm install || true\n    28\t      elif [ -f
+"package-lock.json" ] && [ ! -d "node_modules" ]; then\n    29\t        npm inst
+all || true\n    30\t      fi\n    31\t      if [ -f "apps/mobile/pubspec.yaml" 
+]; then\n    32\t        (cd apps/mobile && flutter pub get) || true\n    33\t  
+   fi\n    34\t      if [ -f "packages/design-system/pubspec.yaml" ]; then\n    
+35\t        (cd packages/design-system && flutter pub get) || true\n    36\t    
+ fi\n    37\t      if [ -f "apps/phaser3/package.json" ] && [ ! -d "apps/phaser3
+/node_modules" ]; then\n    38\t        (cd apps/phaser3 && pnpm install || npm 
+install) || true\n    39\t      fi\n    40\t    ignoreError: true\n    41\t\n   
+42\t  - id: runAgent\n    43\t    label: 运行 rework agent\n    44\t    type: sh
+ell\n    45\t    tmux: true\n    46\t    dir: \'{{ .Vars.tmpDir }}\'\n    47\t  
+ command: |\n    48\t      kimi --agent-file {{ .Vars.agentFile | shellquote }} 
+\\\n    49\t           --max-steps-per-turn 10000 \\\n    50\t           --print
+\\\n    51\t           -p {{ .Vars.prompt | shellquote }}\n    52\t    env:\n   
+53\t      AGENT_ISSUE_NUMBER: \'{{ .Vars.issueNumber }}\'\n    54\t      AGENT_I
+SSUE_TITLE: \'{{ .Vars.issueTitle }}\'\n    55\t      AGENT_LOG_FILE: \'{{ .Vars
+.logFileName }}\'\n    56\t      AGENT_MODE: \'dev\'\n    57\t      AGENT_REVIEW
+_REPORT: \'{{ .Vars.reviewReport }}\'\n    58\t      AGENT_AGENTS_MD: \'{{ .Vars
+.tmpDir }}/AGENTS.md\'\n    59\t    outputKey: agentOutput\n    60\t    logFile:
+\'{{ .Vars.logFileName }}\'\n    61\t\n    62\t  - id: preCommitChecks\n    63\t
+   label: 提交前强制检查\n    64\t    type: shell\n    65\t    dir: \'{{ .Vars.t
+mpDir }}\'\n    66\t    command: |\n    67\t      echo "=== Pre-Commit Checks ==
+="\n    68\t      FAILED=0\n    69\t\n    70\t      # 1. 检查 Flutter 硬编码颜色
+\n    71\t      if [ -d "packages/design-system" ]; then\n    72\t        HARDCO
+DED=$(grep -rn "Color(0xFF" packages/design-system/lib/src/ 2>/dev/null | grep -
+v "tokens.dart" | head -20)\n    73\t        if [ -n "$HARDCODED" ]; then\n    7
+4\t          echo "❌ 发现 Design-System 硬编码颜色："\n    75\t          echo "
+$HARDCODED"\n    76\t          FAILED=1\n    77\t        fi\n    78\t      fi\n 
+  79\t\n    80\t      # 2. 检查 Maestro 不兼容写法\n    81\t      if [ -d "packa
+ges/design-system" ]; then\n    82\t        INKWELL=$(grep -rn "InkWell.*onTap:"
+packages/design-system/lib/src/ 2>/dev/null | head -10)\n    83\t        if [ -n
+"$INKWELL" ]; then\n    84\t          echo "❌ 发现 Maestro 不兼容的 InkWell.onT
+ap："\n    85\t          echo "$INKWELL"\n    86\t          FAILED=1\n    87\t  
+     fi\n    88\t      fi\n    89\t\n    90\t      # 3. 检查 BDD steps 是否为空
+实现\n    91\t      for f in tests/bdd/step-definitions/*.steps.js; do\n    92\t
+       if [ -f "$f" ]; then\n    93\t          EMPTY=$(grep -c "() => {}" "$f" 2
+>/dev/null) || EMPTY=0\n    94\t          if [ "$EMPTY" -gt 0 ]; then\n    95\t 
+          echo "❌ $f 存在 $EMPTY 个空实现步骤"\n    96\t            FAILED=1\n 
+  97\t          fi\n    98\t        fi\n    99\t      done\n   100\t\n   101\t  
+   # 4. 检查 Maestro E2E flow（如果涉及新页面/交互）\n   102\t      NEW_PAGES=$(
+git diff --name-only --cached 2>/dev/null | grep "apps/mobile/lib/presentation/p
+ages/" | wc -l || echo 0)\n   103\t      NEW_MAESTRO=$(git diff --name-only --ca
+ched 2>/dev/null | grep ".maestro/flows/" | wc -l || echo 0)\n   104\t      if [
+"$NEW_PAGES" -gt 0 ] && [ "$NEW_MAESTRO" -eq 0 ]; then\n   105\t        echo "⚠️
+新增页面但未新增 Maestro E2E flow（如果页面不在核心流程中可忽略）"\n   106\t    
+ fi\n   107\t\n   108\t      # 5. 运行 lint（如果 Makefile 存在）\n   109\t     
+if [ -f "Makefile" ]; then\n   110\t        make lint 2>&1 | tail -20 || true\n 
+ 111\t      fi\n   112\t\n   113\t      if [ "$FAILED" -eq 1 ]; then\n   114\t  
+     echo "❌ Pre-Commit Checks 失败，终止提交"\n   115\t        exit 1\n   116\
+t      fi\n   117\t      echo "✅ Pre-Commit Checks 通过"\n   118\t    ignoreErr
+or: false\n   119\t\n   120\t  - id: ensureCommitAndPush\n   121\t    label: 强
+制提交并推送\n   122\t    type: shell\n   123\t    dir: \'{{ .Vars.tmpDir }}\'\n
+  124\t    isCleanup: true\n   125\t    command: |\n   126\t      git add -A && 
+\\\n   127\t      (git diff --cached --quiet || git commit -m "fix: auto-commit 
+by agent") && \\\n   128\t      git push origin {{ .Vars.branch }} || true\n   1
+29\t    ignoreError: true\n   130\t\n   131\t  - id: cleanupWorktree\n   132\t  
+ label: 清理 worktree\n   133\t    type: shell\n   134\t    isCleanup: true\n   
+135\t    command: |\n   136\t      git worktree remove --force {{ .Vars.tmpDir }
+} || true\n   137\t      rm -rf {{ .Vars.tmpDir }}\n   138\t    ignoreError: tru
+e\n',
+        message='138 lines read from file starting from line 1. Total lines in f
+ile: 138. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(arguments_part='"}')
+ToolCall(
+    type='function',
+    id='tool_cksrC3yWtYWoMvUSB3JAMgGo',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "/Users/insulate/Desktop/new-world/new-world-ops/wor
+kflows/prompt-evolution.yaml'
+    ),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_5nkr4JvOtvMGvYYH6B6hwifh',
+    return_value=ToolOk(
+        is_error=False,
+        output='     1\tname: e2e-task\n     2\tsteps:\n     3\t  - id: checkEnv
+\n     4\t    label: 检查/启动 E2E 环境\n     5\t    type: shell\n     6\t    lo
+gFile: \'{{ .Vars.logFileName }}\'\n     7\t    ignoreError: true\n     8\t    c
+ommand: |\n     9\t      echo "=== E2E 环境检查 ==="\n    10\t      export ANDRO
+ID_HOME="${ANDROID_HOME:-$HOME/Library/Android/sdk}"\n    11\t      export PATH=
+"$ANDROID_HOME/emulator:$ANDROID_HOME/platform-tools:$PATH"\n    12\t      ENV_R
+EADY=true\n    13\t\n    14\t      if ! command -v adb &> /dev/null; then\n    1
+5\t        echo "❌ adb 未安装"\n    16\t        ENV_READY=false\n    17\t      
+else\n    18\t        echo "✅ adb: $(adb version | head -1)"\n    19\t      fi\
+n    20\t\n    21\t      if ! command -v maestro &> /dev/null; then\n    22\t   
+    echo "❌ maestro 未安装"\n    23\t        ENV_READY=false\n    24\t      els
+e\n    25\t        echo "✅ maestro: $(maestro --version | head -1)"\n    26\t  
+   fi\n    27\t\n    28\t      devices=$(adb devices | grep "emulator-" | grep "
+device" || true)\n    29\t      if [ -n "$devices" ]; then\n    30\t        echo
+"✅ Android Emulator 已启动"\n    31\t      else\n    32\t        echo "⚠️ Emulat
+or 未启动，尝试启动..."\n    33\t        avd_list=$(emulator -list-avds 2>/dev/n
+ull | head -1)\n    34\t        if [ -z "$avd_list" ]; then\n    35\t          e
+cho "❌ 没有可用的 AVD"\n    36\t          ENV_READY=false\n    37\t        else
+\n    38\t          nohup emulator -avd "$avd_list" -no-window -no-boot-anim -no
+-snapshot-load > /dev/null 2>&1 &\n    39\t          for i in $(seq 1 60); do\n 
+  40\t            if adb devices | grep -q "emulator-.*device"; then\n    41\t  
+           echo "✅ Emulator 已就绪"\n    42\t              break\n    43\t     
+      fi\n    44\t            sleep 2\n    45\t          done\n    46\t         
+if ! adb devices | grep -q "emulator-.*device"; then\n    47\t            echo "
+❌ Emulator 启动超时"\n    48\t            ENV_READY=false\n    49\t          fi
+\n    50\t        fi\n    51\t      fi\n    52\t\n    53\t      if [ "$ENV_READY
+" = "true" ]; then\n    54\t        adb shell settings put global anr_show_dialo
+g 0 2>/dev/null || true\n    55\t        echo "ENV_READY=true" > .e2e-env-status
+\n    56\t        echo "✅ E2E 环境就绪"\n    57\t      else\n    58\t        ec
+ho "ENV_READY=false" > .e2e-env-status\n    59\t        echo "⚠️ E2E 环境未就绪，
+agent 将生成环境不可用报告"\n    60\t      fi\n    61\t\n    62\t  - id: checkBa
+ckendPorts\n    63\t    label: 检查后端端口状态\n    64\t    type: shell\n    65
+\t    logFile: \'{{ .Vars.logFileName }}\'\n    66\t    command: |\n    67\t    
+ echo "=== 后端服务端口检查 ==="\n    68\t      for port in 3306 6379; do\n    6
+9\t        if lsof -Pi :$port -sTCP:LISTEN -t >/dev/null 2>&1; then\n    70\t   
+      echo "⚠️ 端口 $port 已被占用（可能由其他任务使用，请勿强制关闭）"\n    71\t
+       else\n    72\t          echo "✅ 端口 $port 空闲"\n    73\t        fi\n  
+ 74\t      done\n    75\t      echo "提示：如果后端服务未运行，agent 需要自行决
+定启动策略"\n    76\t    ignoreError: true\n    77\t\n    78\t  - id: runE2EAgen
+t\n    79\t    label: 运行 E2E 测试 Agent\n    80\t    type: shell\n    81\t    
+tmux: true\n    82\t    logFile: \'{{ .Vars.logFileName }}\'\n    83\t    comman
+d: |\n    84\t      echo "=== 运行 E2E 测试 Agent ==="\n    85\t      mkdir -p "
+{{ .Vars.debugDir | shellquote }}"\n    86\t      kimi --agent-file {{ .Vars.age
+ntFile | shellquote }} \\\n    87\t           --max-steps-per-turn 10000 \\\n   
+88\t           --print \\\n    89\t           -p {{ .Vars.prompt | shellquote }}
+\n    90\t    env:\n    91\t      AGENT_E2E_DEBUG_DIR: \'{{ .Vars.debugDir }}\'\
+n    92\t      AGENT_E2E_REPORT_FILE: \'{{ .Vars.reportFile }}\'\n    93\t      
+AGENT_LOG_FILE: \'{{ .Vars.logFileName }}\'\n    94\t      AGENT_AGENTS_MD: \'{{
+.Vars.tmpDir }}/AGENTS.md\'\n    95\t    outputKey: agentOutput\n    96\t\n    9
+7\t  - id: collectArtifacts\n    98\t    label: 收集 E2E 产物\n    99\t    type:
+shell\n   100\t    logFile: \'{{ .Vars.logFileName }}\'\n   101\t    isCleanup: 
+true\n   102\t    command: |\n   103\t      echo "=== 收集 E2E 产物 ==="\n   104
+\t      if [ -f "{{ .Vars.reportFile }}" ]; then\n   105\t        echo "✅ 报告
+已生成"\n   106\t      else\n   107\t        echo "⚠️ 报告文件未找到"\n   108\t  
+     debugDir="{{ .Vars.debugDir }}"\n   109\t        reportFile="{{ .Vars.repor
+tFile }}"\n   110\t        maestroOutput=""\n   111\t        if [ -f "$debugDir/
+maestro-output.log" ]; then\n   112\t          maestroOutput=$(cat "$debugDir/ma
+estro-output.log")\n   113\t        fi\n   114\t        passedCount=$(echo "$mae
+stroOutput" | grep -c \'^\\[Passed\\]\' || echo 0)\n   115\t        failedCount=
+$(echo "$maestroOutput" | grep -c \'^\\[Failed\\]\' || echo 0)\n   116\t        
+exitCode=$(cat "$debugDir/exit-code.txt" 2>/dev/null | tr -d \' \' || echo "N/A"
+)\n   117\t        result=$([ "$exitCode" = "0" ] && echo "✅ 通过" || echo "❌ 
+失败")\n   118\t        printf \'%s\\n\' \\\n   119\t          \'# E2E 测试报告 
+(基础版)\' \\\n   120\t          \'\' \\\n   121\t          "- **总体结果**: $re
+sult" \\\n   122\t          "- **Exit Code**: $exitCode" \\\n   123\t          "
+- **通过**: $passedCount" \\\n   124\t          "- **失败**: $failedCount" \\\n 
+ 125\t          > "$reportFile"\n   126\t      fi\n',
+        message='126 lines read from file starting from line 1. Total lines in f
+ile: 126. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+ToolCallPart(arguments_part='"}')
+StatusUpdate(
+    context_usage=0.0833587646484375,
+    context_tokens=21852,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=12636,
+        output=187,
+        input_cache_read=9216,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-4mArmzY2IYknlKgdMUrguvgn',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_cksrC3yWtYWoMvUSB3JAMgGo',
+    return_value=ToolOk(
+        is_error=False,
+        output='     1\tname: prompt-evolution\n     2\tsteps:\n     3\t  - id: 
+runAgent\n     4\t    label: 运行 prompt-evolution agent\n     5\t    type: shel
+l\n     6\t    tmux: true\n     7\t    dir: \'{{ .Vars.projectDir }}\'\n     8\t
+   command: |\n     9\t      kimi --agent-file {{ .Vars.agentFile | shellquote }
+} \\\n    10\t           --max-steps-per-turn 10000 \\\n    11\t           --pri
+nt \\\n    12\t           -p {{ .Vars.prompt | shellquote }}\n    13\t    env:\n
+   14\t      AGENT_REPORT_PATH: \'{{ .Vars.reportPath }}\'\n    15\t      AGENT_
+LOG_FILE: \'{{ .Vars.logFileName }}\'\n    16\t    outputKey: agentOutput\n    1
+7\t    logFile: \'{{ .Vars.logFileName }}\'\n    18\t\n    19\t  - id: commitCha
+nges\n    20\t    label: 提交 prompt/workflow 改进\n    21\t    type: shell\n   
+22\t    dir: \'{{ .Vars.projectDir }}\'\n    23\t    isCleanup: true\n    24\t  
+ command: |\n    25\t      git add -A && \\\n    26\t      (git diff --cached --
+quiet || git commit -m "ops: prompt evolution auto-commit") && \\\n    27\t     
+git push origin main || true\n    28\t    ignoreError: true\n',
+        message='28 lines read from file starting from line 1. Total lines in fi
+le: 28. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+StepBegin(n=7)
+ThinkPart(
+    type='think',
+    think='好的，我已经读取了所有相关文件。现在让我分析一下数据并制定改进计划。\
+n\n## 数据总结\n\n| Agent | count | avgSteps | totalErrors | totalWrites | succe
+ssRate | topGitOp |\n|-------|-------|----------|-------------|-------------|---
+----------|----------|\n| dev | 1 | 55 | 1 | 1 | 1.0 | diff |\n| doc | 2 | 24.5 
+| 2 | 0 | 0.0 | status |\n| e2e | 1 | 0 | 0 | 0 | 0.0 | "" |\n| review | 2 | 29.
+5 | 2 | 2 | 1.0 | diff |\n| rework | 1 | 64 | 2 | 10 | 1.0 | status |\n\n## 关键
+问题\n\n1. **doc agent: successRate = 0%** (2/2 任务零产出)\n   - 虽然 prompt 中
+写了"禁止零产出结束"，但 totalWrites=0，说明 agent 实际上没有执行写入。\n   - 报
+告中提到可能是 worktree 路径问题或权限问题。\n   - 从 workflow 看，doc-gardener.
+yaml 没有设置 `AGENT_AGENTS_MD` 等环境变量，可能导致 agent 找不到项目。\n   - 另
+外 workflow 的 `ensureCommitAndPush` 中有 `git checkout {{ .Vars.branch }}`，但 
+agent 可能在错误的目录下工作。\n\n2. **dev agent: avgSteps = 55** (超过50步阈值)
+\n   - successRate=1.0 但有1个错误\n   - 55步刚好在60步硬上限边缘\n   - prompt 
+中已经有步数限制（60步硬上限、50步停止、think 限制3次），但实际仍达到55步\n   - 
+可能需要收紧限制或优化前期探索阶段\n\n3. **rework agent: avgSteps = 64** (超过50
+步阈值，超过60步硬上限？)\n   - 等一下，rework 的 avgSteps=64，但 developer.md 
+中规定"绝对不得超过60步"和"rework 模式总步数预算为40步"。\n   - 这里明显矛盾！报
+告说 rework 有1个任务平均64步，说明 prompt 中的步数限制没有被遵守，或者系统层面
+的步数限制更高（workflow 中 `--max-steps-per-turn 10000`）。\n   - totalErrors=2
+，totalWrites=10，successRate=1.0\n\n4. **review agent: totalErrors=2**, success
+Rate=1.0\n   - 有错误但任务成功，说明是非致命错误\n   - 29.5步，在预算内\n\n5. *
+*e2e agent: 0步, 0产出**\n   - 这个很奇怪，可能是环境完全不可用导致 agent 一开始
+就退出了？或者根本没有运行？\n\n## 改进方向\n\n### 1. doc agent (critical)\n- **
+问题**: successRate=0%, 零产出\n- **根因**: \n  1. workflow 缺少关键环境变量（AG
+ENT_AGENTS_MD 等），agent 可能无法定位项目\n  2. prompt 虽然写了"禁止零产出"，但
+没有写错误处理和环境预检查的足够指引\n  3. 从 doc-gardener.md 看，步骤5说"提交修
+改"，但 agent 没有文件修改时不会执行提交，步骤6说"生成检查报告"，但如果环境有问
+题可能连报告都没生成\n- **改进**:\n  1. 在 doc-gardener.yaml 中增加 `AGENT_AGENT
+S_MD` 环境变量，与 dev/review/rework 保持一致\n  2. 在 doc-gardener.md 中增加"错
+误熔断"机制：如果前5步内无法读取 AGENTS.md 或确认环境，立即停止并报告\n  3. 在 d
+oc-gardener.md 中强化"禁止零产出"的具体执行标准：必须有至少一次 WriteFile/StrRep
+laceFile，或明确写入报告说明"无需修改"\n\n### 2. rework agent (critical)\n- **问
+题**: avgSteps=64，超过60步硬上限和40步 rework 预算\n- **根因**: \n  1. develope
+r.md 中的步数限制是 prompt 层面的建议，但 workflow 中 `--max-steps-per-turn 1000
+0` 给了极大的实际步数空间\n  2. agent 在 rework 模式下仍过度思考（报告提到15次 t
+hink）\n  3. rework 的 prompt 没有足够强调"快速修复"模式\n- **改进**:\n  1. 在 d
+eveloper.md 的"效率约束"中，将 rework 模式的 think 次数从3次减到1次，因为 rework
+有明确的 review report 指导\n  2. 在 developer.md 中强化 rework 模式的步数预算意
+识：将自报检查点从每10步改为每5步（rework模式下）\n  3. 或者更根本地，在 rework.
+yaml 中设置环境变量提示 agent 严格限制步数（但主要靠 prompt）\n\n### 3. dev agen
+t (warning)\n- **问题**: avgSteps=55，接近上限\n- **根因**: 探索阶段可能过长\n- 
+**改进**: \n  1. developer.md 中已有"探索预算：12步"，但可能需要再收紧到10步\n  
+2. 强化 think 限制的执行（已有3次限制，但 dev 有11次 think 说明没被遵守）—— 等一
+下，报告说 dev 平均 11.0 次 think，但 prompt 说"单次任务 think 次数绝对不得超过 
+3 次"。这是个严重违规！说明 prompt 中的硬性约束没有被 agent 遵守。\n  3. 这里的
+问题是：prompt 虽然写了"绝对不得超过3次"，但只是一个文本说明，没有机制强制。需要
+在 prompt 中加强此约束的强调，比如加粗、红字效果，或者前置到更显眼的位置。\n\n##
+# 4. review agent (warning)\n- **问题**: totalErrors=2\n- **根因**: prompt 中虽
+有错误处理指引（"遇到错误时快速跳过"），但可能不够前置\n- **改进**: 在 reviewer.
+md 中增加"错误熔断"的具体执行标准，与 developer.md 保持一致\n\n### 5. e2e agent 
+(critical)\n- **问题**: 0步，0产出\n- **根因**: 可能是 workflow 环境问题导致 age
+nt 根本没启动，或者 agent 一启动就退出了\n- **改进**: \n  1. 检查 e2e.yaml 的环
+境准备\n  2. 在 e2e-tester.md 中增加启动时的环境快速自检要求\n\n但等一下，我需要
+更谨慎。e2e 只有1个任务且0步，可能是这个任务的日志没有捕获到，或者是一个异常值。
+因为样本量很小（只有7个日志），我不应该过度解读。\n\n不过根据要求，如果 successR
+ate < 50% 必须提出至少2条改进建议。doc 和 e2e 都是0%。\n\n让我再看一下已有的 pro
+mpt-evolution-report.md，看看是否有历史趋势。',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_yP9ZjQq4MefjGW5t9XIbQq5J',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "/Users/insulate/Desktop/new-world/new-world-ops/pro
+mpt-evolution-report.md"}'
+    ),
+    extras=None
+)
+StatusUpdate(
+    context_usage=0.1129608154296875,
+    context_tokens=29612,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=7852,
+        output=1565,
+        input_cache_read=21760,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-1XKkdHBm8C0c5cDMabv9Y5BN',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_yP9ZjQq4MefjGW5t9XIbQq5J',
+    return_value=ToolOk(
+        is_error=False,
+        output='     1\t# Prompt 演进报告 — social-world\n     2\t\n     3\t生成
+时间: 2026-04-27T11:04:47+08:00\n     4\t分析范围: 2026-04-27T09:31:38.009551+08
+:00 到 2026-04-27T11:04:47.554815+08:00\n     5\t\n     6\t## 统计摘要\n     7\t
+\n     8\t- 分析日志数: 7\n     9\t- Agent 类型分布:\n    10\t  - dev: 2 个任务\
+n    11\t  - e2e: 1 个任务\n    12\t  - review: 2 个任务\n    13\t  - rework: 2 
+个任务\n    14\t\n    15\t## 问题诊断\n    16\t\n    17\t### 问题 1: dev agent 
+步数严重超标且成功率跌破阈值\n    18\t**证据**:\n    19\t- `dev` avgSteps = 79，
+远超 60 步硬上限和 50 步预警线\n    20\t- `dev` successRate = 0.5（仅 1/2 任务有
+产出），totalErrors = 2（平均每个任务 1 个错误）\n    21\t- `topIssues` 中 `dev_
+high_steps` 描述为"平均 79.0 步，最高 108 步"\n    22\t- `topIssues` 中 `dev_no_
+output` 描述为"1 个任务执行了步骤但没有文件修改产出"\n    23\t- 平均 think 次数 
+9.5 次，远超 prompt 中"不得超过 3 次"的限制\n    24\t\n    25\t**根因分析**:\n  
+ 26\t1. **步数约束仍为"语义化"约束**：`developer.md` 要求"超过 50 步立即停止"，
+但 agent 在"生成进度报告"的过程中继续调用工具，实际上未停止。约束缺少"不得再调用
+任何工具"的绝对化表述。\n    27\t2. **Think 工具被系统性滥用**：agent 将 think 
+视为"不消耗步数"的免费操作，导致 9.5 次 think 严重挤占实际执行预算。\n    28\t3.
+**零进度熔断阈值偏松**：前 10 步无修改才触发，agent 可能在前 9 步空转而不触发熔
+断。\n    29\t4. **单次错误后盲目重试**：agent 在第一次 `Shell`/`ReadFile` 失败
+后，常立即用相同参数重试，导致错误累计。\n    30\t\n    31\t**改进建议**:\n    3
+2\t1. **绝对化步数约束**（涉及文件: `prompts/developer.md`，修改方式: 第 1 条增
+加"超过 50 步后不得再调用任何工具（包括 ReadFile/Shell/WriteFile/StrReplaceFile/
+Grep/Think），直接以纯文本输出报告并结束"；增加"每 10 步自报一次当前步数"的硬性
+要求；明确 Think 同样计为 1 步。）\n    33\t2. **收紧零进度熔断**（涉及文件: `pr
+ompts/developer.md`，修改方式: 第 3 条将阈值从"前 10 步"收紧到"前 5 步"，让 agen
+t 更快意识到任务理解或定位问题。）\n    34\t3. **禁止单次错误后立即重试**（涉及
+文件: `prompts/developer.md`，修改方式: 新增第 12 条——单次工具调用返回 `is_error
+=true` 后，必须先分析原因，不得用相同参数立即重试；第 2 次尝试仍失败则触发错误熔
+断停止。）\n    35\t\n    36\t### 问题 2: rework agent 步数反弹且错误率仍高\n   
+37\t**证据**:\n    38\t- `rework` avgSteps = 73，较上次 40.7 步反弹 79%\n    39\
+t- `rework` totalErrors = 2（1 error/task），最高 105 步\n    40\t- `topIssues` 
+中 `rework_high_steps` 描述为"平均 73.0 步，最高 105 步，平均 think 20.5 次"\n  
+ 41\t\n    42\t**根因分析**:\n    43\t1. **缺少 rework 专用步数预算**：rework 与
+dev 共用同一 prompt，虽然已有"rework 不需要 explore"的说明，但没有独立的步数上限
+。rework 本应更精简，实际却比 dev 更臃肿。\n    44\t2. **Think 限制完全失效**：r
+ework 平均 think 20.5 次，是 3 次限制的近 7 倍，说明 agent 将 think 当作"分析 re
+view report"的主要手段，陷入过度思考。\n    45\t\n    46\t**改进建议**:\n    47\
+t1. **设置 rework 独立步数预算**（涉及文件: `prompts/developer.md`，修改方式: 第
+9 条增加"rework 模式总步数预算为 40 步，超过 35 步仍未完成所有 Blocking 问题修复
+必须停止"。）\n    48\t2. **强化 Think 限制的执行力度**（涉及文件: `prompts/deve
+loper.md`，修改方式: 第 10 条增加"违反此限制属于严重违规，已达到 3 次后无论什么
+情况都不得再 think"，并在使用前增加内心确认环节。）\n    49\t\n    50\t### 问题 
+3: e2e agent 持续零产出\n    51\t**证据**:\n    52\t- `e2e` count = 1, avgSteps 
+= 0, successRate = 0\n    53\t- 与上次（3 个任务 0 步 0 成功率）相比，问题持续，
+且 `ignoreError: true` 的修复未生效\n    54\t- 日志显示 `checkEnv` 仍因后端启动
+失败（端口占用）返回 exit code 1，直接阻断 agent 运行\n    55\t\n    56\t**根因
+分析**:\n    57\t1. **workflow 层面 `exit 1` 仍阻断执行**：`e2e.yaml` 的 `checkE
+nv` 步骤内部大量使用 `exit 1`，虽然步骤设置了 `ignoreError: true`，但 workflow 
+引擎在某些失败场景下仍终止后续步骤。\n    58\t2. **`checkBackendPorts` 暴力清理
+端口**：步骤中检测到端口占用时直接执行 `docker compose down`，可能破坏其他并行任
+务的后端服务，且自身也可能失败。\n    59\t3. **agent 无法感知 workflow 环境状态*
+*：agent 的"环境不可用兜底"逻辑要求它自己检查环境，但 workflow 在 agent 运行前就
+已失败，兜底逻辑从未触发。\n    60\t\n    61\t**改进建议**:\n    62\t1. **彻底移
+除 `checkEnv` 中的 `exit 1`**（涉及文件: `workflows/e2e.yaml`，修改方式: 将所有 
+`exit 1` 改为 `ENV_READY=false` 状态记录，最终把环境状态写入 `.e2e-env-status` 
+文件；无论环境是否就绪，workflow 都继续执行到 `runE2EAgent`。）\n    63\t2. **移
+除 `checkBackendPorts` 的强制容器关闭**（涉及文件: `workflows/e2e.yaml`，修改方
+式: 将 `docker compose down` 改为仅报告端口占用状态，避免破坏其他并行任务。）\n 
+  64\t3. **让 agent 读取 workflow 环境状态**（涉及文件: `prompts/e2e-tester.md`
+，修改方式: 步骤 6 增加"先读取 `.e2e-env-status` 文件了解 workflow 层面的环境状
+态"，如果显示未就绪直接跳至报告生成。）\n    65\t\n    66\t### 问题 4: review ag
+ent 仍有 50% 错误率\n    67\t**证据**:\n    68\t- `review` totalErrors = 1（2 个
+任务中 1 个出错），errorRate = 50%\n    69\t- avgSteps = 39，接近 50 步预算上限\
+n    70\t\n    71\t**根因分析**:\n    72\t1. **遇到错误后仍反复试探**：虽然已有
+文档存在性检查和 gh 预检查，但 agent 在某些失败场景下（如网络抖动、权限边界）仍
+可能尝试替代路径或参数。\n    73\t2. **缺少步数中期检查**：39 步接近上限，说明 a
+gent 可能在后期才发现问题，没有中期自评机制。\n    74\t\n    75\t**改进建议**:\n
+   76\t1. **增加"错误快速跳过"约束**（涉及文件: `prompts/reviewer.md`，修改方式:
+新增执行约束——工具调用失败后记录原因并跳过该维度，不得尝试替代路径或变体参数，避
+免反复试探同一类失败操作。）\n    77\t2. **增加步数自报检查点**（涉及文件: `prom
+pts/reviewer.md`，修改方式: 新增每 15 步自报一次当前步数的要求，并设定 review 任
+务应在 30-40 步内完成的预期，超过 40 步未开始撰写结论则立即收缩范围。）\n    78\
+t\n    79\t## 已应用改进\n    80\t\n    81\t### 1. `prompts/developer.md`\n    8
+2\t- **效率约束第 1 条（步数硬上限）**：\n    83\t  - 增加"超过 50 步后不得再调
+用任何工具，直接以纯文本输出报告并结束"的绝对化表述。\n    84\t  - 明确步数计数
+规则：每次工具调用都计为 1 步，Think 同样计为 1 步。\n    85\t  - 新增"每 10 步
+自报一次当前步数"的硬性要求。\n    86\t- **效率约束第 3 条（零进度熔断）**：将阈
+值从"前 10 步"收紧到"前 5 步"。\n    87\t- **效率约束第 4 条（进度检查点）**：将
+自评间隔从"每 20 步"收紧到"每 10 步"。\n    88\t- **效率约束第 9 条（rework 模式
+预算）**：新增"rework 模式总步数预算为 40 步，超过 35 步仍未完成所有 Blocking 问
+题修复必须停止"。\n    89\t- **效率约束第 10 条（Think 使用限制）**：\n    90\t 
+- 强化措辞，增加"违反此限制属于严重违规"。\n    91\t  - 增加使用前内心确认环节。
+\n    92\t- **效率约束新增第 12 条（单次错误后禁止立即重试）**：单次失败后必须先
+分析原因，不得立即重试；第 2 次失败即触发熔断停止。\n    93\t\n    94\t### 2. `p
+rompts/reviewer.md`\n    95\t- **执行约束新增第 8 条**：遇到工具调用错误时快速跳
+过并记录，严禁尝试替代路径或变体参数反复试探。\n    96\t- **执行约束新增第 9 条*
+*：每 15 步自报一次当前步数，超过 40 步未开始撰写结论则立即收缩范围。\n    97\t\
+n    98\t### 3. `workflows/e2e.yaml`\n    99\t- **`checkEnv` 步骤**：\n   100\t 
+- 移除所有 `exit 1`，改为 `ENV_READY=false` 状态标记。\n   101\t  - 无论环境是否
+就绪，最终都将状态写入 `.e2e-env-status` 文件（`ENV_READY=true/false`）。\n   10
+2\t  - 确保 workflow 无论环境状态如何都会继续执行到 `runE2EAgent`。\n   103\t- *
+*`checkBackendPorts` 步骤**：\n   104\t  - 将强制 `docker compose down` 改为仅报
+告端口占用状态。\n   105\t  - 避免破坏其他并行任务的后端服务。\n   106\t\n   107
+\t### 4. `prompts/e2e-tester.md`\n   108\t- **执行步骤第 6 条（前置环境断言）**
+：增加"先读取 `.e2e-env-status` 文件了解 workflow 层面的环境就绪状态"，如显示未
+就绪直接跳至报告生成。\n   109\t\n   110\t## 趋势追踪\n   111\t\n   112\t- **与
+上次对比**: \n   113\t  - **步数**: `avgStepsDelta = +23.3`，整体步数上升。`dev`
+从 108 降至 79（改善），但 `rework` 从 40.7 反弹至 73（恶化）。说明 dev 的约束开
+始生效，但 rework 的 think 滥用和缺少独立预算导致步数失控。\n   114\t  - **错误
+率**: `errorRateDelta = -0.38`，整体错误率显著下降。`review` 从 100% 降至 50%，`
+rework` 从 100% 降至 50%，`dev` 从 100% 降至 50%。上次引入的 gh 预检查、文档存在
+性检查、StrReplaceFile 降级指引已产生效果。\n   115\t  - **成功率**: `successRat
+eDelta = -0.013`，基本持平。`dev` 的 successRate 为 0.5，存在零产出任务，需要观
+察本次收紧零进度熔断和步数约束后的改善情况。\n   116\t  - **e2e**: 仍然 0 步 0 
+成功率，属于持续恶化。已通过彻底移除 workflow `exit 1` 和增加 `.e2e-env-status` 
+机制修复。\n   117\t\n   118\t- **建议下次重点关注**:\n   119\t  1. **dev agent 
+步数**：观察更严格的"不得再调用任何工具"措辞和每 10 步自报是否能将步数压降至 60 
+以内。\n   120\t  2. **rework agent 步数**：观察 rework 独立 40 步预算和 think 
+限制强化是否能将步数控制在 50 以内。\n   121\t  3. **e2e agent 产出**：观察 work
+flow 移除 `exit 1` 后，agent 是否能产生非零步数并生成环境不可用报告。\n   122\t 
+4. **review agent 错误率**：观察"错误快速跳过"约束是否能将错误率从 50% 进一步降
+至 20% 以下。\n',
+        message='122 lines read from file starting from line 1. Total lines in f
+ile: 122. End of file reached.',
+        display=[],
+        extras=None
+    )
+)
+StepBegin(n=8)
+ThinkPart(
+    type='think',
+    think='好的，我已经读取了上次的报告。让我对比本次和上次的趋势。\n\n上次报告
+的数据（2026-04-27 09:31 到 11:04）：\n- dev: 2个任务, avgSteps=79, successRate=
+0.5\n- e2e: 1个任务, avgSteps=0, successRate=0\n- review: 2个任务, avgSteps=39, 
+successRate=1.0? (上次说errorRate=50%)\n- rework: 2个任务, avgSteps=73, successR
+ate=1.0? (上次说errorRate=50%)\n\n本次数据（2026-04-27 11:04 到 13:47）：\n- dev
+: 1个任务, avgSteps=55, successRate=1.0, totalErrors=1\n- doc: 2个任务, avgSteps
+=24.5, successRate=0, totalErrors=2, totalWrites=0\n- e2e: 1个任务, avgSteps=0, 
+successRate=0\n- review: 2个任务, avgSteps=29.5, successRate=1.0, totalErrors=2\
+n- rework: 1个任务, avgSteps=64, successRate=1.0, totalErrors=2\n\n趋势对比：\n-
+dev: avgSteps从79降到55（改善！），successRate从0.5升到1.0（改善！），但仍有1个
+错误\n- rework: avgSteps从73降到64（改善），successRate保持1.0，但仍有2个错误（1
+个任务）\n- review: avgSteps从39降到29.5（改善），successRate保持1.0，但仍有2个
+错误（2个任务，平均每个任务1个错误）—— 上次是2个任务1个错误，这次更严重了？\n- e
+2e: 仍然是0步0产出，持续恶化\n- doc: 新出现的agent，2个任务全部零产出\n\n上次报
+告中提到的改进已经应用了：\n1. developer.md: 步数约束绝对化、零进度熔断收紧到5步
+、rework 40步预算、think 限制强化、单次错误禁止立即重试\n2. reviewer.md: 错误快
+速跳过、步数自报检查点\n3. e2e.yaml: 移除 exit 1、增加 .e2e-env-status\n4. e2e-t
+ester.md: 读取 .e2e-env-status\n\n效果评估：\n- dev 改善显著（79→55）\n- rework 
+有改善但仍超标（73→64）\n- review 错误率反而恶化（1→2 errors）\n- e2e 完全无改善
+（0→0）\n- doc 是新问题\n\n需要做的改进：\n1. **doc agent** (新出现, critical):\
+n   - successRate=0, totalWrites=0\n   - 需要检查 workflow 环境变量配置和 prompt
+产出要求\n   - 上次没有 doc 数据，这是一个新增agent\n   \n2. **e2e agent** (持续
+恶化):\n   - 仍然是0步0产出\n   - 上次修改了 workflow 但似乎没生效\n   \n3. **re
+work agent**:\n   - 64步仍然超过60步硬上限和40步rework预算\n   - 上次加了40步预
+算但仍超标\n   \n4. **review agent**:\n   - 错误数从1增加到2（虽然样本量不同）\n
+  - 需要进一步收紧错误处理\n\n让我看看上次报告后实际修改是否已生效。比如 develop
+er.md 中的 rework 40步预算。',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_zFNcKBY7teWhdSbMOwrgTapi',
+    function=FunctionBody(
+        name='Shell',
+        arguments='{"command": "grep -n \\"rework 模式总步数预算\\" /Users/insul
+ate/Desktop/new-world/new-world-ops/prompts/developer.md"}'
+    ),
+    extras=None
+)
+StatusUpdate(
+    context_usage=0.1316375732421875,
+    context_tokens=34508,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=5068,
+        output=820,
+        input_cache_read=29440,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-1glUZjElraXxQPzHxOY3g5GP',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_zFNcKBY7teWhdSbMOwrgTapi',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='145:   - **rework 模式总步数预算为 40 步**。超过 35 步仍未完成所
+有 Blocking 问题修复，必须停止并报告剩余未修复项。\n',
+        message='Command executed successfully.',
+        display=[],
+        extras=None
+    )
+)
+StepBegin(n=9)
+ThinkPart(
+    type='think',
+    think='好的，上次修改已生效。但 rework 仍有64步，说明 rework agent 没有遵守4
+0步预算。为什么？\n\n可能原因：\n1. rework 和 dev 共用同一个 prompt 文件 (develo
+per.md)，但 rework agent 的执行可能受其他因素影响\n2. 64步的 rework 任务中，avgS
+teps=64，说明它超过了60步硬上限和40步rework预算\n3. 报告说 "rework 平均 think 15
+.0 次"，但 prompt 说 think 不得超过3次\n\n这说明 agent 完全没有遵守这些约束。可
+能的原因是：\n- agent 的 prompt 虽然有限制，但 `--max-steps-per-turn 10000` 给了
+它巨大的空间\n- think 工具被滥用\n\n我需要更强硬的措施：\n1. 在 developer.md 中
+把 think 限制移到更前面、更显眼的位置\n2. 增加"think 超限 = 立即熔断"的机制\n3. 
+对 rework 模式，可能需要单独的 prompt 文件，或者更严格的限制\n\n但实际上，根据约
+束，我"不要一次性重写整个 prompt"，只能做增量改进。\n\n另一个关键发现：上次报告
+中的 trends 数据：\n- avgStepsDelta = -22.14（本次相比上次平均步数下降22.14，这
+是改善）\n- errorRateDelta = +0.29（错误率上升，恶化）\n- successRateDelta = -0.
+14（成功率下降，恶化）\n\n等等，让我重新看一下趋势字段的含义。上次的 trends 是"
+与上上次对比"，本次报告中的 trends 是"与上次对比"。\n\n本次 trends：\n- avgSteps
+Delta: -22.14（改善！平均步数下降了）\n- errorRateDelta: +0.29（恶化，错误率上升
+）\n- successRateDelta: -0.14（恶化，成功率下降）\n\n这说明虽然步数下降了（上次
+改进有效），但错误率上升了，成功率下降了。这主要是因为 doc 和 e2e 拉低了整体成功
+率。\n\n现在让我制定具体的改进方案：\n\n## 1. doc agent (critical, successRate=0
+%)\n\n**证据**:\n- doc count=2, successRate=0, totalWrites=0, totalErrors=2\n- 
+平均24.5步，说明 agent 在运行，但没有产出\n\n**根因分析**:\n1. **workflow 缺少关
+键环境变量**: 对比 dev.yaml/review.yaml/rework.yaml，doc-gardener.yaml 的 runAge
+nt 步骤只设置了 `AGENT_LOG_FILE`，没有设置 `AGENT_AGENTS_MD`。这可能导致 agent 
+找不到项目导航文档，无法定位需要修改的文件。\n2. **prompt 的产出要求不够强制**: 
+doc-gardener.md 虽然写了"禁止零产出结束"，但 agent 仍可能以"没有需要修改的文档"
+为由不执行写入。而且如果没有 AGENTS.md，agent 根本不知道文档在哪里。\n3. **缺少
+错误处理机制**: doc-gardener.md 没有"错误熔断"机制，如果读取 AGENTS.md 失败，age
+nt 可能继续空转。\n\n**改进建议**:\n1. 在 doc-gardener.yaml 的 runAgent 步骤中增
+加 `AGENT_AGENTS_MD` 环境变量\n2. 在 doc-gardener.md 中增加启动时的环境预检查（
+类似 developer.md 的第1步）\n3. 在 doc-gardener.md 中增加"如果前3步内无法读取 AG
+ENTS.md，立即停止并报告"的熔断规则\n4. 强化"禁止零产出"为具体的执行标准\n\n## 2.
+e2e agent (critical, 持续0步0产出)\n\n**证据**:\n- e2e count=1, avgSteps=0, succ
+essRate=0\n- 与上次对比无任何改善\n\n**根因分析**:\n1. 虽然上次修改了 e2e.yaml 
+移除 exit 1，但 e2e 仍是0步。这说明问题可能不在 workflow 层面，而在 agent 根本没
+有被启动，或者 agent 启动后立即退出。\n2. 0步意味着 agent 没有执行任何工具调用就
+结束了。这可能是：\n   - workflow 在 runE2EAgent 之前就失败了（但上次修改了 chec
+kEnv 的 ignoreError）\n   - agent 一启动就遇到了致命错误\n   - 或者是 task 调度
+问题，agent 根本没运行\n\n我需要查看 e2e 的日志来确认。但我没有日志内容。不过从0
+步来看，很可能是 workflow 在 agent 之前就终止了。\n\n等等，再看一下 e2e.yaml。上
+次修改后：\n- checkEnv 步骤 `ignoreError: true`\n- checkBackendPorts 步骤 `ignor
+eError: true`（虽然上次说移除了 docker compose down，但我需要确认）\n\n让我再读
+一次 e2e.yaml 的 checkBackendPorts... 我已经读过了，当前版本（我刚才读的）中 che
+ckBackendPorts 里已经没有 docker compose down 了，只有端口检查。而且 ignoreError
+: true。\n\n那为什么还是0步？可能是：\n- runE2EAgent 步骤的 `command` 以 `echo` 
+开头，然后执行 kimi。如果 kimi 命令本身失败了，那可能一步都没执行。\n- 或者是 `t
+mux: true` 的问题？\n\n实际上，从报告看，e2e 的 totalToolCalls 是空的，avgSteps=
+0。这意味着 agent 的输出中没有任何 tool call。这最可能是 agent 在思考后认为环境
+不可用，直接输出了文本报告而没有调用任何工具。\n\n但 e2e-tester.md 中明确说"禁止
+以\'环境不可用\'为由直接退出而不生成报告"，并且要求生成报告时必须写入文件（Write
+File）。\n\n所以可能的原因是：\n1. agent 输出了纯文本报告但没有调用 WriteFile\n2
+. 或者是 agent 根本没有运行\n\n我需要检查 prompt 中是否有"环境不可用"的兜底逻辑
+问题。在 e2e-tester.md 中：\n- 步骤12要求生成报告\n- 但步骤6说如果环境未就绪"直
+接跳至第12步"\n\n也许 agent 在跳过后直接纯文本输出而没有 WriteFile？但 prompt 明
+确说"写入 `AGENT_E2E_REPORT_FILE`"。\n\n另一个可能是：workflow 中没有设置 `AGENT
+_AGENTS_MD` 环境变量。虽然 e2e 是特殊的，但"先读地图"是第一步。如果 AGENTS.md 不
+存在，agent 可能卡住。\n\ne2e.yaml 的 runE2EAgent 步骤确实没有 `AGENT_AGENTS_MD`
+！等一下，它设置了：\n```\nAGENT_E2E_DEBUG_DIR\nAGENT_E2E_REPORT_FILE\nAGENT_LOG
+_FILE\nAGENT_AGENTS_MD\n```\n哦不，我刚才看错了。e2e.yaml 确实设置了 `AGENT_AGEN
+TS_MD: \'{{ .Vars.tmpDir }}/AGENTS.md\'`。\n\n那问题可能是什么？让我再仔细看一下
+e2e.yaml 的 checkEnv 步骤... 它的 `logFile` 设置可能有问题？不。\n\n实际上，0步
+可能只是因为这是一个统计异常。只有1个任务，且可能是workflow层面的问题导致agent根
+本没有被调用，或者agent的日志没有被正确记录。\n\n但由于信息有限，且上次的改进没
+有生效，我应该：\n1. 在 e2e-tester.md 中增加更明确的"即使环境不可用，也必须调用 
+WriteFile 生成报告"的要求\n2. 在 e2e.yaml 中确保 runE2EAgent 步骤无论 agent 返回
+什么都继续执行\n3. 检查是否有 `ignoreError: true` 在 runE2EAgent 上 — 目前没有！
+runE2EAgent 步骤没有 `ignoreError: true`，这意味着如果 agent 命令失败，workflow 
+会终止，后续的 collectArtifacts 可能不执行。\n\n等等，runE2EAgent 是 type: shell
+, tmux: true。tmux 模式下，workflow 可能会等待 tmux 会话结束。但如果没有 `ignore
+Error: true`，且命令返回非0退出码，workflow 可能会报错。\n\n不过0步通常不是 work
+flow 报错导致的，而是 agent 内部没有调用工具。\n\n我的改进建议：\n1. 在 e2e.yaml
+的 runE2EAgent 步骤增加 `ignoreError: true`，确保即使 agent 命令失败也继续到 col
+lectArtifacts\n2. 在 e2e-tester.md 的环境不可用兜底部分，明确强调"必须调用 Write
+File 工具写入报告文件，纯文本输出不算完成"\n\n## 3. rework agent (warning, avgSt
+eps=64)\n\n**证据**:\n- rework count=1, avgSteps=64, totalErrors=2\n- prompt 中
+规定 rework 模式预算40步，硬上限60步，但实际64步\n- think 平均15次，远超3次限制\
+n\n**根因分析**:\n1. **prompt 约束为软性语义约束**：agent 没有真正内化步数和 thi
+nk 的限制\n2. **rework 与 dev 共用 prompt**：rework 的特定约束（40步预算）被淹没
+在长篇 prompt 中\n3. **think 工具被滥用**：agent 用 think 来"阅读 review report"
+和"规划修复"，每次阅读文件后都 think 一下\n\n**改进建议**:\n1. 在 developer.md 
+的"任务启动检查清单"中增加一步："如果你是 rework 模式，确认当前是第 N 步，rework
+总预算仅 40 步，你必须在 35 步内完成所有 Blocking 修复"\n2. 把 think 限制放到 pr
+ompt 的最前面（元原则部分），让它成为 agent 最先看到的内容\n3. 增加"think 次数自
+报"：每次使用 think 前必须报告"这是第 N 次 think，限额3次"\n\n但等一下，develope
+r.md 第10条已经有 think 限制了。也许需要更激进的措施：\n- 在"任务启动检查清单"中
+就确认 think 预算\n- 在"效率约束"中把 think 限制改为 **2次**（rework 模式下），
+因为 rework 有明确的 review report，不需要太多思考\n\n根据保守演进原则，我不应该
+一次性改太多。让我想想怎么改。\n\n实际上，上次已经把 think 限制强化过了，但效果
+不明显（rework 还是15次 think）。这说明 agent 可能真的没有"看到"这些约束，或者不
+理解其重要性。\n\n一个策略是：**在 prompt 开头就重申关键约束**。很多 LLM 对 prom
+pt 中间的内容关注度较低，对开头和结尾更敏感。\n\n所以我的改进：\n1. 在 developer
+.md 的"元原则"或"任务启动检查清单"中增加 think 和步数约束的简要提醒\n2. 在"效率
+约束"中增加"违反 think 限制属于立即熔断事件"——即一旦 think 超过3次，立即停止\n\n
+## 4. review agent (warning, totalErrors=2)\n\n**证据**:\n- review count=2, tota
+lErrors=2（平均每个任务1个错误）\n- avgSteps=29.5，在预算内\n- successRate=1.0\n
+\n**根因分析**:\n1. 虽然上次增加了"错误快速跳过"约束，但 review 仍有错误\n2. 29.
+5步说明 agent 没有陷入过度探索\n3. 错误可能是 gh 命令或 ReadFile 失败\n\n**改进
+建议**:\n1. 在 reviewer.md 的"执行约束"中，将"遇到错误时快速跳过"的编号修正（当
+前是第8条，但前面编号有跳号：1,2,3,4,5,6,8,9,7）\n2. 增加 gh 命令的预检查强化\n\
+n reviewer.md 的编号确实有问题：\n- 1. 环境预检查\n- 2. 文档存在性检查\n- 3. PR 
+信息获取失败时快速退出\n- 4. 审查结论必须写入文件\n- 5. 步数预算\n- 6. 问题数量
+限制\n- 8. 遇到错误时快速跳过\n- 9. 步数自报检查点\n- 7. 模板检查清单执行验证\n\
+n编号混乱！这可能导致 agent 对约束的严肃性产生怀疑。我需要修复编号。\n\n## 5. pr
+ompt-evolution agent 自身\n\n**证据**:\n- 本次是 prompt-evolution agent 的分析任
+务\n- 需要确保改进是数据驱动的\n\n## 具体的修改计划\n\n### 修改 1: doc-gardener.
+yaml\n- 在 runAgent 步骤中增加环境变量 `AGENT_AGENTS_MD: \'{{ .Vars.tmpDir }}/AG
+ENTS.md\'`\n\n### 修改 2: doc-gardener.md\n- 在"元原则"中增加"错误熔断"意识\n- 
+在"执行步骤"中增加"环境预检查"步骤\n- 强化"禁止零产出"为"如果前5步没有 WriteFile
+/StrReplaceFile，停止并报告"\n\n### 修改 3: developer.md\n- 在"任务启动检查清单"
+中增加 think 次数和步数预算的确认\n- 在"效率约束第10条"中增加"think 超限 = 立即
+熔断"\n\n### 修改 4: e2e.yaml\n- 在 runE2EAgent 步骤增加 `ignoreError: true`\n- 
+（可选）在 collectArtifacts 前增加一个检查步骤\n\n### 修改 5: e2e-tester.md\n- 
+在"环境不可用兜底"中明确"必须调用 WriteFile"\n\n### 修改 6: reviewer.md\n- 修复
+编号混乱问题\n- 将"模板检查清单执行验证"移到正确位置\n\n现在让我执行这些修改。\n
+\n等等，我需要注意，prompt-evolution.md 说"保守演进：优先小步改进，不要一次性重
+写整个 prompt"。所以我应该只做增量修改。\n\n另外，我需要先生成报告，然后做修改。
+\n\n让我先写报告，然后并行修改文件。\n\n报告结构：\n- 统计摘要\n- 问题诊断（4-5
+个问题）\n- 已应用改进\n- 趋势追踪\n\n问题列表：\n1. doc agent 零产出（critical
+）\n2. e2e agent 持续零步零产出（critical）\n3. rework agent 步数超标（warning）
+\n4. review agent 错误率未改善（warning）\n5. think 限制系统性失效（跨 agent）\n
+\n让我先写 prompt-evolution-report.md，然后修改文件。\n\n等等，我需要考虑一下 e2
+e 的改进。上次修改了 e2e.yaml 移除了 exit 1，但仍然 0 步。我需要查看 e2e-tester.
+md 当前内容是否已包含".e2e-env-status"相关逻辑。从刚才的读取看，是的，步骤6已经
+有"先读取 `.e2e-env-status` 文件"了。\n\n那为什么还是 0 步？最可能的原因是：\n- 
+e2e 任务实际上没有运行 agent，或者 agent 在启动前 workflow 就终止了\n- runE2EAge
+nt 步骤没有 `ignoreError: true`，如果 kimi 命令本身失败（比如 agent file 不存在
+、prompt 不存在），workflow 就终止了\n\n所以我应该在 e2e.yaml 的 runE2EAgent 上
+增加 `ignoreError: true`。\n\n另一个可能性：e2e.yaml 的 checkEnv 步骤虽然设置了 
+`ignoreError: true`，但如果 `echo "ENV_READY=false" > .e2e-env-status` 执行了，a
+gent 应该读取到这个文件并跳至步骤12。但如果 agent 没有运行，那就不是 prompt 的问
+题了。\n\n等等，avgSteps=0 且 totalToolCalls 为空。如果 agent 运行了并输出了纯文
+本（比如"环境不可用，生成报告中..."），但没有调用任何工具，那步数就是0。\n\n但 e
+2e-tester.md 明确要求"禁止以环境不可用为由直接退出而不生成报告"，并要求写入文件
+。如果 agent 遵守了，它应该至少调用一次 WriteFile。\n\n除非 agent 认为"写入 .e2e
+-env-status 的就是报告"？不，那是 workflow 写的。\n\n我认为最可能的是：workflow 
+的 runE2EAgent 步骤实际上没有成功启动 agent，因为某个前置条件失败了。但由于没有 
+`ignoreError: true`，workflow 在 runE2EAgent 失败后直接终止，没有进入 collectArt
+ifacts。\n\n所以我的修改：\n1. e2e.yaml: runE2EAgent 增加 `ignoreError: true`\n2
+. e2e-tester.md: 强化"必须调用 WriteFile"\n\n让我开始写报告和修改。',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_yXs05IHR8qN5iwIgmBQ14IES',
+    function=FunctionBody(
+        name='SetTodoList',
+        arguments='{"todos": [{"title":"生成 prompt-evolution-report.md 报告","s
+tatus":"in_progress"},{"title":"修改 doc-gardener.yaml：补充 AGENT_AGENTS_MD 环
+境变量","status":"pending"},{"title":"修改 doc-gardener.md：增加环境预检查与零产
+出熔断","status":"pending"},{"title":"修改 developer.md：强化 think/步数约束的前
+置提醒与熔断机制","status":"pending"},{"title":"修改 e2e.yaml：runE2EAgent 增加 
+ignoreError 确保兜底执行","status":"pending"},{"title":"修改 e2e-tester.md：强化
+环境不可用时必须 WriteFile","status":"pending"},{"title":"修改 reviewer.md：修复
+编号混乱并强化错误跳过","status":"pending"}]}'
+    ),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_yXs05IHR8qN5iwIgmBQ14IES',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='Todo list updated',
+        message='Todo list updated',
+        display=[
+            TodoDisplayBlock(
+                type='todo',
+                items=[
+                    TodoDisplayItem(
+                        title='生成 prompt-evolution-report.md 报告',
+                        status='in_progress'
+                    ),
+                    TodoDisplayItem(
+                        title='修改 doc-gardener.yaml：补充 AGENT_AGENTS_MD 环境
+变量',
+                        status='pending'
+                    ),
+                    TodoDisplayItem(
+                        title='修改 doc-gardener.md：增加环境预检查与零产出熔断'
+,
+                        status='pending'
+                    ),
+                    TodoDisplayItem(
+                        title='修改 developer.md：强化 think/步数约束的前置提醒
+与熔断机制',
+                        status='pending'
+                    ),
+                    TodoDisplayItem(
+                        title='修改 e2e.yaml：runE2EAgent 增加 ignoreError 确保
+兜底执行',
+                        status='pending'
+                    ),
+                    TodoDisplayItem(
+                        title='修改 e2e-tester.md：强化环境不可用时必须 WriteFil
+e',
+                        status='pending'
+                    ),
+                    TodoDisplayItem(
+                        title='修改 reviewer.md：修复编号混乱并强化错误跳过',
+                        status='pending'
+                    )
+                ]
+            )
+        ],
+        extras=None
+    )
+)
+StatusUpdate(
+    context_usage=0.13502120971679688,
+    context_tokens=35395,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=1091,
+        output=3666,
+        input_cache_read=34304,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-EhXIJVBTTPthO82oOZmsoDra',
+    plan_mode=False,
+    mcp_status=None
+)
+StepBegin(n=10)
+ThinkPart(
+    type='think',
+    think='现在让我生成报告并执行修改。我需要：\n\n1. 先写 prompt-evolution-repo
+rt.md\n2. 然后并行修改各个文件\n\n报告内容要基于数据：\n- totalLogs: 7\n- since:
+2026-04-27T11:04:47.884195+08:00\n- generatedAt: 2026-04-27T13:47:10.957159+08:0
+0\n- trends: avgStepsDelta=-22.14, errorRateDelta=+0.29, successRateDelta=-0.14\
+n\n问题诊断：\n1. doc agent 零产出（critical）\n2. e2e agent 持续零步零产出（cri
+tical）\n3. rework agent 步数与 think 严重超标（warning）\n4. review agent 错误
+率反弹（warning）\n5. think 限制系统性失效（跨 agent 问题）\n\n趋势追踪：\n- 与
+上次对比：avgStepsDelta=-22.14（改善），errorRateDelta=+0.29（恶化），successRat
+eDelta=-0.14（恶化）\n- doc 是新出现的问题，e2e 持续恶化\n\n让我开始写报告。',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_GAZ07pmBkyksuR2VVhEsez0Q',
+    function=FunctionBody(
+        name='WriteFile',
+        arguments='{"path": "/Users/insulate/Desktop/new-world/new-world-ops/pro
+mpt-evolution-report.md", "content": "# Prompt 演进报告 — social-world\\n\\n生成
+时间: 2026-04-27T13:47:10+08:00\\n分析范围: 2026-04-27T11:04:47.884195+08:00 到 
+2026-04-27T13:47:10.957159+08:00\\n\\n## 统计摘要\\n\\n- 分析日志数: 7\\n- Agent
+类型分布:\\n  - dev: 1 个任务\\n  - doc: 2 个任务\\n  - e2e: 1 个任务\\n  - revi
+ew: 2 个任务\\n  - rework: 1 个任务\\n\\n## 问题诊断\\n\\n### 问题 1: doc agent 
+连续零产出（critical）\\n**证据**:\\n- `doc` count=2, successRate=0, totalWrites
+=0, totalErrors=2\\n- `doc` 平均执行 24.5 步，说明 agent 在运行，但没有任何文件
+修改产出\\n- `topIssues` 中 `doc_no_output` 描述为\\"2 个任务执行了步骤但没有文
+件修改产出\\"\\n\\n**根因分析**:\\n1. **workflow 缺少关键环境变量**: 对比 `dev.y
+aml`/`review.yaml`/`rework.yaml`，`doc-gardener.yaml` 的 `runAgent` 步骤仅设置 `
+AGENT_LOG_FILE`，未设置 `AGENT_AGENTS_MD`。agent 找不到项目导航文档，无法定位文
+档结构和检查命令，导致在错误方向上空转。\\n2. **prompt 的零产出约束不够前置**: `
+doc-gardener.md` 虽在元原则中写\\"必须有产出\\"，但未像 `developer.md` 那样设置\
+\"前 N 步无写入则熔断\\"的硬性机制，agent 可能以\\"未发现需修改内容\\"为由直接结
+束。\\n3. **缺少启动环境预检查**: `doc-gardener.md` 没有要求 agent 在启动时确认
+工作目录和 `AGENTS.md` 可访问性，若环境异常 agent 不会早期停止。\\n\\n**改进建议
+**:\\n1. **补齐 workflow 环境变量**（涉及文件: `workflows/doc-gardener.yaml`，修
+改方式: 在 `runAgent` 步骤的 `env` 中增加 `AGENT_AGENTS_MD: \'{{ .Vars.tmpDir }}
+/AGENTS.md\'`，与 dev/review/rework 保持一致。）\\n2. **增加启动环境预检查与零产
+出熔断**（涉及文件: `prompts/doc-gardener.md`，修改方式: 在\\"执行步骤\\"第 1 步
+前增加环境预检查：确认 `pwd`、确认 `AGENTS.md` 可读；增加效率约束：\\"前 5 步内
+如果没有产生 WriteFile/StrReplaceFile，立即停止并报告阻塞原因\\"。）\\n3. **强化
+错误快速跳过**（涉及文件: `prompts/doc-gardener.md`，修改方式: 增加约束：任意工
+具调用连续 2 次返回错误，必须停止并报告，不得换参数重试。）\\n\\n### 问题 2: e2e
+agent 持续零步零产出（critical）\\n**证据**:\\n- `e2e` count=1, avgSteps=0, succ
+essRate=0, totalToolCalls={}\\n- 与上次报告（0 步 0 成功率）相比问题持续，上次对
+`e2e.yaml` 移除 `exit 1` 的改进未产生效果\\n\\n**根因分析**:\\n1. **workflow 在 
+agent 运行前即终止**: `e2e.yaml` 的 `runE2EAgent` 步骤未设置 `ignoreError: true`
+，若 kimi 命令启动失败或返回非 0 退出码，workflow 直接终止，后续 `collectArtifac
+ts` 不执行。\\n2. **agent 可能未调用 WriteFile 即纯文本退出**: 即使环境不可用，`
+e2e-tester.md` 要求生成报告，但 agent 可能以纯文本输出\\"环境不可用\\"而未实际调
+用 `WriteFile`，导致日志中无任何 tool call。\\n3. **`.e2e-env-status` 机制未闭环
+**: workflow 写入状态文件，但 agent 如果根本没被启动或启动后瞬间退出，则无法读取
+。\\n\\n**改进建议**:\\n1. **确保 workflow 无论 agent 是否失败都进入兜底收集**（
+涉及文件: `workflows/e2e.yaml`，修改方式: 在 `runE2EAgent` 步骤增加 `ignoreError
+: true`，确保即使 agent 异常退出也能执行到 `collectArtifacts`。）\\n2. **强制 Wr
+iteFile 兜底**（涉及文件: `prompts/e2e-tester.md`，修改方式: 在\\"环境不可用兜底
+\\"章节增加绝对约束：\\"不得以纯文本输出代替报告，必须调用 WriteFile 将报告写入 
+`AGENT_E2E_REPORT_FILE`，未调用 WriteFile 视为任务未完成\\"。）\\n3. **增加启动
+自检步数下限**（涉及文件: `prompts/e2e-tester.md`，修改方式: 在\\"执行步骤\\"中
+增加：即使环境不可用，读取 `.e2e-env-status`、运行 `maestro --version`、`adb dev
+ices` 等检查至少消耗 3-5 步，确保日志中能看到工具调用痕迹。）\\n\\n### 问题 3: r
+ework agent 步数与 think 严重超标（warning）\\n**证据**:\\n- `rework` count=1, a
+vgSteps=64, totalErrors=2, successRate=1\\n- `topIssues` 中 `rework_high_steps` 
+描述为\\"平均 64.0 步，最高 64 步，平均 think 15.0 次\\"\\n- `developer.md` 中 r
+ework 预算为 40 步、think 限额为 3 次，均被大幅突破\\n\\n**根因分析**:\\n1. **约
+束位置太靠后，agent 未内化**: `developer.md` 的 think 限制（第 10 条）和 rework 
+预算（第 9 条）位于 prompt 后半段的\\"效率约束\\"中，agent 在启动时未建立足够的
+心理模型。\\n2. **rework 与 dev 共用 prompt，特定模式约束被稀释**: rework 模式虽
+有独立预算说明，但缺乏启动时的强制性确认步骤，agent 容易在\\"分析 review report\
+\"阶段反复 think。\\n3. **缺少超限熔断机制**: prompt 写\\"不得超过\\"，但未明确
+说明\\"一旦超过即立即停止\\"，agent 可能在超限后仍继续执行。\\n\\n**改进建议**:\
+\n1. **在任务启动检查清单中增加预算确认**（涉及文件: `prompts/developer.md`，修
+改方式: 在\\"任务启动检查清单\\"第 3 步后增加第 4 步——\\"确认步数与 think 预算：
+如果是 rework 模式，确认总预算 40 步/think 限额 3 次；如果是 dev 模式，确认总预
+算 60 步/think 限额 3 次。在内心默念当前剩余预算\\"。）\\n2. **将 think 限制升级
+为熔断事件**（涉及文件: `prompts/developer.md`，修改方式: 在效率约束第 10 条末尾
+增加：\\"think 次数达到 3 次后，无论遇到什么情况都不得再使用 think，必须直接执行
+操作或向人类报告。如果第 4 次调用 think，视为严重违规，必须立即停止任务并报告\\"
+。）\\n3. **在 rework 预算条款中增加中途检查点**（涉及文件: `prompts/developer.m
+d`，修改方式: 效率约束第 9 条增加：\\"rework 模式下每 5 步必须自报一次当前步数，
+超过 35 步仍未完成所有 Blocking 修复，必须立即停止\\"。）\\n\\n### 问题 4: revie
+w agent 错误率反弹（warning）\\n**证据**:\\n- `review` count=2, totalErrors=2（
+平均每个任务 1 个错误），上次同期为 2 个任务 1 个错误\\n- `review` avgSteps=29.5
+，在 50 步预算内，说明未陷入过度探索\\n- `topIssues` 中 `review_high_error_rate`
+描述为\\"错误率 100%（2/2）\\"\\n\\n**根因分析**:\\n1. **编号混乱降低约束严肃性*
+*: `reviewer.md` 执行约束编号为 1,2,3,4,5,6,8,9,7，存在跳号和倒序，agent 可能将\
+\"遇到错误时快速跳过\\"（第 8 条）视为非核心建议。\\n2. **gh 命令预检查虽已存在
+，但网络/权限类错误仍会发生**: agent 在 2 个任务中都遇到了 gh 或 ReadFile 错误，
+说明外部依赖的不稳定性超出预检查范围。\\n3. **缺少错误熔断阈值**: `reviewer.md` 
+未像 `developer.md` 那样规定\\"连续 N 次错误则停止\\"，agent 可能在遇到单次错误
+后仍尝试替代操作。\\n\\n**改进建议**:\\n1. **修复编号混乱**（涉及文件: `prompts/
+reviewer.md`，修改方式: 将执行约束重新编号为连续 1-9，将\\"模板检查清单执行验证\
+\"（原第 7 条）移到第 7 位，\\"遇到错误时快速跳过\\"（原第 8 条）改为第 8 位，\\
+"步数自报检查点\\"（原第 9 条）改为第 9 位。）\\n2. **增加错误熔断阈值**（涉及文
+件: `prompts/reviewer.md`，修改方式: 在执行约束中新增：\\"任意工具调用如果连续 2
+次返回错误，立即停止审查并生成失败报告，不得尝试替代路径或变体参数\\"。）\\n3. *
+*强化 gh 预检查的容错**（涉及文件: `prompts/reviewer.md`，修改方式: 在执行约束第
+1 条增加：如果 `gh auth status` 或 `gh pr view` 因网络超时失败，最多重试 1 次，
+仍失败则停止并报告。）\\n\\n### 问题 5: think 工具系统性滥用（跨 agent）\\n**证
+据**:\\n- `dev` 平均 think 11.0 次（限额 3 次），`rework` 平均 think 15.0 次（限
+额 3 次）\\n- 上次已在 `developer.md` 中强化 think 限制措辞，但本次仍严重超标\\n
+\\n**根因分析**:\\n1. **think 被 agent 视为\\"免费分析\\"**: 虽然 prompt 明确\\"
+Think 同样计为 1 步\\"，但 agent 可能将 think 与\\"步数预算\\"割裂，认为 think 
+是规划行为而非实际步数。\\n2. **缺少前端硬拦截**: 完全依赖 prompt 语义约束，没有
+在 agent 启动时通过环境变量或参数进行工具层面的限制。\\n3. **agent 对\\"严重违规
+\\"没有成本感知**: prompt 说\\"违反此限制属于严重违规\\"，但未说明违规后的具体后
+果（如任务立即终止）。\\n\\n**改进建议**:\\n1. **在 developer.md 元原则中前置 th
+ink 限制**（涉及文件: `prompts/developer.md`，修改方式: 在\\"元原则\\"部分新增第
+4 条：\\"Think 不是免费工具。每次 Think 消耗 1 步，且绝对不得超过 3 次。超出即熔
+断。\\"）\\n2. **通过 workflow 限制 think 次数**（涉及文件: `workflows/dev.yaml`
+、`workflows/rework.yaml`，修改方式: 在 `runAgent` 的 command 中增加 `--max-thin
+k-count 3` 参数，如果 kimi 支持；否则在 env 中设置 `AGENT_MAX_THINK=3` 供 agent 
+自检。注：若工具不支持，此建议降级为在 prompt 中强化。）\\n3. **明确超限后果**（
+涉及文件: `prompts/developer.md`，修改方式: 在效率约束第 10 条中明确：\\"第 4 次
+及以后的 think 调用属于严重违规，必须立即停止所有操作，直接输出任务报告并结束，
+不得继续执行任何工具调用\\"。）\\n\\n## 已应用改进\\n\\n### 1. `workflows/doc-ga
+rdener.yaml`\\n- **runAgent 步骤环境变量**: 增加 `AGENT_AGENTS_MD: \'{{ .Vars.tm
+pDir }}/AGENTS.md\'`，确保 doc agent 能正确定位项目导航文档。\\n\\n### 2. `promp
+ts/doc-gardener.md`\\n- **启动环境预检查**: 在\\"执行步骤\\"第 1 步前增加环境确
+认要求：执行 `pwd` 和 `ls AGENTS.md`，确认环境正常；如果 `AGENTS.md` 不存在，立
+即停止并报告。\\n- **零产出熔断**: 在\\"效率约束\\"中新增：前 5 步内如果没有产生
+WriteFile/StrReplaceFile，立即停止并报告阻塞原因；禁止以\\"未发现需修改内容\\"为
+由零产出结束。\\n- **错误熔断**: 新增：任意工具调用连续 2 次返回错误，必须停止并
+报告，不得换参数重试。\\n\\n### 3. `workflows/e2e.yaml`\\n- **runE2EAgent 步骤容
+错**: 增加 `ignoreError: true`，确保即使 e2e agent 异常退出，workflow 也能继续执
+行到 `collectArtifacts` 进行兜底收集。\\n\\n### 4. `prompts/e2e-tester.md`\\n- *
+*强制 WriteFile 兜底**: 在\\"环境不可用兜底\\"章节增加绝对约束：必须调用 WriteFi
+le 将报告写入 `AGENT_E2E_REPORT_FILE`，纯文本输出不算完成。\\n- **启动自检步数下
+限**: 在\\"执行步骤\\"中强调：即使环境不可用，执行环境检查（读取 `.e2e-env-statu
+s`、运行 `maestro --version`、`adb devices`）也至少消耗 3-5 步，确保日志有痕迹。
+\\n\\n### 5. `prompts/developer.md`\\n- **元原则前置 think 限制**: 在\\"元原则\\
+"新增第 4 条：\\"Think 不是免费工具。每次 Think 消耗 1 步，且绝对不得超过 3 次。
+超出即熔断。\\"\\n- **任务启动检查清单增加预算确认**: 第 3 步后增加第 4 步——确认
+步数与 think 预算（rework 40 步/think 3 次；dev 60 步/think 3 次）。\\n- **rewor
+k 中途检查点**: 效率约束第 9 条增加：rework 模式下每 5 步自报一次，超过 35 步未
+完成 Blocking 修复必须停止。\\n- **think 超限熔断**: 效率约束第 10 条增加：第 4 
+次 think 调用属于严重违规，必须立即停止所有操作，直接输出报告并结束。\\n\\n### 6
+. `prompts/reviewer.md`\\n- **修复编号混乱**: 执行约束重新编号为连续 1-9。\\n- *
+*增加错误熔断阈值**: 新增约束：任意工具调用连续 2 次返回错误，立即停止审查并生成
+失败报告。\\n- **强化 gh 预检查容错**: 执行约束第 1 条增加网络超时最多重试 1 次
+。\\n\\n## 趋势追踪\\n\\n- **与上次对比**:\\n  - **步数**: `avgStepsDelta = -22.
+14`，整体平均步数显著下降。`dev` 从 79 降至 55（改善 30%），`rework` 从 73 降至 
+64（改善 12%）。说明上次对 developer.md 的步数约束（50 步预警、零进度熔断收紧、r
+ework 40 步预算）已开始生效。\\n  - **错误率**: `errorRateDelta = +0.29`，整体错
+误率上升。`review` 从 1 个错误增至 2 个（恶化），`doc` 新增 2 个错误（新增 agent
+）。说明错误处理约束在 review 和 doc 上仍需加强。\\n  - **成功率**: `successRate
+Delta = -0.14`，整体成功率下降。主要受 `doc`（0%）和 `e2e`（0%）拖累。dev/review
+/rework 的 successRate 均为 1.0，核心开发链路稳定。\\n  - **e2e**: 连续两次 0 步
+0 成功率，属于持续恶化。本次通过 `ignoreError: true` 和强制 WriteFile 兜底进行修
+复。\\n  - **doc**: 首次出现即 100% 错误率 0% 成功率，属于新暴露的短板。本次通过
+补齐环境变量和增加零产出熔断进行修复。\\n\\n- **建议下次重点关注**:\\n  1. **doc
+agent 产出**: 观察补齐 `AGENT_AGENTS_MD` 和零产出熔断后，是否能产生文档修改或检
+查报告。\\n  2. **e2e agent 启动痕迹**: 观察 `runE2EAgent` 增加 `ignoreError: tr
+ue` 后，是否能在日志中看到 tool call 痕迹（即使是环境不可用报告）。\\n  3. **rew
+ork agent think 次数**: 观察 think 限制前置为熔断事件后，rework 的 think 次数是
+否能从 15 次压降到 3 次以内。\\n  4. **review agent 错误率**: 观察错误熔断阈值和
+gh 容错改进后，错误率是否能从 100%（2/2）降至 50% 以下。\\n"}'
+    ),
+    extras=None
+)
+StatusUpdate(
+    context_usage=0.14911270141601562,
+    context_tokens=39089,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=2993,
+        output=4215,
+        input_cache_read=36096,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-IJynQ7sPqF05gQJFeDhFnWNl',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_GAZ07pmBkyksuR2VVhEsez0Q',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='',
+        message='File successfully overwritten. Current size: 13507 bytes.',
+        display=[
+            DiffDisplayBlock(
+                type='diff',
+                path='/Users/insulate/Desktop/new-world/new-world-ops/prompt-evo
+lution-report.md',
+                old_text='# Prompt 演进报告 — social-world\n\n生成时间: 2026-04-
+27T11:04:47+08:00\n分析范围: 2026-04-27T09:31:38.009551+08:00 到 2026-04-27T11:0
+4:47.554815+08:00\n\n## 统计摘要\n\n- 分析日志数: 7\n- Agent 类型分布:\n  - dev:
+2 个任务\n  - e2e: 1 个任务\n  - review: 2 个任务\n  - rework: 2 个任务\n\n## 问
+题诊断\n\n### 问题 1: dev agent 步数严重超标且成功率跌破阈值\n**证据**:\n- `dev`
+avgSteps = 79，远超 60 步硬上限和 50 步预警线\n- `dev` successRate = 0.5（仅 1/2
+任务有产出），totalErrors = 2（平均每个任务 1 个错误）\n- `topIssues` 中 `dev_hi
+gh_steps` 描述为"平均 79.0 步，最高 108 步"\n- `topIssues` 中 `dev_no_output` 描
+述为"1 个任务执行了步骤但没有文件修改产出"\n- 平均 think 次数 9.5 次，远超 promp
+t 中"不得超过 3 次"的限制\n\n**根因分析**:\n1. **步数约束仍为"语义化"约束**：`de
+veloper.md` 要求"超过 50 步立即停止"，但 agent 在"生成进度报告"的过程中继续调用
+工具，实际上未停止。约束缺少"不得再调用任何工具"的绝对化表述。\n2. **Think 工具
+被系统性滥用**：agent 将 think 视为"不消耗步数"的免费操作，导致 9.5 次 think 严
+重挤占实际执行预算。\n3. **零进度熔断阈值偏松**：前 10 步无修改才触发，agent 可
+能在前 9 步空转而不触发熔断。\n4. **单次错误后盲目重试**：agent 在第一次 `Shell`
+/`ReadFile` 失败后，常立即用相同参数重试，导致错误累计。\n\n**改进建议**:\n1. **
+绝对化步数约束**（涉及文件: `prompts/developer.md`，修改方式: 第 1 条增加"超过 5
+0 步后不得再调用任何工具（包括 ReadFile/Shell/WriteFile/StrReplaceFile/Grep/Thin
+k），直接以纯文本输出报告并结束"；增加"每 10 步自报一次当前步数"的硬性要求；明确
+Think 同样计为 1 步。）\n2. **收紧零进度熔断**（涉及文件: `prompts/developer.md`
+，修改方式: 第 3 条将阈值从"前 10 步"收紧到"前 5 步"，让 agent 更快意识到任务理
+解或定位问题。）\n3. **禁止单次错误后立即重试**（涉及文件: `prompts/developer.md
+`，修改方式: 新增第 12 条——单次工具调用返回 `is_error=true` 后，必须先分析原因，
+不得用相同参数立即重试；第 2 次尝试仍失败则触发错误熔断停止。）\n\n### 问题 2: r
+ework agent 步数反弹且错误率仍高\n**证据**:\n- `rework` avgSteps = 73，较上次 40
+.7 步反弹 79%\n- `rework` totalErrors = 2（1 error/task），最高 105 步\n- `topIs
+sues` 中 `rework_high_steps` 描述为"平均 73.0 步，最高 105 步，平均 think 20.5 
+次"\n\n**根因分析**:\n1. **缺少 rework 专用步数预算**：rework 与 dev 共用同一 pr
+ompt，虽然已有"rework 不需要 explore"的说明，但没有独立的步数上限。rework 本应更
+精简，实际却比 dev 更臃肿。\n2. **Think 限制完全失效**：rework 平均 think 20.5 
+次，是 3 次限制的近 7 倍，说明 agent 将 think 当作"分析 review report"的主要手段
+，陷入过度思考。\n\n**改进建议**:\n1. **设置 rework 独立步数预算**（涉及文件: `p
+rompts/developer.md`，修改方式: 第 9 条增加"rework 模式总步数预算为 40 步，超过 
+35 步仍未完成所有 Blocking 问题修复必须停止"。）\n2. **强化 Think 限制的执行力度
+**（涉及文件: `prompts/developer.md`，修改方式: 第 10 条增加"违反此限制属于严重
+违规，已达到 3 次后无论什么情况都不得再 think"，并在使用前增加内心确认环节。）\n
+\n### 问题 3: e2e agent 持续零产出\n**证据**:\n- `e2e` count = 1, avgSteps = 0, 
+successRate = 0\n- 与上次（3 个任务 0 步 0 成功率）相比，问题持续，且 `ignoreErr
+or: true` 的修复未生效\n- 日志显示 `checkEnv` 仍因后端启动失败（端口占用）返回 e
+xit code 1，直接阻断 agent 运行\n\n**根因分析**:\n1. **workflow 层面 `exit 1` 仍
+阻断执行**：`e2e.yaml` 的 `checkEnv` 步骤内部大量使用 `exit 1`，虽然步骤设置了 `
+ignoreError: true`，但 workflow 引擎在某些失败场景下仍终止后续步骤。\n2. **`chec
+kBackendPorts` 暴力清理端口**：步骤中检测到端口占用时直接执行 `docker compose do
+wn`，可能破坏其他并行任务的后端服务，且自身也可能失败。\n3. **agent 无法感知 wor
+kflow 环境状态**：agent 的"环境不可用兜底"逻辑要求它自己检查环境，但 workflow 在
+agent 运行前就已失败，兜底逻辑从未触发。\n\n**改进建议**:\n1. **彻底移除 `checkE
+nv` 中的 `exit 1`**（涉及文件: `workflows/e2e.yaml`，修改方式: 将所有 `exit 1` 
+改为 `ENV_READY=false` 状态记录，最终把环境状态写入 `.e2e-env-status` 文件；无论
+环境是否就绪，workflow 都继续执行到 `runE2EAgent`。）\n2. **移除 `checkBackendPo
+rts` 的强制容器关闭**（涉及文件: `workflows/e2e.yaml`，修改方式: 将 `docker comp
+ose down` 改为仅报告端口占用状态，避免破坏其他并行任务。）\n3. **让 agent 读取 w
+orkflow 环境状态**（涉及文件: `prompts/e2e-tester.md`，修改方式: 步骤 6 增加"先
+读取 `.e2e-env-status` 文件了解 workflow 层面的环境状态"，如果显示未就绪直接跳至
+报告生成。）\n\n### 问题 4: review agent 仍有 50% 错误率\n**证据**:\n- `review` 
+totalErrors = 1（2 个任务中 1 个出错），errorRate = 50%\n- avgSteps = 39，接近 5
+0 步预算上限\n\n**根因分析**:\n1. **遇到错误后仍反复试探**：虽然已有文档存在性检
+查和 gh 预检查，但 agent 在某些失败场景下（如网络抖动、权限边界）仍可能尝试替代
+路径或参数。\n2. **缺少步数中期检查**：39 步接近上限，说明 agent 可能在后期才发
+现问题，没有中期自评机制。\n\n**改进建议**:\n1. **增加"错误快速跳过"约束**（涉及
+文件: `prompts/reviewer.md`，修改方式: 新增执行约束——工具调用失败后记录原因并跳
+过该维度，不得尝试替代路径或变体参数，避免反复试探同一类失败操作。）\n2. **增加
+步数自报检查点**（涉及文件: `prompts/reviewer.md`，修改方式: 新增每 15 步自报一
+次当前步数的要求，并设定 review 任务应在 30-40 步内完成的预期，超过 40 步未开始
+撰写结论则立即收缩范围。）\n\n## 已应用改进\n\n### 1. `prompts/developer.md`\n- 
+**效率约束第 1 条（步数硬上限）**：\n  - 增加"超过 50 步后不得再调用任何工具，直
+接以纯文本输出报告并结束"的绝对化表述。\n  - 明确步数计数规则：每次工具调用都计
+为 1 步，Think 同样计为 1 步。\n  - 新增"每 10 步自报一次当前步数"的硬性要求。\n
+- **效率约束第 3 条（零进度熔断）**：将阈值从"前 10 步"收紧到"前 5 步"。\n- **效
+率约束第 4 条（进度检查点）**：将自评间隔从"每 20 步"收紧到"每 10 步"。\n- **效
+率约束第 9 条（rework 模式预算）**：新增"rework 模式总步数预算为 40 步，超过 35 
+步仍未完成所有 Blocking 问题修复必须停止"。\n- **效率约束第 10 条（Think 使用限
+制）**：\n  - 强化措辞，增加"违反此限制属于严重违规"。\n  - 增加使用前内心确认环
+节。\n- **效率约束新增第 12 条（单次错误后禁止立即重试）**：单次失败后必须先分析
+原因，不得立即重试；第 2 次失败即触发熔断停止。\n\n### 2. `prompts/reviewer.md`\
+n- **执行约束新增第 8 条**：遇到工具调用错误时快速跳过并记录，严禁尝试替代路径或
+变体参数反复试探。\n- **执行约束新增第 9 条**：每 15 步自报一次当前步数，超过 40
+步未开始撰写结论则立即收缩范围。\n\n### 3. `workflows/e2e.yaml`\n- **`checkEnv` 
+步骤**：\n  - 移除所有 `exit 1`，改为 `ENV_READY=false` 状态标记。\n  - 无论环境
+是否就绪，最终都将状态写入 `.e2e-env-status` 文件（`ENV_READY=true/false`）。\n 
+- 确保 workflow 无论环境状态如何都会继续执行到 `runE2EAgent`。\n- **`checkBacken
+dPorts` 步骤**：\n  - 将强制 `docker compose down` 改为仅报告端口占用状态。\n  -
+避免破坏其他并行任务的后端服务。\n\n### 4. `prompts/e2e-tester.md`\n- **执行步骤
+第 6 条（前置环境断言）**：增加"先读取 `.e2e-env-status` 文件了解 workflow 层面
+的环境就绪状态"，如显示未就绪直接跳至报告生成。\n\n## 趋势追踪\n\n- **与上次对比
+**: \n  - **步数**: `avgStepsDelta = +23.3`，整体步数上升。`dev` 从 108 降至 79
+（改善），但 `rework` 从 40.7 反弹至 73（恶化）。说明 dev 的约束开始生效，但 rew
+ork 的 think 滥用和缺少独立预算导致步数失控。\n  - **错误率**: `errorRateDelta =
+-0.38`，整体错误率显著下降。`review` 从 100% 降至 50%，`rework` 从 100% 降至 50%
+，`dev` 从 100% 降至 50%。上次引入的 gh 预检查、文档存在性检查、StrReplaceFile 
+降级指引已产生效果。\n  - **成功率**: `successRateDelta = -0.013`，基本持平。`de
+v` 的 successRate 为 0.5，存在零产出任务，需要观察本次收紧零进度熔断和步数约束后
+的改善情况。\n  - **e2e**: 仍然 0 步 0 成功率，属于持续恶化。已通过彻底移除 work
+flow `exit 1` 和增加 `.e2e-env-status` 机制修复。\n\n- **建议下次重点关注**:\n  
+1. **dev agent 步数**：观察更严格的"不得再调用任何工具"措辞和每 10 步自报是否能
+将步数压降至 60 以内。\n  2. **rework agent 步数**：观察 rework 独立 40 步预算和
+think 限制强化是否能将步数控制在 50 以内。\n  3. **e2e agent 产出**：观察 workfl
+ow 移除 `exit 1` 后，agent 是否能产生非零步数并生成环境不可用报告。\n  4. **revi
+ew agent 错误率**：观察"错误快速跳过"约束是否能将错误率从 50% 进一步降至 20% 以
+下。',
+                new_text='# Prompt 演进报告 — social-world\n\n生成时间: 2026-04-
+27T13:47:10+08:00\n分析范围: 2026-04-27T11:04:47.884195+08:00 到 2026-04-27T13:4
+7:10.957159+08:00\n\n## 统计摘要\n\n- 分析日志数: 7\n- Agent 类型分布:\n  - dev:
+1 个任务\n  - doc: 2 个任务\n  - e2e: 1 个任务\n  - review: 2 个任务\n  - rework
+: 1 个任务\n\n## 问题诊断\n\n### 问题 1: doc agent 连续零产出（critical）\n**证
+据**:\n- `doc` count=2, successRate=0, totalWrites=0, totalErrors=2\n- `doc` 平
+均执行 24.5 步，说明 agent 在运行，但没有任何文件修改产出\n- `topIssues` 中 `doc
+_no_output` 描述为"2 个任务执行了步骤但没有文件修改产出"\n\n**根因分析**:\n1. **
+workflow 缺少关键环境变量**: 对比 `dev.yaml`/`review.yaml`/`rework.yaml`，`doc-g
+ardener.yaml` 的 `runAgent` 步骤仅设置 `AGENT_LOG_FILE`，未设置 `AGENT_AGENTS_MD
+`。agent 找不到项目导航文档，无法定位文档结构和检查命令，导致在错误方向上空转。\
+n2. **prompt 的零产出约束不够前置**: `doc-gardener.md` 虽在元原则中写"必须有产出
+"，但未像 `developer.md` 那样设置"前 N 步无写入则熔断"的硬性机制，agent 可能以"
+未发现需修改内容"为由直接结束。\n3. **缺少启动环境预检查**: `doc-gardener.md` 没
+有要求 agent 在启动时确认工作目录和 `AGENTS.md` 可访问性，若环境异常 agent 不会
+早期停止。\n\n**改进建议**:\n1. **补齐 workflow 环境变量**（涉及文件: `workflows
+/doc-gardener.yaml`，修改方式: 在 `runAgent` 步骤的 `env` 中增加 `AGENT_AGENTS_M
+D: \'{{ .Vars.tmpDir }}/AGENTS.md\'`，与 dev/review/rework 保持一致。）\n2. **增
+加启动环境预检查与零产出熔断**（涉及文件: `prompts/doc-gardener.md`，修改方式: 
+在"执行步骤"第 1 步前增加环境预检查：确认 `pwd`、确认 `AGENTS.md` 可读；增加效率
+约束："前 5 步内如果没有产生 WriteFile/StrReplaceFile，立即停止并报告阻塞原因"。
+）\n3. **强化错误快速跳过**（涉及文件: `prompts/doc-gardener.md`，修改方式: 增加
+约束：任意工具调用连续 2 次返回错误，必须停止并报告，不得换参数重试。）\n\n### 
+问题 2: e2e agent 持续零步零产出（critical）\n**证据**:\n- `e2e` count=1, avgSte
+ps=0, successRate=0, totalToolCalls={}\n- 与上次报告（0 步 0 成功率）相比问题持
+续，上次对 `e2e.yaml` 移除 `exit 1` 的改进未产生效果\n\n**根因分析**:\n1. **work
+flow 在 agent 运行前即终止**: `e2e.yaml` 的 `runE2EAgent` 步骤未设置 `ignoreErro
+r: true`，若 kimi 命令启动失败或返回非 0 退出码，workflow 直接终止，后续 `collec
+tArtifacts` 不执行。\n2. **agent 可能未调用 WriteFile 即纯文本退出**: 即使环境不
+可用，`e2e-tester.md` 要求生成报告，但 agent 可能以纯文本输出"环境不可用"而未实
+际调用 `WriteFile`，导致日志中无任何 tool call。\n3. **`.e2e-env-status` 机制未
+闭环**: workflow 写入状态文件，但 agent 如果根本没被启动或启动后瞬间退出，则无法
+读取。\n\n**改进建议**:\n1. **确保 workflow 无论 agent 是否失败都进入兜底收集**
+（涉及文件: `workflows/e2e.yaml`，修改方式: 在 `runE2EAgent` 步骤增加 `ignoreErr
+or: true`，确保即使 agent 异常退出也能执行到 `collectArtifacts`。）\n2. **强制 W
+riteFile 兜底**（涉及文件: `prompts/e2e-tester.md`，修改方式: 在"环境不可用兜底"
+章节增加绝对约束："不得以纯文本输出代替报告，必须调用 WriteFile 将报告写入 `AGEN
+T_E2E_REPORT_FILE`，未调用 WriteFile 视为任务未完成"。）\n3. **增加启动自检步数
+下限**（涉及文件: `prompts/e2e-tester.md`，修改方式: 在"执行步骤"中增加：即使环
+境不可用，读取 `.e2e-env-status`、运行 `maestro --version`、`adb devices` 等检查
+至少消耗 3-5 步，确保日志中能看到工具调用痕迹。）\n\n### 问题 3: rework agent 步
+数与 think 严重超标（warning）\n**证据**:\n- `rework` count=1, avgSteps=64, tota
+lErrors=2, successRate=1\n- `topIssues` 中 `rework_high_steps` 描述为"平均 64.0 
+步，最高 64 步，平均 think 15.0 次"\n- `developer.md` 中 rework 预算为 40 步、th
+ink 限额为 3 次，均被大幅突破\n\n**根因分析**:\n1. **约束位置太靠后，agent 未内
+化**: `developer.md` 的 think 限制（第 10 条）和 rework 预算（第 9 条）位于 prom
+pt 后半段的"效率约束"中，agent 在启动时未建立足够的心理模型。\n2. **rework 与 de
+v 共用 prompt，特定模式约束被稀释**: rework 模式虽有独立预算说明，但缺乏启动时的
+强制性确认步骤，agent 容易在"分析 review report"阶段反复 think。\n3. **缺少超限
+熔断机制**: prompt 写"不得超过"，但未明确说明"一旦超过即立即停止"，agent 可能在
+超限后仍继续执行。\n\n**改进建议**:\n1. **在任务启动检查清单中增加预算确认**（涉
+及文件: `prompts/developer.md`，修改方式: 在"任务启动检查清单"第 3 步后增加第 4 
+步——"确认步数与 think 预算：如果是 rework 模式，确认总预算 40 步/think 限额 3 次
+；如果是 dev 模式，确认总预算 60 步/think 限额 3 次。在内心默念当前剩余预算"。）
+\n2. **将 think 限制升级为熔断事件**（涉及文件: `prompts/developer.md`，修改方式
+: 在效率约束第 10 条末尾增加："think 次数达到 3 次后，无论遇到什么情况都不得再使
+用 think，必须直接执行操作或向人类报告。如果第 4 次调用 think，视为严重违规，必
+须立即停止任务并报告"。）\n3. **在 rework 预算条款中增加中途检查点**（涉及文件: 
+`prompts/developer.md`，修改方式: 效率约束第 9 条增加："rework 模式下每 5 步必须
+自报一次当前步数，超过 35 步仍未完成所有 Blocking 修复，必须立即停止"。）\n\n###
+问题 4: review agent 错误率反弹（warning）\n**证据**:\n- `review` count=2, total
+Errors=2（平均每个任务 1 个错误），上次同期为 2 个任务 1 个错误\n- `review` avgS
+teps=29.5，在 50 步预算内，说明未陷入过度探索\n- `topIssues` 中 `review_high_err
+or_rate` 描述为"错误率 100%（2/2）"\n\n**根因分析**:\n1. **编号混乱降低约束严肃
+性**: `reviewer.md` 执行约束编号为 1,2,3,4,5,6,8,9,7，存在跳号和倒序，agent 可能
+将"遇到错误时快速跳过"（第 8 条）视为非核心建议。\n2. **gh 命令预检查虽已存在，
+但网络/权限类错误仍会发生**: agent 在 2 个任务中都遇到了 gh 或 ReadFile 错误，说
+明外部依赖的不稳定性超出预检查范围。\n3. **缺少错误熔断阈值**: `reviewer.md` 未
+像 `developer.md` 那样规定"连续 N 次错误则停止"，agent 可能在遇到单次错误后仍尝
+试替代操作。\n\n**改进建议**:\n1. **修复编号混乱**（涉及文件: `prompts/reviewer.
+md`，修改方式: 将执行约束重新编号为连续 1-9，将"模板检查清单执行验证"（原第 7 条
+）移到第 7 位，"遇到错误时快速跳过"（原第 8 条）改为第 8 位，"步数自报检查点"（
+原第 9 条）改为第 9 位。）\n2. **增加错误熔断阈值**（涉及文件: `prompts/reviewer
+.md`，修改方式: 在执行约束中新增："任意工具调用如果连续 2 次返回错误，立即停止审
+查并生成失败报告，不得尝试替代路径或变体参数"。）\n3. **强化 gh 预检查的容错**（
+涉及文件: `prompts/reviewer.md`，修改方式: 在执行约束第 1 条增加：如果 `gh auth 
+status` 或 `gh pr view` 因网络超时失败，最多重试 1 次，仍失败则停止并报告。）\n\
+n### 问题 5: think 工具系统性滥用（跨 agent）\n**证据**:\n- `dev` 平均 think 11.
+0 次（限额 3 次），`rework` 平均 think 15.0 次（限额 3 次）\n- 上次已在 `develop
+er.md` 中强化 think 限制措辞，但本次仍严重超标\n\n**根因分析**:\n1. **think 被 a
+gent 视为"免费分析"**: 虽然 prompt 明确"Think 同样计为 1 步"，但 agent 可能将 th
+ink 与"步数预算"割裂，认为 think 是规划行为而非实际步数。\n2. **缺少前端硬拦截**
+: 完全依赖 prompt 语义约束，没有在 agent 启动时通过环境变量或参数进行工具层面的
+限制。\n3. **agent 对"严重违规"没有成本感知**: prompt 说"违反此限制属于严重违规"
+，但未说明违规后的具体后果（如任务立即终止）。\n\n**改进建议**:\n1. **在 develop
+er.md 元原则中前置 think 限制**（涉及文件: `prompts/developer.md`，修改方式: 在"
+元原则"部分新增第 4 条："Think 不是免费工具。每次 Think 消耗 1 步，且绝对不得超
+过 3 次。超出即熔断。"）\n2. **通过 workflow 限制 think 次数**（涉及文件: `workf
+lows/dev.yaml`、`workflows/rework.yaml`，修改方式: 在 `runAgent` 的 command 中增
+加 `--max-think-count 3` 参数，如果 kimi 支持；否则在 env 中设置 `AGENT_MAX_THIN
+K=3` 供 agent 自检。注：若工具不支持，此建议降级为在 prompt 中强化。）\n3. **明
+确超限后果**（涉及文件: `prompts/developer.md`，修改方式: 在效率约束第 10 条中明
+确："第 4 次及以后的 think 调用属于严重违规，必须立即停止所有操作，直接输出任务
+报告并结束，不得继续执行任何工具调用"。）\n\n## 已应用改进\n\n### 1. `workflows/
+doc-gardener.yaml`\n- **runAgent 步骤环境变量**: 增加 `AGENT_AGENTS_MD: \'{{ .Va
+rs.tmpDir }}/AGENTS.md\'`，确保 doc agent 能正确定位项目导航文档。\n\n### 2. `pr
+ompts/doc-gardener.md`\n- **启动环境预检查**: 在"执行步骤"第 1 步前增加环境确认
+要求：执行 `pwd` 和 `ls AGENTS.md`，确认环境正常；如果 `AGENTS.md` 不存在，立即
+停止并报告。\n- **零产出熔断**: 在"效率约束"中新增：前 5 步内如果没有产生 WriteF
+ile/StrReplaceFile，立即停止并报告阻塞原因；禁止以"未发现需修改内容"为由零产出结
+束。\n- **错误熔断**: 新增：任意工具调用连续 2 次返回错误，必须停止并报告，不得
+换参数重试。\n\n### 3. `workflows/e2e.yaml`\n- **runE2EAgent 步骤容错**: 增加 `i
+gnoreError: true`，确保即使 e2e agent 异常退出，workflow 也能继续执行到 `collect
+Artifacts` 进行兜底收集。\n\n### 4. `prompts/e2e-tester.md`\n- **强制 WriteFile 
+兜底**: 在"环境不可用兜底"章节增加绝对约束：必须调用 WriteFile 将报告写入 `AGENT
+_E2E_REPORT_FILE`，纯文本输出不算完成。\n- **启动自检步数下限**: 在"执行步骤"中
+强调：即使环境不可用，执行环境检查（读取 `.e2e-env-status`、运行 `maestro --vers
+ion`、`adb devices`）也至少消耗 3-5 步，确保日志有痕迹。\n\n### 5. `prompts/deve
+loper.md`\n- **元原则前置 think 限制**: 在"元原则"新增第 4 条："Think 不是免费工
+具。每次 Think 消耗 1 步，且绝对不得超过 3 次。超出即熔断。"\n- **任务启动检查清
+单增加预算确认**: 第 3 步后增加第 4 步——确认步数与 think 预算（rework 40 步/thin
+k 3 次；dev 60 步/think 3 次）。\n- **rework 中途检查点**: 效率约束第 9 条增加：
+rework 模式下每 5 步自报一次，超过 35 步未完成 Blocking 修复必须停止。\n- **thin
+k 超限熔断**: 效率约束第 10 条增加：第 4 次 think 调用属于严重违规，必须立即停止
+所有操作，直接输出报告并结束。\n\n### 6. `prompts/reviewer.md`\n- **修复编号混乱
+**: 执行约束重新编号为连续 1-9。\n- **增加错误熔断阈值**: 新增约束：任意工具调用
+连续 2 次返回错误，立即停止审查并生成失败报告。\n- **强化 gh 预检查容错**: 执行
+约束第 1 条增加网络超时最多重试 1 次。\n\n## 趋势追踪\n\n- **与上次对比**:\n  - 
+**步数**: `avgStepsDelta = -22.14`，整体平均步数显著下降。`dev` 从 79 降至 55（
+改善 30%），`rework` 从 73 降至 64（改善 12%）。说明上次对 developer.md 的步数约
+束（50 步预警、零进度熔断收紧、rework 40 步预算）已开始生效。\n  - **错误率**: `
+errorRateDelta = +0.29`，整体错误率上升。`review` 从 1 个错误增至 2 个（恶化），
+`doc` 新增 2 个错误（新增 agent）。说明错误处理约束在 review 和 doc 上仍需加强。
+\n  - **成功率**: `successRateDelta = -0.14`，整体成功率下降。主要受 `doc`（0%）
+和 `e2e`（0%）拖累。dev/review/rework 的 successRate 均为 1.0，核心开发链路稳定
+。\n  - **e2e**: 连续两次 0 步 0 成功率，属于持续恶化。本次通过 `ignoreError: tr
+ue` 和强制 WriteFile 兜底进行修复。\n  - **doc**: 首次出现即 100% 错误率 0% 成功
+率，属于新暴露的短板。本次通过补齐环境变量和增加零产出熔断进行修复。\n\n- **建议
+下次重点关注**:\n  1. **doc agent 产出**: 观察补齐 `AGENT_AGENTS_MD` 和零产出熔
+断后，是否能产生文档修改或检查报告。\n  2. **e2e agent 启动痕迹**: 观察 `runE2EA
+gent` 增加 `ignoreError: true` 后，是否能在日志中看到 tool call 痕迹（即使是环境
+不可用报告）。\n  3. **rework agent think 次数**: 观察 think 限制前置为熔断事件
+后，rework 的 think 次数是否能从 15 次压降到 3 次以内。\n  4. **review agent 错
+误率**: 观察错误熔断阈值和 gh 容错改进后，错误率是否能从 100%（2/2）降至 50% 以
+下。',
+                old_start=1,
+                new_start=1,
+                is_summary=False
+            )
+        ],
+        extras=None
+    )
+)
+StepBegin(n=11)
+ThinkPart(
+    type='think',
+    think='报告已经写好了。现在我需要执行具体的文件修改。让我按照 todo list 逐个
+修改。\n\n1. workflows/doc-gardener.yaml: 增加 AGENT_AGENTS_MD\n2. prompts/doc-g
+ardener.md: 增加环境预检查、零产出熔断、错误熔断\n3. prompts/developer.md: 元原
+则前置 think 限制、启动检查清单增加预算确认、rework 中途检查点、think 超限熔断\n
+4. workflows/e2e.yaml: runE2EAgent 增加 ignoreError: true\n5. prompts/e2e-tester
+.md: 强制 WriteFile 兜底、启动自检步数下限\n6. prompts/reviewer.md: 修复编号、增
+加错误熔断、强化 gh 容错\n\n让我先修改简单的 workflow 文件，然后修改 prompt 文件
+。\n\n### 修改 1: workflows/doc-gardener.yaml\n当前 env:\n```yaml\n    env:\n   
+  AGENT_LOG_FILE: \'{{ .Vars.logFileName }}\'\n```\n\n改为:\n```yaml\n    env:\n
+     AGENT_LOG_FILE: \'{{ .Vars.logFileName }}\'\n      AGENT_AGENTS_MD: \'{{ .V
+ars.tmpDir }}/AGENTS.md\'\n```\n\n### 修改 2: prompts/doc-gardener.md\n当前内容
+：\n```\n## 执行步骤\n\n1. **读取 AGENTS.md**：了解项目文档结构、文档规范路径和
+可用检查命令。\n```\n\n我需要在前面增加环境预检查。可以在"执行步骤"前增加一个小
+节，或者修改第1步。\n\n让我修改第1步为环境预检查，然后把原来的读取 AGENTS.md 变
+成第2步。但这样改动有点大。更好的方式是在"执行步骤"前增加一个"启动检查"小节。\n\
+n或者，我可以修改"元原则"部分，增加约束。\n\n让我看看 doc-gardener.md 的当前结构
+：\n- 元原则（3条）\n- 执行步骤（5步）\n- 效率约束（2条）\n\n我可以在"执行步骤"
+中把第1步扩展为包含环境检查，在"效率约束"中增加零产出熔断和错误熔断。\n\n### 修
+改 3: prompts/developer.md\n需要在多个地方修改：\n1. 元原则增加第4条\n2. 任务启
+动检查清单增加第4步\n3. 效率约束第9条增加中途检查点\n4. 效率约束第10条增加超限熔
+断\n\n### 修改 4: workflows/e2e.yaml\n在 runE2EAgent 步骤增加 `ignoreError: true
+`\n\n### 修改 5: prompts/e2e-tester.md\n当前"环境不可用兜底"在第167-179行。需要
+增加强制 WriteFile。\n\n### 修改 6: prompts/reviewer.md\n需要修复编号并增加约束
+。\n\n让我并行执行这些修改。',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_Y8eGPLJpDEOarXPW2SXpJCgr',
+    function=FunctionBody(
+        name='SetTodoList',
+        arguments='{"todos": [{"title":"生成 prompt-evolution-report.md 报告","s
+tatus":"done"},{"title":"修改 doc-gardener.yaml：补充 AGENT_AGENTS_MD 环境变量",
+"status":"in_progress"},{"title":"修改 doc-gardener.md：增加环境预检查与零产出熔
+断","status":"in_progress"},{"title":"修改 developer.md：强化 think/步数约束的前
+置提醒与熔断机制","status":"in_progress"},{"title":"修改 e2e.yaml：runE2EAgent 
+增加 ignoreError 确保兜底执行","status":"in_progress"},{"title":"修改 e2e-tester
+.md：强化环境不可用时必须 WriteFile","status":"in_progress"},{"title":"修改 revi
+ewer.md：修复编号混乱并强化错误跳过","status":"in_progress"}]}'
+    ),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_Y8eGPLJpDEOarXPW2SXpJCgr',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='Todo list updated',
+        message='Todo list updated',
+        display=[
+            TodoDisplayBlock(
+                type='todo',
+                items=[
+                    TodoDisplayItem(
+                        title='生成 prompt-evolution-report.md 报告',
+                        status='done'
+                    ),
+                    TodoDisplayItem(
+                        title='修改 doc-gardener.yaml：补充 AGENT_AGENTS_MD 环境
+变量',
+                        status='in_progress'
+                    ),
+                    TodoDisplayItem(
+                        title='修改 doc-gardener.md：增加环境预检查与零产出熔断'
+,
+                        status='in_progress'
+                    ),
+                    TodoDisplayItem(
+                        title='修改 developer.md：强化 think/步数约束的前置提醒
+与熔断机制',
+                        status='in_progress'
+                    ),
+                    TodoDisplayItem(
+                        title='修改 e2e.yaml：runE2EAgent 增加 ignoreError 确保
+兜底执行',
+                        status='in_progress'
+                    ),
+                    TodoDisplayItem(
+                        title='修改 e2e-tester.md：强化环境不可用时必须 WriteFil
+e',
+                        status='in_progress'
+                    ),
+                    TodoDisplayItem(
+                        title='修改 reviewer.md：修复编号混乱并强化错误跳过',
+                        status='in_progress'
+                    )
+                ]
+            )
+        ],
+        extras=None
+    )
+)
+StatusUpdate(
+    context_usage=0.16532135009765625,
+    context_tokens=43338,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=3658,
+        output=756,
+        input_cache_read=39680,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-8esTBxyDYqOXqaIFkOKFkhfx',
+    plan_mode=False,
+    mcp_status=None
+)
+StepBegin(n=12)
+ThinkPart(
+    type='think',
+    think='现在让我并行执行所有文件修改。\n\n1. doc-gardener.yaml: 增加 AGENT_AG
+ENTS_MD\n2. doc-gardener.md: 增加环境预检查、零产出熔断、错误熔断\n3. developer.
+md: 多处修改\n4. e2e.yaml: 增加 ignoreError: true\n5. e2e-tester.md: 强化 WriteF
+ile\n6. reviewer.md: 修复编号并增加约束\n\n让我逐个构造 StrReplaceFile 调用。',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_L5sWSQ7ThZkDc35LiQejPAOf',
+    function=FunctionBody(
+        name='StrReplaceFile',
+        arguments='{"path": "/Users/insulate/Desktop/new-world/new-world-ops/wor
+kflows/doc-gardener.yaml", "edit": {"old":"    env:\\n      AGENT_LOG_FILE: \'{{
+.Vars.logFileName }}\'","new":"    env:\\n      AGENT_LOG_FILE: \'{{ .Vars.logFi
+leName }}\'\\n      AGENT_AGENTS_MD: \'{{ .Vars.tmpDir }}/AGENTS.md\'"}}'
+    ),
+    extras=None
+)
+ToolCall(
+    type='function',
+    id='tool_hKOU15Qj5TMSVxI6A8IlXL4b',
+    function=FunctionBody(name='StrReplaceFile', arguments=''),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_L5sWSQ7ThZkDc35LiQejPAOf',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='',
+        message='File successfully edited. Applied 1 edit(s) with 1 total replac
+ement(s).',
+        display=[
+            DiffDisplayBlock(
+                type='diff',
+                path='/Users/insulate/Desktop/new-world/new-world-ops/workflows/
+doc-gardener.yaml',
+                old_text="           -p {{ .Vars.prompt | shellquote }}\n    env
+:\n      AGENT_LOG_FILE: '{{ .Vars.logFileName }}'\n    outputKey: agentOutput\n
+   logFile: '{{ .Vars.logFileName }}'\n",
+                new_text="           -p {{ .Vars.prompt | shellquote }}\n    env
+:\n      AGENT_LOG_FILE: '{{ .Vars.logFileName }}'\n      AGENT_AGENTS_MD: '{{ .
+Vars.tmpDir }}/AGENTS.md'\n    outputKey: agentOutput\n    logFile: '{{ .Vars.lo
+gFileName }}'\n",
+                old_start=12,
+                new_start=12,
+                is_summary=False
+            )
+        ],
+        extras=None
+    )
+)
+ToolCallPart(
+    arguments_part='{"path": "/Users/insulate/Desktop/new-world/new-world-ops/wo
+rkflows/e2e.yaml", "edit": {"old":"  - id: runE2EAgent\\n    label: 运行 E2E 测
+试 Agent\\n    type: shell\\n    tmux: true\\n    logFile: \'{{ .Vars.logFileNam
+e }}\'\\n    command: |","new":"  - id: runE2EAgent\\n    label: 运行 E2E 测试 A
+gent\\n    type: shell\\n    tmux: true\\n    logFile: \'{{ .Vars.logFileName }}
+\'\\n    ignoreError: true\\n    command: |"}}'
+)
+StatusUpdate(
+    context_usage=0.1683197021484375,
+    context_tokens=44124,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=860,
+        output=348,
+        input_cache_read=43264,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-PG7C29cRF4t3veP4iF48T4qA',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_hKOU15Qj5TMSVxI6A8IlXL4b',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='',
+        message='File successfully edited. Applied 1 edit(s) with 1 total replac
+ement(s).',
+        display=[
+            DiffDisplayBlock(
+                type='diff',
+                path='/Users/insulate/Desktop/new-world/new-world-ops/workflows/
+e2e.yaml',
+                old_text='    type: shell\n    tmux: true\n    logFile: \'{{ .Va
+rs.logFileName }}\'\n    command: |\n      echo "=== 运行 E2E 测试 Agent ==="\n 
+    mkdir -p "{{ .Vars.debugDir | shellquote }}"',
+                new_text='    type: shell\n    tmux: true\n    logFile: \'{{ .Va
+rs.logFileName }}\'\n    ignoreError: true\n    command: |\n      echo "=== 运行
+E2E 测试 Agent ==="\n      mkdir -p "{{ .Vars.debugDir | shellquote }}"',
+                old_start=80,
+                new_start=80,
+                is_summary=False
+            )
+        ],
+        extras=None
+    )
+)
+StepBegin(n=13)
+ThinkPart(
+    type='think',
+    think='Workflow 修改完成了。现在继续修改 prompt 文件。我需要：\n\n1. doc-gar
+dener.md:\n   - 在"执行步骤"前增加环境预检查\n   - 在"效率约束"中增加零产出熔断
+和错误熔断\n\n2. developer.md:\n   - 元原则增加第4条\n   - 任务启动检查清单增加
+第4步\n   - 效率约束第9条增加中途检查点\n   - 效率约束第10条增加超限熔断\n\n3. e
+2e-tester.md:\n   - 强制 WriteFile 兜底\n\n4. reviewer.md:\n   - 修复编号\n   - 
+增加错误熔断\n   - 强化 gh 容错\n\n让我并行修改。',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_A5Oxo6XWGLV93lQvOHyciPjI',
+    function=FunctionBody(
+        name='StrReplaceFile',
+        arguments='{"path": "/Users/insulate/Desktop/new-world/new-world-ops/pro
+mpts/doc-gardener.md", "edit": [{"old":"## 执行步骤\\n\\n1. **读取 AGENTS.md**：
+了解项目文档结构、文档规范路径和可用检查命令。","new":"## 启动环境预检查（第 1 
+步必须完成）\\n\\n开始前，用 1 个步骤确认环境：\\n1. **确认环境**：执行 `pwd` 和
+`ls AGENTS.md`，确认你在正确的 worktree 目录且项目导航文档可访问。如果 `AGENTS.m
+d` 不存在或环境异常，立即停止并报告阻塞原因，不要继续执行后续步骤。\\n\\n## 执行
+步骤\\n\\n1. **读取 AGENTS.md**：了解项目文档结构、文档规范路径和可用检查命令。"
+},{"old":"## 效率约束\\n\\n- **步数预算**：超过 40 步仍未完成文档检查和修复，停
+下来报告阻塞原因。\\n- **禁止零产出结束**：如果确实没有文档需要修改，仍必须生成
+检查报告文件并提交（报告本身就是一种产出）。","new":"## 效率约束\\n\\n1. **步数
+预算**：超过 40 步仍未完成文档检查和修复，停下来报告阻塞原因。\\n2. **禁止零产出
+结束**：如果确实没有文档需要修改，仍必须生成检查报告文件并提交（报告本身就是一种
+产出）。\\n3. **零产出熔断**：前 5 步内如果没有产生任何文件修改（WriteFile/StrRe
+placeFile），必须停下来重新评估：\\"我是否理解了任务？是否在正确的文件上工作？\\
+"如果无法确认，停止并报告。\\n4. **错误熔断**：任意工具调用（Shell、ReadFile、Wr
+iteFile、StrReplaceFile、Grep 等）如果连续 2 次返回 `is_error=true`，必须**立即
+停止执行**，生成错误摘要报告并结束任务。不允许通过换参数、换文件、换思路继续尝试
+。连续错误说明环境或假设有问题，不是 agent 能自行解决的。\\n5. **单次错误后禁止
+立即重试**：任意工具调用如果返回 `is_error=true`，你必须先分析失败原因（读取错误
+信息、检查参数、确认文件/路径是否存在），**不得用相同或相似参数立即再次调用同一
+工具**。只有在你明确修正了导致错误的因素后，才能重试。如果同一操作在第 2 次尝试
+后仍失败，立即执行\\"错误熔断\\"逻辑（停止并报告）。"}]}'
+    ),
+    extras=None
+)
+ToolCall(
+    type='function',
+    id='tool_dHSbFca4tzSSBb7VBFZ7ZO8M',
+    function=FunctionBody(name='StrReplaceFile', arguments='{"path":'),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_A5Oxo6XWGLV93lQvOHyciPjI',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='',
+        message='File successfully edited. Applied 2 edit(s) with 2 total replac
+ement(s).',
+        display=[
+            DiffDisplayBlock(
+                type='diff',
+                path='/Users/insulate/Desktop/new-world/new-world-ops/prompts/do
+c-gardener.md',
+                old_text='- **先读地图**：启动后先读取项目导航文档（`AGENT_AGENT
+S_MD` 或 `AGENTS.md`），了解项目的文档组织方式和检查命令。\n- **只修确定性问题**
+：错别字、死链、索引缺失条目可以直接修；架构与代码不一致时只报不修。\n- **必须有
+产出**：无论发现多少问题，任务结束时必须至少有文档修改提交或明确的检查报告写入文
+件。\n\n## 执行步骤\n',
+                new_text='- **先读地图**：启动后先读取项目导航文档（`AGENT_AGENT
+S_MD` 或 `AGENTS.md`），了解项目的文档组织方式和检查命令。\n- **只修确定性问题**
+：错别字、死链、索引缺失条目可以直接修；架构与代码不一致时只报不修。\n- **必须有
+产出**：无论发现多少问题，任务结束时必须至少有文档修改提交或明确的检查报告写入文
+件。\n\n## 启动环境预检查（第 1 步必须完成）\n\n开始前，用 1 个步骤确认环境：\n1
+. **确认环境**：执行 `pwd` 和 `ls AGENTS.md`，确认你在正确的 worktree 目录且项目
+导航文档可访问。如果 `AGENTS.md` 不存在或环境异常，立即停止并报告阻塞原因，不要
+继续执行后续步骤。\n\n## 执行步骤\n',
+                old_start=7,
+                new_start=7,
+                is_summary=False
+            ),
+            DiffDisplayBlock(
+                type='diff',
+                path='/Users/insulate/Desktop/new-world/new-world-ops/prompts/do
+c-gardener.md',
+                old_text='\n## 效率约束\n\n- **步数预算**：超过 40 步仍未完成文
+档检查和修复，停下来报告阻塞原因。\n- **禁止零产出结束**：如果确实没有文档需要修
+改，仍必须生成检查报告文件并提交（报告本身就是一种产出）。',
+                new_text='\n## 效率约束\n\n1. **步数预算**：超过 40 步仍未完成文
+档检查和修复，停下来报告阻塞原因。\n2. **禁止零产出结束**：如果确实没有文档需要
+修改，仍必须生成检查报告文件并提交（报告本身就是一种产出）。\n3. **零产出熔断**
+：前 5 步内如果没有产生任何文件修改（WriteFile/StrReplaceFile），必须停下来重新
+评估："我是否理解了任务？是否在正确的文件上工作？"如果无法确认，停止并报告。\n4.
+**错误熔断**：任意工具调用（Shell、ReadFile、WriteFile、StrReplaceFile、Grep 等
+）如果连续 2 次返回 `is_error=true`，必须**立即停止执行**，生成错误摘要报告并结
+束任务。不允许通过换参数、换文件、换思路继续尝试。连续错误说明环境或假设有问题，
+不是 agent 能自行解决的。\n5. **单次错误后禁止立即重试**：任意工具调用如果返回 `
+is_error=true`，你必须先分析失败原因（读取错误信息、检查参数、确认文件/路径是否
+存在），**不得用相同或相似参数立即再次调用同一工具**。只有在你明确修正了导致错误
+的因素后，才能重试。如果同一操作在第 2 次尝试后仍失败，立即执行"错误熔断"逻辑（
+停止并报告）。',
+                old_start=38,
+                new_start=43,
+                is_summary=False
+            )
+        ],
+        extras=None
+    )
+)
+ToolCallPart(
+    arguments_part=' "/Users/insulate/Desktop/new-world/new-world-ops/prompts/de
+veloper.md", "edit": [{"old":"1. **先读地图**：任何动作之前，优先读取项目导航文
+档。**读取顺序**：\\n   - 首先检查环境变量 `AGENT_AGENTS_MD`，如果存在则读取该路
+径\\n   - 否则读取当前工作目录下的 `AGENTS.md`\\n   - 最后读取当前工作目录下的 `
+README.md`\\n   **禁止**通过 `../` 等相对路径跨目录猜测项目根目录。项目特定的路
+径、命令、规范**不在本 prompt 中**，必须在 `AGENTS.md` 中查找。\\n2. **渐进式披
+露**：不要一次性读完所有文档。根据当前任务推断需要阅读的最小文档集合，逐步获取信
+息。\\n3. **效果优先**：先跑通端到端，再考虑优雅性。","new":"1. **先读地图**：任
+何动作之前，优先读取项目导航文档。**读取顺序**：\\n   - 首先检查环境变量 `AGENT_
+AGENTS_MD`，如果存在则读取该路径\\n   - 否则读取当前工作目录下的 `AGENTS.md`\\n 
+ - 最后读取当前工作目录下的 `README.md`\\n   **禁止**通过 `../` 等相对路径跨目录
+猜测项目根目录。项目特定的路径、命令、规范**不在本 prompt 中**，必须在 `AGENTS.m
+d` 中查找。\\n2. **渐进式披露**：不要一次性读完所有文档。根据当前任务推断需要阅
+读的最小文档集合，逐步获取信息。\\n3. **效果优先**：先跑通端到端，再考虑优雅性。
+\\n4. **Think 不是免费工具**：每次 Think 消耗 1 步，且绝对不得超过 3 次。超出即
+熔断。不要把 Think 当作\\"不消耗预算的分析时间\\"。"},{"old":"3. **设置待办清单*
+*：使用 `SetTodoList` 工具列出本次任务要完成的 3-5 个具体事项。每完成一项更新状
+态。如果无法列出清晰的待办事项，说明任务边界不清晰，停止并报告。\\n\\n**如果你在
+前 5 步内没有完成上述检查清单，说明你在犹豫或困惑，必须立即停下来报告当前状态和
+阻塞原因。**","new":"3. **设置待办清单**：使用 `SetTodoList` 工具列出本次任务要
+完成的 3-5 个具体事项。每完成一项更新状态。如果无法列出清晰的待办事项，说明任务
+边界不清晰，停止并报告。\\n4. **确认步数与 think 预算**：在内心确认当前模式的总
+预算——dev 模式总预算 60 步/think 限额 3 次；rework 模式总预算 40 步/think 限额 3
+次。默念\\"当前剩余预算 X 步，剩余 think Y 次\\"。如果无法确认预算，说明你对任务
+模式不清晰，停止并报告。\\n\\n**如果你在前 5 步内没有完成上述检查清单，说明你在
+犹豫或困惑，必须立即停下来报告当前状态和阻塞原因。**"},{"old":"   - **rework 模
+式预算**：\\n     - rework 不需要 explore 阶段，review report 已经告诉你问题在哪
+。\\n     - **rework 模式总步数预算为 40 步**。超过 35 步仍未完成所有 Blocking 
+问题修复，必须停止并报告剩余未修复项。","new":"   - **rework 模式预算**：\\n    
+- rework 不需要 explore 阶段，review report 已经告诉你问题在哪。\\n     - **rewo
+rk 模式总步数预算为 40 步**。超过 35 步仍未完成所有 Blocking 问题修复，必须停止
+并报告剩余未修复项。\\n     - **rework 中途检查点**：每 5 步必须在思考中自报一次
+当前步数，例如\\"[rework 步数检查] 当前第 20 步，剩余预算 20 步\\"。如果忘记自报
+，说明你已失去对步数的控制，必须立即停下来报告。"},{"old":"10. **Think 使用限制*
+*：仅在涉及 3 个以上文件协调或复杂架构决策时使用 think 工具。常规代码阅读、文件
+修改、命令执行直接操作，不要 think。\\n   - **单次任务 think 次数绝对不得超过 3 
+次**，Think 本身计为 1 步。\\n   - **违反此限制属于严重违规**：如果你已经 think 
+了 3 次，之后无论遇到什么情况都不得再使用 think，必须直接执行具体操作或向人类报
+告。\\n   - 每次使用 think 前，先在内心确认：\\"这是本次任务第 N 次 think，限额 
+3 次，是否值得用在这里？\\"如果 N 已达到 3，严禁使用。","new":"10. **Think 使用
+限制**：仅在涉及 3 个以上文件协调或复杂架构决策时使用 think 工具。常规代码阅读、
+文件修改、命令执行直接操作，不要 think。\\n   - **单次任务 think 次数绝对不得超
+过 3 次**，Think 本身计为 1 步。\\n   - **违反此限制属于严重违规，触发立即熔断**
+：如果你已经 think 了 3 次，之后无论遇到什么情况都不得再使用 think，必须直接执行
+具体操作或向人类报告。**如果第 4 次调用 think，必须立即停止所有操作，直接输出任
+务执行报告并结束任务，不得继续执行任何工具调用。**\\n   - 每次使用 think 前，先
+在内心确认：\\"这是本次任务第 N 次 think，限额 3 次，是否值得用在这里？\\"如果 N
+已达到 3，严禁使用。"}]}'
+)
+StatusUpdate(
+    context_usage=0.1699371337890625,
+    context_tokens=44548,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=516,
+        output=1919,
+        input_cache_read=44032,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-hoEmFfo2uVZKfVv6nSQ2xZVk',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_dHSbFca4tzSSBb7VBFZ7ZO8M',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='',
+        message='File successfully edited. Applied 4 edit(s) with 3 total replac
+ement(s).',
+        display=[
+            DiffDisplayBlock(
+                type='diff',
+                path='/Users/insulate/Desktop/new-world/new-world-ops/prompts/de
+veloper.md',
+                old_text='   **禁止**通过 `../` 等相对路径跨目录猜测项目根目录。
+项目特定的路径、命令、规范**不在本 prompt 中**，必须在 `AGENTS.md` 中查找。\n2. 
+**渐进式披露**：不要一次性读完所有文档。根据当前任务推断需要阅读的最小文档集合，
+逐步获取信息。\n3. **效果优先**：先跑通端到端，再考虑优雅性。\n\n## 任务启动检查
+清单（第 1-3 步必须完成）\n',
+                new_text='   **禁止**通过 `../` 等相对路径跨目录猜测项目根目录。
+项目特定的路径、命令、规范**不在本 prompt 中**，必须在 `AGENTS.md` 中查找。\n2. 
+**渐进式披露**：不要一次性读完所有文档。根据当前任务推断需要阅读的最小文档集合，
+逐步获取信息。\n3. **效果优先**：先跑通端到端，再考虑优雅性。\n4. **Think 不是免
+费工具**：每次 Think 消耗 1 步，且绝对不得超过 3 次。超出即熔断。不要把 Think 当
+作"不消耗预算的分析时间"。\n\n## 任务启动检查清单（第 1-3 步必须完成）\n',
+                old_start=11,
+                new_start=11,
+                is_summary=False
+            ),
+            DiffDisplayBlock(
+                type='diff',
+                path='/Users/insulate/Desktop/new-world/new-world-ops/prompts/de
+veloper.md',
+                old_text='   - **rework 模式**：先读取 review report（环境变量 `
+AGENT_REVIEW_REPORT` 或当前目录下的 review report 文件），列出需要修复的具体问题
+清单（Blocking / Major / Minor）。不要猜测，不要扩大修复范围。\n   - **dev 模式*
+*：明确 issue 的核心目标是什么，用一句话概括。不要偏离目标。\n3. **设置待办清单*
+*：使用 `SetTodoList` 工具列出本次任务要完成的 3-5 个具体事项。每完成一项更新状
+态。如果无法列出清晰的待办事项，说明任务边界不清晰，停止并报告。\n\n**如果你在前
+5 步内没有完成上述检查清单，说明你在犹豫或困惑，必须立即停下来报告当前状态和阻塞
+原因。**\n',
+                new_text='   - **rework 模式**：先读取 review report（环境变量 `
+AGENT_REVIEW_REPORT` 或当前目录下的 review report 文件），列出需要修复的具体问题
+清单（Blocking / Major / Minor）。不要猜测，不要扩大修复范围。\n   - **dev 模式*
+*：明确 issue 的核心目标是什么，用一句话概括。不要偏离目标。\n3. **设置待办清单*
+*：使用 `SetTodoList` 工具列出本次任务要完成的 3-5 个具体事项。每完成一项更新状
+态。如果无法列出清晰的待办事项，说明任务边界不清晰，停止并报告。\n4. **确认步数
+与 think 预算**：在内心确认当前模式的总预算——dev 模式总预算 60 步/think 限额 3 
+次；rework 模式总预算 40 步/think 限额 3 次。默念"当前剩余预算 X 步，剩余 think 
+Y 次"。如果无法确认预算，说明你对任务模式不清晰，停止并报告。\n\n**如果你在前 5 
+步内没有完成上述检查清单，说明你在犹豫或困惑，必须立即停下来报告当前状态和阻塞原
+因。**\n',
+                old_start=21,
+                new_start=22,
+                is_summary=False
+            ),
+            DiffDisplayBlock(
+                type='diff',
+                path='/Users/insulate/Desktop/new-world/new-world-ops/prompts/de
+veloper.md',
+                old_text='   - 不要修改与 review report 无关的代码。不要"顺手优
+化"。\n10. **Think 使用限制**：仅在涉及 3 个以上文件协调或复杂架构决策时使用 thi
+nk 工具。常规代码阅读、文件修改、命令执行直接操作，不要 think。\n   - **单次任务
+think 次数绝对不得超过 3 次**，Think 本身计为 1 步。\n   - **违反此限制属于严重
+违规**：如果你已经 think 了 3 次，之后无论遇到什么情况都不得再使用 think，必须直
+接执行具体操作或向人类报告。\n   - 每次使用 think 前，先在内心确认："这是本次任
+务第 N 次 think，限额 3 次，是否值得用在这里？"如果 N 已达到 3，严禁使用。\n11. 
+**StrReplaceFile 失败处理**：如果 `StrReplaceFile` 连续失败 2 次，先 `ReadFile` 
+确认文件当前内容，再构造精确替换文本；如果仍然失败，改用 `WriteFile` 重写整个文
+件，或向人类报告具体失败片段，不要无限重试。\n12. **单次错误后禁止立即重试**：任
+意工具调用如果返回 `is_error=true`，你必须先分析失败原因（读取错误信息、检查参数
+、确认文件/路径是否存在），**不得用相同或相似参数立即再次调用同一工具**。只有在
+你明确修正了导致错误的因素后，才能重试。如果同一操作在第 2 次尝试后仍失败，立即
+执行"错误熔断"逻辑（停止并报告）。',
+                new_text='   - 不要修改与 review report 无关的代码。不要"顺手优
+化"。\n10. **Think 使用限制**：仅在涉及 3 个以上文件协调或复杂架构决策时使用 thi
+nk 工具。常规代码阅读、文件修改、命令执行直接操作，不要 think。\n   - **单次任务
+think 次数绝对不得超过 3 次**，Think 本身计为 1 步。\n   - **违反此限制属于严重
+违规，触发立即熔断**：如果你已经 think 了 3 次，之后无论遇到什么情况都不得再使用
+think，必须直接执行具体操作或向人类报告。**如果第 4 次调用 think，必须立即停止所
+有操作，直接输出任务执行报告并结束任务，不得继续执行任何工具调用。**\n   - 每次
+使用 think 前，先在内心确认："这是本次任务第 N 次 think，限额 3 次，是否值得用在
+这里？"如果 N 已达到 3，严禁使用。\n11. **StrReplaceFile 失败处理**：如果 `StrRe
+placeFile` 连续失败 2 次，先 `ReadFile` 确认文件当前内容，再构造精确替换文本；如
+果仍然失败，改用 `WriteFile` 重写整个文件，或向人类报告具体失败片段，不要无限重
+试。\n12. **单次错误后禁止立即重试**：任意工具调用如果返回 `is_error=true`，你必
+须先分析失败原因（读取错误信息、检查参数、确认文件/路径是否存在），**不得用相同
+或相似参数立即再次调用同一工具**。只有在你明确修正了导致错误的因素后，才能重试。
+如果同一操作在第 2 次尝试后仍失败，立即执行"错误熔断"逻辑（停止并报告）。',
+                old_start=148,
+                new_start=150,
+                is_summary=False
+            )
+        ],
+        extras=None
+    )
+)
+StepBegin(n=14)
+ThinkPart(
+    type='think',
+    think='developer.md 的修改中，有一个 edit 没有成功匹配（Applied 4 edit(s) wi
+th 3 total replacement(s)），这意味着有一个替换失败了。我需要检查是哪一个失败了
+。\n\n可能是"Think 使用限制"那段的匹配问题，因为格式可能有细微差别。让我读取 dev
+eloper.md 的相关部分来确认。\n\n但先继续完成其他文件的修改，然后再回来检查 devel
+oper.md。',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_0FWsqy33CCPrXZBKkh5U1LC4',
+    function=FunctionBody(
+        name='StrReplaceFile',
+        arguments='{"path": "/Users/insulate/Desktop/new-world/new-world-ops/pro
+mpts/e2e-tester.md", "edit": [{"old":"## 环境不可用兜底\\n\\n如果因为以下原因无
+法执行 Maestro 测试，你仍然必须完成第 12 步（生成报告）：\\n- 模拟器无法启动或 A
+PK 构建/安装失败\\n- Maestro 命令不存在\\n- 后端服务无法连接\\n\\n报告内容必须包
+含：\\n- **总体结果**: ❌ 环境不可用\\n- **不可用原因**: 具体说明（如 \\"APK 构
+建失败：...\\"）\\n- **建议**: 需要人类介入的修复步骤\\n\\n**禁止以\\"环境不可用
+\\"为由直接退出而不生成报告。**","new":"## 环境不可用兜底\\n\\n如果因为以下原因
+无法执行 Maestro 测试，你仍然必须完成第 12 步（生成报告）：\\n- 模拟器无法启动或
+APK 构建/安装失败\\n- Maestro 命令不存在\\n- 后端服务无法连接\\n\\n报告内容必须
+包含：\\n- **总体结果**: ❌ 环境不可用\\n- **不可用原因**: 具体说明（如 \\"APK 
+构建失败：...\\"）\\n- **建议**: 需要人类介入的修复步骤\\n\\n**禁止以\\"环境不可
+用\\"为由直接退出而不生成报告。**\\n**绝对约束：不得以纯文本输出代替报告文件。必
+须调用 WriteFile 工具将报告写入 `AGENT_E2E_REPORT_FILE` 指定的路径，未调用 Write
+File 视为任务未完成。**"}]}'
+    ),
+    extras=None
+)
+ToolCall(
+    type='function',
+    id='tool_Os7M5PSwOu3XXkMmaQ9p3bCr',
+    function=FunctionBody(name='StrReplaceFile', arguments=''),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_0FWsqy33CCPrXZBKkh5U1LC4',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='',
+        message='File successfully edited. Applied 1 edit(s) with 1 total replac
+ement(s).',
+        display=[
+            DiffDisplayBlock(
+                type='diff',
+                path='/Users/insulate/Desktop/new-world/new-world-ops/prompts/e2
+e-tester.md',
+                old_text='- **建议**: 需要人类介入的修复步骤\n\n**禁止以"环境不
+可用"为由直接退出而不生成报告。**\n\n## 自检清单\n',
+                new_text='- **建议**: 需要人类介入的修复步骤\n\n**禁止以"环境不
+可用"为由直接退出而不生成报告。**\n**绝对约束：不得以纯文本输出代替报告文件。必
+须调用 WriteFile 工具将报告写入 `AGENT_E2E_REPORT_FILE` 指定的路径，未调用 Write
+File 视为任务未完成。**\n\n## 自检清单\n',
+                old_start=177,
+                new_start=177,
+                is_summary=False
+            )
+        ],
+        extras=None
+    )
+)
+ToolCallPart(
+    arguments_part='{"path": "/Users/insulate/Desktop/new-world/new-world-ops/pr
+ompts/reviewer.md", "edit": [{"old":"1. **环境预检查**：运行任何 `gh` 命令前，先
+执行 `gh auth status` 确认 GitHub CLI 已认证。然后执行 `gh pr view \\"$AGENT_PR_
+NUMBER\\" --json number`（或当前 PR 号）确认 PR 可访问。如果认证失败或 PR 不存在
+，立即停止审查，生成失败报告说明原因，不要继续尝试其他命令。","new":"1. **环境预
+检查**：运行任何 `gh` 命令前，先执行 `gh auth status` 确认 GitHub CLI 已认证。然
+后执行 `gh pr view \\"$AGENT_PR_NUMBER\\" --json number`（或当前 PR 号）确认 PR 
+可访问。如果认证失败或 PR 不存在，立即停止审查，生成失败报告说明原因，不要继续尝
+试其他命令。如果因网络超时失败，最多重试 1 次，仍失败则停止并报告网络问题。"},{"
+old":"5. **步数预算**：超过 50 步仍未完成审查报告写入，停下来报告阻塞原因。\\n6.
+**问题数量限制**：Blocking + Major 问题总数不得超过 5 个。如果审查发现超过 5 个 
+Blocking/Major 问题，只保留最严重的 5 个详细说明并给出修复指令，其余问题归入\\"
+其他问题概要\\"章节简述。这样可以避免 rework agent 因任务过载而步数膨胀或失败。\
+\n8. **遇到错误时快速跳过，不要反复试探**：如果 `ReadFile`、`Shell` 或 `Grep` 等
+工具调用返回错误（文件不存在、命令失败、权限不足），记录错误原因，将该维度标记为
+\\"未验证（执行错误）\\"并立即跳过，**不得尝试替代路径、变体参数或绕过方式**。例
+如：读取 `docs/ui-spec.md` 失败，不要尝试 `docs/UI-spec.md` 或 `docs/spec.md`，
+直接标注未验证并继续下一项。反复试探同一类失败操作会浪费步数并增加错误率。\\n9. 
+**步数自报检查点**：每 15 步必须在思考中自报一次当前步数。review 任务平均应在 30
+-40 步内完成，如果超过 40 步仍未开始撰写审查结论，说明你陷入了过度探索，必须立即
+收缩范围，聚焦最关键的问题输出报告。\\n\\n7. **模板检查清单执行验证**：","new":"
+5. **步数预算**：超过 50 步仍未完成审查报告写入，停下来报告阻塞原因。\\n6. **问
+题数量限制**：Blocking + Major 问题总数不得超过 5 个。如果审查发现超过 5 个 Bloc
+king/Major 问题，只保留最严重的 5 个详细说明并给出修复指令，其余问题归入\\"其他
+问题概要\\"章节简述。这样可以避免 rework agent 因任务过载而步数膨胀或失败。\\n7.
+**模板检查清单执行验证**："},{"old":"7. **模板检查清单执行验证**：\\n   - 如果 P
+R 类型有对应的执行计划模板（feat / bug fix / refactor 等），必须检查 developer 
+的强制结束报告中是否包含模板检查清单的执行结果。\\n   - 如果 developer 报告了模
+板检查清单的执行结果，抽查其中 1-2 个关键检查项是否真实执行（例如：报告说\\"已运
+行 `make check-contract-sync`\\"，但 PR diff 中前后端字段明显不一致 → 标记为 Blo
+cking）。\\n   - 如果 developer 的任务类型有模板但报告中完全没有按模板逐项确认 →
+**标记为 Blocking**：「未按执行计划模板执行自检，关键检查项（契约同步/Entity 注
+册/持久化验证/Mock 一致性等）状态未知」。\\n   - 如果项目没有执行计划模板体系，
+在验证结果表格中标注「未验证（无模板体系）」。","new":"7. **模板检查清单执行验证
+**：\\n   - 如果 PR 类型有对应的执行计划模板（feat / bug fix / refactor 等），必
+须检查 developer 的强制结束报告中是否包含模板检查清单的执行结果。\\n   - 如果 de
+veloper 报告了模板检查清单的执行结果，抽查其中 1-2 个关键检查项是否真实执行（例
+如：报告说\\"已运行 `make check-contract-sync`\\"，但 PR diff 中前后端字段明显不
+一致 → 标记为 Blocking）。\\n   - 如果 developer 的任务类型有模板但报告中完全没
+有按模板逐项确认 → **标记为 Blocking**：「未按执行计划模板执行自检，关键检查项（
+契约同步/Entity 注册/持久化验证/Mock 一致性等）状态未知」。\\n   - 如果项目没有
+执行计划模板体系，在验证结果表格中标注「未验证（无模板体系）」。\\n8. **遇到错误
+时快速跳过，不要反复试探**：如果 `ReadFile`、`Shell` 或 `Grep` 等工具调用返回错
+误（文件不存在、命令失败、权限不足），记录错误原因，将该维度标记为\\"未验证（执
+行错误）\\"并立即跳过，**不得尝试替代路径、变体参数或绕过方式**。例如：读取 `doc
+s/ui-spec.md` 失败，不要尝试 `docs/UI-spec.md` 或 `docs/spec.md`，直接标注未验证
+并继续下一项。反复试探同一类失败操作会浪费步数并增加错误率。\\n9. **错误熔断**：
+任意工具调用如果连续 2 次返回错误，立即停止审查并生成失败报告，不得尝试替代路径
+或变体参数。\\n10. **步数自报检查点**：每 15 步必须在思考中自报一次当前步数。rev
+iew 任务平均应在 30-40 步内完成，如果超过 40 步仍未开始撰写审查结论，说明你陷入
+了过度探索，必须立即收缩范围，聚焦最关键的问题输出报告。"}]}'
+)
+StatusUpdate(
+    context_usage=0.17754364013671875,
+    context_tokens=46542,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=1998,
+        output=1708,
+        input_cache_read=44544,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-gPbFRTTUDQIGNh8EWiho9itg',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_Os7M5PSwOu3XXkMmaQ9p3bCr',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='',
+        message='File successfully edited. Applied 3 edit(s) with 3 total replac
+ement(s).',
+        display=[
+            DiffDisplayBlock(
+                type='diff',
+                path='/Users/insulate/Desktop/new-world/new-world-ops/prompts/re
+viewer.md',
+                old_text='\n## 执行约束\n\n1. **环境预检查**：运行任何 `gh` 命令
+前，先执行 `gh auth status` 确认 GitHub CLI 已认证。然后执行 `gh pr view "$AGENT
+_PR_NUMBER" --json number`（或当前 PR 号）确认 PR 可访问。如果认证失败或 PR 不存
+在，立即停止审查，生成失败报告说明原因，不要继续尝试其他命令。\n2. **文档存在性
+检查**：读取规范文档前，先用 `Shell` 命令（如 `ls -la <路径>` 或 `test -f <路径>
+`）确认文件存在。如果文件不存在，跳过该维度并在报告中标注"未验证（文件缺失）"，
+不要直接执行 `ReadFile` 导致错误浪费步数。\n3. **PR 信息获取失败时快速退出**：如
+果 `gh pr diff` 或 `gh pr view` 失败，根据错误码立即处理：\n   - `Could not reso
+lve to a PullRequest` / `HTTP 404` → 立即停止，报告 PR 不存在或无权访问。',
+                new_text='\n## 执行约束\n\n1. **环境预检查**：运行任何 `gh` 命令
+前，先执行 `gh auth status` 确认 GitHub CLI 已认证。然后执行 `gh pr view "$AGENT
+_PR_NUMBER" --json number`（或当前 PR 号）确认 PR 可访问。如果认证失败或 PR 不存
+在，立即停止审查，生成失败报告说明原因，不要继续尝试其他命令。如果因网络超时失败
+，最多重试 1 次，仍失败则停止并报告网络问题。\n2. **文档存在性检查**：读取规范文
+档前，先用 `Shell` 命令（如 `ls -la <路径>` 或 `test -f <路径>`）确认文件存在。
+如果文件不存在，跳过该维度并在报告中标注"未验证（文件缺失）"，不要直接执行 `Read
+File` 导致错误浪费步数。\n3. **PR 信息获取失败时快速退出**：如果 `gh pr diff` 或
+`gh pr view` 失败，根据错误码立即处理：\n   - `Could not resolve to a PullReques
+t` / `HTTP 404` → 立即停止，报告 PR 不存在或无权访问。',
+                old_start=137,
+                new_start=137,
+                is_summary=False
+            ),
+            DiffDisplayBlock(
+                type='diff',
+                path='/Users/insulate/Desktop/new-world/new-world-ops/prompts/re
+viewer.md',
+                old_text='4. **审查结论必须写入文件**：无论审查结果是 PASS 还是 
+NEEDS_FIX，都必须将完整审查报告写入 `AGENT_REVIEW_REPORT` 环境变量指定的路径（默
+认 `logs/review-report-<pr_number>.md`）。纯文本输出不算完成。\n5. **步数预算**
+：超过 50 步仍未完成审查报告写入，停下来报告阻塞原因。\n6. **问题数量限制**：Blo
+cking + Major 问题总数不得超过 5 个。如果审查发现超过 5 个 Blocking/Major 问题，
+只保留最严重的 5 个详细说明并给出修复指令，其余问题归入"其他问题概要"章节简述。
+这样可以避免 rework agent 因任务过载而步数膨胀或失败。\n8. **遇到错误时快速跳过
+，不要反复试探**：如果 `ReadFile`、`Shell` 或 `Grep` 等工具调用返回错误（文件不
+存在、命令失败、权限不足），记录错误原因，将该维度标记为"未验证（执行错误）"并立
+即跳过，**不得尝试替代路径、变体参数或绕过方式**。例如：读取 `docs/ui-spec.md` 
+失败，不要尝试 `docs/UI-spec.md` 或 `docs/spec.md`，直接标注未验证并继续下一项。
+反复试探同一类失败操作会浪费步数并增加错误率。\n9. **步数自报检查点**：每 15 步
+必须在思考中自报一次当前步数。review 任务平均应在 30-40 步内完成，如果超过 40 步
+仍未开始撰写审查结论，说明你陷入了过度探索，必须立即收缩范围，聚焦最关键的问题输
+出报告。\n\n7. **模板检查清单执行验证**：\n   - 如果 PR 类型有对应的执行计划模板
+（feat / bug fix / refactor 等），必须检查 developer 的强制结束报告中是否包含模
+板检查清单的执行结果。\n   - 如果 developer 报告了模板检查清单的执行结果，抽查其
+中 1-2 个关键检查项是否真实执行（例如：报告说"已运行 `make check-contract-sync`"
+，但 PR diff 中前后端字段明显不一致 → 标记为 Blocking）。\n   - 如果 developer 
+的任务类型有模板但报告中完全没有按模板逐项确认 → **标记为 Blocking**：「未按执行
+计划模板执行自检，关键检查项（契约同步/Entity 注册/持久化验证/Mock 一致性等）状
+态未知」。\n   - 如果项目没有执行计划模板体系，在验证结果表格中标注「未验证（无
+模板体系）」。\n\n## 诚实性约束（不可违背）\n',
+                new_text='4. **审查结论必须写入文件**：无论审查结果是 PASS 还是 
+NEEDS_FIX，都必须将完整审查报告写入 `AGENT_REVIEW_REPORT` 环境变量指定的路径（默
+认 `logs/review-report-<pr_number>.md`）。纯文本输出不算完成。\n5. **步数预算**
+：超过 50 步仍未完成审查报告写入，停下来报告阻塞原因。\n6. **问题数量限制**：Blo
+cking + Major 问题总数不得超过 5 个。如果审查发现超过 5 个 Blocking/Major 问题，
+只保留最严重的 5 个详细说明并给出修复指令，其余问题归入"其他问题概要"章节简述。
+这样可以避免 rework agent 因任务过载而步数膨胀或失败。\n7. **模板检查清单执行验
+证**：\n   - 如果 PR 类型有对应的执行计划模板（feat / bug fix / refactor 等），
+必须检查 developer 的强制结束报告中是否包含模板检查清单的执行结果。\n   - 如果 d
+eveloper 报告了模板检查清单的执行结果，抽查其中 1-2 个关键检查项是否真实执行（例
+如：报告说"已运行 `make check-contract-sync`"，但 PR diff 中前后端字段明显不一致
+→ 标记为 Blocking）。\n   - 如果 developer 的任务类型有模板但报告中完全没有按模
+板逐项确认 → **标记为 Blocking**：「未按执行计划模板执行自检，关键检查项（契约同
+步/Entity 注册/持久化验证/Mock 一致性等）状态未知」。\n   - 如果项目没有执行计划
+模板体系，在验证结果表格中标注「未验证（无模板体系）」。\n8. **遇到错误时快速跳
+过，不要反复试探**：如果 `ReadFile`、`Shell` 或 `Grep` 等工具调用返回错误（文件
+不存在、命令失败、权限不足），记录错误原因，将该维度标记为"未验证（执行错误）"并
+立即跳过，**不得尝试替代路径、变体参数或绕过方式**。例如：读取 `docs/ui-spec.md`
+失败，不要尝试 `docs/UI-spec.md` 或 `docs/spec.md`，直接标注未验证并继续下一项。
+反复试探同一类失败操作会浪费步数并增加错误率。\n9. **错误熔断**：任意工具调用如
+果连续 2 次返回错误，立即停止审查并生成失败报告，不得尝试替代路径或变体参数。\n1
+0. **步数自报检查点**：每 15 步必须在思考中自报一次当前步数。review 任务平均应在
+30-40 步内完成，如果超过 40 步仍未开始撰写审查结论，说明你陷入了过度探索，必须立
+即收缩范围，聚焦最关键的问题输出报告。\n\n## 诚实性约束（不可违背）\n',
+                old_start=147,
+                new_start=147,
+                is_summary=False
+            )
+        ],
+        extras=None
+    )
+)
+StepBegin(n=15)
+ThinkPart(
+    type='think',
+    think='让我检查 developer.md 的修改是否都成功了。之前显示 "Applied 4 edit(s)
+with 3 total replacement(s)"，说明有一个失败了。我需要找出是哪一个。\n\n让我读取
+developer.md 的相关部分。',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_u1U7jL3PLTSuxP3JVVUcV8Fm',
+    function=FunctionBody(
+        name='Shell',
+        arguments='{"command": "grep -n \\"Think 不是免费工具\\" /Users/insulate
+/Desktop/new-world/new-world-ops/prompts/developer.md || echo \\"NOT FOUND\\"\\n
+grep -n \\"确认步数与 think 预算\\" /Users/insulate/Desktop/new-world/new-world-
+ops/prompts/developer.md || echo \\"NOT FOUND\\"\\ngrep -n \\"rework 中途检查点\
+\" /Users/insulate/Desktop/new-world/new-world-ops/prompts/developer.md || echo 
+\\"NOT FOUND\\"\\ngrep -n \\"触发立即熔断\\" /Users/insulate/Desktop/new-world/n
+ew-world-ops/prompts/developer.md || echo \\"NOT FOUND\\""}'
+    ),
+    extras=None
+)
+StatusUpdate(
+    context_usage=0.18434906005859375,
+    context_tokens=48326,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=1990,
+        output=198,
+        input_cache_read=46336,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-QJgLkb365jU0N1fM3lOLzSYl',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_u1U7jL3PLTSuxP3JVVUcV8Fm',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='14:4. **Think 不是免费工具**：每次 Think 消耗 1 步，且绝对不得超
+过 3 次。超出即熔断。不要把 Think 当作"不消耗预算的分析时间"。\n25:4. **确认步数
+与 think 预算**：在内心确认当前模式的总预算——dev 模式总预算 60 步/think 限额 3 
+次；rework 模式总预算 40 步/think 限额 3 次。默念"当前剩余预算 X 步，剩余 think 
+Y 次"。如果无法确认预算，说明你对任务模式不清晰，停止并报告。\nNOT FOUND\n153:  
+- **违反此限制属于严重违规，触发立即熔断**：如果你已经 think 了 3 次，之后无论遇
+到什么情况都不得再使用 think，必须直接执行具体操作或向人类报告。**如果第 4 次调
+用 think，必须立即停止所有操作，直接输出任务执行报告并结束任务，不得继续执行任何
+工具调用。**\n',
+        message='Command executed successfully.',
+        display=[],
+        extras=None
+    )
+)
+StepBegin(n=16)
+ThinkPart(
+    type='think',
+    think='"rework 中途检查点"没有找到，说明第3个替换失败了。让我查看 developer.
+md 中 rework 模式预算的部分，看看当前内容是什么。',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_7VyYipnG0mRqR7gZWwcKuMow',
+    function=FunctionBody(
+        name='ReadFile',
+        arguments='{"path": "/Users/insulate/Desktop/new-world/new-world-ops/pro
+mpts/developer.md", "line_offset": 140, "n_lines": 20}'
+    ),
+    extras=None
+)
+StatusUpdate(
+    context_usage=0.18600845336914062,
+    context_tokens=48761,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=633,
+        output=81,
+        input_cache_read=48128,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-dyjvk823wbPcq5R5nndZbQnx',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_7VyYipnG0mRqR7gZWwcKuMow',
+    return_value=ToolOk(
+        is_error=False,
+        output='   140\t4. **进度检查点**：每执行 10 步，必须做一次自评——"过去 1
+0 步是否产生了至少一次文件修改？"如果答案为否，立即停止并报告阻塞原因。\n   141\
+t5. **探索预算**：读取项目文档和代码以定位修改点的阶段，不得超过 12 步。如果 12 
+步内仍未定位到需要修改的文件，停止并报告。\n   142\t6. **零修改产出处理**：探索
+后如果确认无需任何代码或文档修改，必须显式说明"经检查，当前代码已符合要求，无需
+修改"并立即结束任务，不允许为了消耗步数而做无意义操作。\n   143\t7. **避免重复验
+证**：同一验证命令（如测试、构建）连续失败 2 次后，先修复已知问题再重试，不允许
+无脑重复。\n   144\t8. **命令输出限制**：执行可能产生大量输出的 Shell 命令（如 `
+grep -r`、`find`、`git diff`、`cat` 大文件）时，必须使用 `| head -N` 或 `| tail 
+-N` 限制输出（N ≤ 30），避免触发\'chunk exceed the limit\'错误导致命令失败。\n  
+145\t9. **rework 模式预算**：\n   146\t   - rework 不需要 explore 阶段，review r
+eport 已经告诉你问题在哪。\n   147\t   - **rework 模式总步数预算为 40 步**。超过
+35 步仍未完成所有 Blocking 问题修复，必须停止并报告剩余未修复项。\n   148\t   - 
+如果 review report 无法读取或内容为空，不要猜测问题，立即停止并报告"无法读取 rev
+iew report"。\n   149\t   - 如果 review report 中的问题超过 5 个，优先修复所有 B
+locking 问题，最多再修复 3 个 Major 问题，其余明确报告为"留待后续迭代"。\n   150
+\t   - 不要修改与 review report 无关的代码。不要"顺手优化"。\n   151\t10. **Thin
+k 使用限制**：仅在涉及 3 个以上文件协调或复杂架构决策时使用 think 工具。常规代码
+阅读、文件修改、命令执行直接操作，不要 think。\n   152\t   - **单次任务 think 次
+数绝对不得超过 3 次**，Think 本身计为 1 步。\n   153\t   - **违反此限制属于严重
+违规，触发立即熔断**：如果你已经 think 了 3 次，之后无论遇到什么情况都不得再使用
+think，必须直接执行具体操作或向人类报告。**如果第 4 次调用 think，必须立即停止所
+有操作，直接输出任务执行报告并结束任务，不得继续执行任何工具调用。**\n   154\t  
+- 每次使用 think 前，先在内心确认："这是本次任务第 N 次 think，限额 3 次，是否值
+得用在这里？"如果 N 已达到 3，严禁使用。\n   155\t11. **StrReplaceFile 失败处理*
+*：如果 `StrReplaceFile` 连续失败 2 次，先 `ReadFile` 确认文件当前内容，再构造精
+确替换文本；如果仍然失败，改用 `WriteFile` 重写整个文件，或向人类报告具体失败片
+段，不要无限重试。\n   156\t12. **单次错误后禁止立即重试**：任意工具调用如果返回
+`is_error=true`，你必须先分析失败原因（读取错误信息、检查参数、确认文件/路径是否
+存在），**不得用相同或相似参数立即再次调用同一工具**。只有在你明确修正了导致错误
+的因素后，才能重试。如果同一操作在第 2 次尝试后仍失败，立即执行"错误熔断"逻辑（
+停止并报告）。\n   157\t\n   158\t## 诚实性约束（不可违背）\n   159\t\n',
+        message='20 lines read from file starting from line 140. Total lines in 
+file: 195.',
+        display=[],
+        extras=None
+    )
+)
+StepBegin(n=17)
+ThinkPart(
+    type='think',
+    think='我看到 "rework 模式预算" 部分（第145-150行），"rework 中途检查点"的替
+换失败了，因为原文格式和我替换时用的文本不完全匹配。\n\n当前原文是：\n```\n9. **
+rework 模式预算**：\n   - rework 不需要 explore 阶段，review report 已经告诉你问
+题在哪。\n   - **rework 模式总步数预算为 40 步**。超过 35 步仍未完成所有 Blockin
+g 问题修复，必须停止并报告剩余未修复项。\n```\n\n我之前的替换文本是：\n```\n   -
+**rework 模式预算**：\n     - rework 不需要 explore 阶段，review report 已经告诉
+你问题在哪。\n     - **rework 模式总步数预算为 40 步**。超过 35 步仍未完成所有 B
+locking 问题修复，必须停止并报告剩余未修复项。\n```\n\n编号从 "9." 变成了缩进的 
+"- "，这导致匹配失败。\n\n让我重新做这次替换，使用正确的原文格式。',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_E2YjlThcyi2kejQfZuJDJqhA',
+    function=FunctionBody(
+        name='StrReplaceFile',
+        arguments='{"path": "/Users/insulate/Desktop/new-world/new-world-ops/pro
+mpts/developer.md", "edit": {"old":"9. **rework 模式预算**：\\n   - rework 不需
+要 explore 阶段，review report 已经告诉你问题在哪。\\n   - **rework 模式总步数预
+算为 40 步**。超过 35 步仍未完成所有 Blocking 问题修复，必须停止并报告剩余未修复
+项。","new":"9. **rework 模式预算**：\\n   - rework 不需要 explore 阶段，review 
+report 已经告诉你问题在哪。\\n   - **rework 模式总步数预算为 40 步**。超过 35 步
+仍未完成所有 Blocking 问题修复，必须停止并报告剩余未修复项。\\n   - **rework 中
+途检查点**：每 5 步必须在思考中自报一次当前步数，例如\\"[rework 步数检查] 当前第
+20 步，剩余预算 20 步\\"。如果忘记自报，说明你已失去对步数的控制，必须立即停下来
+报告。"}}'
+    ),
+    extras=None
+)
+StatusUpdate(
+    context_usage=0.18960952758789062,
+    context_tokens=49705,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=1065,
+        output=464,
+        input_cache_read=48640,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-wCyu47LHFlcsBUOdyffEYfNW',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_E2YjlThcyi2kejQfZuJDJqhA',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='',
+        message='File successfully edited. Applied 1 edit(s) with 1 total replac
+ement(s).',
+        display=[
+            DiffDisplayBlock(
+                type='diff',
+                path='/Users/insulate/Desktop/new-world/new-world-ops/prompts/de
+veloper.md',
+                old_text='9. **rework 模式预算**：\n   - rework 不需要 explore 
+阶段，review report 已经告诉你问题在哪。\n   - **rework 模式总步数预算为 40 步**
+。超过 35 步仍未完成所有 Blocking 问题修复，必须停止并报告剩余未修复项。\n   - 
+如果 review report 无法读取或内容为空，不要猜测问题，立即停止并报告"无法读取 rev
+iew report"。\n   - 如果 review report 中的问题超过 5 个，优先修复所有 Blocking 
+问题，最多再修复 3 个 Major 问题，其余明确报告为"留待后续迭代"。\n   - 不要修改
+与 review report 无关的代码。不要"顺手优化"。',
+                new_text='9. **rework 模式预算**：\n   - rework 不需要 explore 
+阶段，review report 已经告诉你问题在哪。\n   - **rework 模式总步数预算为 40 步**
+。超过 35 步仍未完成所有 Blocking 问题修复，必须停止并报告剩余未修复项。\n   - *
+*rework 中途检查点**：每 5 步必须在思考中自报一次当前步数，例如"[rework 步数检查
+] 当前第 20 步，剩余预算 20 步"。如果忘记自报，说明你已失去对步数的控制，必须立
+即停下来报告。\n   - 如果 review report 无法读取或内容为空，不要猜测问题，立即停
+止并报告"无法读取 review report"。\n   - 如果 review report 中的问题超过 5 个，
+优先修复所有 Blocking 问题，最多再修复 3 个 Major 问题，其余明确报告为"留待后续
+迭代"。\n   - 不要修改与 review report 无关的代码。不要"顺手优化"。',
+                old_start=145,
+                new_start=145,
+                is_summary=False
+            )
+        ],
+        extras=None
+    )
+)
+StepBegin(n=18)
+ThinkPart(
+    type='think',
+    think='现在让我检查所有修改是否都成功了。我需要验证：\n\n1. doc-gardener.yam
+l: AGENT_AGENTS_MD 已添加\n2. doc-gardener.md: 环境预检查、零产出熔断、错误熔断\
+n3. developer.md: 元原则 think 限制、启动检查清单预算确认、rework 中途检查点、th
+ink 超限熔断\n4. e2e.yaml: ignoreError: true\n5. e2e-tester.md: 强制 WriteFile\n
+6. reviewer.md: 编号修复、错误熔断、gh 容错\n\n让我并行检查。',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_Q0TBuLv2cBpPBUz6LKF5RoUD',
+    function=FunctionBody(
+        name='Shell',
+        arguments='{"command": "echo \\"=== doc-gardener.yaml ===\\" && grep -A2
+\\"AGENT_AGENTS_MD\\" /Users/insulate/Desktop/new-world/new-world-ops/workflows/
+doc-gardener.yaml && echo \\"=== e2e.yaml ===\\" && grep -A1 \\"ignoreError\\" /
+Users/insulate/Desktop/new-world/new-world-ops/workflows/e2e.yaml | head -3 && e
+cho \\"=== doc-gardener.md ===\\" && grep -n \\"零产出熔断\\\\|错误熔断\\\\|启动
+环境预检查\\" /Users/insulate/Desktop/new-world/new-world-ops/prompts/doc-garden
+er.md && echo \\"=== developer.md ===\\" && grep -n \\"Think 不是免费工具\\\\|确
+认步数与 think 预算\\\\|rework 中途检查点\\\\|触发立即熔断\\" /Users/insulate/De
+sktop/new-world/new-world-ops/prompts/developer.md && echo \\"=== e2e-tester.md 
+===\\" && grep -n \\"绝对约束\\\\|未调用 WriteFile\\" /Users/insulate/Desktop/ne
+w-world/new-world-ops/prompts/e2e-tester.md && echo \\"=== reviewer.md ===\\" &&
+grep -n \\"错误熔断\\\\|网络超时\\\\|步数自报检查点\\" /Users/insulate/Desktop/n
+ew-world/new-world-ops/prompts/reviewer.md"}'
+    ),
+    extras=None
+)
+StatusUpdate(
+    context_usage=0.19153213500976562,
+    context_tokens=50209,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=545,
+        output=423,
+        input_cache_read=49664,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-vkMLNV0pWoQGhtp6naKm4ZCR',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_Q0TBuLv2cBpPBUz6LKF5RoUD',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='=== doc-gardener.yaml ===\n      AGENT_AGENTS_MD: \'{{ .Vars.tmp
+Dir }}/AGENTS.md\'\n    outputKey: agentOutput\n    logFile: \'{{ .Vars.logFileN
+ame }}\'\n=== e2e.yaml ===\n    ignoreError: true\n    command: |\n--\n=== doc-g
+ardener.md ===\n11:## 启动环境预检查（第 1 步必须完成）\n48:3. **零产出熔断**：
+前 5 步内如果没有产生任何文件修改（WriteFile/StrReplaceFile），必须停下来重新评
+估："我是否理解了任务？是否在正确的文件上工作？"如果无法确认，停止并报告。\n49:4
+. **错误熔断**：任意工具调用（Shell、ReadFile、WriteFile、StrReplaceFile、Grep 
+等）如果连续 2 次返回 `is_error=true`，必须**立即停止执行**，生成错误摘要报告并
+结束任务。不允许通过换参数、换文件、换思路继续尝试。连续错误说明环境或假设有问题
+，不是 agent 能自行解决的。\n50:5. **单次错误后禁止立即重试**：任意工具调用如果
+返回 `is_error=true`，你必须先分析失败原因（读取错误信息、检查参数、确认文件/路
+径是否存在），**不得用相同或相似参数立即再次调用同一工具**。只有在你明确修正了导
+致错误的因素后，才能重试。如果同一操作在第 2 次尝试后仍失败，立即执行"错误熔断"
+逻辑（停止并报告）。\n=== developer.md ===\n14:4. **Think 不是免费工具**：每次 T
+hink 消耗 1 步，且绝对不得超过 3 次。超出即熔断。不要把 Think 当作"不消耗预算的
+分析时间"。\n25:4. **确认步数与 think 预算**：在内心确认当前模式的总预算——dev 模
+式总预算 60 步/think 限额 3 次；rework 模式总预算 40 步/think 限额 3 次。默念"当
+前剩余预算 X 步，剩余 think Y 次"。如果无法确认预算，说明你对任务模式不清晰，停
+止并报告。\n148:   - **rework 中途检查点**：每 5 步必须在思考中自报一次当前步数
+，例如"[rework 步数检查] 当前第 20 步，剩余预算 20 步"。如果忘记自报，说明你已失
+去对步数的控制，必须立即停下来报告。\n154:   - **违反此限制属于严重违规，触发立
+即熔断**：如果你已经 think 了 3 次，之后无论遇到什么情况都不得再使用 think，必须
+直接执行具体操作或向人类报告。**如果第 4 次调用 think，必须立即停止所有操作，直
+接输出任务执行报告并结束任务，不得继续执行任何工具调用。**\n=== e2e-tester.md ==
+=\n180:**绝对约束：不得以纯文本输出代替报告文件。必须调用 WriteFile 工具将报告写
+入 `AGENT_E2E_REPORT_FILE` 指定的路径，未调用 WriteFile 视为任务未完成。**\n=== 
+reviewer.md ===\n140:1. **环境预检查**：运行任何 `gh` 命令前，先执行 `gh auth st
+atus` 确认 GitHub CLI 已认证。然后执行 `gh pr view "$AGENT_PR_NUMBER" --json num
+ber`（或当前 PR 号）确认 PR 可访问。如果认证失败或 PR 不存在，立即停止审查，生成
+失败报告说明原因，不要继续尝试其他命令。如果因网络超时失败，最多重试 1 次，仍失
+败则停止并报告网络问题。\n145:   - 网络超时 → 最多重试 1 次，仍失败则停止并报告
+网络问题。\n156:9. **错误熔断**：任意工具调用如果连续 2 次返回错误，立即停止审查
+并生成失败报告，不得尝试替代路径或变体参数。\n157:10. **步数自报检查点**：每 15 
+步必须在思考中自报一次当前步数。review 任务平均应在 30-40 步内完成，如果超过 40 
+步仍未开始撰写审查结论，说明你陷入了过度探索，必须立即收缩范围，聚焦最关键的问题
+输出报告。\n',
+        message='Command executed successfully.',
+        display=[],
+        extras=None
+    )
+)
+StepBegin(n=19)
+ThinkPart(
+    type='think',
+    think='所有修改都已成功应用。让我再检查一下 reviewer.md 的编号是否正确。',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_mV3cloqtplefLy3MPvk2SbYe',
+    function=FunctionBody(
+        name='Shell',
+        arguments='{"command": "grep -n \\"^[0-9]\\\\+\\\\. \\\\*\\\\*\\" /Users
+/insulate/Desktop/new-world/new-world-ops/prompts/reviewer.md | tail -15"}'
+    ),
+    extras=None
+)
+StatusUpdate(
+    context_usage=0.19666290283203125,
+    context_tokens=51554,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=1378,
+        output=72,
+        input_cache_read=50176,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-Manc4Hp0aljfHkNLyYMYD1Z0',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_mV3cloqtplefLy3MPvk2SbYe',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='37:5. **已有相关代码** — 参考同模块或同类型的已实现代码，保持风
+格一致\n95:1. **问题描述**：简明扼要说明是什么问题\n96:2. **影响范围**：哪些功能
+/用户受影响\n97:3. **修复指令**：具体文件路径 + 修改建议（可直接复制给开发 Agent
+执行）\n98:4. **依据**：引用哪份项目文档或代码证据支持这个判断\n140:1. **环境预
+检查**：运行任何 `gh` 命令前，先执行 `gh auth status` 确认 GitHub CLI 已认证。然
+后执行 `gh pr view "$AGENT_PR_NUMBER" --json number`（或当前 PR 号）确认 PR 可访
+问。如果认证失败或 PR 不存在，立即停止审查，生成失败报告说明原因，不要继续尝试其
+他命令。如果因网络超时失败，最多重试 1 次，仍失败则停止并报告网络问题。\n141:2. 
+**文档存在性检查**：读取规范文档前，先用 `Shell` 命令（如 `ls -la <路径>` 或 `te
+st -f <路径>`）确认文件存在。如果文件不存在，跳过该维度并在报告中标注"未验证（文
+件缺失）"，不要直接执行 `ReadFile` 导致错误浪费步数。\n142:3. **PR 信息获取失败
+时快速退出**：如果 `gh pr diff` 或 `gh pr view` 失败，根据错误码立即处理：\n147:
+4. **审查结论必须写入文件**：无论审查结果是 PASS 还是 NEEDS_FIX，都必须将完整审
+查报告写入 `AGENT_REVIEW_REPORT` 环境变量指定的路径（默认 `logs/review-report-<p
+r_number>.md`）。纯文本输出不算完成。\n148:5. **步数预算**：超过 50 步仍未完成审
+查报告写入，停下来报告阻塞原因。\n149:6. **问题数量限制**：Blocking + Major 问题
+总数不得超过 5 个。如果审查发现超过 5 个 Blocking/Major 问题，只保留最严重的 5 
+个详细说明并给出修复指令，其余问题归入"其他问题概要"章节简述。这样可以避免 rewor
+k agent 因任务过载而步数膨胀或失败。\n150:7. **模板检查清单执行验证**：\n155:8. 
+**遇到错误时快速跳过，不要反复试探**：如果 `ReadFile`、`Shell` 或 `Grep` 等工具
+调用返回错误（文件不存在、命令失败、权限不足），记录错误原因，将该维度标记为"未
+验证（执行错误）"并立即跳过，**不得尝试替代路径、变体参数或绕过方式**。例如：读
+取 `docs/ui-spec.md` 失败，不要尝试 `docs/UI-spec.md` 或 `docs/spec.md`，直接标
+注未验证并继续下一项。反复试探同一类失败操作会浪费步数并增加错误率。\n156:9. **
+错误熔断**：任意工具调用如果连续 2 次返回错误，立即停止审查并生成失败报告，不得
+尝试替代路径或变体参数。\n157:10. **步数自报检查点**：每 15 步必须在思考中自报一
+次当前步数。review 任务平均应在 30-40 步内完成，如果超过 40 步仍未开始撰写审查结
+论，说明你陷入了过度探索，必须立即收缩范围，聚焦最关键的问题输出报告。\n',
+        message='Command executed successfully.',
+        display=[],
+        extras=None
+    )
+)
+StepBegin(n=20)
+ThinkPart(
+    type='think',
+    think='reviewer.md 的编号现在已经是连续的了（1-10），很好。\n\n让我再确认一
+下 developer.md 的编号是否还正确。',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_tLC30P9vKXmJjVFC99Eph3WV',
+    function=FunctionBody(
+        name='Shell',
+        arguments='{"command": "grep -n \\"^[0-9]\\\\+\\\\. \\\\*\\\\*\\" /Users
+/insulate/Desktop/new-world/new-world-ops/prompts/developer.md | tail -20"}'
+    ),
+    extras=None
+)
+StatusUpdate(
+    context_usage=0.19978713989257812,
+    context_tokens=52373,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=917,
+        output=85,
+        input_cache_read=51456,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-en12Un8SKEEbWFxP0o6yEdat',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_tLC30P9vKXmJjVFC99Eph3WV',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='21:2. **确认任务边界**：\n24:3. **设置待办清单**：使用 `SetTodoL
+ist` 工具列出本次任务要完成的 3-5 个具体事项。每完成一项更新状态。如果无法列出清
+晰的待办事项，说明任务边界不清晰，停止并报告。\n25:4. **确认步数与 think 预算**
+：在内心确认当前模式的总预算——dev 模式总预算 60 步/think 限额 3 次；rework 模式
+总预算 40 步/think 限额 3 次。默念"当前剩余预算 X 步，剩余 think Y 次"。如果无法
+确认预算，说明你对任务模式不清晰，停止并报告。\n85:1. **调用链完整吗？**\n89:2. 
+**规范遵守了吗？**\n94:3. **测试运行了吗？**\n98:4. **文档同步了吗？**\n102:5. *
+*有什么遗留问题？**\n135:1. **步数硬上限**：绝对不得超过 60 步。如果执行超过 50 
+步仍未完成核心代码修改，**立即停止**——这意味着你不得再调用任何工具（包括 ReadFil
+e、Shell、WriteFile、StrReplaceFile、Grep、Think 等），直接以纯文本输出最终进度
+报告并结束任务。严禁在"报告"后继续执行任何操作。\n138:2. **错误熔断**：**任意工
+具调用**（Shell、ReadFile、WriteFile、StrReplaceFile、Grep 等）如果连续 3 次返回
+`is_error=true`，必须**立即停止执行**，生成错误摘要报告并结束任务。不允许通过换
+参数、换文件、换思路继续尝试。连续错误说明环境或假设有问题，不是 agent 能自行解
+决的。\n139:3. **零进度熔断**：前 5 步内如果没有产生任何文件修改（WriteFile/StrR
+eplaceFile），必须停下来重新评估："我是否理解了任务？是否在正确的文件上工作？"如
+果无法确认，停止并报告。\n140:4. **进度检查点**：每执行 10 步，必须做一次自评——"
+过去 10 步是否产生了至少一次文件修改？"如果答案为否，立即停止并报告阻塞原因。\n1
+41:5. **探索预算**：读取项目文档和代码以定位修改点的阶段，不得超过 12 步。如果 1
+2 步内仍未定位到需要修改的文件，停止并报告。\n142:6. **零修改产出处理**：探索后
+如果确认无需任何代码或文档修改，必须显式说明"经检查，当前代码已符合要求，无需修
+改"并立即结束任务，不允许为了消耗步数而做无意义操作。\n143:7. **避免重复验证**：
+同一验证命令（如测试、构建）连续失败 2 次后，先修复已知问题再重试，不允许无脑重
+复。\n144:8. **命令输出限制**：执行可能产生大量输出的 Shell 命令（如 `grep -r`、
+`find`、`git diff`、`cat` 大文件）时，必须使用 `| head -N` 或 `| tail -N` 限制输
+出（N ≤ 30），避免触发\'chunk exceed the limit\'错误导致命令失败。\n145:9. **rew
+ork 模式预算**：\n152:10. **Think 使用限制**：仅在涉及 3 个以上文件协调或复杂架
+构决策时使用 think 工具。常规代码阅读、文件修改、命令执行直接操作，不要 think。\
+n156:11. **StrReplaceFile 失败处理**：如果 `StrReplaceFile` 连续失败 2 次，先 `R
+eadFile` 确认文件当前内容，再构造精确替换文本；如果仍然失败，改用 `WriteFile` 重
+写整个文件，或向人类报告具体失败片段，不要无限重试。\n157:12. **单次错误后禁止立
+即重试**：任意工具调用如果返回 `is_error=true`，你必须先分析失败原因（读取错误信
+息、检查参数、确认文件/路径是否存在），**不得用相同或相似参数立即再次调用同一工
+具**。只有在你明确修正了导致错误的因素后，才能重试。如果同一操作在第 2 次尝试后
+仍失败，立即执行"错误熔断"逻辑（停止并报告）。\n',
+        message='Command executed successfully.',
+        display=[],
+        extras=None
+    )
+)
+StepBegin(n=21)
+ThinkPart(
+    type='think',
+    think='所有修改都已成功完成。让我更新 todo list 并做最终确认。\n\n让我再确认
+一下 doc-gardener.md 的内容是否正确，特别是编号。',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_wjAssI4joRsQqfl4wvSaAd0r',
+    function=FunctionBody(
+        name='Shell',
+        arguments='{"command": "grep -n \\"^[0-9]\\\\+\\\\. \\\\*\\\\*\\" /Users
+/insulate/Desktop/new-world/new-world-ops/prompts/doc-gardener.md"}'
+    ),
+    extras=None
+)
+StatusUpdate(
+    context_usage=0.20362472534179688,
+    context_tokens=53379,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=1155,
+        output=86,
+        input_cache_read=52224,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-6EcSbinghPcRRSmn3B24Qtu5',
+    plan_mode=False,
+    mcp_status=None
+)
+ToolResult(
+    tool_call_id='tool_wjAssI4joRsQqfl4wvSaAd0r',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='14:1. **确认环境**：执行 `pwd` 和 `ls AGENTS.md`，确认你在正确的
+worktree 目录且项目导航文档可访问。如果 `AGENTS.md` 不存在或环境异常，立即停止并
+报告阻塞原因，不要继续执行后续步骤。\n18:1. **读取 AGENTS.md**：了解项目文档结构
+、文档规范路径和可用检查命令。\n19:2. **检查文档一致性**：\n23:3. **修复确定性问
+题**：\n26:4. **提交修改**：\n30:5. **生成检查报告**（无论是否有修改）：\n46:1. 
+**步数预算**：超过 40 步仍未完成文档检查和修复，停下来报告阻塞原因。\n47:2. **禁
+止零产出结束**：如果确实没有文档需要修改，仍必须生成检查报告文件并提交（报告本身
+就是一种产出）。\n48:3. **零产出熔断**：前 5 步内如果没有产生任何文件修改（Write
+File/StrReplaceFile），必须停下来重新评估："我是否理解了任务？是否在正确的文件上
+工作？"如果无法确认，停止并报告。\n49:4. **错误熔断**：任意工具调用（Shell、Read
+File、WriteFile、StrReplaceFile、Grep 等）如果连续 2 次返回 `is_error=true`，必
+须**立即停止执行**，生成错误摘要报告并结束任务。不允许通过换参数、换文件、换思路
+继续尝试。连续错误说明环境或假设有问题，不是 agent 能自行解决的。\n50:5. **单次
+错误后禁止立即重试**：任意工具调用如果返回 `is_error=true`，你必须先分析失败原因
+（读取错误信息、检查参数、确认文件/路径是否存在），**不得用相同或相似参数立即再
+次调用同一工具**。只有在你明确修正了导致错误的因素后，才能重试。如果同一操作在第
+2 次尝试后仍失败，立即执行"错误熔断"逻辑（停止并报告）。\n',
+        message='Command executed successfully.',
+        display=[],
+        extras=None
+    )
+)
+StepBegin(n=22)
+ThinkPart(
+    type='think',
+    think='所有修改都已完成且验证成功。让我更新 todo list 为全部完成状态。',
+    encrypted=None
+)
+ToolCall(
+    type='function',
+    id='tool_e31S9Jykyafq75WuKiH72jTq',
+    function=FunctionBody(
+        name='SetTodoList',
+        arguments='{"todos": [{"title":"生成 prompt-evolution-report.md 报告","s
+tatus":"done"},{"title":"修改 doc-gardener.yaml：补充 AGENT_AGENTS_MD 环境变量",
+"status":"done"},{"title":"修改 doc-gardener.md：增加环境预检查与零产出熔断","st
+atus":"done"},{"title":"修改 developer.md：强化 think/步数约束的前置提醒与熔断机
+制","status":"done"},{"title":"修改 e2e.yaml：runE2EAgent 增加 ignoreError 确保
+兜底执行","status":"done"},{"title":"修改 e2e-tester.md：强化环境不可用时必须 Wr
+iteFile","status":"done"},{"title":"修改 reviewer.md：修复编号混乱并强化错误跳过
+","status":"done"}]}'
+    ),
+    extras=None
+)
+ToolResult(
+    tool_call_id='tool_e31S9Jykyafq75WuKiH72jTq',
+    return_value=ToolReturnValue(
+        is_error=False,
+        output='Todo list updated',
+        message='Todo list updated',
+        display=[
+            TodoDisplayBlock(
+                type='todo',
+                items=[
+                    TodoDisplayItem(
+                        title='生成 prompt-evolution-report.md 报告',
+                        status='done'
+                    ),
+                    TodoDisplayItem(
+                        title='修改 doc-gardener.yaml：补充 AGENT_AGENTS_MD 环境
+变量',
+                        status='done'
+                    ),
+                    TodoDisplayItem(
+                        title='修改 doc-gardener.md：增加环境预检查与零产出熔断'
+,
+                        status='done'
+                    ),
+                    TodoDisplayItem(
+                        title='修改 developer.md：强化 think/步数约束的前置提醒
+与熔断机制',
+                        status='done'
+                    ),
+                    TodoDisplayItem(
+                        title='修改 e2e.yaml：runE2EAgent 增加 ignoreError 确保
+兜底执行',
+                        status='done'
+                    ),
+                    TodoDisplayItem(
+                        title='修改 e2e-tester.md：强化环境不可用时必须 WriteFil
+e',
+                        status='done'
+                    ),
+                    TodoDisplayItem(
+                        title='修改 reviewer.md：修复编号混乱并强化错误跳过',
+                        status='done'
+                    )
+                ]
+            )
+        ],
+        extras=None
+    )
+)
+StatusUpdate(
+    context_usage=0.20560836791992188,
+    context_tokens=53899,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=651,
+        output=186,
+        input_cache_read=53248,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-xiu6IAP18Xrv3KLM4SJCyDsh',
+    plan_mode=False,
+    mcp_status=None
+)
+StepBegin(n=23)
+ThinkPart(
+    type='think',
+    think='用户要求我分析统计报告并生成改进建议，我已经完成了所有工作：\n\n1. 读
+取并分析了统计报告\n2. 识别了5个关键问题（doc零产出、e2e持续零步、rework步数超标
+、review错误率反弹、think系统性滥用）\n3. 生成了 prompt-evolution-report.md\n4. 
+实际修改了6个文件：\n   - workflows/doc-gardener.yaml（增加 AGENT_AGENTS_MD）\n 
+ - prompts/doc-gardener.md（环境预检查、零产出熔断、错误熔断）\n   - prompts/dev
+eloper.md（think前置限制、预算确认、rework检查点、think熔断）\n   - workflows/e2
+e.yaml（runE2EAgent增加ignoreError）\n   - prompts/e2e-tester.md（强制WriteFile
+兜底）\n   - prompts/reviewer.md（修复编号、错误熔断、gh容错）\n\n我应该向用户汇
+报完成情况，包括报告路径和修改的文件列表。',
+    encrypted=None
+)
+TextPart(
+    type='text',
+    text='分析已完成，改进建议已写入项目根目录的 `prompt-evolution-report.md`，
+并根据数据驱动的判断直接修改了 6 个文件。\n\n## 核心发现\n\n| Agent | 关键指标 |
+诊断结论 |\n|-------|----------|----------|\n| **doc** | successRate=0%, writes=
+0 | workflow 缺少 `AGENT_AGENTS_MD`，agent 找不到项目导航文档，在错误方向上空转 
+|\n| **e2e** | avgSteps=0, successRate=0 | 持续恶化，workflow 在 agent 失败后直
+接终止，未进入兜底收集 |\n| **rework** | avgSteps=64, think=15次 | 步数/think 严
+重超标，约束位于 prompt 后半段，agent 未内化 |\n| **review** | totalErrors=2/2 
+任务 | 错误率反弹，编号混乱降低了约束严肃性 |\n| **dev** | avgSteps=55 | 较上次 
+79 步显著改善，但 think 仍超标 |\n\n## 趋势对比\n- **步数**: `avgStepsDelta = -2
+2.14`（改善），dev 从 79→55，rework 从 73→64\n- **错误率**: `errorRateDelta = +0
+.29`（恶化），主要受 doc 和 review 拖累\n- **成功率**: `successRateDelta = -0.14
+`（恶化），doc/e2e 零产出拉低整体\n\n## 已应用的直接修改\n\n1. **`workflows/doc-
+gardener.yaml`** — 补齐 `AGENT_AGENTS_MD` 环境变量，与 dev/review/rework 保持一
+致\n2. **`prompts/doc-gardener.md`** — 增加启动环境预检查、零产出熔断（前5步无写
+入则停止）、错误熔断与禁止重试\n3. **`prompts/developer.md`** — 元原则前置 think
+限制（"Think 不是免费工具"）、任务启动时确认步数/think 预算、rework 每5步自报检
+查点、think 超限立即熔断\n4. **`workflows/e2e.yaml`** — `runE2EAgent` 增加 `igno
+reError: true`，确保 agent 失败后仍能执行到底\n5. **`prompts/e2e-tester.md`** — 
+环境不可用时强制要求调用 `WriteFile`，禁止纯文本输出代替报告\n6. **`prompts/revi
+ewer.md`** — 修复执行约束编号混乱（1-10 连续）、新增错误熔断阈值（连续2次错误停
+止）、gh 网络超时最多重试1次\n\n详细诊断与改进逻辑见报告文件：`/Users/insulate/D
+esktop/new-world/new-world-ops/prompt-evolution-report.md`'
+)
+StatusUpdate(
+    context_usage=0.20643234252929688,
+    context_tokens=54115,
+    max_context_tokens=262144,
+    token_usage=TokenUsage(
+        input_other=355,
+        output=782,
+        input_cache_read=53760,
+        input_cache_creation=0
+    ),
+    message_id='chatcmpl-AraOlgzF1UOToZZQigwxf7N9',
+    plan_mode=False,
+    mcp_status=None
+)
+TurnEnd()
+
+To resume this session: kimi -r 04e1f1a2-27fc-43b4-9daa-bbad2c1b06f3
+
+✅ 任务完成

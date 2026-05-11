@@ -1,0 +1,149 @@
+name: e2e-task
+steps:
+  - id: checkEnv
+    label: 检查/启动 E2E 环境
+    type: shell
+    logFile: '{{ .Vars.logFileName }}'
+    ignoreError: true
+    command: |
+      echo "=== E2E 环境检查 ==="
+      export ANDROID_HOME="${ANDROID_HOME:-$HOME/Library/Android/sdk}"
+      export PATH="$ANDROID_HOME/emulator:$ANDROID_HOME/platform-tools:$PATH"
+      ENV_READY=true
+
+      if ! command -v adb &> /dev/null; then
+        echo "❌ adb 未安装"
+        ENV_READY=false
+      else
+        echo "✅ adb: $(adb version | head -1)"
+      fi
+
+      if ! command -v maestro &> /dev/null; then
+        echo "❌ maestro 未安装"
+        ENV_READY=false
+      else
+        echo "✅ maestro: $(maestro --version | head -1)"
+      fi
+
+      # Docker daemon 预检
+      if ! docker info >/dev/null 2>&1; then
+        echo "❌ Docker daemon 未运行"
+        ENV_READY=false
+      else
+        echo "✅ Docker daemon 运行中"
+      fi
+
+      devices=$(adb devices | grep "emulator-" | grep "device" || true)
+      if [ -n "$devices" ]; then
+        echo "✅ Android Emulator 已启动"
+      else
+        echo "⚠️ Emulator 未启动，尝试启动..."
+        avd_list=$(emulator -list-avds 2>/dev/null | head -1)
+        if [ -z "$avd_list" ]; then
+          echo "❌ 没有可用的 AVD"
+          ENV_READY=false
+        else
+          nohup emulator -avd "$avd_list" -no-window -no-boot-anim -no-snapshot-load > /dev/null 2>&1 &
+          for i in $(seq 1 60); do
+            if adb devices | grep -q "emulator-.*device"; then
+              echo "✅ Emulator 已就绪"
+              break
+            fi
+            sleep 2
+          done
+          if ! adb devices | grep -q "emulator-.*device"; then
+            echo "❌ Emulator 启动超时"
+            ENV_READY=false
+          fi
+        fi
+      fi
+
+      if [ "$ENV_READY" = "true" ]; then
+        adb shell settings put global anr_show_dialog 0 2>/dev/null || true
+        echo "ENV_READY=true" > .e2e-env-status
+        echo "✅ E2E 环境就绪"
+      else
+        echo "ENV_READY=false" > .e2e-env-status
+        echo "⚠️ E2E 环境未就绪，agent 将生成环境不可用报告"
+      fi
+
+  - id: checkBackendPorts
+    label: 检查后端端口状态
+    type: shell
+    logFile: '{{ .Vars.logFileName }}'
+    command: |
+      echo "=== 后端服务端口检查 ==="
+      for port in 3306 6379; do
+        if lsof -Pi :$port -sTCP:LISTEN -t >/dev/null 2>&1; then
+          echo "⚠️ 端口 $port 已被占用（可能由其他任务使用，请勿强制关闭）"
+        else
+          echo "✅ 端口 $port 空闲"
+        fi
+      done
+      echo "提示：如果后端服务未运行，agent 需要自行决定启动策略"
+    ignoreError: true
+
+  - id: ensureReportDir
+    label: 创建报告目录
+    type: shell
+    logFile: '{{ .Vars.logFileName }}'
+    command: |
+      reportFile="{{ .Vars.reportFile }}"
+      mkdir -p "$(dirname "$reportFile")"
+      echo "✅ 报告目录已就绪: $(dirname "$reportFile")"
+    ignoreError: true
+
+  - id: runE2EAgent
+    label: 运行 E2E 测试 Agent
+    type: shell
+    tmux: true
+    logFile: '{{ .Vars.logFileName }}'
+    ignoreError: true
+    command: |
+      echo "=== 运行 E2E 测试 Agent ==="
+      mkdir -p "{{ .Vars.debugDir | shellquote }}"
+      kimi --agent-file {{ .Vars.agentFile | shellquote }} \
+           --max-steps-per-turn 10000 \
+           --print \
+           -p {{ .Vars.prompt | shellquote }}
+    env:
+      AGENT_E2E_DEBUG_DIR: '{{ .Vars.debugDir }}'
+      AGENT_E2E_REPORT_FILE: '{{ .Vars.reportFile }}'
+      AGENT_LOG_FILE: '{{ .Vars.logFileName }}'
+      # AGENT_AGENTS_MD 由 dashboard 在 buildAgentContext 中自动设置，无需在此覆盖
+    outputKey: agentOutput
+
+  - id: collectArtifacts
+    label: 收集 E2E 产物
+    type: shell
+    logFile: '{{ .Vars.logFileName }}'
+    isCleanup: true
+    command: |
+      echo "=== 收集 E2E 产物 ==="
+      reportFile="{{ .Vars.reportFile }}"
+      if [ -f "$reportFile" ] && [ -s "$reportFile" ]; then
+        echo "✅ 报告已生成"
+        exit 0
+      fi
+      
+      echo "❌ agent 未生成报告文件，执行兜底生成并标记失败"
+      debugDir="{{ .Vars.debugDir }}"
+      mkdir -p "$(dirname "$reportFile")"
+      maestroOutput=""
+      if [ -f "$debugDir/maestro-output.log" ]; then
+        maestroOutput=$(cat "$debugDir/maestro-output.log")
+      fi
+      passedCount=$(echo "$maestroOutput" | grep -c '^\[Passed\]' || echo 0)
+      failedCount=$(echo "$maestroOutput" | grep -c '^\[Failed\]' || echo 0)
+      exitCode=$(cat "$debugDir/exit-code.txt" 2>/dev/null | tr -d ' ' || echo "N/A")
+      result=$([ "$exitCode" = "0" ] && echo "✅ 通过" || echo "❌ 失败")
+      printf '%s\n' \
+        '# E2E 测试报告 (兜底生成 — Agent 未输出报告)' \
+        '' \
+        "- **总体结果**: $result" \
+        "- **Exit Code**: $exitCode" \
+        "- **通过**: $passedCount" \
+        "- **失败**: $failedCount" \
+        "- **警告**: Agent 未生成报告，此为 workflow 兜底输出" \
+        > "$reportFile"
+      exit 1

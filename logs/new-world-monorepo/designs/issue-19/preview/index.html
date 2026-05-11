@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Issue #19 — 国风 UI 组件预览</title>
+<style>
+  :root {
+    --bg: #f7f5f0;
+    --card-bg: #ffffff;
+    --border: #e0dcd4;
+    --ink-black: #1a1a1a;
+    --paper-yellow: #f5f0e6;
+    --cinnabar-red: #c45c48;
+    --stone-cyan: #4a9eff;
+    --indigo-blue: #3d5a80;
+    --gold-brown: #c9a227;
+    --light-ink: #666666;
+    --white: #ffffff;
+    --ink-text: #2c2c2c;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Microsoft YaHei", "PingFang SC", "Noto Sans SC", sans-serif;
+    background: var(--bg);
+    color: var(--ink-text);
+    line-height: 1.6;
+    padding-bottom: 60px;
+  }
+  header {
+    background: var(--ink-black);
+    color: var(--white);
+    padding: 28px 40px;
+    border-bottom: 3px solid var(--gold-brown);
+  }
+  header h1 { font-size: 22px; margin-bottom: 6px; }
+  header p { color: var(--light-ink); font-size: 13px; }
+  .container { max-width: 1200px; margin: 0 auto; padding: 28px 40px; }
+
+  .section {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    margin-bottom: 24px;
+    overflow: hidden;
+  }
+  .section-header {
+    background: var(--paper-yellow);
+    padding: 14px 20px;
+    border-bottom: 2px solid var(--gold-brown);
+    font-size: 15px;
+    font-weight: bold;
+    color: var(--ink-black);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-body { padding: 20px; }
+
+  /* Color Palette */
+  .color-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 16px;
+  }
+  .color-card {
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+    text-align: center;
+  }
+  .color-swatch {
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: bold;
+    font-family: "SF Mono", Consolas, monospace;
+  }
+  .color-name {
+    padding: 8px;
+    font-size: 12px;
+    color: var(--light-ink);
+    font-family: "SF Mono", Consolas, monospace;
+    background: #faf8f4;
+  }
+
+  /* Component Cards */
+  .comp-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+  }
+  .comp-card {
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 16px;
+    background: #faf8f4;
+    transition: box-shadow 0.2s;
+  }
+  .comp-card:hover {
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    border-color: var(--gold-brown);
+  }
+  .comp-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+  .comp-name {
+    font-size: 15px;
+    font-weight: bold;
+    color: var(--ink-black);
+    font-family: "SF Mono", Consolas, monospace;
+  }
+  .comp-badge {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    background: var(--paper-yellow);
+    color: var(--indigo-blue);
+    border: 1px solid var(--gold-brown);
+  }
+  .comp-visual {
+    background: var(--white);
+    border: 1px dashed var(--border);
+    border-radius: 4px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 12px;
+  }
+  .comp-fields {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+  .comp-fields .field {
+    font-size: 11px;
+    padding: 2px 8px;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    color: var(--indigo-blue);
+  }
+  .comp-fields code {
+    font-family: "SF Mono", Consolas, monospace;
+    color: var(--cinnabar-red);
+  }
+  .comp-desc {
+    font-size: 12px;
+    color: var(--light-ink);
+    border-top: 1px solid var(--border);
+    padding-top: 8px;
+    margin-top: 4px;
+  }
+
+  /* Infrastructure exports */
+  .infra-category {
+    font-size: 13px;
+    font-weight: bold;
+    color: var(--indigo-blue);
+    margin: 16px 0 10px 0;
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--border);
+  }
+  .infra-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  .infra-card {
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 12px;
+    background: #faf8f4;
+    transition: box-shadow 0.15s, border-color 0.15s;
+  }
+  .infra-card:hover {
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    border-color: var(--gold-brown);
+  }
+  .infra-kind {
+    font-size: 9px;
+    padding: 1px 5px;
+    border-radius: 3px;
+    background: var(--indigo-blue);
+    color: #fff;
+    display: inline-block;
+    margin-bottom: 6px;
+    font-family: "SF Mono", Consolas, monospace;
+    text-transform: uppercase;
+  }
+  .infra-name {
+    font-family: "SF Mono", Consolas, monospace;
+    font-size: 12px;
+    color: var(--cinnabar-red);
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .infra-desc {
+    font-size: 11px;
+    color: var(--light-ink);
+    line-height: 1.4;
+    max-height: 2.8em;
+    overflow: hidden;
+  }
+
+  .status-bar {
+    text-align: center;
+    padding: 16px;
+    color: var(--light-ink);
+    font-size: 12px;
+  }
+  @keyframes loadPulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.8); }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>🎨 Issue #19 — 国风 UI 组件预览</h1>
+  <p>由设计代码自动生成 · 色板与组件定义源自 src/ui/</p>
+</header>
+
+<div class="container">
+  <div class="section">
+    <div class="section-header">🎨 国风水墨色板（7 色）</div>
+    <div class="section-body">
+      <div class="color-grid">
+        
+        <div class="color-card">
+            <div class="color-swatch" style="background:#c45c48;color:#ffffff">#c45c48</div>
+            <div class="color-name">cinnabarRed</div>
+        </div>
+        <div class="color-card">
+            <div class="color-swatch" style="background:#c9a227;color:#2c2c2c">#c9a227</div>
+            <div class="color-name">goldBrown</div>
+        </div>
+        <div class="color-card">
+            <div class="color-swatch" style="background:#3d5a80;color:#ffffff">#3d5a80</div>
+            <div class="color-name">indigoBlue</div>
+        </div>
+        <div class="color-card">
+            <div class="color-swatch" style="background:#1a1a1a;color:#ffffff">#1a1a1a</div>
+            <div class="color-name">inkBlack</div>
+        </div>
+        <div class="color-card">
+            <div class="color-swatch" style="background:#666666;color:#ffffff">#666666</div>
+            <div class="color-name">lightInk</div>
+        </div>
+        <div class="color-card">
+            <div class="color-swatch" style="background:#008080;color:#ffffff">#008080</div>
+            <div class="color-name">stoneCyan</div>
+        </div>
+        <div class="color-card">
+            <div class="color-swatch" style="background:#ffffff;color:#2c2c2c">#ffffff</div>
+            <div class="color-name">white</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  
+
+  <div class="section">
+    <div class="section-header">🧩 组件清单（共 4 个)</div>
+    <div class="section-body">
+      <div class="comp-grid">
+        
+        <div class="comp-card">
+            <div class="comp-header">
+                <span class="comp-name">UIToast</span>
+                <span class="comp-badge">Layer 1</span>
+            </div>
+            <div class="comp-visual">
+                <div style="display:flex;align-items:center;justify-content:center;height:100%;width:100%;"><div style="display:flex;align-items:center;background:#f5f0e6;border:1px solid #c9a227;border-radius:4px;padding:10px 14px;width:85%;box-shadow:0 2px 6px rgba(0,0,0,0.08);position:relative;overflow:hidden;"><div style="position:absolute;left:0;top:2px;bottom:2px;width:3px;background:#008080;border-radius:2px;"></div><span style="font-size:12px;color:#1a1a1a;margin-left:6px;">轻提示消息</span></div></div>
+            </div>
+            <div class="comp-fields"><span class="field"><code>message?</code>: string</span><span class="field"><code>type?</code>: UINotificationType</span><span class="field"><code>duration?</code>: number</span><span class="field"><code>icon?</code>: string</span><span class="field"><code>texture?</code>: string</span><span class="field"><code>depth?</code>: number</span></div>
+            
+        </div>
+        <div class="comp-card">
+            <div class="comp-header">
+                <span class="comp-name">UIPanel</span>
+                <span class="comp-badge">Layer 1</span>
+            </div>
+            <div class="comp-visual">
+                <div style="display:flex;align-items:center;justify-content:center;height:100%;width:100%;"><div style="background:#f5f0e6;border:1px solid #c9a227;border-radius:6px;padding:12px 14px;width:90%;box-shadow:0 2px 8px rgba(0,0,0,0.08);"><div style="height:3px;background:#c9a227;border-radius:2px;margin-bottom:8px;"></div><div style="height:6px;background:#e0dcd4;border-radius:2px;width:70%;margin-bottom:5px;"></div><div style="height:6px;background:#e0dcd4;border-radius:2px;width:50%;"></div></div></div>
+            </div>
+            <div class="comp-fields"><span class="field"><code>title?</code>: string</span><span class="field"><code>texture?</code>: string</span><span class="field"><code>bgColor?</code>: number</span><span class="field"><code>strokeColor?</code>: number</span><span class="field"><code>showClose?</code>: boolean</span><span class="field"><code>showOverlay?</code>: boolean</span></div>
+            
+        </div>
+        <div class="comp-card">
+            <div class="comp-header">
+                <span class="comp-name">UIDialog</span>
+                <span class="comp-badge">Layer 1</span>
+            </div>
+            <div class="comp-visual">
+                <div style="display:flex;align-items:center;justify-content:center;height:100%;width:100%;"><div style="background:#fff;border:2px solid #c9a227;border-radius:8px;padding:14px 16px;width:80%;box-shadow:0 6px 20px rgba(0,0,0,0.15);text-align:center;"><div style="font-size:13px;color:#1a1a1a;margin-bottom:10px;font-weight:600;">确认操作</div><div style="display:flex;gap:10px;justify-content:center;"><div style="background:#c45c48;color:#fff;padding:5px 16px;border-radius:3px;font-size:11px;letter-spacing:1px;">确定</div><div style="background:#f5f0e6;color:#1a1a1a;padding:5px 16px;border-radius:3px;font-size:11px;border:1px solid #c9a227;">取消</div></div></div></div>
+            </div>
+            <div class="comp-fields"><span class="field"><code>title?</code>: string</span><span class="field"><code>message?</code>: string</span><span class="field"><code>confirmText?</code>: string</span><span class="field"><code>cancelText?</code>: string</span><span class="field"><code>showCancel?</code>: boolean</span><span class="field"><code>confirmTexture?</code>: string</span></div>
+            
+        </div>
+        <div class="comp-card">
+            <div class="comp-header">
+                <span class="comp-name">UIAlert</span>
+                <span class="comp-badge">Layer 1</span>
+            </div>
+            <div class="comp-visual">
+                <div style="display:flex;align-items:center;justify-content:center;height:100%;width:100%;"><div style="display:flex;align-items:center;background:#f5f0e6;border:1px solid #c9a227;border-radius:4px;padding:8px 14px;width:85%;box-shadow:0 2px 6px rgba(0,0,0,0.08);position:relative;overflow:hidden;"><div style="position:absolute;left:0;top:2px;bottom:2px;width:3px;background:#3d5a80;border-radius:2px;"></div><span style="font-size:12px;color:#1a1a1a;margin-left:6px;">提示消息内容</span></div></div>
+            </div>
+            <div class="comp-fields"><span class="field"><code>message?</code>: string</span><span class="field"><code>type?</code>: UINotificationType</span><span class="field"><code>duration?</code>: number</span><span class="field"><code>isAutoHide?</code>: boolean</span><span class="field"><code>depth?</code>: number</span></div>
+            
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="status-bar">
+    ⚠️ 本页面由系统自动生成，仅展示组件接口定义与色板。实际视觉效果以 Phaser3 渲染为准。
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,213 @@
+name: e2e-task
+steps:
+  - id: checkEnv
+    label: 检查/启动 E2E 环境
+    type: shell
+    dir: '{{ .Vars.worktreePath }}'
+    logFile: '{{ .Vars.logFileName }}'
+    ignoreError: true
+    command: |
+      echo "=== E2E 环境检查 ==="
+      echo "任务类型: {{ .Vars.taskKind }}"
+      export ANDROID_HOME="${ANDROID_HOME:-$HOME/Library/Android/sdk}"
+      export PATH="$ANDROID_HOME/emulator:$ANDROID_HOME/platform-tools:$PATH"
+      if ! command -v adb &> /dev/null; then
+        echo "❌ adb 未安装或未加入 PATH"
+        exit 1
+      fi
+      echo "✅ adb: $(adb version | head -1)"
+      if ! command -v maestro &> /dev/null; then
+        echo "❌ maestro 未安装"
+        exit 1
+      fi
+      echo "✅ maestro: $(maestro --version | head -1)"
+      if [ "{{ .Vars.taskKind }}" != "frontend-only" ]; then
+        echo ""
+        echo "=== 检查后端正端 ==="
+        health_resp=$(curl -sf http://localhost:3001/api/v1/health 2>/dev/null || echo "")
+        if echo "$health_resp" | grep -q '"status".*"ok"'; then
+          echo "✅ 后端 API 已运行"
+        else
+          echo "⚠️ 后端未运行，尝试启动 E2E 环境..."
+          if [ -f "Makefile" ] && grep -q "e2e-env-up" Makefile 2>/dev/null; then
+            # 清理可能已存在的同名容器，避免命名冲突
+            docker rm -f sw-mysql sw-redis 2>/dev/null || true
+            make e2e-env-up 2>&1
+            sleep 3
+            health_resp2=$(curl -sf http://localhost:3001/api/v1/health 2>/dev/null || echo "")
+            if echo "$health_resp2" | grep -q '"status".*"ok"'; then
+              echo "✅ 后端 API 启动成功"
+              if docker exec sw-redis redis-cli SETEX sms_code:13800138000 3600 123456 >/dev/null 2>&1; then
+                echo "🔑 E2E 测试验证码已预置"
+              fi
+            else
+              echo "❌ 后端 API 启动失败"
+              exit 1
+            fi
+          else
+            echo "⚠️ 未找到 e2e-env-up Makefile 目标"
+          fi
+        fi
+      fi
+      devices=$(adb devices | grep "emulator-" | grep "device" || true)
+      if [ -n "$devices" ]; then
+        echo "✅ Android Emulator 已启动:"
+        echo "$devices"
+      else
+        echo "⚠️ Emulator 未启动，尝试自动启动..."
+        avd_list=$(emulator -list-avds 2>/dev/null | head -1)
+        if [ -z "$avd_list" ]; then
+          echo "❌ 没有可用的 AVD"
+          exit 1
+        fi
+        echo "📱 使用 AVD: $avd_list"
+        nohup emulator -avd "$avd_list" -no-window -no-boot-anim -no-snapshot-load > /dev/null 2>&1 &
+        emulator_pid=$!
+        echo "🚀 Emulator 进程已启动 (PID: $emulator_pid)"
+        for i in $(seq 1 60); do
+          if adb devices | grep -q "emulator-.*device"; then
+            echo "✅ Emulator 已就绪"
+            break
+          fi
+          echo "⏳ 等待 emulator 就绪... ($i/60)"
+          sleep 2
+        done
+        if ! adb devices | grep -q "emulator-.*device"; then
+          echo "❌ Emulator 启动超时"
+          exit 1
+        fi
+      fi
+      echo ""
+      echo "🔧 关闭 ANR 弹窗..."
+      adb shell settings put global anr_show_dialog 0
+      echo "✅ ANR 弹窗已关闭"
+
+  - id: flutterBuild
+    label: 构建 Flutter Debug APK
+    type: shell
+    condition: '{{ ne .Vars.taskKind "backend-only" }}'
+    dir: '{{ .Vars.worktreePath }}'
+    logFile: '{{ .Vars.logFileName }}'
+    command: |
+      echo ""
+      echo "=== 构建 Flutter Debug APK ==="
+      cd apps/mobile
+      flutter clean
+      flutter build apk --debug 2>&1
+      if [ ! -f "build/app/outputs/flutter-apk/app-debug.apk" ]; then
+        echo "❌ APK 构建失败"
+        exit 1
+      fi
+      echo "✅ APK 构建完成"
+
+  - id: installApk
+    label: 安装 APK 到模拟器
+    type: shell
+    condition: '{{ ne .Vars.taskKind "backend-only" }}'
+    dir: '{{ .Vars.worktreePath }}'
+    logFile: '{{ .Vars.logFileName }}'
+    command: |
+      echo ""
+      echo "=== 安装 APK ==="
+      adb install -r apps/mobile/build/app/outputs/flutter-apk/app-debug.apk 2>&1
+      if [ $? -ne 0 ]; then
+        echo "❌ APK 安装失败"
+        exit 1
+      fi
+      echo "✅ APK 安装完成"
+      adb shell pm clear com.example.mobile 2>/dev/null || true
+
+  - id: fixIncludes
+    label: 修复 Maestro includes 文件格式
+    type: shell
+    condition: '{{ ne .Vars.taskKind "backend-only" }}'
+    dir: '{{ .Vars.worktreePath }}'
+    logFile: '{{ .Vars.logFileName }}'
+    command: |
+      echo ""
+      echo "=== 修复 Maestro includes 文件格式 ==="
+      if [ -d ".maestro" ]; then
+        find .maestro -name "*.yaml" -path "*/includes/*" 2>/dev/null | while read f; do
+          if ! grep -q "^appId:" "$f" 2>/dev/null; then
+            echo "🔧 修复 includes 格式: $f"
+            first_non_comment=$(grep -n -v "^#" "$f" | head -1 | cut -d: -f1)
+            if [ -n "$first_non_comment" ]; then
+              awk -v n="$first_non_comment" 'NR==n {print "appId: com.example.mobile"; print "---"; print ""} {print}' "$f" > "${f}.tmp" && mv "${f}.tmp" "$f"
+            else
+              echo "" >> "$f"
+              echo "appId: com.example.mobile" >> "$f"
+              echo "---" >> "$f"
+              echo "" >> "$f"
+            fi
+          fi
+        done
+      fi
+      echo "✅ includes 文件格式检查完成"
+
+  - id: runE2EAgent
+    label: 运行 E2E 测试 Agent
+    type: shell
+    tmux: true
+    condition: '{{ ne .Vars.taskKind "backend-only" }}'
+    dir: '{{ .Vars.worktreePath }}'
+    logFile: '{{ .Vars.logFileName }}'
+    command: |
+      echo ""
+      echo "=== 运行 E2E 测试 Agent ==="
+      echo "Agent 文件: {{ .Vars.agentFile | shellquote }}"
+      echo "Debug 目录: {{ .Vars.debugDir | shellquote }}"
+      echo "报告文件: {{ .Vars.reportFile | shellquote }}"
+      echo ""
+      mkdir -p "{{ .Vars.debugDir | shellquote }}"
+      kimi --agent-file {{ .Vars.agentFile | shellquote }} \
+           --max-steps-per-turn 10000 \
+           --print \
+           -p {{ .Vars.prompt | shellquote }}
+    env:
+      AGENT_E2E_DEBUG_DIR: '{{ .Vars.debugDir }}'
+      AGENT_E2E_REPORT_FILE: '{{ .Vars.reportFile }}'
+      AGENT_LOG_FILE: '{{ .Vars.logFileName }}'
+    outputKey: agentOutput
+
+  - id: collectArtifacts
+    label: 收集 E2E 产物
+    type: shell
+    dir: '{{ .Vars.worktreePath }}'
+    logFile: '{{ .Vars.logFileName }}'
+    isCleanup: true
+    command: |
+      echo ""
+      echo "=== 收集 E2E 产物 ==="
+      echo "Debug 目录: {{ .Vars.debugDir }}"
+      echo "报告文件: {{ .Vars.reportFile }}"
+      if [ -f "{{ .Vars.reportFile }}" ]; then
+        echo "✅ 报告已生成"
+        head -20 "{{ .Vars.reportFile }}"
+      else
+        echo "⚠️ 报告文件未找到，生成基础报告..."
+        debugDir="{{ .Vars.debugDir }}"
+        reportFile="{{ .Vars.reportFile }}"
+        maestroOutput=""
+        if [ -f "$debugDir/maestro-output.log" ]; then
+          maestroOutput=$(cat "$debugDir/maestro-output.log")
+        fi
+        passedCount=$(echo "$maestroOutput" | grep -c '^\[Passed\]' || echo 0)
+        failedCount=$(echo "$maestroOutput" | grep -c '^\[Failed\]' || echo 0)
+        exitCode=$(cat "$debugDir/exit-code.txt" 2>/dev/null | tr -d ' ' || echo "N/A")
+        result=$([ "$exitCode" = "0" ] && echo "✅ 通过" || echo "❌ 失败")
+        printf '%s\n' \
+          '# E2E 测试报告 (基础版)' \
+          '' \
+          "- **总体结果**: $result" \
+          "- **Exit Code**: $exitCode" \
+          "- **通过**: $passedCount" \
+          "- **失败**: $failedCount" \
+          > "$reportFile"
+        echo "✅ 基础报告已生成: $reportFile"
+      fi
+      echo ""
+      echo "========================================"
+      echo "📄 报告文件: {{ .Vars.reportFile }}"
+      echo "📸 截图目录: {{ .Vars.debugDir }}"
+      echo "📄 完整日志: {{ .Vars.logFileName }}"
+      echo "========================================"

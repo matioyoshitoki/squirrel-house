@@ -1,0 +1,22 @@
+{
+  "taskID": "doc-gardener-68",
+  "type": "doc-gardener",
+  "status": "running",
+  "projectName": "social-world",
+  "startedAt": "2026-05-06T17:33:17.871404+08:00",
+  "lastHeartbeat": "2026-05-06T17:45:14.09332+08:00",
+  "stepResults": {
+    "cleanupWorktree": {
+      "status": "success",
+      "exitCode": 0
+    },
+    "ensureCommitAndPush": {
+      "status": "success",
+      "exitCode": 0
+    },
+    "runAgent": {
+      "status": "success",
+      "exitCode": 0
+    }
+  }
+}

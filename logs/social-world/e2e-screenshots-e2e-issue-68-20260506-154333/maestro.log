@@ -1,0 +1,275 @@
+15:47:10.752 [ INFO] MAESTRO.logSystemInfo: ---- System Info ----
+15:47:10.754 [ INFO] MAESTRO.logSystemInfo: Maestro Version: 1.39.13
+15:47:10.755 [ INFO] MAESTRO.logSystemInfo: CI: Undefined
+15:47:10.755 [ INFO] MAESTRO.logSystemInfo: OS Name: Mac OS X
+15:47:10.755 [ INFO] MAESTRO.logSystemInfo: OS Version: 26.1
+15:47:10.755 [ INFO] MAESTRO.logSystemInfo: Architecture: aarch64
+15:47:10.755 [ INFO] MAESTRO.logSystemInfo: Java Version: 21
+15:47:10.773 [ INFO] MAESTRO.logSystemInfo: Xcode Version: null
+15:47:11.525 [ INFO] MAESTRO.logSystemInfo: Flutter Version: 3.24.5
+15:47:12.028 [DEBUG] io.micrometer.common.util.internal.logging.InternalLoggerFactory.newDefaultFactory: Using SLF4J as the default logging framework
+15:47:12.230 [ INFO] MAESTRO.logSystemInfo: Flutter Channel: stable
+15:47:12.230 [ INFO] MAESTRO.logSystemInfo: ---------------------
+15:47:24.277 [ INFO] MAESTRO.logSystemInfo: ---- System Info ----
+15:47:24.278 [ INFO] MAESTRO.logSystemInfo: Maestro Version: 1.39.13
+15:47:24.278 [ INFO] MAESTRO.logSystemInfo: CI: Undefined
+15:47:24.278 [ INFO] MAESTRO.logSystemInfo: OS Name: Mac OS X
+15:47:24.278 [ INFO] MAESTRO.logSystemInfo: OS Version: 26.1
+15:47:24.278 [ INFO] MAESTRO.logSystemInfo: Architecture: aarch64
+15:47:24.278 [ INFO] MAESTRO.logSystemInfo: Java Version: 21
+15:47:24.285 [ INFO] MAESTRO.logSystemInfo: Xcode Version: null
+15:47:24.374 [DEBUG] io.micrometer.common.util.internal.logging.InternalLoggerFactory.newDefaultFactory: Using SLF4J as the default logging framework
+15:47:24.886 [ INFO] MAESTRO.logSystemInfo: Flutter Version: 3.24.5
+15:47:25.427 [ INFO] MAESTRO.logSystemInfo: Flutter Channel: stable
+15:47:25.427 [ INFO] MAESTRO.logSystemInfo: ---------------------
+15:47:25.885 [ INFO] maestro.cli.command.TestCommand.runShardSuite: [shard 1] Selected device emulator-5554 using port 7001
+15:47:29.755 [ INFO] maestro.Maestro.invoke: Getting device info
+15:47:29.897 [ INFO] maestro.Maestro.invoke: Got device info: DeviceInfo(platform=ANDROID, widthPixels=1080, heightPixels=2400, widthGrid=1080, heightGrid=2400)
+15:47:29.955 [ INFO] maestro.cli.runner.MaestroCommandRunner.invoke: Define variables RUNNING
+15:47:29.956 [ INFO] maestro.cli.runner.MaestroCommandRunner.invoke: Define variables metadata CommandMetadata(numberOfRuns=null, evaluatedCommand=MaestroCommand(defineVariablesCommand=DefineVariablesCommand(env={MAESTRO_FILENAME=login}, label=null, optional=false)), logMessages=[], insight=Insight(message=, level=NONE))
+15:47:29.957 [ INFO] maestro.cli.runner.MaestroCommandRunner.invoke: Define variables COMPLETED
+15:47:29.957 [ INFO] maestro.cli.runner.MaestroCommandRunner.invoke: Apply configuration RUNNING
+15:47:29.958 [ INFO] maestro.cli.runner.MaestroCommandRunner.invoke: Apply configuration metadata CommandMetadata(numberOfRuns=null, evaluatedCommand=MaestroCommand(applyConfigurationCommand=ApplyConfigurationCommand(config=MaestroConfig(appId=com.example.mobile, name=null, tags=[], ext={}, onFlowStart=null, onFlowComplete=null), label=null, optional=false)), logMessages=[], insight=Insight(message=, level=NONE))
+15:47:29.958 [ INFO] maestro.cli.runner.MaestroCommandRunner.invoke: Apply configuration COMPLETED
+15:47:29.958 [ INFO] maestro.cli.runner.MaestroCommandRunner.invoke: Launch app "com.example.mobile" with clear state RUNNING
+15:47:29.958 [ INFO] maestro.cli.runner.MaestroCommandRunner.invoke: Launch app "com.example.mobile" with clear state metadata CommandMetadata(numberOfRuns=null, evaluatedCommand=MaestroCommand(launchAppCommand=LaunchAppCommand(appId=com.example.mobile, clearState=true, clearKeychain=null, stopApp=null, permissions=null, launchArguments=null, label=null, optional=false)), logMessages=[], insight=Insight(message=, level=NONE))
+15:47:29.958 [ INFO] maestro.Maestro.clearAppState: Clearing app state com.example.mobile
+15:47:30.950 [ INFO] maestro.Maestro.launchApp: Launching app com.example.mobile
+15:47:31.048 [ INFO] maestro.cli.runner.MaestroCommandRunner.invoke: Launch app "com.example.mobile" with clear state COMPLETED
+15:47:31.048 [ INFO] maestro.cli.runner.MaestroCommandRunner.invoke: Run includes/login-as-test-user.yaml RUNNING
+15:47:31.049 [ INFO] maestro.cli.runner.MaestroCommandRunner.invoke: Run includes/login-as-test-user.yaml metadata CommandMetadata(numberOfRuns=null, evaluatedCommand=MaestroCommand(runFlowCommand=RunFlowCommand(commands=[MaestroCommand(applyConfigurationCommand=ApplyConfigurationCommand(config=MaestroConfig(appId=com.example.mobile, name=null, tags=[], ext={}, onFlowStart=null, onFlowComplete=null), label=null, optional=false)), MaestroCommand(assertConditionCommand=AssertConditionCommand(condition=Condition(platform=null, visible=ElementSelector(textRegex=欢迎使用 Social World, idRegex=null, size=null, below=null, above=null, leftOf=null, rightOf=null, containsChild=null, containsDescendants=null, traits=null, index=null, enabled=null, optional=false, selected=null, checked=null, focused=null, childOf=null), notVisible=null, scriptCondition=null, label=null), timeout=30000, label=null, optional=false)), MaestroCommand(assertConditionCommand=AssertConditionCommand(condition=Condition(platform=null, visible=ElementSelector(textRegex=手机号一键登录, idRegex=null, size=null, below=null, above=null, leftOf=null, rightOf=null, containsChild=null, containsDescendants=null, traits=null, index=null, enabled=null, optional=false, selected=null, checked=null, focused=null, childOf=null), notVisible=null, scriptCondition=null, label=null), timeout=null, label=null, optional=false)), MaestroCommand(tapOnElementCommand=TapOnElementCommand(selector=ElementSelector(textRegex=手机号, idRegex=null, size=null, below=null, above=null, leftOf=null, rightOf=null, containsChild=null, containsDescendants=null, traits=null, index=null, enabled=null, optional=false, selected=null, checked=null, focused=null, childOf=null), retryIfNoChange=true, waitUntilVisible=false, longPress=false, repeat=null, waitToSettleTimeoutMs=null, label=null, optional=false)), MaestroCommand(inputTextCommand=InputTextCommand(text=13800138000, label=null, optional=false)), MaestroCommand(tapOnElementCommand=TapOnElementCommand(selector=ElementSelector(textRegex=获取验证码, idRegex=null, size=null, below=null, above=null, leftOf=null, rightOf=null, containsChild=null, containsDescendants=null, traits=null, index=null, enabled=null, optional=false, selected=null, checked=null, focused=null, childOf=null), retryIfNoChange=true, waitUntilVisible=false, longPress=false, repeat=null, waitToSettleTimeoutMs=null, label=null, optional=false)), MaestroCommand(tapOnElementCommand=TapOnElementCommand(selector=ElementSelector(textRegex=验证码, idRegex=null, size=null, below=null, above=null, leftOf=null, rightOf=null, containsChild=null, containsDescendants=null, traits=null, index=null, enabled=null, optional=false, selected=null, checked=null, focused=null, childOf=null), retryIfNoChange=true, waitUntilVisible=false, longPress=false, repeat=null, waitToSettleTimeoutMs=null, label=null, optional=false)), MaestroCommand(inputTextCommand=InputTextCommand(text=123456, label=null, optional=false)), MaestroCommand(hideKeyboardCommand=HideKeyboardCommand()), MaestroCommand(tapOnElementCommand=TapOnElementCommand(selector=ElementSelector(textRegex=登录, idRegex=null, size=null, below=null, above=null, leftOf=null, rightOf=null, containsChild=null, containsDescendants=null, traits=null, index=null, enabled=null, optional=false, selected=null, checked=null, focused=null, childOf=null), retryIfNoChange=true, waitUntilVisible=false, longPress=false, repeat=null, waitToSettleTimeoutMs=null, label=null, optional=false))], condition=null, sourceDescription=includes/login-as-test-user.yaml, config=MaestroConfig(appId=com.example.mobile, name=null, tags=[], ext={}, onFlowStart=null, onFlowComplete=null), label=null, optional=false)), logMessages=[], insight=Insight(message=, level=NONE))
+15:47:31.050 [ INFO] maestro.cli.runner.MaestroCommandRunner.invoke: Apply configuration RUNNING
+15:47:31.050 [ INFO] maestro.cli.runner.MaestroCommandRunner.invoke: Apply configuration metadata CommandMetadata(numberOfRuns=null, evaluatedCommand=MaestroCommand(applyConfigurationCommand=ApplyConfigurationCommand(config=MaestroConfig(appId=com.example.mobile, name=null, tags=[], ext={}, onFlowStart=null, onFlowComplete=null), label=null, optional=false)), logMessages=[], insight=Insight(message=, level=NONE))
+15:47:31.050 [ INFO] maestro.cli.runner.MaestroCommandRunner.invoke: Apply configuration COMPLETED
+15:47:31.050 [ INFO] maestro.cli.runner.MaestroCommandRunner.invoke: Assert that "欢迎使用 Social World" is visible RUNNING
+15:47:31.050 [ INFO] maestro.cli.runner.MaestroCommandRunner.invoke: Assert that "欢迎使用 Social World" is visible metadata CommandMetadata(numberOfRuns=null, evaluatedCommand=MaestroCommand(assertConditionCommand=AssertConditionCommand(condition=Condition(platform=null, visible=ElementSelector(textRegex=欢迎使用 Social World, idRegex=null, size=null, below=null, above=null, leftOf=null, rightOf=null, containsChild=null, containsDescendants=null, traits=null, index=null, enabled=null, optional=false, selected=null, checked=null, focused=null, childOf=null), notVisible=null, scriptCondition=null, label=null), timeout=30000, label=null, optional=false)), logMessages=[], insight=Insight(message=, level=NONE))
+15:47:35.327 [ INFO] maestro.cli.runner.MaestroCommandRunner.invoke: Assert that "欢迎使用 Social World" is visible COMPLETED
+15:47:35.332 [ INFO] maestro.cli.runner.MaestroCommandRunner.invoke: Assert that "手机号一键登录" is visible RUNNING
+15:47:35.333 [ INFO] maestro.cli.runner.MaestroCommandRunner.invoke: Assert that "手机号一键登录" is visible metadata CommandMetadata(numberOfRuns=null, evaluatedCommand=MaestroCommand(assertConditionCommand=AssertConditionCommand(condition=Condition(platform=null, visible=ElementSelector(textRegex=手机号一键登录, idRegex=null, size=null, below=null, above=null, leftOf=null, rightOf=null, containsChild=null, containsDescendants=null, traits=null, index=null, enabled=null, optional=false, selected=null, checked=null, focused=null, childOf=null), notVisible=null, scriptCondition=null, label=null), timeout=null, label=null, optional=false)), logMessages=[], insight=Insight(message=, level=NONE))
+15:47:35.636 [ INFO] maestro.cli.runner.MaestroCommandRunner.invoke: Assert that "手机号一键登录" is visible COMPLETED
+15:47:35.637 [ INFO] maestro.cli.runner.MaestroCommandRunner.invoke: Tap on "手机号" RUNNING
+15:47:35.638 [ INFO] maestro.cli.runner.MaestroCommandRunner.invoke: Tap on "手机号" metadata CommandMetadata(numberOfRuns=null, evaluatedCommand=MaestroCommand(tapOnElementCommand=TapOnElementCommand(selector=ElementSelector(textRegex=手机号, idRegex=null, size=null, below=null, above=null, leftOf=null, rightOf=null, containsChild=null, containsDescendants=null, traits=null, index=null, enabled=null, optional=false, selected=null, checked=null, focused=null, childOf=null), retryIfNoChange=true, waitUntilVisible=false, longPress=false, repeat=null, waitToSettleTimeoutMs=null, label=null, optional=false)), logMessages=[], insight=Insight(message=, level=NONE))
+15:47:35.695 [ INFO] maestro.Maestro.tap-BUbHBYE: Tapping on element:  UiElement(treeNode=TreeNode(attributes={text=, accessibilityText=, hintText=手机号, ignoreBoundsFiltering=false, resource-id=, clickable=true, bounds=[42,677][1038,809], enabled=true, focused=false, checked=false, scrollable=false, selected=false, class=android.widget.EditText}, children=[], clickable=true, enabled=true, focused=false, checked=false, selected=false), bounds=Bounds(x=42, y=677, width=996, height=132))
+15:47:36.879 [ INFO] maestro.Maestro.tap-BUbHBYE: Refreshed element
+15:47:36.894 [ INFO] maestro.Maestro.hierarchyBasedTap-hbl3e4M: Tapping at (540, 743) using hierarchy based logic for wait
+15:47:36.895 [TRACE] maestro.utils.ScreenshotUtils.takeScreenshot: Taking screenshot to byte array
+15:47:36.895 [TRACE] maestro.utils.ScreenshotUtils.takeScreenshot: Taking screenshot to output sink
+15:47:40.253 [ INFO] maestro.Maestro.hierarchyBasedTap-hbl3e4M: Something have changed in the UI judging by view hierarchy. Proceed.
+15:47:40.254 [ INFO] maestro.cli.runner.MaestroCommandRunner.invoke: Tap on "手机号" COMPLETED
+15:47:40.254 [ INFO] maestro.cli.runner.MaestroCommandRunner.invoke: Input text 13800138000 RUNNING
+15:47:40.255 [ INFO] maestro.cli.runner.MaestroCommandRunner.invoke: Input text 13800138000 metadata CommandMetadata(numberOfRuns=null, evaluatedCommand=MaestroCommand(inputTextCommand=InputTextCommand(text=13800138000, label=null, optional=false)), logMessages=[], insight=Insight(message=, level=NONE))
+15:47:40.256 [ INFO] maestro.Maestro.inputText: Inputting text: 13800138000
+15:47:42.450 [ INFO] maestro.cli.runner.MaestroCommandRunner.invoke: Input text 13800138000 COMPLETED
+15:47:42.450 [ INFO] maestro.cli.runner.MaestroCommandRunner.invoke: Tap on "获取验证码" RUNNING
+15:47:42.450 [ INFO] maestro.cli.runner.MaestroCommandRunner.invoke: Tap on "获取验证码" metadata CommandMetadata(numberOfRuns=null, evaluatedCommand=MaestroCommand(tapOnElementCommand=TapOnElementCommand(selector=ElementSelector(textRegex=获取验证码, idRegex=null, size=null, below=null, above=null, leftOf=null, rightOf=null, containsChild=null, containsDescendants=null, traits=null, index=null, enabled=null, optional=false, selected=null, checked=null, focused=null, childOf=null), retryIfNoChange=true, waitUntilVisible=false, longPress=false, repeat=null, waitToSettleTimeoutMs=null, label=null, optional=false)), logMessages=[], insight=Insight(message=, level=NONE))
+15:47:42.499 [ INFO] maestro.Maestro.tap-BUbHBYE: Tapping on element:  UiElement(treeNode=TreeNode(attributes={text=, accessibilityText=获取验证码, hintText=, ignoreBoundsFiltering=false, resource-id=, clickable=true, bounds=[720,851][1038,998], enabled=true, focused=false, checked=false, scrollable=false, selected=false, class=android.widget.Button}, children=[], clickable=true, enabled=true, focused=false, checked=false, selected=false), bounds=Bounds(x=720, y=851, width=318, height=147))
+15:47:43.652 [ INFO] maestro.Maestro.tap-BUbHBYE: Refreshed element
+15:47:43.652 [ INFO] maestro.Maestro.hierarchyBasedTap-hbl3e4M: Tapping at (879, 924) using hierarchy based logic for wait
+15:47:43.652 [TRACE] maestro.utils.ScreenshotUtils.takeScreenshot: Taking screenshot to byte array
+15:47:43.652 [TRACE] maestro.utils.ScreenshotUtils.takeScreenshot: Taking screenshot to output sink
+15:47:45.415 [ INFO] maestro.Maestro.hierarchyBasedTap-hbl3e4M: Something have changed in the UI judging by view hierarchy. Proceed.
+15:47:45.415 [ INFO] maestro.cli.runner.MaestroCommandRunner.invoke: Tap on "获取验证码" COMPLETED
+15:47:45.415 [ INFO] maestro.cli.runner.MaestroCommandRunner.invoke: Tap on "验证码" RUNNING
+15:47:45.416 [ INFO] maestro.cli.runner.MaestroCommandRunner.invoke: Tap on "验证码" metadata CommandMetadata(numberOfRuns=null, evaluatedCommand=MaestroCommand(tapOnElementCommand=TapOnElementCommand(selector=ElementSelector(textRegex=验证码, idRegex=null, size=null, below=null, above=null, leftOf=null, rightOf=null, containsChild=null, containsDescendants=null, traits=null, index=null, enabled=null, optional=false, selected=null, checked=null, focused=null, childOf=null), retryIfNoChange=true, waitUntilVisible=false, longPress=false, repeat=null, waitToSettleTimeoutMs=null, label=null, optional=false)), logMessages=[], insight=Insight(message=, level=NONE))
+15:47:45.539 [ INFO] maestro.Maestro.tap-BUbHBYE: Tapping on element:  UiElement(treeNode=TreeNode(attributes={text=, accessibilityText=, hintText=验证码, ignoreBoundsFiltering=false, resource-id=, clickable=true, bounds=[42,861][678,987], enabled=true, focused=false, checked=false, scrollable=false, selected=false, class=android.widget.EditText}, children=[], clickable=true, enabled=true, focused=false, checked=false, selected=false), bounds=Bounds(x=42, y=861, width=636, height=126))
+15:47:46.466 [ INFO] maestro.Maestro.tap-BUbHBYE: Refreshed element
+15:47:46.467 [ INFO] maestro.Maestro.hierarchyBasedTap-hbl3e4M: Tapping at (360, 924) using hierarchy based logic for wait
+15:47:46.467 [TRACE] maestro.utils.ScreenshotUtils.takeScreenshot: Taking screenshot to byte array
+15:47:46.467 [TRACE] maestro.utils.ScreenshotUtils.takeScreenshot: Taking screenshot to output sink
+15:47:49.687 [ INFO] maestro.Maestro.hierarchyBasedTap-hbl3e4M: Something have changed in the UI judging by view hierarchy. Proceed.
+15:47:49.688 [ INFO] maestro.cli.runner.MaestroCommandRunner.invoke: Tap on "验证码" COMPLETED
+15:47:49.689 [ INFO] maestro.cli.runner.MaestroCommandRunner.invoke: Input text 123456 RUNNING
+15:47:49.690 [ INFO] maestro.cli.runner.MaestroCommandRunner.invoke: Input text 123456 metadata CommandMetadata(numberOfRuns=null, evaluatedCommand=MaestroCommand(inputTextCommand=InputTextCommand(text=123456, label=null, optional=false)), logMessages=[], insight=Insight(message=, level=NONE))
+15:47:49.700 [ INFO] maestro.Maestro.inputText: Inputting text: 123456
+15:47:52.097 [ERROR] maestro.drivers.AndroidDriver.callViewHierarchy: Failed to get view hierarchy: Network closed for unknown reason
+io.grpc.StatusRuntimeException: UNAVAILABLE: Network closed for unknown reason
+	at io.grpc.stub.ClientCalls.toStatusRuntimeException(ClientCalls.java:275)
+	at io.grpc.stub.ClientCalls.getUnchecked(ClientCalls.java:256)
+	at io.grpc.stub.ClientCalls.blockingUnaryCall(ClientCalls.java:169)
+	at maestro_android.MaestroDriverGrpc$MaestroDriverBlockingStub.viewHierarchy(MaestroDriverGrpc.java:641)
+	at maestro.drivers.AndroidDriver.callViewHierarchy(AndroidDriver.kt:350)
+	at maestro.drivers.AndroidDriver.callViewHierarchy$default(AndroidDriver.kt:348)
+	at maestro.drivers.AndroidDriver$contentDescriptor$1.invoke(AndroidDriver.kt:313)
+	at maestro.drivers.AndroidDriver$contentDescriptor$1.invoke(AndroidDriver.kt:312)
+	at maestro.utils.Metrics.measured(Metrics.kt:48)
+	at maestro.drivers.AndroidDriver.contentDescriptor(AndroidDriver.kt:312)
+	at maestro.ViewHierarchy$Companion.from-8JJjmZI(ViewHierarchy.kt:29)
+	at maestro.utils.ScreenshotUtils$Companion.viewHierarchy-c1iYVAs(ScreenshotUtils.kt:99)
+	at maestro.utils.ScreenshotUtils$Companion.waitForAppToSettle-OpTFbEc(ScreenshotUtils.kt:58)
+	at maestro.drivers.AndroidDriver$waitForAppToSettle$1.invoke-prqvCes(AndroidDriver.kt:690)
+	at maestro.drivers.AndroidDriver$waitForAppToSettle$1.invoke(AndroidDriver.kt:686)
+	at maestro.utils.Metrics.measured(Metrics.kt:48)
+	at maestro.drivers.AndroidDriver.waitForAppToSettle-5RpGHs4(AndroidDriver.kt:686)
+	at maestro.Maestro.waitForAppToSettle-5RpGHs4(Maestro.kt:478)
+	at maestro.Maestro.waitForAppToSettle-5RpGHs4$default(Maestro.kt:473)
+	at maestro.Maestro.inputText(Maestro.kt:485)
+	at maestro.orchestra.Orchestra.inputTextCommand(Orchestra.kt:903)
+	at maestro.orchestra.Orchestra.executeCommand(Orchestra.kt:288)
+	at maestro.orchestra.Orchestra.executeSubflowCommands(Orchestra.kt:748)
+	at maestro.orchestra.Orchestra.runSubFlow(Orchestra.kt:800)
+	at maestro.orchestra.Orchestra.runFlowCommand(Orchestra.kt:647)
+	at maestro.orchestra.Orchestra.executeCommand(Orchestra.kt:299)
+	at maestro.orchestra.Orchestra.executeCommands(Orchestra.kt:205)
+	at maestro.orchestra.Orchestra.runFlow(Orchestra.kt:138)
+	at maestro.cli.runner.MaestroCommandRunner.runCommands(MaestroCommandRunner.kt:187)
+	at maestro.cli.runner.TestRunner$runSingle$result$1.invoke(TestRunner.kt:64)
+	at maestro.cli.runner.TestRunner$runSingle$result$1.invoke(TestRunner.kt:55)
+	at maestro.cli.runner.TestRunner.runCatching(TestRunner.kt:165)
+	at maestro.cli.runner.TestRunner.runSingle(TestRunner.kt:55)
+	at maestro.cli.command.TestCommand.runSingleFlow(TestCommand.kt:382)
+	at maestro.cli.command.TestCommand.access$runSingleFlow(TestCommand.kt:65)
+	at maestro.cli.command.TestCommand$runShardSuite$2.invoke(TestCommand.kt:353)
+	at maestro.cli.command.TestCommand$runShardSuite$2.invoke(TestCommand.kt:323)
+	at maestro.cli.session.MaestroSessionManager.newSession(MaestroSessionManager.kt:105)
+	at maestro.cli.session.MaestroSessionManager.newSession$default(MaestroSessionManager.kt:53)
+	at maestro.cli.command.TestCommand.runShardSuite(TestCommand.kt:323)
+	at maestro.cli.command.TestCommand.access$runShardSuite(TestCommand.kt:65)
+	at maestro.cli.command.TestCommand$handleSessions$1$results$1$1.invokeSuspend(TestCommand.kt:290)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:104)
+	at kotlinx.coroutines.internal.LimitedDispatcher$Worker.run(LimitedDispatcher.kt:111)
+	at kotlinx.coroutines.scheduling.TaskImpl.run(Tasks.kt:99)
+	at kotlinx.coroutines.scheduling.CoroutineScheduler.runSafely(CoroutineScheduler.kt:585)
+	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.executeTask(CoroutineScheduler.kt:802)
+	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.runWorker(CoroutineScheduler.kt:706)
+	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.run(CoroutineScheduler.kt:693)
+15:47:53.107 [ERROR] maestro.drivers.AndroidDriver.callViewHierarchy: Failed to get view hierarchy: io exception
+io.grpc.StatusRuntimeException: UNAVAILABLE: io exception
+	at io.grpc.stub.ClientCalls.toStatusRuntimeException(ClientCalls.java:275)
+	at io.grpc.stub.ClientCalls.getUnchecked(ClientCalls.java:256)
+	at io.grpc.stub.ClientCalls.blockingUnaryCall(ClientCalls.java:169)
+	at maestro_android.MaestroDriverGrpc$MaestroDriverBlockingStub.viewHierarchy(MaestroDriverGrpc.java:641)
+	at maestro.drivers.AndroidDriver.callViewHierarchy(AndroidDriver.kt:350)
+	at maestro.drivers.AndroidDriver.callViewHierarchy(AndroidDriver.kt:364)
+	at maestro.drivers.AndroidDriver.callViewHierarchy$default(AndroidDriver.kt:348)
+	at maestro.drivers.AndroidDriver$contentDescriptor$1.invoke(AndroidDriver.kt:313)
+	at maestro.drivers.AndroidDriver$contentDescriptor$1.invoke(AndroidDriver.kt:312)
+	at maestro.utils.Metrics.measured(Metrics.kt:48)
+	at maestro.drivers.AndroidDriver.contentDescriptor(AndroidDriver.kt:312)
+	at maestro.ViewHierarchy$Companion.from-8JJjmZI(ViewHierarchy.kt:29)
+	at maestro.utils.ScreenshotUtils$Companion.viewHierarchy-c1iYVAs(ScreenshotUtils.kt:99)
+	at maestro.utils.ScreenshotUtils$Companion.waitForAppToSettle-OpTFbEc(ScreenshotUtils.kt:58)
+	at maestro.drivers.AndroidDriver$waitForAppToSettle$1.invoke-prqvCes(AndroidDriver.kt:690)
+	at maestro.drivers.AndroidDriver$waitForAppToSettle$1.invoke(AndroidDriver.kt:686)
+	at maestro.utils.Metrics.measured(Metrics.kt:48)
+	at maestro.drivers.AndroidDriver.waitForAppToSettle-5RpGHs4(AndroidDriver.kt:686)
+	at maestro.Maestro.waitForAppToSettle-5RpGHs4(Maestro.kt:478)
+	at maestro.Maestro.waitForAppToSettle-5RpGHs4$default(Maestro.kt:473)
+	at maestro.Maestro.inputText(Maestro.kt:485)
+	at maestro.orchestra.Orchestra.inputTextCommand(Orchestra.kt:903)
+	at maestro.orchestra.Orchestra.executeCommand(Orchestra.kt:288)
+	at maestro.orchestra.Orchestra.executeSubflowCommands(Orchestra.kt:748)
+	at maestro.orchestra.Orchestra.runSubFlow(Orchestra.kt:800)
+	at maestro.orchestra.Orchestra.runFlowCommand(Orchestra.kt:647)
+	at maestro.orchestra.Orchestra.executeCommand(Orchestra.kt:299)
+	at maestro.orchestra.Orchestra.executeCommands(Orchestra.kt:205)
+	at maestro.orchestra.Orchestra.runFlow(Orchestra.kt:138)
+	at maestro.cli.runner.MaestroCommandRunner.runCommands(MaestroCommandRunner.kt:187)
+	at maestro.cli.runner.TestRunner$runSingle$result$1.invoke(TestRunner.kt:64)
+	at maestro.cli.runner.TestRunner$runSingle$result$1.invoke(TestRunner.kt:55)
+	at maestro.cli.runner.TestRunner.runCatching(TestRunner.kt:165)
+	at maestro.cli.runner.TestRunner.runSingle(TestRunner.kt:55)
+	at maestro.cli.command.TestCommand.runSingleFlow(TestCommand.kt:382)
+	at maestro.cli.command.TestCommand.access$runSingleFlow(TestCommand.kt:65)
+	at maestro.cli.command.TestCommand$runShardSuite$2.invoke(TestCommand.kt:353)
+	at maestro.cli.command.TestCommand$runShardSuite$2.invoke(TestCommand.kt:323)
+	at maestro.cli.session.MaestroSessionManager.newSession(MaestroSessionManager.kt:105)
+	at maestro.cli.session.MaestroSessionManager.newSession$default(MaestroSessionManager.kt:53)
+	at maestro.cli.command.TestCommand.runShardSuite(TestCommand.kt:323)
+	at maestro.cli.command.TestCommand.access$runShardSuite(TestCommand.kt:65)
+	at maestro.cli.command.TestCommand$handleSessions$1$results$1$1.invokeSuspend(TestCommand.kt:290)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:104)
+	at kotlinx.coroutines.internal.LimitedDispatcher$Worker.run(LimitedDispatcher.kt:111)
+	at kotlinx.coroutines.scheduling.TaskImpl.run(Tasks.kt:99)
+	at kotlinx.coroutines.scheduling.CoroutineScheduler.runSafely(CoroutineScheduler.kt:585)
+	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.executeTask(CoroutineScheduler.kt:802)
+	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.runWorker(CoroutineScheduler.kt:706)
+	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.run(CoroutineScheduler.kt:693)
+Caused by: io.netty.channel.AbstractChannel$AnnotatedConnectException: Connection refused: localhost/[0:0:0:0:0:0:0:1]:7001
+Caused by: java.net.ConnectException: Connection refused
+	at java.base/sun.nio.ch.Net.pollConnect(Native Method)
+	at java.base/sun.nio.ch.Net.pollConnectNow(Net.java:682)
+	at java.base/sun.nio.ch.SocketChannelImpl.finishConnect(SocketChannelImpl.java:973)
+	at io.netty.channel.socket.nio.NioSocketChannel.doFinishConnect(NioSocketChannel.java:337)
+	at io.netty.channel.nio.AbstractNioChannel$AbstractNioUnsafe.finishConnect(AbstractNioChannel.java:334)
+	at io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:776)
+	at io.netty.channel.nio.NioEventLoop.processSelectedKeysOptimized(NioEventLoop.java:724)
+	at io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:650)
+	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:562)
+	at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:997)
+	at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74)
+	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+15:47:53.108 [ INFO] maestro.Maestro.takeScreenshot: Taking screenshot
+15:47:53.108 [TRACE] maestro.utils.ScreenshotUtils.takeScreenshot: Taking screenshot to output sink
+15:47:53.110 [ INFO] maestro.Maestro.takeScreenshot: Taking screenshot
+15:47:53.110 [TRACE] maestro.utils.ScreenshotUtils.takeScreenshot: Taking screenshot to output sink
+15:47:53.110 [ERROR] maestro.cli.runner.TestRunner.runCatching: Failed to run flow
+io.grpc.StatusRuntimeException: UNAVAILABLE: io exception
+	at io.grpc.stub.ClientCalls.toStatusRuntimeException(ClientCalls.java:275)
+	at io.grpc.stub.ClientCalls.getUnchecked(ClientCalls.java:256)
+	at io.grpc.stub.ClientCalls.blockingUnaryCall(ClientCalls.java:169)
+	at maestro_android.MaestroDriverGrpc$MaestroDriverBlockingStub.viewHierarchy(MaestroDriverGrpc.java:641)
+	at maestro.drivers.AndroidDriver.callViewHierarchy(AndroidDriver.kt:350)
+	at maestro.drivers.AndroidDriver.callViewHierarchy(AndroidDriver.kt:364)
+	at maestro.drivers.AndroidDriver.callViewHierarchy$default(AndroidDriver.kt:348)
+	at maestro.drivers.AndroidDriver$contentDescriptor$1.invoke(AndroidDriver.kt:313)
+	at maestro.drivers.AndroidDriver$contentDescriptor$1.invoke(AndroidDriver.kt:312)
+	at maestro.utils.Metrics.measured(Metrics.kt:48)
+	at maestro.drivers.AndroidDriver.contentDescriptor(AndroidDriver.kt:312)
+	at maestro.ViewHierarchy$Companion.from-8JJjmZI(ViewHierarchy.kt:29)
+	at maestro.utils.ScreenshotUtils$Companion.viewHierarchy-c1iYVAs(ScreenshotUtils.kt:99)
+	at maestro.utils.ScreenshotUtils$Companion.waitForAppToSettle-OpTFbEc(ScreenshotUtils.kt:58)
+	at maestro.drivers.AndroidDriver$waitForAppToSettle$1.invoke-prqvCes(AndroidDriver.kt:690)
+	at maestro.drivers.AndroidDriver$waitForAppToSettle$1.invoke(AndroidDriver.kt:686)
+	at maestro.utils.Metrics.measured(Metrics.kt:48)
+	at maestro.drivers.AndroidDriver.waitForAppToSettle-5RpGHs4(AndroidDriver.kt:686)
+	at maestro.Maestro.waitForAppToSettle-5RpGHs4(Maestro.kt:478)
+	at maestro.Maestro.waitForAppToSettle-5RpGHs4$default(Maestro.kt:473)
+	at maestro.Maestro.inputText(Maestro.kt:485)
+	at maestro.orchestra.Orchestra.inputTextCommand(Orchestra.kt:903)
+	at maestro.orchestra.Orchestra.executeCommand(Orchestra.kt:288)
+	at maestro.orchestra.Orchestra.executeSubflowCommands(Orchestra.kt:748)
+	at maestro.orchestra.Orchestra.runSubFlow(Orchestra.kt:800)
+	at maestro.orchestra.Orchestra.runFlowCommand(Orchestra.kt:647)
+	at maestro.orchestra.Orchestra.executeCommand(Orchestra.kt:299)
+	at maestro.orchestra.Orchestra.executeCommands(Orchestra.kt:205)
+	at maestro.orchestra.Orchestra.runFlow(Orchestra.kt:138)
+	at maestro.cli.runner.MaestroCommandRunner.runCommands(MaestroCommandRunner.kt:187)
+	at maestro.cli.runner.TestRunner$runSingle$result$1.invoke(TestRunner.kt:64)
+	at maestro.cli.runner.TestRunner$runSingle$result$1.invoke(TestRunner.kt:55)
+	at maestro.cli.runner.TestRunner.runCatching(TestRunner.kt:165)
+	at maestro.cli.runner.TestRunner.runSingle(TestRunner.kt:55)
+	at maestro.cli.command.TestCommand.runSingleFlow(TestCommand.kt:382)
+	at maestro.cli.command.TestCommand.access$runSingleFlow(TestCommand.kt:65)
+	at maestro.cli.command.TestCommand$runShardSuite$2.invoke(TestCommand.kt:353)
+	at maestro.cli.command.TestCommand$runShardSuite$2.invoke(TestCommand.kt:323)
+	at maestro.cli.session.MaestroSessionManager.newSession(MaestroSessionManager.kt:105)
+	at maestro.cli.session.MaestroSessionManager.newSession$default(MaestroSessionManager.kt:53)
+	at maestro.cli.command.TestCommand.runShardSuite(TestCommand.kt:323)
+	at maestro.cli.command.TestCommand.access$runShardSuite(TestCommand.kt:65)
+	at maestro.cli.command.TestCommand$handleSessions$1$results$1$1.invokeSuspend(TestCommand.kt:290)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:104)
+	at kotlinx.coroutines.internal.LimitedDispatcher$Worker.run(LimitedDispatcher.kt:111)
+	at kotlinx.coroutines.scheduling.TaskImpl.run(Tasks.kt:99)
+	at kotlinx.coroutines.scheduling.CoroutineScheduler.runSafely(CoroutineScheduler.kt:585)
+	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.executeTask(CoroutineScheduler.kt:802)
+	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.runWorker(CoroutineScheduler.kt:706)
+	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.run(CoroutineScheduler.kt:693)
+Caused by: io.netty.channel.AbstractChannel$AnnotatedConnectException: Connection refused: localhost/[0:0:0:0:0:0:0:1]:7001
+Caused by: java.net.ConnectException: Connection refused
+	at java.base/sun.nio.ch.Net.pollConnect(Native Method)
+	at java.base/sun.nio.ch.Net.pollConnectNow(Net.java:682)
+	at java.base/sun.nio.ch.SocketChannelImpl.finishConnect(SocketChannelImpl.java:973)
+	at io.netty.channel.socket.nio.NioSocketChannel.doFinishConnect(NioSocketChannel.java:337)
+	at io.netty.channel.nio.AbstractNioChannel$AbstractNioUnsafe.finishConnect(AbstractNioChannel.java:334)
+	at io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:776)
+	at io.netty.channel.nio.NioEventLoop.processSelectedKeysOptimized(NioEventLoop.java:724)
+	at io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:650)
+	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:562)
+	at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:997)
+	at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74)
+	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
+	at java.base/java.lang.Thread.run(Thread.java:1583)

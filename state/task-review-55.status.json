@@ -1,0 +1,38 @@
+{
+  "taskID": "review-55",
+  "type": "review",
+  "status": "running",
+  "projectName": "social-world",
+  "startedAt": "2026-04-24T07:13:11.242422+08:00",
+  "lastHeartbeat": "2026-04-24T07:24:55.097732+08:00",
+  "stepResults": {
+    "checkCurrentBranch": {
+      "status": "success",
+      "exitCode": 0
+    },
+    "cleanupWorktree": {
+      "status": "success",
+      "exitCode": 0
+    },
+    "copyReport": {
+      "status": "success",
+      "exitCode": 0
+    },
+    "extractDesignAssets": {
+      "status": "success",
+      "exitCode": 0
+    },
+    "extractDocCoverage": {
+      "status": "success",
+      "exitCode": 0
+    },
+    "makeLogsDir": {
+      "status": "success",
+      "exitCode": 0
+    },
+    "runAgent": {
+      "status": "success",
+      "exitCode": 0
+    }
+  }
+}

@@ -1,0 +1,6 @@
+[2026-05-07 11:56:07] PR #64 Rework 启动
+分支: feat/issue-5
+
+❌ rework失败: shell step addLabel start failed: context canceled
+
+🛑 任务已停止

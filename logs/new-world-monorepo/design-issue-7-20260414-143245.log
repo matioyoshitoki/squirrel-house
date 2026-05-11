@@ -1,0 +1,6 @@
+[2026-04-14 14:32:45] Issue #7: 启动 UI 设计
+项目路径: ../../new-world-monorepo
+日志文件: logs/new-world-monorepo/design-issue-7-20260414-143245.log
+
+❌ 设计任务失败: shell step createWorktree failed: exit status 128, output: fatal: invalid reference: origin/dev/2.1.0
+

@@ -1,0 +1,231 @@
+2026/04/21 09:59:44 📋 已加载配置文件
+2026/04/21 09:59:44 📍 已恢复上次选择的项目: social-world
+2026/04/21 09:59:44 ✅ 已加载 9 个 CTX 模板
+2026/04/21 09:59:44 🔍 开始重建任务状态 [social-world]...
+2026/04/21 09:59:44 📝 已从 state/tasks.json 恢复 67 个任务状态
+2026/04/21 09:59:44 📁 找到 232 个文件
+2026/04/21 09:59:44 📝 更新任务状态: review-53 -> interrupted (来自日志推断)
+2026/04/21 09:59:44 📝 更新任务状态: dev-1 -> success (来自日志推断)
+2026/04/21 09:59:44 📝 更新任务状态: dev-37 -> success (来自日志推断)
+2026/04/21 09:59:44 📝 更新任务状态: rework-16 -> success (来自日志推断)
+2026/04/21 09:59:44 📝 更新任务状态: rework-33 -> success (来自日志推断)
+2026/04/21 09:59:44 📝 更新任务状态: design-29 -> success (来自日志推断)
+2026/04/21 09:59:44 📝 更新任务状态: design-43 -> success (来自日志推断)
+2026/04/21 09:59:44 📝 更新任务状态: dev-2 -> success (来自日志推断)
+2026/04/21 09:59:44 📝 更新任务状态: rework-38 -> success (来自日志推断)
+2026/04/21 09:59:44 📝 更新任务状态: review-6 -> success (来自日志推断)
+2026/04/21 09:59:44 📝 更新任务状态: dev-17 -> success (来自日志推断)
+2026/04/21 09:59:44 📝 更新任务状态: rework-53 -> success (来自日志推断)
+2026/04/21 09:59:44 📝 更新任务状态: dev-29 -> success (来自日志推断)
+2026/04/21 09:59:44 📝 更新任务状态: dev-51 -> failed (来自日志推断)
+2026/04/21 09:59:44 📝 更新任务状态: review-38 -> success (来自日志推断)
+2026/04/21 09:59:44 📝 更新任务状态: review-44 -> success (来自日志推断)
+2026/04/21 09:59:44 📝 更新任务状态: review-11 -> success (来自日志推断)
+2026/04/21 09:59:44 📝 更新任务状态: review-15 -> success (来自日志推断)
+2026/04/21 09:59:44 📝 更新任务状态: rework-51 -> failed (来自日志推断)
+2026/04/21 09:59:44 📝 更新任务状态: dev-3 -> success (来自日志推断)
+2026/04/21 09:59:44 📝 更新任务状态: dev-8 -> success (来自日志推断)
+2026/04/21 09:59:44 📝 更新任务状态: review-30 -> success (来自日志推断)
+2026/04/21 09:59:44 📝 更新任务状态: rework-30 -> success (来自日志推断)
+2026/04/21 09:59:44 📝 更新任务状态: rework-31 -> success (来自日志推断)
+2026/04/21 09:59:44 📝 更新任务状态: dev-32 -> success (来自日志推断)
+2026/04/21 09:59:44 📝 更新任务状态: review-31 -> success (来自日志推断)
+2026/04/21 09:59:44 📝 更新任务状态: dev-13 -> interrupted (来自日志推断)
+2026/04/21 09:59:44 📝 更新任务状态: dev-43 -> interrupted (来自日志推断)
+2026/04/21 09:59:44 📝 更新任务状态: dev-44 -> failed (来自日志推断)
+2026/04/21 09:59:44 📝 更新任务状态: dev-19 -> success (来自日志推断)
+2026/04/21 09:59:44 📝 更新任务状态: dev-36 -> stopped (来自日志推断)
+2026/04/21 09:59:44 📝 更新任务状态: review-16 -> success (来自日志推断)
+2026/04/21 09:59:44 📝 更新任务状态: review-33 -> success (来自日志推断)
+2026/04/21 09:59:44 📝 更新任务状态: review-41 -> success (来自日志推断)
+2026/04/21 09:59:44 📝 更新任务状态: design-4 -> success (来自日志推断)
+2026/04/21 09:59:44 📝 更新任务状态: dev-12 -> interrupted (来自日志推断)
+2026/04/21 09:59:44 📝 更新任务状态: dev-18 -> success (来自日志推断)
+2026/04/21 09:59:44 📝 更新任务状态: dev-4 -> success (来自日志推断)
+2026/04/21 09:59:44 📝 更新任务状态: dev-9 -> failed (来自日志推断)
+2026/04/21 09:59:44 📝 更新任务状态: rework-44 -> failed (来自日志推断)
+2026/04/21 09:59:44 📝 更新任务状态: dev-10 -> success (来自日志推断)
+2026/04/21 09:59:44 📝 更新任务状态: review-42 -> success (来自日志推断)
+2026/04/21 09:59:44 📝 更新任务状态: review-51 -> success (来自日志推断)
+2026/04/21 09:59:44 📝 更新任务状态: rework-42 -> failed (来自日志推断)
+2026/04/21 09:59:44 📝 更新任务状态: dev-20 -> success (来自日志推断)
+2026/04/21 09:59:44 📝 更新任务状态: dev-39 -> success (来自日志推断)
+2026/04/21 09:59:44 📝 更新任务状态: dev-42 -> failed (来自日志推断)
+2026/04/21 09:59:44 📝 更新任务状态: review-36 -> success (来自日志推断)
+2026/04/21 09:59:44 📝 更新任务状态: dev-7 -> success (来自日志推断)
+2026/04/21 09:59:44 📝 更新任务状态: review-34 -> success (来自日志推断)
+2026/04/21 09:59:44 📝 更新任务状态: dev-35 -> success (来自日志推断)
+2026/04/21 09:59:44 📝 更新任务状态: review-14 -> success (来自日志推断)
+2026/04/21 09:59:44 📝 更新任务状态: review-40 -> success (来自日志推断)
+2026/04/21 09:59:44 📝 跳过过期的 Review Report: PR #11
+2026/04/21 09:59:44 📝 跳过过期的 Review Report: PR #14
+2026/04/21 09:59:44 📝 跳过过期的 Review Report: PR #15
+2026/04/21 09:59:44 📝 跳过过期的 Review Report: PR #16
+2026/04/21 09:59:44 📝 跳过过期的 Review Report: PR #31
+2026/04/21 09:59:44 📝 跳过过期的 Review Report: PR #33
+2026/04/21 09:59:44 📝 跳过过期的 Review Report: PR #34
+2026/04/21 09:59:44 📝 跳过过期的 Review Report: PR #36
+2026/04/21 09:59:44 📝 跳过过期的 Review Report: PR #38
+2026/04/21 09:59:44 📝 跳过过期的 Review Report: PR #40
+2026/04/21 09:59:44 📝 跳过过期的 Review Report: PR #41
+2026/04/21 09:59:44 📝 跳过过期的 Review Report: PR #42
+2026/04/21 09:59:44 📝 跳过过期的 Review Report: PR #44
+2026/04/21 09:59:44 📝 跳过过期的 Review Report: PR #51
+2026/04/21 09:59:44 📝 跳过过期的 Review Report: PR #6
+2026/04/21 09:59:44 📝 恢复 Review 返工状态: PR #10 -> success
+2026/04/21 09:59:44 📝 恢复 Review 返工状态: PR #11 -> success
+2026/04/21 09:59:44 📝 恢复 Review 返工状态: PR #14 -> success
+2026/04/21 09:59:44 📝 恢复 Review 返工状态: PR #15 -> success
+2026/04/21 09:59:44 📝 恢复 Review 返工状态: PR #42 -> failed
+2026/04/21 09:59:44 📝 恢复 Review 返工状态: PR #6 -> success
+2026/04/21 09:59:44 🚀 Agent Dashboard 启动于 http://localhost:8080
+2026/04/21 10:01:10 📡 收到 SIGHUP，启动热重启...
+2026/04/21 10:01:10 🚀 子进程已启动 (pid=52283)
+2026/04/21 10:01:10 📋 已加载配置文件
+2026/04/21 10:01:10 📍 已恢复上次选择的项目: social-world
+2026/04/21 10:01:10 ✅ 已加载 9 个 CTX 模板
+2026/04/21 10:01:10 🔍 开始重建任务状态 [social-world]...
+2026/04/21 10:01:10 📝 已从 state/tasks.json 恢复 67 个任务状态
+2026/04/21 10:01:10 📁 找到 232 个文件
+2026/04/21 10:01:10 📝 更新任务状态: review-15 -> success (来自日志推断)
+2026/04/21 10:01:10 📝 更新任务状态: review-44 -> success (来自日志推断)
+2026/04/21 10:01:10 📝 更新任务状态: review-36 -> success (来自日志推断)
+2026/04/21 10:01:10 📝 更新任务状态: review-38 -> success (来自日志推断)
+2026/04/21 10:01:10 📝 更新任务状态: rework-33 -> success (来自日志推断)
+2026/04/21 10:01:10 📝 更新任务状态: design-29 -> success (来自日志推断)
+2026/04/21 10:01:10 📝 更新任务状态: dev-13 -> interrupted (来自日志推断)
+2026/04/21 10:01:10 📝 更新任务状态: dev-2 -> success (来自日志推断)
+2026/04/21 10:01:10 📝 更新任务状态: dev-44 -> failed (来自日志推断)
+2026/04/21 10:01:10 📝 更新任务状态: rework-44 -> failed (来自日志推断)
+2026/04/21 10:01:10 📝 更新任务状态: dev-12 -> interrupted (来自日志推断)
+2026/04/21 10:01:10 📝 更新任务状态: dev-42 -> failed (来自日志推断)
+2026/04/21 10:01:10 📝 更新任务状态: dev-43 -> interrupted (来自日志推断)
+2026/04/21 10:01:10 📝 更新任务状态: review-30 -> success (来自日志推断)
+2026/04/21 10:01:10 📝 更新任务状态: review-42 -> success (来自日志推断)
+2026/04/21 10:01:10 📝 更新任务状态: rework-42 -> failed (来自日志推断)
+2026/04/21 10:01:10 📝 更新任务状态: dev-1 -> success (来自日志推断)
+2026/04/21 10:01:10 📝 更新任务状态: dev-20 -> success (来自日志推断)
+2026/04/21 10:01:10 📝 更新任务状态: dev-3 -> success (来自日志推断)
+2026/04/21 10:01:10 📝 更新任务状态: review-33 -> success (来自日志推断)
+2026/04/21 10:01:10 📝 更新任务状态: dev-51 -> failed (来自日志推断)
+2026/04/21 10:01:10 📝 更新任务状态: review-31 -> success (来自日志推断)
+2026/04/21 10:01:10 📝 更新任务状态: rework-53 -> success (来自日志推断)
+2026/04/21 10:01:10 📝 更新任务状态: review-16 -> success (来自日志推断)
+2026/04/21 10:01:10 📝 更新任务状态: dev-32 -> success (来自日志推断)
+2026/04/21 10:01:10 📝 更新任务状态: review-6 -> success (来自日志推断)
+2026/04/21 10:01:10 📝 更新任务状态: rework-30 -> success (来自日志推断)
+2026/04/21 10:01:10 📝 更新任务状态: dev-37 -> success (来自日志推断)
+2026/04/21 10:01:10 📝 更新任务状态: dev-4 -> success (来自日志推断)
+2026/04/21 10:01:10 📝 更新任务状态: review-41 -> success (来自日志推断)
+2026/04/21 10:01:10 📝 更新任务状态: dev-36 -> stopped (来自日志推断)
+2026/04/21 10:01:10 📝 更新任务状态: dev-7 -> success (来自日志推断)
+2026/04/21 10:01:10 📝 更新任务状态: dev-8 -> success (来自日志推断)
+2026/04/21 10:01:10 📝 更新任务状态: review-40 -> success (来自日志推断)
+2026/04/21 10:01:10 📝 更新任务状态: design-43 -> success (来自日志推断)
+2026/04/21 10:01:10 📝 更新任务状态: dev-17 -> success (来自日志推断)
+2026/04/21 10:01:10 📝 更新任务状态: dev-19 -> success (来自日志推断)
+2026/04/21 10:01:10 📝 更新任务状态: review-51 -> success (来自日志推断)
+2026/04/21 10:01:10 📝 更新任务状态: dev-35 -> success (来自日志推断)
+2026/04/21 10:01:10 📝 更新任务状态: dev-9 -> failed (来自日志推断)
+2026/04/21 10:01:10 📝 更新任务状态: review-11 -> success (来自日志推断)
+2026/04/21 10:01:10 📝 更新任务状态: rework-38 -> success (来自日志推断)
+2026/04/21 10:01:10 📝 更新任务状态: rework-51 -> failed (来自日志推断)
+2026/04/21 10:01:10 📝 更新任务状态: design-4 -> success (来自日志推断)
+2026/04/21 10:01:10 📝 更新任务状态: dev-10 -> success (来自日志推断)
+2026/04/21 10:01:10 📝 更新任务状态: dev-29 -> success (来自日志推断)
+2026/04/21 10:01:10 📝 更新任务状态: dev-39 -> success (来自日志推断)
+2026/04/21 10:01:10 📝 更新任务状态: review-14 -> success (来自日志推断)
+2026/04/21 10:01:10 📝 更新任务状态: rework-16 -> success (来自日志推断)
+2026/04/21 10:01:10 📝 更新任务状态: rework-31 -> success (来自日志推断)
+2026/04/21 10:01:10 📝 更新任务状态: dev-18 -> success (来自日志推断)
+2026/04/21 10:01:10 📝 更新任务状态: review-34 -> success (来自日志推断)
+2026/04/21 10:01:10 📝 更新任务状态: review-53 -> interrupted (来自日志推断)
+2026/04/21 10:01:10 📝 跳过过期的 Review Report: PR #11
+2026/04/21 10:01:10 📝 跳过过期的 Review Report: PR #14
+2026/04/21 10:01:10 📝 跳过过期的 Review Report: PR #15
+2026/04/21 10:01:10 📝 跳过过期的 Review Report: PR #16
+2026/04/21 10:01:10 📝 跳过过期的 Review Report: PR #31
+2026/04/21 10:01:10 📝 跳过过期的 Review Report: PR #33
+2026/04/21 10:01:10 📝 跳过过期的 Review Report: PR #34
+2026/04/21 10:01:10 📝 跳过过期的 Review Report: PR #36
+2026/04/21 10:01:10 📝 跳过过期的 Review Report: PR #38
+2026/04/21 10:01:10 📝 跳过过期的 Review Report: PR #40
+2026/04/21 10:01:10 📝 跳过过期的 Review Report: PR #41
+2026/04/21 10:01:10 📝 跳过过期的 Review Report: PR #42
+2026/04/21 10:01:10 📝 跳过过期的 Review Report: PR #44
+2026/04/21 10:01:10 📝 跳过过期的 Review Report: PR #51
+2026/04/21 10:01:10 📝 跳过过期的 Review Report: PR #6
+2026/04/21 10:01:10 📝 恢复 Review 返工状态: PR #10 -> success
+2026/04/21 10:01:10 📝 恢复 Review 返工状态: PR #11 -> success
+2026/04/21 10:01:10 📝 恢复 Review 返工状态: PR #14 -> success
+2026/04/21 10:01:10 📝 恢复 Review 返工状态: PR #15 -> success
+2026/04/21 10:01:10 📝 恢复 Review 返工状态: PR #42 -> failed
+2026/04/21 10:01:10 📝 恢复 Review 返工状态: PR #6 -> success
+2026/04/21 10:01:10 🔄 从父进程继承 listener (fd=3)
+2026/04/21 10:01:10 🚀 Agent Dashboard 启动于 http://localhost:8080
+2026/04/21 10:01:15 ✅ 所有 running 任务已完成，旧进程准备退出
+2026/04/21 10:01:15 👋 旧进程退出
+2026/04/21 10:03:06 ⚠️ 飞书通知发送失败: exit status 2, output: {
+  "ok": false,
+  "identity": "user",
+  "error": {
+    "type": "validation",
+    "message": "resolved identity \"user\" (via auto-detect or default-as) is not supported, this command only supports: bot\nhint: use --as bot"
+  }
+}
+2026/04/21 10:13:57 📄 PR #53 Review 报告来自 workflow state (readReport 步骤)
+2026/04/21 10:13:57 Review 任务结束: PR #53, 结果: needs_fix, 错误: <nil>
+2026/04/21 10:14:00 ✅ PR #53 评论已更新, output: https://github.com/MatioYoshitoki/social-world/pull/53#issuecomment-4285114988
+2026/04/21 10:14:00 ⚠️ 飞书通知发送失败: exit status 2, output: {
+  "ok": false,
+  "identity": "user",
+  "error": {
+    "type": "validation",
+    "message": "resolved identity \"user\" (via auto-detect or default-as) is not supported, this command only supports: bot\nhint: use --as bot"
+  }
+}
+2026/04/21 10:24:43 ⚠️ 飞书通知发送失败: exit status 2, output: {
+  "ok": false,
+  "identity": "user",
+  "error": {
+    "type": "validation",
+    "message": "resolved identity \"user\" (via auto-detect or default-as) is not supported, this command only supports: bot\nhint: use --as bot"
+  }
+}
+2026/04/21 10:24:48 [loadWorkflow] using project-specific workflow: workflows/social-world/rework.yaml
+2026/04/21 10:24:48 ⚠️ 飞书通知发送失败: exit status 2, output: {
+  "ok": false,
+  "identity": "user",
+  "error": {
+    "type": "validation",
+    "message": "resolved identity \"user\" (via auto-detect or default-as) is not supported, this command only supports: bot\nhint: use --as bot"
+  }
+}
+2026/04/21 10:39:12 📡 收到 SIGHUP，启动热重启...
+2026/04/21 10:39:12 🚀 子进程已启动 (pid=66072)
+2026/04/21 10:39:17 ⏳ 旧进程等待 1 个 running 任务完成...
+2026/04/21 10:39:22 ⏳ 旧进程等待 1 个 running 任务完成...
+2026/04/21 10:39:27 ⏳ 旧进程等待 1 个 running 任务完成...
+2026/04/21 10:39:32 ⏳ 旧进程等待 1 个 running 任务完成...
+2026/04/21 10:39:37 ⏳ 旧进程等待 1 个 running 任务完成...
+2026/04/21 10:39:42 ⏳ 旧进程等待 1 个 running 任务完成...
+2026/04/21 10:39:47 ⏳ 旧进程等待 1 个 running 任务完成...
+2026/04/21 10:39:52 ⏳ 旧进程等待 1 个 running 任务完成...
+2026/04/21 10:39:57 ⏳ 旧进程等待 1 个 running 任务完成...
+2026/04/21 10:40:02 ⏳ 旧进程等待 1 个 running 任务完成...
+2026/04/21 10:40:07 ⏳ 旧进程等待 1 个 running 任务完成...
+2026/04/21 10:40:12 ⏳ 旧进程等待 1 个 running 任务完成...
+2026/04/21 10:40:17 ⏳ 旧进程等待 1 个 running 任务完成...
+2026/04/21 10:40:22 ⏳ 旧进程等待 1 个 running 任务完成...
+2026/04/21 10:40:23 ✅ PR #53 的 review 状态已重置（返工完成，需重新 Review）
+2026/04/21 10:40:23 ⚠️ 飞书通知发送失败: exit status 2, output: {
+  "ok": false,
+  "identity": "user",
+  "error": {
+    "type": "validation",
+    "message": "resolved identity \"user\" (via auto-detect or default-as) is not supported, this command only supports: bot\nhint: use --as bot"
+  }
+}
+2026/04/21 10:40:25 ✅ PR #53 评论已添加, output: https://github.com/MatioYoshitoki/social-world/pull/53#issuecomment-4285583994
+2026/04/21 10:40:27 ✅ 所有 running 任务已完成，旧进程准备退出
+2026/04/21 10:40:27 👋 旧进程退出

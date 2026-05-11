@@ -1,0 +1,54 @@
+name: pm-task
+steps:
+  - id: fetchOrigin
+    label: 同步远程分支
+    type: shell
+    command: git fetch origin
+    ignoreError: true
+
+  - id: runAgent
+    label: 运行 product-manager agent
+    type: shell
+    tmux: true
+    dir: '{{ .Vars.tmpDir }}'
+    command: |
+      kimi --agent-file {{ .Vars.agentFile | shellquote }} \
+           --max-steps-per-turn 10000 \
+           --print \
+           -p {{ .Vars.prompt | shellquote }}
+    env:
+      AGENT_ISSUE_NUMBER: '{{ .Vars.issueNumber }}'
+      AGENT_ISSUE_TITLE: '{{ .Vars.issueTitle }}'
+      AGENT_LOG_FILE: '{{ .Vars.logFileName }}'
+    outputKey: agentOutput
+    logFile: '{{ .Vars.logFileName }}'
+
+  - id: gitAddPRD
+    label: 添加 PRD 到 git
+    type: shell
+    dir: '{{ .Vars.tmpDir }}'
+    command: git add -f prd/
+    ignoreError: true
+
+  - id: gitCommitPRD
+    label: 提交 PRD
+    type: shell
+    dir: '{{ .Vars.tmpDir }}'
+    command: 'git commit -m "docs: add PRD for issue #{{ .Vars.issueNumber }}"'
+    ignoreError: true
+
+  - id: gitPushPRD
+    label: 推送 PRD 分支
+    type: shell
+    dir: '{{ .Vars.tmpDir }}'
+    command: git push origin {{ .Vars.branch }}
+    ignoreError: true
+
+  - id: cleanupWorktree
+    label: 清理 worktree
+    type: shell
+    isCleanup: true
+    command: |
+      git worktree remove --force {{ .Vars.tmpDir }} || true
+      rm -rf {{ .Vars.tmpDir }}
+    ignoreError: true

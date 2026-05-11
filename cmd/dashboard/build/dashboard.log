@@ -1,0 +1,28 @@
+2026/04/09 07:54:10 🔍 开始重建任务状态...
+2026/04/09 07:54:10 ❌ 无法读取日志目录: open logs: no such file or directory
+2026/04/09 07:54:10 🚀 Agent Dashboard 启动于 http://localhost:8080
+2026/04/09 07:54:12 ⚠️ 获取 issues 失败 (label=plan-ready): chdir ../new-world-server/new-world-api: no such file or directory, output: 
+2026/04/09 07:54:12 ⚠️ 获取 issues 失败 (label=prd-ready): chdir ../new-world-server/new-world-api: no such file or directory, output: 
+2026/04/09 07:54:12 ⚠️ 获取 issues 失败 (label=triage): chdir ../new-world-server/new-world-api: no such file or directory, output: 
+2026/04/09 07:54:12 ⚠️ 获取 issues 失败 (label=analyzing): chdir ../new-world-server/new-world-api: no such file or directory, output: 
+2026/04/09 07:54:12 ⚠️ 获取 PR 列表失败: chdir ../new-world-server/new-world-api: no such file or directory, output: 
+2026/04/09 07:54:22 ⚠️ 获取 issues 失败 (label=plan-ready): chdir ../new-world-server/new-world-api: no such file or directory, output: 
+2026/04/09 07:54:22 ⚠️ 获取 issues 失败 (label=prd-ready): chdir ../new-world-server/new-world-api: no such file or directory, output: 
+2026/04/09 07:54:22 ⚠️ 获取 issues 失败 (label=triage): chdir ../new-world-server/new-world-api: no such file or directory, output: 
+2026/04/09 07:54:22 ⚠️ 获取 issues 失败 (label=analyzing): chdir ../new-world-server/new-world-api: no such file or directory, output: 
+2026/04/09 07:54:22 ⚠️ 获取 PR 列表失败: chdir ../new-world-server/new-world-api: no such file or directory, output: 
+2026/04/09 07:54:32 ⚠️ 获取 issues 失败 (label=plan-ready): chdir ../new-world-server/new-world-api: no such file or directory, output: 
+2026/04/09 07:54:32 ⚠️ 获取 issues 失败 (label=prd-ready): chdir ../new-world-server/new-world-api: no such file or directory, output: 
+2026/04/09 07:54:32 ⚠️ 获取 issues 失败 (label=triage): chdir ../new-world-server/new-world-api: no such file or directory, output: 
+2026/04/09 07:54:32 ⚠️ 获取 issues 失败 (label=analyzing): chdir ../new-world-server/new-world-api: no such file or directory, output: 
+2026/04/09 07:54:32 ⚠️ 获取 PR 列表失败: chdir ../new-world-server/new-world-api: no such file or directory, output: 
+2026/04/09 07:54:42 ⚠️ 获取 issues 失败 (label=plan-ready): chdir ../new-world-server/new-world-api: no such file or directory, output: 
+2026/04/09 07:54:42 ⚠️ 获取 issues 失败 (label=prd-ready): chdir ../new-world-server/new-world-api: no such file or directory, output: 
+2026/04/09 07:54:42 ⚠️ 获取 issues 失败 (label=triage): chdir ../new-world-server/new-world-api: no such file or directory, output: 
+2026/04/09 07:54:42 ⚠️ 获取 issues 失败 (label=analyzing): chdir ../new-world-server/new-world-api: no such file or directory, output: 
+2026/04/09 07:54:42 ⚠️ 获取 PR 列表失败: chdir ../new-world-server/new-world-api: no such file or directory, output: 
+2026/04/09 07:54:55 ⚠️ 获取 issues 失败 (label=plan-ready): chdir ../new-world-server/new-world-api: no such file or directory, output: 
+2026/04/09 07:54:55 ⚠️ 获取 issues 失败 (label=prd-ready): chdir ../new-world-server/new-world-api: no such file or directory, output: 
+2026/04/09 07:54:55 ⚠️ 获取 issues 失败 (label=triage): chdir ../new-world-server/new-world-api: no such file or directory, output: 
+2026/04/09 07:54:55 ⚠️ 获取 issues 失败 (label=analyzing): chdir ../new-world-server/new-world-api: no such file or directory, output: 
+2026/04/09 07:54:55 ⚠️ 获取 PR 列表失败: chdir ../new-world-server/new-world-api: no such file or directory, output: 

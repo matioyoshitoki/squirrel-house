@@ -1,0 +1,93 @@
+name: pr-review
+steps:
+  - id: checkCurrentBranch
+    label: 检测当前分支
+    type: shell
+    command: git branch --show-current
+    outputKey: currentBranch
+    ignoreError: true
+
+  - id: stashAndCheckout
+    label: 释放目标分支占用
+    type: shell
+    condition: '{{ eq (.State.currentBranch | trim) .Vars.branch }}'
+    command: |
+      git stash push -m "dashboard-review-auto-stash" && \
+      git checkout origin/{{ .Vars.branch }} || git checkout {{ .Vars.branch }}
+    ignoreError: true
+
+  - id: makeLogsDir
+    label: 创建 logs 目录
+    type: shell
+    command: mkdir -p {{ .Vars.tmpDir }}/logs
+
+  - id: extractDesignAssets
+    label: 提取设计图资源
+    type: shell
+    dir: '{{ .Vars.tmpDir }}'
+    command: |
+      # 设计资产和 Figma 链接已由 Dashboard 预生成
+      touch .design-assets.txt .figma-links.txt .doc-coverage.txt
+    ignoreError: true
+
+  - id: extractDocCoverage
+    label: 提取文档覆盖信息
+    type: shell
+    dir: '{{ .Vars.tmpDir }}'
+    command: |
+      # 文档覆盖信息已由 Dashboard 预生成
+      touch .doc-coverage.txt
+      echo "" >> .doc-coverage.txt
+      echo "=== 现有 docs 目录结构（顶层） ===" >> .doc-coverage.txt
+      ls -R docs/ 2>/dev/null | head -n 50 >> .doc-coverage.txt || true
+    ignoreError: true
+
+  - id: runAgent
+    label: 运行 reviewer agent
+    type: shell
+    tmux: true
+    dir: '{{ .Vars.tmpDir }}'
+    command: |
+      kimi --agent-file {{ .Vars.agentFile | shellquote }} \
+           --max-steps-per-turn 10000 \
+           --print \
+           -p {{ .Vars.prompt | shellquote }}
+    env:
+      AGENT_PR_NUMBER: '{{ .Vars.prNumber }}'
+      AGENT_PR_BRANCH: '{{ .Vars.branch }}'
+      AGENT_LOG_FILE: '{{ .Vars.logFileName }}'
+      # AGENT_AGENTS_MD 由 dashboard 在 buildAgentContext 中自动设置，无需在此覆盖
+    outputKey: agentOutput
+    logFile: '{{ .Vars.logFileName }}'
+
+  - id: readReport
+    label: 读取审查报告到内存
+    type: readFile
+    path: '{{ .Vars.tmpDir }}/logs/review-report-{{ .Vars.prNumber }}.md'
+    outputKey: reviewReportContent
+    ignoreError: true
+
+  - id: copyReport
+    label: 复制审查报告到日志目录
+    type: shell
+    command: cp {{ .Vars.tmpDir }}/logs/review-report-{{ .Vars.prNumber }}.md {{ .Vars.logsDir }}/review-report-{{ .Vars.prNumber }}.md 2>/dev/null || true
+    ignoreError: true
+
+  - id: cleanupWorktree
+    label: 清理 worktree
+    type: shell
+    isCleanup: true
+    command: |
+      git worktree remove --force {{ .Vars.tmpDir }} || true
+      rm -rf {{ .Vars.tmpDir }}
+    ignoreError: true
+
+  - id: restoreBranch
+    label: 恢复本地分支
+    type: shell
+    condition: '{{ eq (.State.currentBranch | trim) .Vars.branch }}'
+    isCleanup: true
+    command: |
+      git checkout {{ .Vars.branch }} || true
+      git stash pop || true
+    ignoreError: true
