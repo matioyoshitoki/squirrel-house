@@ -1,9 +1,0 @@
-
-Waiting for flows to complete...
-[Passed] login (18s)
-[Failed] setup (18s) (Assertion is false: "完善资料" is visible)
-[Passed] open_drawer (5s)
-[Passed] edit_server_url (41s)
-
-1/4 Flow Failed
-

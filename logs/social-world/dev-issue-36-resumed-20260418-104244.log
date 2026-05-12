@@ -1,7 +1,0 @@
-[2026-04-18 10:42:44] Issue #36: 恢复开发
-Agent类型: doc-gardener
-项目路径: ../../social-world
-日志文件: /Users/insulate/Desktop/new-world/new-world-ops/logs/social-world/dev-issue-36-resumed-20260418-104244.log
-
-❌ dev失败: shell step createWorktree failed: exit status 128, output: fatal: 'main' is already used by worktree at '/Users/insulate/Desktop/social-world'
-

@@ -1,0 +1,26 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+build/
+
+# Generated CSS
+cmd/dashboard/static/style.css
+
+# Runtime logs
+logs/
+cmd/dashboard/logs/
+*.log
+
+# Runtime state
+state/
+
+# PID files
+*.pid
+
+# macOS
+.DS_Store
+
+# Local environment configs
+configs/dashboard.json
+ecosystem.config.js

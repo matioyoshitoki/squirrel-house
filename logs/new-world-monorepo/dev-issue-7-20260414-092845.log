@@ -1,7 +1,0 @@
-[2026-04-14 09:28:45] Issue #7: 启动开发
-Agent类型: developer
-项目路径: ../../new-world-monorepo
-日志文件: logs/new-world-monorepo/dev-issue-7-20260414-092845.log
-
-❌ 开发失败: shell step createWorktree failed: exit status 128, output: fatal: invalid reference: origin/origin/main
-

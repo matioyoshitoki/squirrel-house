@@ -1,4 +1,0 @@
-[2026-04-23 21:03:20] PR #55 Rework 启动
-分支: feat/issue-43
-
-❌ rework失败: tmux step runAgent start failed: exit status 1

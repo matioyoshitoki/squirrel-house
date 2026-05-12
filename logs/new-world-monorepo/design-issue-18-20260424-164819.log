@@ -1,7 +1,0 @@
-[2026-04-24 16:48:19] Issue #18: 启动 UI 设计
-项目路径: ../../new-world-monorepo
-日志文件: /Users/insulate/Desktop/new-world/new-world-ops/logs/new-world-monorepo/design-issue-18-20260424-164819.log
-
-❌ git worktree add failed: exit status 128
-fatal: invalid reference: origin/dev/2.1.0
-

@@ -1,7 +1,0 @@
-[2026-04-25 19:17:55] E2E 任务启动 (由 rework-58)
-分支: feat/issue-5
-项目: social-world
-日志: /Users/insulate/Desktop/new-world/new-world-ops/logs/social-world/e2e-issue-58-20260425-191755.log
-
-
-❌ e2e失败: shell step checkEnv start failed: fork/exec /bin/bash: no such file or directory
