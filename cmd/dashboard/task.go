@@ -154,7 +154,7 @@ var taskRegistry = map[TaskType]taskSpec{
 				// Review 未通过时自动触发 Rework
 				TargetType: TaskTypeRework,
 				Condition: func(t *Task, sourceVars map[string]interface{}, wfCtx *workflow.Context) bool {
-					if t.Result == "PASS" {
+					if t.Result == "passed" {
 						log.Printf("[hook] PR #%d Review 通过，无需 Rework", t.TargetID)
 						return false
 					}
@@ -773,7 +773,7 @@ func runningTasksByProject(projectName string) []*Task {
 	defer tasksMutex.RUnlock()
 	result := make([]*Task, 0)
 	for _, t := range tasks {
-		if t.ProjectName == projectName && t.Status != "success" {
+		if t.ProjectName == projectName && t.Status == "running" {
 			result = append(result, t)
 		}
 	}

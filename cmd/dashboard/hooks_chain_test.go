@@ -280,7 +280,7 @@ func TestHookChain_ReviewPass_NoRework(t *testing.T) {
 	mockDisp, _, _, _ := setupHookTest(t)
 
 	task := makeTask(TaskTypeReview, 58, "success")
-	task.Result = "PASS"
+	task.Result = "passed"
 	spec := taskRegistry[TaskTypeReview]
 	triggerHooks(task, spec, map[string]interface{}{}, nil, true)
 
@@ -367,7 +367,7 @@ func TestHookChain_ReviewPass_NoHooks(t *testing.T) {
 	mockCounter.countFn = func(prNumber int, projectName string) int { return 5 }
 
 	task := makeTask(TaskTypeReview, 58, "success")
-	task.Result = "PASS"
+	task.Result = "passed"
 	spec := taskRegistry[TaskTypeReview]
 	triggerHooks(task, spec, map[string]interface{}{}, nil, true)
 
@@ -423,7 +423,7 @@ func TestHookChain_ConditionFalse_SkipsHook(t *testing.T) {
 	mockDisp, _, _, _ := setupHookTest(t)
 
 	task := makeTask(TaskTypeReview, 58, "success")
-	task.Result = "PASS"
+	task.Result = "passed"
 	spec := taskRegistry[TaskTypeReview]
 	triggerHooks(task, spec, map[string]interface{}{}, nil, true)
 

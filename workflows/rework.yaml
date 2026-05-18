@@ -27,6 +27,45 @@ steps:
       fi
     ignoreError: true
 
+  - id: envReadinessCheck
+    label: 环境就绪检查
+    type: shell
+    dir: '{{ .Vars.tmpDir }}'
+    command: |
+      echo "=== 环境就绪检查 ==="
+      MISSING=0
+
+      if [ -f "AGENTS.md" ]; then
+        echo "✅ AGENTS.md"
+      else
+        echo "⚠️ AGENTS.md 缺失"
+        MISSING=1
+      fi
+
+      if [ -f "Makefile" ]; then
+        echo "✅ Makefile"
+      else
+        echo "ℹ️ Makefile 缺失（非必须）"
+      fi
+
+      if [ -f "{{ .Vars.reviewReport }}" ]; then
+        echo "✅ review report: {{ .Vars.reviewReport }}"
+      else
+        echo "⚠️ review report 不存在: {{ .Vars.reviewReport }}"
+        MISSING=1
+      fi
+
+      # 将检查结果写入文件供 agent 读取
+      mkdir -p logs
+      echo "env_check_time: $(date -Iseconds)" > logs/rework-env-check.txt
+      echo "review_report_exists: $([ -f '{{ .Vars.reviewReport }}' ] && echo 'true' || echo 'false')" >> logs/rework-env-check.txt
+      echo "agents_md_exists: $([ -f 'AGENTS.md' ] && echo 'true' || echo 'false')" >> logs/rework-env-check.txt
+
+      if [ "$MISSING" -eq 1 ]; then
+        echo "⚠️ 部分关键文件缺失，agent 可能需要额外处理"
+      fi
+    ignoreError: true
+
   - id: runAgent
     label: 运行 rework agent
     type: shell
