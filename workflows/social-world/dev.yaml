@@ -29,7 +29,7 @@ steps:
     type: shell
     command: |
       echo "=== Emulator Check ==="
-      export ANDROID_HOME=/Users/insulate/Library/Android/sdk
+      export ANDROID_HOME=/opt/android-sdk
       export PATH="$ANDROID_HOME/platform-tools:$PATH"
 
       ANDROID_EMU=$(adb devices 2>/dev/null | grep "emulator" | head -1 | awk '{print $1}')

@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"os"
+	"path/filepath"
 	"text/template"
 
 	"gopkg.in/yaml.v3"
@@ -18,7 +19,7 @@ type ctxTemplatesConfig struct {
 
 // loadCtxTemplates 从 prompts/ctx-templates.yaml 加载所有模板
 func loadCtxTemplates() error {
-	data, err := os.ReadFile("prompts/ctx-templates.yaml")
+	data, err := os.ReadFile(filepath.Join(projectRoot, "prompts", "ctx-templates.yaml"))
 	if err != nil {
 		return fmt.Errorf("read ctx-templates.yaml: %w", err)
 	}

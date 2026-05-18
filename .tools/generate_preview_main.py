@@ -174,6 +174,8 @@ def generate_main_dart(preview_dir, output_file):
             types = extract_types(content)
             all_type_defs.update(types)
 
+    # 收集所有 widget，按名称去重（同名 widget 只保留第一次出现的）
+    widget_files = {}  # name -> filepath
     for root, _, files in os.walk(preview_dir):
         if any(skip in root.split(os.sep) for skip in skip_dirs):
             continue
@@ -184,23 +186,21 @@ def generate_main_dart(preview_dir, output_file):
             widgets = extract_widgets(filepath, all_type_defs)
             for w in widgets:
                 known_types.add(w['name'])
+                if w['name'] not in widget_files:
+                    widget_files[w['name']] = filepath
 
-    for root, _, files in os.walk(preview_dir):
-        if any(skip in root.split(os.sep) for skip in skip_dirs):
-            continue
-        for filename in files:
-            if not filename.endswith('.dart'):
+    for name, filepath in widget_files.items():
+        rel = os.path.relpath(filepath, preview_dir)
+        import_path = 'preview/' + rel.replace('\\', '/')
+        imports.add(f"import '{import_path}';")
+
+    for name, filepath in widget_files.items():
+        widgets = extract_widgets(filepath, all_type_defs)
+        for w in widgets:
+            if w['name'] != name:
                 continue
-            filepath = os.path.join(root, filename)
-            widgets = extract_widgets(filepath, all_type_defs)
-            if not widgets:
-                continue
-            rel = os.path.relpath(filepath, preview_dir)
-            import_path = 'preview/' + rel.replace('\\', '/')
-            imports.add(f"import '{import_path}';")
-            for w in widgets:
-                code, is_safe = build_instance(w['name'], w['params'], known_types, all_type_defs, w.get('has_scaffold', False))
-                instances.append(f"            _buildCard('{w['name']}', {code}),")
+            code, is_safe = build_instance(w['name'], w['params'], known_types, all_type_defs, w.get('has_scaffold', False))
+            instances.append(f"            _buildCard('{w['name']}', {code}),")
 
     if not instances:
         instances.append("            const Center(child: Text('未找到可预览的 Widget')),")

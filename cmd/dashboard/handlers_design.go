@@ -146,6 +146,7 @@ func startDesignTask(issueNumber int, issueTitle string) string {
 			"prompt":      prompt,
 			"logsDir":     logsDir,
 			"projectName": projectName,
+			"projectPath": projectPath,
 		}
 		for k, v := range agentCtx {
 			vars[k] = v

@@ -56,6 +56,7 @@ steps:
       AGENT_PR_NUMBER: '{{ .Vars.prNumber }}'
       AGENT_PR_BRANCH: '{{ .Vars.branch }}'
       AGENT_LOG_FILE: '{{ .Vars.logFileName }}'
+      AGENT_REVIEW_REPORT: '{{ .Vars.tmpDir }}/logs/review-report-{{ .Vars.prNumber }}.md'
       # AGENT_AGENTS_MD 由 dashboard 在 buildAgentContext 中自动设置，无需在此覆盖
     outputKey: agentOutput
     logFile: '{{ .Vars.logFileName }}'

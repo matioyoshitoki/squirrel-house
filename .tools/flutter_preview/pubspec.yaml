@@ -29,7 +29,7 @@ environment:
 # versions available, run `flutter pub outdated`.
 dependencies:
   social_world_design_system:
-    path: /Users/insulate/Desktop/social-world/packages/design-system
+    path: /root/social-world/packages/design-system
   flutter:
     sdk: flutter
 
@@ -39,7 +39,7 @@ dependencies:
 
 dev_dependencies:
   social_world_design_system:
-    path: /Users/insulate/Desktop/social-world/packages/design-system
+    path: /root/social-world/packages/design-system
   flutter_test:
     sdk: flutter
 

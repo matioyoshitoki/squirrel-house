@@ -121,6 +121,26 @@ func readTaskStatusFile(taskID string) *TaskStatusFile {
 	return &status
 }
 
+// updateTaskStatusFileStatus 仅更新状态文件中的 status 字段（用于重建和清理时持久化）
+func updateTaskStatusFileStatus(taskID string, newStatus string) {
+	path := taskStatusFilePath(taskID)
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return
+	}
+	var status TaskStatusFile
+	if err := json.Unmarshal(data, &status); err != nil {
+		return
+	}
+	if status.Status == newStatus {
+		return
+	}
+	status.Status = newStatus
+	status.LastHeartbeat = time.Now()
+	data, _ = json.MarshalIndent(status, "", "  ")
+	os.WriteFile(path, data, 0644)
+}
+
 // taskRegistry 任务类型策略表
 // 使用 taskSpec（定义在 hooks.go）替代匿名 struct，支持 AfterSuccess / AfterFailure hooks
 var taskRegistry = map[TaskType]taskSpec{
@@ -557,15 +577,18 @@ func runTaskWorkflow(task *Task, vars map[string]interface{}, preRun func(*Task)
 		close(stopHeartbeat)
 		<-heartbeatDone
 
-		// 最终状态写入
+		// 最终状态写入（步骤级结果）
 		writeTaskStatusFile(task, wfCtx)
 
-		// 特定类型后处理
+		// 特定类型后处理（更新 task.Status 为 success/failed）
 		if task.Type == TaskTypeReview {
 			postProcessReviewTask(task, wfCtx, wfErr, logsDir)
 		} else {
 			postProcessGenericTask(task, wfErr)
 		}
+
+		// 再次写入状态文件，确保最终状态（success/failed）被持久化
+		writeTaskStatusFile(task, wfCtx)
 
 		// 触发 hooks（在 OnFinished 之前，让 hook 任务和通知并行）
 		triggerHooks(task, spec, vars, wfCtx, task.Status == "success")

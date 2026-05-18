@@ -390,12 +390,17 @@ func (gl *gitlabPlatform) run(args ...string) ([]byte, error) {
 }
 
 func (gl *gitlabPlatform) AuthStatus() error {
-	_, err := gl.run("auth", "status")
-	return err
+	// glab auth status 在有多个 host 配置或 token 被标记为 invalid 时也会返回非零退出码
+	// 使用轻量 API 调用验证实际认证状态
+	output, err := gl.run("mr", "list", "--per-page", "1", "-F", "json")
+	if err != nil {
+		return fmt.Errorf("glab API call failed: %w, output: %s", err, string(output))
+	}
+	return nil
 }
 
 func (gl *gitlabPlatform) ListOpenMRs() ([]MergeRequest, error) {
-	output, err := gl.run("mr", "list", "--state", "opened", "-F", "json")
+	output, err := gl.run("mr", "list", "-F", "json")
 	if err != nil {
 		return nil, fmt.Errorf("list MRs: %w, output: %s", err, string(output))
 	}
@@ -455,7 +460,7 @@ func (gl *gitlabPlatform) ViewMR(iid int) (*MergeRequest, error) {
 }
 
 func (gl *gitlabPlatform) FindMRByBranch(branch string) (int, error) {
-	output, err := gl.run("mr", "list", "--source-branch", branch, "--state", "opened", "-F", "json")
+	output, err := gl.run("mr", "list", "--source-branch", branch, "-F", "json")
 	if err != nil {
 		return 0, fmt.Errorf("find MR by branch %s: %w, output: %s", branch, err, string(output))
 	}
@@ -558,7 +563,7 @@ func (gl *gitlabPlatform) AddMRLabel(iid int, label string) error {
 }
 
 func (gl *gitlabPlatform) ListOpenIssues() ([]Issue, error) {
-	output, err := gl.run("issue", "list", "--state", "opened", "-F", "json")
+	output, err := gl.run("issue", "list", "-O", "json")
 	if err != nil {
 		return nil, fmt.Errorf("list issues: %w, output: %s", err, string(output))
 	}
@@ -571,6 +576,11 @@ func (gl *gitlabPlatform) ListOpenIssues() ([]Issue, error) {
 		UpdatedAt string   `json:"updated_at"`
 	}
 	if err := json.Unmarshal(output, &raw); err != nil {
+		// glab 在没有 issues 时输出文本提示而非 JSON（如 "No open issues match..."），此时返回空数组
+		trimmed := strings.TrimSpace(string(output))
+		if len(trimmed) > 0 && !strings.HasPrefix(trimmed, "[") && !strings.HasPrefix(trimmed, "{") {
+			return []Issue{}, nil
+		}
 		return nil, err
 	}
 	result := make([]Issue, len(raw))
@@ -588,7 +598,7 @@ func (gl *gitlabPlatform) ListOpenIssues() ([]Issue, error) {
 }
 
 func (gl *gitlabPlatform) ViewIssue(iid int) (*Issue, error) {
-	output, err := gl.run("issue", "view", strconv.Itoa(iid), "-F", "json")
+	output, err := gl.run("issue", "view", strconv.Itoa(iid), "-O", "json")
 	if err != nil {
 		return nil, fmt.Errorf("view issue %d: %w, output: %s", iid, err, string(output))
 	}

@@ -385,7 +385,7 @@ func TestEnsureToolPaths(t *testing.T) {
 	found := false
 	for _, e := range result {
 		if strings.HasPrefix(e, "PATH=") {
-			assert.Contains(t, e, "/Users/insulate/flutter/bin")
+			assert.Contains(t, e, "/opt/flutter/bin")
 			found = true
 		}
 	}
@@ -398,7 +398,7 @@ func TestEnsureToolPaths_NoExistingPath(t *testing.T) {
 	found := false
 	for _, e := range result {
 		if strings.HasPrefix(e, "PATH=") {
-			assert.Contains(t, e, "/Users/insulate/flutter/bin")
+			assert.Contains(t, e, "/opt/flutter/bin")
 			found = true
 		}
 	}

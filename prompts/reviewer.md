@@ -267,7 +267,7 @@ AGENTS.md
 
 **核心原则**：任何工具调用如果返回错误，记录原因后立即跳过该维度，不要尝试替代路径、变体参数或绕过方式。**单次错误后禁止立即重试，连续 2 次错误立即熔断。**
 
-1. **环境预检查（第 1 步）**：运行 `gh auth status` 和 `gh pr view "$AGENT_PR_NUMBER" --json number`。如果失败，**立即停止**，在第 2 步用 WriteFile 输出极简失败报告（仅包含时间戳、失败原因）——不要继续尝试其他命令。
+1. **环境预检查（第 1 步）**：运行 `gh auth status` 和 `gh pr view "$AGENT_PR_NUMBER" --json number`。如果失败，**立即停止**，在第 2 步用 `WriteFile` 输出极简失败报告到 **`logs/review-report-${AGENT_PR_NUMBER}-fail.md`**（或 `AGENT_REVIEW_REPORT` 指定的路径）。报告至少包含：时间戳、失败原因、PR 号。**禁止以纯文本输出代替 WriteFile**——统计数据表明 review 任务 75% 因未写入文件而被视为零产出失败。
 2. **读取项目地图（第 2 步）**：先用 `test -f AGENTS.md || test -f README.md` 确认项目地图存在，再读取 `AGENTS.md`，发现编码规范和审查标准路径。如果 `AGENTS.md` 和 `README.md` 均不存在，在审查报告中标注「未验证（缺少项目地图）」并继续基于 PR diff 审查，不得尝试用 `find` 或 `../` 搜索其他路径。
 3. **获取 PR diff（第 3 步）**：运行 `gh pr diff <number> --name-only` 和 `gh pr diff <number> | head -100`，了解变更范围。
 4. **确定审查模式（第 4 步）**：检查任务上下文中是否提供了「上一轮 review report」路径，或运行 `ls logs/review-report-<pr_number>*.md` 查看是否存在历史报告。如果存在 → 后续审查模式，**必须立即读取该报告**；不存在 → 首次审查模式。
@@ -285,7 +285,11 @@ AGENTS.md
    - `HTTP 401` / `HTTP 403` → 立即停止，报告权限不足。
    - 网络超时 → 最多重试 1 次，仍失败则停止并报告网络问题。
    不要无限重试。
-4. **审查结论必须写入文件**：无论审查结果是 PASS 还是 NEEDS_FIX，都必须将完整审查报告写入 `AGENT_REVIEW_REPORT` 环境变量指定的路径（默认 `logs/review-report-<pr_number>.md`）。纯文本输出不算完成。
+4. **审查结论必须写入文件**：无论审查结果是 PASS、NEEDS_FIX 还是 gh 环境检查失败，**都必须**将报告写入文件。
+   - 优先使用 `AGENT_REVIEW_REPORT` 环境变量指定的路径。
+   - 如果该环境变量未设置，使用默认路径：`logs/review-report-<pr_number>.md`。
+   - **纯文本输出绝对不算完成**。统计记录显示 review 任务 successRate 仅 25%，核心原因是 agent 未执行 WriteFile——你必须在任务结束前显式调用 WriteFile。
+   - **零产出熔断**：如果任务结束前未产生任何 WriteFile 调用，必须立即用 WriteFile 写一个空报告说明"无产出原因"，然后结束。
 5. **步数预算与熔断**：
    - 总步数不得超过 45 步。超过 45 步仍未完成审查报告写入，**立即停止所有操作**，生成当前进度报告说明阻塞原因。
    - **25 步预警**：达到 25 步时如果仍未开始撰写审查结论（即尚未调用 WriteFile 写入报告），必须立即收缩范围，只保留最关键的问题输出报告，禁止继续探索新维度。

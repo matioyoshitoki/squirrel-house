@@ -27,6 +27,7 @@ export const api = {
     docGardenerTasks: () => get('/api/doc-gardener-tasks'),
     designAssets: (issueNumber) => get(`/api/design-assets?issueNumber=${issueNumber}`),
     buildDesignPreview: (issueNumber) => post('/api/build-design-preview', { issueNumber }),
+    submitDesignFeedback: (issueNumber, feedback) => post('/api/design-feedback', { issueNumber, feedback }),
     reviewReport: (prNumber) => get(`/api/review-report?pr=${prNumber}`),
 
     reviewPR: (prNumber, branch) => post('/api/review-pr', { prNumber, branch }),

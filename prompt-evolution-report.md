@@ -1,73 +1,82 @@
-# Prompt 演进报告 — social-world
+# Prompt 演进报告 — type-one
 
-生成时间: 2026-05-07 12:00:00+08:00
-分析范围: 2026-05-07T10:45:50 到 2026-05-07T11:56:21
+生成时间: 2026-05-18 17:26:01
+分析范围: 0001-01-01T00:00:00Z 至 2026-05-18T17:19:59+08:00
 
 ## 统计摘要
 
-- 分析日志数: 4
-- Agent 类型分布: rework=4
-
-| 指标 | 数值 |
-|------|------|
-| 平均步数 | 23.25 |
-| 成功率 | 50% |
-| 错误率（任务级） | 75% (3/4) |
-| 总错误数 | 5 |
-| 总文件写入/替换 | 10 |
-| Shell 调用总数 | 59（平均 14.75 次/任务） |
-| Top Git Op | Shell（表明大量 Shell 调用未产生有效 git 操作） |
+- 分析日志数: 9
+- Agent 类型分布:
+  - design: 3 任务（avgSteps 49, successRate 100%, totalErrors 15）
+  - dev: 2 任务（avgSteps 40, successRate 50%, totalErrors 7）
+  - review: 4 任务（avgSteps 5.75, successRate 25%, totalErrors 1）
 
 ## 问题诊断
 
-### 问题 1: rework Shell 预算严重超支
-**证据**: 4 个 rework 任务共调用 Shell 59 次，平均 14.75 次/任务；developer.md 规定 rework 非 git Shell 限额 10 次，但 agent 实际严重失控。
+### 问题 1: review 任务零产出率极高（75%）
+**证据**: review 执行 4 次，successRate 仅 0.25，totalWrites 仅 1，avgSteps 仅 5.75。
 **根因分析**:
-1. prompt 中 Shell 预算定义为"除 git 操作外"，agent 难以准确区分 git Shell 与非 git Shell，导致计数混乱、实际失控。
-2. `rework_prompt` 要求"按项目技术栈运行自测"，并列出大量测试/构建命令（flutter analyze/test、npm run lint/test/build、go test/vet 等），agent 倾向于顺序执行多个命令。
-3. 缺少 Shell 预算的强制外化要求，agent 未在 `SetTodoList` 中实时跟踪 Shell 消耗。
-
+- reviewer prompt 要求 gh 认证失败后"用 WriteFile 输出极简失败报告"，但统计数据表明 3/4 的任务没有产生任何 WriteFile 调用。
+- `workflows/review.yaml` 没有向 agent 传递 `AGENT_REVIEW_REPORT` 环境变量，agent 可能因路径不确定而未写入文件。
+- avgSteps 5.75 说明大量任务在第 1-2 步 gh 认证失败后就以纯文本输出结束，未执行 WriteFile，被统计系统标记为零产出。
 **改进建议**:
-1. **修改 developer.md 的 Shell 预算定义**：将"除 git 操作外"改为"**所有 Shell 工具调用（含 git）**总计不超过 10 次"，并要求在 `SetTodoList` 中外化 `Shell 预算: N/10`。（涉及文件: `prompts/developer.md`）
-2. **修改 rework_prompt 的测试策略**：将"运行自测"改为"**仅从命令列表中选择 1 个与修改最直接相关的命令执行验证**，严禁顺序执行多个命令或运行全量测试"。（涉及文件: `prompts/ctx-templates.yaml`）
-3. **在 developer.md 中增加 rework 验证限制条款**：明确 rework 模式只允许 1 个验证命令，全量测试/构建留给 dev 模式。（涉及文件: `prompts/developer.md`）
+1. 在 reviewer prompt 中明确：gh 失败后**必须** WriteFile 到 `logs/review-report-<pr>-fail.md`，禁止以纯文本输出代替文件写入。（已修改 `prompts/reviewer.md`）
+2. 在 review workflow 中显式传递 `AGENT_REVIEW_REPORT` 环境变量，消除路径不确定性。（已修改 `workflows/review.yaml`）
+3. 增加"零产出熔断"约束：任务结束前若未产生 WriteFile，必须强制写入空报告说明原因。（已修改 `prompts/reviewer.md`）
 
-### 问题 2: rework 错误率 75%，成功率仅 50%
-**证据**: 4 个任务中 3 个出现错误（累计 5 次工具错误），successRate=0.5；其中 1 个任务零产出。
+### 问题 2: design 任务高错误率 + 高步数
+**证据**: design 3 次任务，totalErrors 15（平均 5 次错误/任务），avgSteps 49，2 次超过 50 步（最高 65 步），Shell 调用 99 次（33 次/任务），ReadFile 48 次（16 次/任务）。
 **根因分析**:
-1. 错误发生后，agent 缺少针对 rework 场景的"快速止损"指引。现有错误熔断规则（累计 3 次停止）虽存在，但 agent 在达到熔断前已消耗大量步数试错。
-2. `StrReplaceFile` 失败是常见错误源之一（10 次写入对应若干次错误），虽然 prompt 要求先 ReadFile，但执行不到位。
-3. 零产出任务说明"必须有文件修改"的约束在边界情况下执行不严格。
-
+- `prompts/ui-designer.md` 相比 `prompts/developer.md` **完全缺少**效率约束章节（无步数上限、无 Think 限制、无错误熔断、无 Shell 预算）。
+- agent 在探索阶段无节制地调用 Shell（33 次/任务）和 ReadFile（16 次/任务），遇到错误后缺乏恢复指引，反复试错导致 totalErrors 高达 15。
+- 没有"快速开始"检查清单，agent 在环境确认和地图读取上消耗过多步数，缺乏明确的执行路径。
 **改进建议**:
-1. **在 developer.md 的 rework 模式段落中增加"常见错误快速诊断"子项**：将已有的 `StrReplaceFile` 失败处理、`Shell` 超时禁止重试、`git commit` hook 失败处理等规则，在 rework 预算段落内以清单形式再次强调，降低认知负荷。（涉及文件: `prompts/developer.md`）
-2. **强化零产出熔断**：明确如果第 5 步前无文件修改，必须停止并报告；如果 review report 中问题已修复或无需修改，必须在第 5 步前用 `WriteFile` 生成 `logs/rework-noop-<timestamp>.md` 说明文件。（涉及文件: `prompts/developer.md`，该规则已存在但可前置到启动检查清单中强调）
+1. 在 ui-designer prompt 中增加与 developer 对标的效率约束：步数上限 60、Think 上限 3 次、错误上限 5 次、Shell 预算 20 次、git status 上限 3 次。（已修改 `prompts/ui-designer.md`）
+2. 增加"40 步预警"和"设计探索预算 10 步"机制，强制 agent 在探索超支时切换到执行模式。（已修改 `prompts/ui-designer.md`）
+3. 增加快速开始检查清单（第 1-3 步完成环境确认、地图读取、待办清单），减少前期犹豫。（已修改 `prompts/ui-designer.md`）
 
-### 问题 3: 成功率较上次下降 30%
-**证据**: successRateDelta = -0.3。
-**根因分析**: 平均步数减少 10.15、错误数也有所下降，说明熔断机制部分生效（agent 遇到问题时更快停止）。但成功产出比例反而降低，表明 agent 在紧缩预算后缺乏"有效完成"的策略——它知道何时停止，但不知道如何在预算内稳定成功。
+### 问题 3: dev 任务成功率 50% + Shell 调用失控
+**证据**: dev 2 次任务，successRate 0.5，avgSteps 40，最高 77 步（突破 60 步上限），Shell 调用 47 次（23.5 次/任务），topGitOp 为 `status`。
+**根因分析**:
+- `prompts/developer.md` 虽有 60 步上限，但 **dev 模式缺少独立的 Shell 预算上限**（仅 rework 模式限 10 次）。agent 将大量 Shell 调用用于本可用 ReadFile/Grep/StrReplaceFile 完成的操作。
+- topGitOp 为 `status` 直接印证了 prompt 中提到的症状："agent 在用 `git status` 代替有效的进度判断——这是步数失控的典型症状"。
+- 最高 77 步突破 60 步上限，说明 prompt 中的熔断机制执行不力，agent 对预算缺乏感知。
 **改进建议**:
-1. **在 rework_prompt 中增加修复范围控制**：明确"优先修复所有 Blocking 问题，最多再修复 3 个 Major 问题，其余报告为留待后续迭代"。防止 agent 试图修复所有问题而耗尽预算。（涉及文件: `prompts/ctx-templates.yaml`）
+1. 在 developer prompt 中增加 dev 模式 Shell 预算上限 25 次，与 rework 模式 10 次并列，并要求每次 Shell 前更新 SetTodoList 计数器。（已修改 `prompts/developer.md`）
+2. 强化"超过 60 步后调用工具属于严重违规"的措辞，增加步数超限后的具体处理 SOP。
+3. （建议纳入下次迭代评估）`workflows/dev.yaml` 中 `preCommitChecks` 的 `ignoreError: false` 可能在 agent 完成代码修改后因 lint/test 失败而阻断提交，导致 successRate 降低。需评估是否应改为 `ignoreError: true` 仅输出警告。
 
 ## 已应用改进
 
-本次分析产生以下直接修改：
+本次分析后直接修改了以下文件：
 
-1. **`prompts/developer.md`**:
-   - 将 rework Shell 预算从"除 git 外 10 次"改为"**所有 Shell 调用（含 git）总计 10 次**"，消除计数歧义。
-   - 在 `SetTodoList` 启动检查清单中，将计数器从 3 项扩展为包含 `"Shell 预算: 0/10"` 的 4 项，并要求每次 Shell 调用后同步更新。
-   - 在 rework 模式预算段落中新增**"rework 验证限制"**：明确只允许执行 1 个验证命令，禁止全量测试/构建。
-   - 在 rework 模式预算段落中新增**"rework 常见错误快速诊断清单"**，将已有规则以清单形式集中呈现，降低 rework 场景下的认知负荷。
+1. **`prompts/ui-designer.md`** — 新增完整"效率约束（不可违背）"章节
+   - 步数硬上限 60 步，40 步预警进入收尾阶段
+   - Think 上限 3 次，第 4 次触发熔断
+   - 错误上限 5 次，连续 2 次错误熔断
+   - Shell 预算上限 20 次
+   - git status 上限 3 次
+   - 设计探索预算 10 步
+   - 进度检查点（每 10 步自评）
+   - 快速开始检查清单（第 1-3 步）
 
-2. **`prompts/ctx-templates.yaml`**:
-   - 修改 `rework_prompt` 步骤 3 的表述，从"按项目技术栈运行自测"改为"**仅从以下命令中选择 1 个与修改最直接相关的命令执行验证**"，并增加"严禁顺序执行多个命令或运行全量测试"的警告。
-   - 在步骤 4 的 `git commit` 提示中增加"同一 hook 错误不要重复 commit 超过 2 次"的限制。
-   - 在审查报告段落前增加修复范围控制说明：优先 Blocking，最多 3 个 Major。
+2. **`prompts/reviewer.md`** — 强化零产出保护
+   - 环境预检查（第 1 步）失败后强制要求 WriteFile 到指定路径，并引用统计数据警示
+   - 审查结论写入文件条款增加 `AGENT_REVIEW_REPORT` 未设置时的兜底路径
+   - 新增"纯文本输出绝对不算完成"和"零产出熔断"条款
+
+3. **`workflows/review.yaml`** — 消除环境变量盲区
+   - `runAgent` 步骤 env 中新增 `AGENT_REVIEW_REPORT: '{{ .Vars.tmpDir }}/logs/review-report-{{ .Vars.prNumber }}.md'`
+
+4. **`prompts/developer.md`** — 补齐 dev 模式 Shell 预算
+   - 铁律中 Shell 预算上限扩展为"dev 限额 25 次 / rework 限额 10 次"
+   - 增加统计数据引用（dev 平均 23.5 次 Shell）作为警示
+   - 明确倡导"能用 ReadFile/Grep/StrReplaceFile 完成的工作绝不使用 Shell"
 
 ## 趋势追踪
 
-- 与上次对比:
-  - 平均步数: ↓ 10.15（改善，说明步数控制生效）
-  - 错误数/日志: ↓ 0.95（改善，错误熔断部分起作用）
-  - 成功率: ↓ 30%（恶化，agent 在预算内完成修复的能力下降）
-- 建议下次重点关注: **rework 的成功率与 Shell 调用次数**。如果下次报告 Shell 调用仍 > 10 次/任务，需进一步在 workflow 层面限制 `TestCommands` 的注入范围，或设置 `--max-steps-per-turn` 更严格的硬件限制。
+- **与上次对比**: 无历史报告可供对比，本次为基线分析。
+- **建议下次重点关注**:
+  - review agent 的 successRate 是否从 25% 提升至 75% 以上
+  - design agent 的 avgSteps 是否降至 40 以下，totalErrors 是否降至 2 以下/任务
+  - dev agent 的 Shell 调用次数是否降至 25 次以下，maxSteps 是否不再突破 60

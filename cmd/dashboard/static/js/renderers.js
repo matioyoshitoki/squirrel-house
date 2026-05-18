@@ -159,14 +159,20 @@ function renderIssueGroup(containerId, issues, runningIds, currentProject, desig
             actionsHtml = '<button class="btn btn-sm btn-outline" disabled>运行中</button>' + actionsHtml;
         } else {
             const designAssets = designAssetsCache[issue.number];
+            const hasDesignAssets = designAssets && designAssets.length > 0;
             let viewDesignBtn = '';
-            if (designAssets && designAssets.length > 0) {
+            if (hasDesignAssets) {
                 viewDesignBtn = '<button class="btn btn-sm btn-primary design-view-btn" onclick="openDesignViewer(' + issue.number + ')">查看设计</button>';
             }
             let designBtn = '';
             if (classification !== 'backend-only') {
-                designBtn = '<button class="btn btn-sm btn-purple" onclick="startDesign(event, ' + issue.number + ', \'' +
-                    escapeHtml(issue.title) + '\')">开始设计</button>';
+                if (hasDesignAssets) {
+                    designBtn = '<button class="btn btn-sm btn-purple" onclick="startDesign(event, ' + issue.number + ', \'' +
+                        escapeHtml(issue.title) + '\')">🔄 修改设计</button>';
+                } else {
+                    designBtn = '<button class="btn btn-sm btn-purple" onclick="startDesign(event, ' + issue.number + ', \'' +
+                        escapeHtml(issue.title) + '\')">开始设计</button>';
+                }
             }
 
             if (issueType === 'ui-feedback') {

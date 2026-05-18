@@ -136,6 +136,7 @@ export async function openDesignViewer(issueNumber) {
             else if (asset.type === 'html') icon = '🌐';
             else if (asset.type === 'flutter-web') icon = '🔥';
             else if (asset.type === 'phaser3-web') icon = '🎮';
+            else if (asset.type === 'flutter-web') icon = '📱';
             else if (asset.type === 'code') icon = '💻';
             html += `<div class="design-thumbnail design-file-item flex cursor-pointer items-center gap-2 overflow-hidden text-ellipsis whitespace-nowrap rounded-lg border-l-transparent px-3 py-2.5 text-sm text-muted-foreground transition-all duration-150 hover:bg-secondary hover:text-foreground${asset._idx === 0 ? ' border-l-[3px] border-l-primary' : ''}" data-idx="${asset._idx}" title="${escapeHtml(asset.name)}" onclick="selectDesignAsset('${asset.url}', '${asset.type}')">` +
                 `<span>${icon}</span>${escapeHtml(asset.name)}</div>`;
@@ -185,13 +186,23 @@ export async function openDesignViewer(issueNumber) {
         const project = store.get('currentProject');
         const isPhaser3 = project?.techStack?.frontend === 'phaser3' || project?.techStack?.mobile === 'phaser3';
         const hasCode = assets.some(a => a.type === 'code' && a.name.startsWith('src/ui/'));
-        const hasPreview = assets.some(a => a.type === 'phaser3-web');
+        const hasPreview = assets.some(a => a.type === 'phaser3-web' || a.type === 'flutter-web');
         if (isPhaser3 && hasCode && !hasPreview) {
             buildPreviewBtn.classList.remove('hidden');
             if (previewStatus) previewStatus.classList.add('hidden');
         } else {
             buildPreviewBtn.classList.add('hidden');
             if (previewStatus) previewStatus.classList.add('hidden');
+        }
+    }
+
+    // Design feedback button: show when design assets exist
+    const feedbackBtn = document.getElementById('design-feedback-btn');
+    if (feedbackBtn) {
+        if (assets.length > 0) {
+            feedbackBtn.classList.remove('hidden');
+        } else {
+            feedbackBtn.classList.add('hidden');
         }
     }
 
@@ -543,7 +554,7 @@ export async function buildDesignPreviewHandler(issueNumber) {
             await loadDesignAssets(issueNumber);
             // 直接选中新生成的 preview，避免重新渲染整个 overlay 导致的闪烁
             const assets = store.get('designAssetsCache')[issueNumber] || [];
-            const previewAsset = assets.find(a => a.type === 'phaser3-web');
+            const previewAsset = assets.find(a => a.type === 'phaser3-web' || a.type === 'flutter-web');
             if (previewAsset) {
                 selectDesignAsset(previewAsset.url, previewAsset.type);
             }
@@ -573,7 +584,7 @@ export async function buildDesignPreviewHandler(issueNumber) {
                         let icon = '📝';
                         if (asset.type === 'image') icon = '🖼️';
                         else if (asset.type === 'html') icon = '🌐';
-                        else if (asset.type === 'flutter-web') icon = '🔥';
+                        else if (asset.type === 'flutter-web') icon = '📱';
                         else if (asset.type === 'phaser3-web') icon = '🎮';
                         else if (asset.type === 'code') icon = '💻';
                         html += `<div class="design-thumbnail design-file-item flex cursor-pointer items-center gap-2 overflow-hidden text-ellipsis whitespace-nowrap rounded-lg border-l-transparent px-3 py-2.5 text-sm text-muted-foreground transition-all duration-150 hover:bg-secondary hover:text-foreground${asset._idx === 0 ? ' border-l-[3px] border-l-primary' : ''}" data-idx="${asset._idx}" title="${escapeHtml(asset.name)}" onclick="selectDesignAsset('${asset.url}', '${asset.type}')">` +
@@ -601,6 +612,25 @@ export async function buildDesignPreviewHandler(issueNumber) {
     }
 }
 
+/**
+ * Show design feedback form
+ */
+export async function showDesignFeedbackForm(issueNumber) {
+    const feedback = prompt('请输入设计反馈（如：SplashPage 需要添加加载动画、LoginPage 按钮颜色需要调整等）：');
+    if (!feedback || !feedback.trim()) return;
+
+    try {
+        const res = await api.submitDesignFeedback(issueNumber, feedback.trim());
+        if (res.success) {
+            showToast('反馈已保存，下次点击「修改设计」会带上此反馈');
+        } else {
+            showToast(res.error || '保存反馈失败', true);
+        }
+    } catch (e) {
+        showToast('提交反馈失败: ' + e.message, true);
+    }
+}
+
 // Expose to window for inline onclick handlers
 window.loadDesignAssets = loadDesignAssets;
 window.openDesignViewer = openDesignViewer;
@@ -610,3 +640,4 @@ window.selectDesignAsset = selectDesignAsset;
 window.highlightCode = highlightCode;
 window.runE2EFlow = runE2EFlow;
 window.buildDesignPreviewHandler = buildDesignPreviewHandler;
+window.showDesignFeedbackForm = showDesignFeedbackForm;

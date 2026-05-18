@@ -234,6 +234,7 @@
             <span id="e2e-status" class="hidden text-xs"></span>
             <button id="build-preview-btn" class="hidden btn btn-xs btn-primary" onclick="window.buildDesignPreviewHandler(window.currentDesignIssue || 0)">🎨 生成预览</button>
             <span id="preview-status" class="hidden text-xs"></span>
+            <button id="design-feedback-btn" class="hidden btn btn-xs btn-outline" onclick="window.showDesignFeedbackForm(window.currentDesignIssue || 0)">✏️ 反馈设计问题</button>
           </div>
           <button id="close-design-btn" class="btn btn-sm btn-ghost">关闭</button>
         </div>
@@ -251,6 +252,6 @@
     </div>
   </div>
 
-  <script type="module" src="/static/js/main.js?v=4"></script>
+  <script type="module" src="/static/js/main.js?v=5"></script>
 </body>
 </html>

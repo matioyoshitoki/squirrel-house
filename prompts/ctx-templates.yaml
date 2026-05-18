@@ -38,6 +38,10 @@ templates:
     - 上一轮 review report: {{ .PrevReviewReport }}
       **这是后续审查，你必须先读取该文件，验证上一轮 Blocking/Major 问题是否已修复，再执行轻量级全量检查。**
     {{- end }}
+    {{- if .DesignFeedback }}
+    - 设计反馈: {{ .DesignFeedback }}
+      **这是人工对当前设计资产提出的修改意见，你必须先读取该文件，根据反馈内容进行设计修改。**
+    {{- end }}
 
   # 替代 handlers_pr.go:210 review 主 prompt
   review_main: |
@@ -144,6 +148,14 @@ templates:
     目标：根据需求产出完整的设计资产（设计规范、线框图/原型等），不编写业务逻辑代码。
 
     请为该需求产出完整的设计资产。
+    {{- if .DesignFeedback }}
+
+    **注意：当前任务是基于反馈的设计修改。** 已有设计资产存在，请：
+    1. 先读取现有设计资产（designs/issue-{{ .IssueNumber }}/ 下的所有文件）
+    2. 读取设计反馈文件（{{ .DesignFeedback }}）
+    3. 根据反馈内容进行针对性修改，不要推倒重来
+    4. 保留未被反馈提及的部分，只修改需要调整的内容
+    {{- end }}
 
     开始前，先阅读项目导航文档（AGENTS.md / README.md），通过文档地图发现：
     1. 项目的设计规范路径

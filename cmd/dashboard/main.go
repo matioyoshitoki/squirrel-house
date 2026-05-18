@@ -78,9 +78,14 @@ var (
 	tasks               = make(map[string]*Task)
 	tasksMutex          sync.RWMutex
 	tmpl                *template.Template
+	projectRoot         string // 项目根目录，解决 cd 到其他目录后相对路径失效的问题
 )
 
 func main() {
+	// 定位项目根目录（不依赖当前工作目录）
+	projectRoot = findProjectRoot()
+	log.Printf("📁 项目根目录: %s", projectRoot)
+
 	// 加载配置与状态
 	loadConfig()
 	loadState()
@@ -107,19 +112,22 @@ func main() {
 	// 注册路由
 	http.HandleFunc("/", handleDashboard)
 	// 优先从文件系统读取 static 目录，开发时不需要重新编译
-	if _, err := os.Stat("cmd/dashboard/static"); err == nil {
-		http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("cmd/dashboard/static"))))
+	staticDir := filepath.Join(projectRoot, "cmd", "dashboard", "static")
+	if _, err := os.Stat(staticDir); err == nil {
+		http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir(staticDir))))
 	} else {
 		http.Handle("/static/", http.FileServer(http.FS(staticFS)))
 	}
 	
 	// 静态文件服务：允许浏览器直接访问 logs 下的设计资产
-	http.Handle("/logs/", http.StripPrefix("/logs/", http.FileServer(http.Dir("logs"))))
+	logsDir := filepath.Join(projectRoot, "logs")
+	http.Handle("/logs/", http.StripPrefix("/logs/", http.FileServer(http.Dir(logsDir))))
 
 	// API 路由
 	http.HandleFunc("/api/issues", handleAPIIssues)
 	http.HandleFunc("/api/design-assets", handleDesignAssets)
 	http.HandleFunc("/api/build-design-preview", handleBuildDesignPreview)
+	http.HandleFunc("/api/design-feedback", handleDesignFeedback)
 	http.HandleFunc("/api/start-dev", handleStartDev)
 	http.HandleFunc("/api/resume-dev", handleResumeDev)
 	http.HandleFunc("/api/start-design", handleStartDesign)
@@ -222,7 +230,7 @@ func runServer(ln net.Listener) {
 	}()
 
 	// 保存 pid 供外部 reload 使用
-	os.WriteFile(".dashboard.pid", []byte(strconv.Itoa(os.Getpid())), 0644)
+	os.WriteFile(filepath.Join(projectRoot, ".dashboard.pid"), []byte(strconv.Itoa(os.Getpid())), 0644)
 
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM)
@@ -269,12 +277,27 @@ func runServer(ln net.Listener) {
 
 		log.Printf("👋 旧进程退出")
 		return
-	}
+	case syscall.SIGINT, syscall.SIGTERM:
+		log.Printf("📡 收到 %v，优雅关闭...", sig)
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-	if err := server.Shutdown(ctx); err != nil {
-		log.Printf("⚠️ 优雅关闭失败: %v", err)
+		// 关闭 HTTP 服务，不再接收新请求
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		if err := server.Shutdown(ctx); err != nil {
+			log.Printf("⚠️ 优雅关闭失败: %v", err)
+		}
+		cancel()
+
+		// 设置关闭标志，避免竞争写入状态文件
+		setShuttingDown(true)
+
+		// 忽略后续信号，专心等待任务完成
+		signal.Ignore(syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
+
+		// 等待所有 running 任务完成（SIGINT/SIGTERM 超时更短：2 分钟）
+		waitForRunningTasksWithTimeout(2*time.Minute, 5*time.Second)
+
+		log.Printf("👋 进程退出")
+		return
 	}
 }
 
@@ -350,10 +373,12 @@ func handleSwitchProject(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-const stateFilePath = "configs/dashboard-state.json"
+func stateFilePath() string {
+	return filepath.Join(projectRoot, "configs", "dashboard-state.json")
+}
 
 func loadState() {
-	if data, err := os.ReadFile(stateFilePath); err == nil {
+	if data, err := os.ReadFile(stateFilePath()); err == nil {
 		var state struct {
 			CurrentProjectIndex int `json:"currentProjectIndex"`
 		}
@@ -375,10 +400,34 @@ func saveState() {
 	stateData, _ := json.Marshal(map[string]interface{}{
 		"currentProjectIndex": idx,
 	})
-	os.MkdirAll("configs", 0755)
-	if err := os.WriteFile(stateFilePath, stateData, 0644); err != nil {
+	os.MkdirAll(filepath.Join(projectRoot, "configs"), 0755)
+	if err := os.WriteFile(stateFilePath(), stateData, 0644); err != nil {
 		log.Printf("⚠️ 保存状态失败: %v", err)
 	}
+}
+
+func findProjectRoot() string {
+	// 1. 当前工作目录
+	markers := []string{"go.mod", "configs/dashboard.json"}
+	for _, marker := range markers {
+		if _, err := os.Stat(marker); err == nil {
+			return "."
+		}
+	}
+
+	// 2. 可执行文件目录的父目录（针对 build/dashboard）
+	if exe, err := os.Executable(); err == nil {
+		exeDir := filepath.Dir(exe)
+		parent := filepath.Join(exeDir, "..")
+		for _, marker := range markers {
+			if _, err := os.Stat(filepath.Join(parent, marker)); err == nil {
+				abs, _ := filepath.Abs(parent)
+				return abs
+			}
+		}
+	}
+
+	return "."
 }
 
 func loadConfig() {
@@ -395,9 +444,12 @@ func loadConfig() {
 	}
 
 	// 尝试从配置文件加载
-	if data, err := os.ReadFile("configs/dashboard.json"); err == nil {
+	configPath := filepath.Join(projectRoot, "configs", "dashboard.json")
+	if data, err := os.ReadFile(configPath); err == nil {
 		json.Unmarshal(data, &config)
-		log.Printf("📋 已加载配置文件")
+		log.Printf("📋 已加载配置文件: %s", configPath)
+	} else {
+		log.Printf("⚠️ 无法加载配置文件 %s: %v，使用默认配置", configPath, err)
 	}
 
 	// 环境变量覆盖
@@ -408,8 +460,9 @@ func loadConfig() {
 
 func initTemplates() {
 	// 优先从文件系统读取，开发时不需要重新编译
-	if _, statErr := os.Stat("cmd/dashboard/static/index.html"); statErr == nil {
-		t, err := template.ParseFiles("cmd/dashboard/static/index.html")
+	staticIndexPath := filepath.Join(projectRoot, "cmd", "dashboard", "static", "index.html")
+	if _, statErr := os.Stat(staticIndexPath); statErr == nil {
+		t, err := template.ParseFiles(staticIndexPath)
 		if err != nil {
 			log.Printf("⚠️ 无法解析磁盘模板: %v, 回退到内嵌模板", err)
 			t, err = template.ParseFS(staticFS, "static/index.html")

@@ -37,59 +37,89 @@ steps:
     type: shell
     dir: '{{ .Vars.tmpDir }}'
     command: |
-      export PATH="/Users/insulate/development/flutter/bin:$PATH"
-      TEMPLATE_DIR="/Users/insulate/Desktop/new-world/new-world-ops/.tools/flutter_preview"
+      export PATH="/opt/flutter/bin:$PATH"
+      BASE_TEMPLATE="/root/squirrel-house/.tools/flutter_preview_generic"
       DESIGNS_DIR="designs/issue-{{ .Vars.issueNumber }}"
+      # 创建临时预览编译目录（避免多任务同时修改共享模板）
+      PREVIEW_BUILD_DIR=$(mktemp -d -t "flutter-preview-{{ .Vars.issueNumber }}-XXXXXX")
+
+      # 复制模板到临时目录
+      cp -R "$BASE_TEMPLATE/." "$PREVIEW_BUILD_DIR/"
+
+      # 动态生成 pubspec.yaml：读取当前项目的 Dart 包名并注入为本地依赖
+      PROJECT_PATH="{{ .Vars.projectPath }}"
+      if [ -f "$PROJECT_PATH/pubspec.yaml" ]; then
+        DART_PKG=$(grep -m1 '^name:' "$PROJECT_PATH/pubspec.yaml" | sed 's/name:\s*//')
+        cat > "$PREVIEW_BUILD_DIR/pubspec.yaml" <<PUBSPEC
+name: flutter_preview_generic
+description: "Flutter preview"
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.4.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  $DART_PKG:
+    path: $PROJECT_PATH
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
+PUBSPEC
+      fi
 
       # ========== Flutter 项目预览 ==========
-      # 先判断当前设计任务是否有 Flutter 资产
       HAS_FLUTTER_ASSETS=false
       if [ -f "$DESIGNS_DIR/preview.dart" ] || [ -d "$DESIGNS_DIR/flutter-widgets" ]; then
         HAS_FLUTTER_ASSETS=true
       fi
 
-      # 如果没有 Flutter 资产，清理模板中可能残留的 main.dart（防止上一个 Flutter 任务的残留触发编译）
       if [ "$HAS_FLUTTER_ASSETS" = false ]; then
-        rm -f "$TEMPLATE_DIR/lib/main.dart"
+        rm -f "$PREVIEW_BUILD_DIR/lib/main.dart"
+        rm -rf "$PREVIEW_BUILD_DIR/lib/preview"
       fi
 
       # 情况1：有自包含的 preview.dart，直接使用
       PREVIEW_FILE="$DESIGNS_DIR/preview.dart"
       if [ -f "$PREVIEW_FILE" ]; then
-        cp "$PREVIEW_FILE" "$TEMPLATE_DIR/lib/main.dart"
+        cp "$PREVIEW_FILE" "$PREVIEW_BUILD_DIR/lib/main.dart"
         echo "📄 使用 preview.dart 作为入口"
       else
         # 情况2：有 flutter-widgets/ 目录，自动提取 Widget 生成入口
         WIDGETS_DIR="$DESIGNS_DIR/flutter-widgets"
         if [ -d "$WIDGETS_DIR" ]; then
-          # 先备份模板中的 _tokens.dart（agent 生成的版本可能缺少 token）
-          cp "$TEMPLATE_DIR/lib/preview/_tokens.dart" "/tmp/nwops_tokens_backup.dart" 2>/dev/null || true
-          rm -rf "$TEMPLATE_DIR/lib/"*
-          mkdir -p "$TEMPLATE_DIR/lib/preview"
-          cp -R "$WIDGETS_DIR/"* "$TEMPLATE_DIR/lib/preview/"
-          # 恢复模板 _tokens.dart（包含所有必要 token 定义）
-          if [ -f "/tmp/nwops_tokens_backup.dart" ]; then
-            cp "/tmp/nwops_tokens_backup.dart" "$TEMPLATE_DIR/lib/preview/_tokens.dart"
-          fi
-          python3 "/Users/insulate/Desktop/new-world/new-world-ops/.tools/generate_preview_main.py" "$WIDGETS_DIR" "$TEMPLATE_DIR/lib/main.dart"
+          rm -rf "$PREVIEW_BUILD_DIR/lib/"*
+          mkdir -p "$PREVIEW_BUILD_DIR/lib/preview"
+          cp -R "$WIDGETS_DIR/"* "$PREVIEW_BUILD_DIR/lib/preview/"
+          python3 "/root/squirrel-house/.tools/generate_preview_main.py" "$WIDGETS_DIR" "$PREVIEW_BUILD_DIR/lib/main.dart"
           echo "🔧 已从 flutter-widgets/ 生成预览入口"
         fi
       fi
 
       # 如果前面触发了 Flutter 编译
-      if [ -f "$TEMPLATE_DIR/lib/main.dart" ]; then
-        cd "$TEMPLATE_DIR"
-        # 强制清理 build 缓存，确保 --base-href 生效
-        rm -rf "$TEMPLATE_DIR/build/web"
+      if [ -f "$PREVIEW_BUILD_DIR/lib/main.dart" ]; then
+        cd "$PREVIEW_BUILD_DIR"
+        rm -rf "$PREVIEW_BUILD_DIR/build/web"
         flutter build web --release --base-href "/logs/{{ .Vars.projectName }}/designs/issue-{{ .Vars.issueNumber }}/web/" 2>&1
-        if [ -d "$TEMPLATE_DIR/build/web" ]; then
+        if [ -d "$PREVIEW_BUILD_DIR/build/web" ]; then
           mkdir -p "{{ .Vars.tmpDir }}/$DESIGNS_DIR/web"
-          cp -R "$TEMPLATE_DIR/build/web/"* "{{ .Vars.tmpDir }}/$DESIGNS_DIR/web/"
+          cp -R "$PREVIEW_BUILD_DIR/build/web/"* "{{ .Vars.tmpDir }}/$DESIGNS_DIR/web/"
           echo "✅ Flutter Web 预览编译完成"
         else
           echo "❌ Flutter Web 编译失败"
         fi
       fi
+
+      # 清理临时目录
+      rm -rf "$PREVIEW_BUILD_DIR"
 
       # 如果没有生成任何预览，记录日志
       if [ ! -d "{{ .Vars.tmpDir }}/$DESIGNS_DIR/web" ]; then

@@ -172,11 +172,10 @@ func (e *Engine) renderString(s string) (string, error) {
 // ensureToolPaths 确保 PATH 包含常用开发工具（flutter、homebrew、Android SDK）
 func ensureToolPaths(env []string) []string {
 	extraPaths := []string{
-		"/Users/insulate/flutter/bin",
-		"/opt/homebrew/bin",
-		"/opt/homebrew/sbin",
-		"/Users/insulate/Library/Android/sdk/platform-tools",
-		"/Users/insulate/Library/Android/sdk/emulator",
+		"/opt/flutter/bin",
+		"/usr/local/bin",
+		"/opt/android-sdk/platform-tools",
+		"/opt/android-sdk/emulator",
 	}
 	for i, e := range env {
 		if strings.HasPrefix(e, "PATH=") {

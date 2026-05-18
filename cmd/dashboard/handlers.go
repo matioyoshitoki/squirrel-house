@@ -80,10 +80,15 @@ func rebuildTaskStatus() {
 		tasksMutex.Lock()
 		if existing, ok := tasks[key]; ok {
 			// 内存中已存在，用 .status.json 补充信息
+			// 优先信任 .status.json 中的最终状态（success/failed），防止内存中的 interrupted 覆盖真实结果
 			if existing.Status == "running" && status.Status != "running" {
 				existing.Status = status.Status
 				existing.EndTime = status.LastHeartbeat
 				log.Printf("📝 从状态文件更新: %s -> %s", key, status.Status)
+			} else if (existing.Status == "interrupted" || existing.Status == "stopped") && (status.Status == "success" || status.Status == "failed") {
+				existing.Status = status.Status
+				existing.EndTime = status.LastHeartbeat
+				log.Printf("📝 从状态文件修正: %s %s -> %s", key, existing.Status, status.Status)
 			}
 			tasksMutex.Unlock()
 			continue
@@ -104,6 +109,10 @@ func rebuildTaskStatus() {
 			}
 		}
 
+
+		if finalStatus != status.Status {
+			updateTaskStatusFileStatus(taskID, finalStatus)
+		}
 		tasksMutex.Lock()
 		tasks[key] = &Task{
 			ID:          taskID,
@@ -548,10 +557,21 @@ func buildAgentContext(worktreePath string, issueNumber, prNumber int) map[strin
 	}
 
 	// 设计资产 — 扫描 worktree 中 designs/issue-N/ 目录下的所有文件
-	// （设计资产是在 worktree 中生成的，所以从 worktreePath 读取）
+	// （设计资产是在 worktree 中生成的，优先从 worktreePath 读取）
+	// 如果 worktree 中没有（如开发任务基于 main 分支），回退到 dashboard logs 目录
 	if issueNumber > 0 {
-		designDir := filepath.Join(worktreePath, "designs", fmt.Sprintf("issue-%d", issueNumber))
-		if info, err := os.Stat(designDir); err == nil && info.IsDir() {
+		var designDir string
+		worktreeDesignDir := filepath.Join(worktreePath, "designs", fmt.Sprintf("issue-%d", issueNumber))
+		if info, err := os.Stat(worktreeDesignDir); err == nil && info.IsDir() {
+			designDir = worktreeDesignDir
+		} else {
+			// fallback: 从 dashboard logs 目录读取（设计任务 copyDesignAssets 步骤复制过来的）
+			logsDesignDir := filepath.Join(getProjectLogsDir(getCurrentProjectName()), "designs", fmt.Sprintf("issue-%d", issueNumber))
+			if info, err := os.Stat(logsDesignDir); err == nil && info.IsDir() {
+				designDir = logsDesignDir
+			}
+		}
+		if designDir != "" {
 			ctx["AGENT_DESIGN_DIR"] = designDir
 			entries, _ := os.ReadDir(designDir)
 			var assets []string
@@ -583,6 +603,15 @@ func buildAgentContext(worktreePath string, issueNumber, prNumber int) map[strin
 	docsDir := filepath.Join(projectRoot, "docs")
 	if info, err := os.Stat(docsDir); err == nil && info.IsDir() {
 		ctx["AGENT_DOCS_DIR"] = docsDir
+	}
+
+	// 设计反馈 — 从 dashboard logs 目录读取
+	if issueNumber > 0 {
+		logsDir := getProjectLogsDir(getCurrentProjectName())
+		feedbackPath := filepath.Join(logsDir, "designs", fmt.Sprintf("issue-%d", issueNumber), "design-feedback.md")
+		if _, err := os.Stat(feedbackPath); err == nil {
+			ctx["AGENT_DESIGN_FEEDBACK"] = feedbackPath
+		}
 	}
 
 	// 历史 review report — 从 dashboard logs 目录查找带时间戳的版本
@@ -623,6 +652,7 @@ func formatAgentContextPrompt(ctx map[string]string, issueNumber, prNumber int) 
 		"DesignAssets":         ctx["AGENT_DESIGN_ASSETS"],
 		"DocsDir":              ctx["AGENT_DOCS_DIR"],
 		"PrevReviewReport":     ctx["AGENT_PREV_REVIEW_REPORT"],
+		"DesignFeedback":       ctx["AGENT_DESIGN_FEEDBACK"],
 	}
 	s, err := renderCtxTemplate("agent_context", data)
 	if err != nil {
@@ -904,6 +934,7 @@ func cleanZombieTasks() {
 			if info, err := os.Stat(task.LogFile); err == nil {
 				if time.Since(info.ModTime()) > 30*time.Minute {
 					task.Status = "interrupted"
+					updateTaskStatusFileStatus(task.ID, "interrupted")
 					appendToFile(task.LogFile, []byte("\n⏸️ 任务因长时间无响应被标记为中断\n"))
 					if task.Cancel != nil {
 						task.Cancel()
@@ -1312,6 +1343,51 @@ func handleLogStatus(w http.ResponseWriter, r *http.Request) {
 
 // handleRunE2E 手动触发 E2E 测试运行
 // 统一走 workflow 引擎，和 hook 自动触发同一路径：startE2ETask → runTaskWorkflow → workflows/{project}/e2e.yaml
+func handleDesignFeedback(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		writeJSONError(w, http.StatusMethodNotAllowed, "Method not allowed")
+		return
+	}
+
+	var req struct {
+		IssueNumber int    `json:"issueNumber"`
+		Feedback    string `json:"feedback"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		writeJSONError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+	if req.IssueNumber == 0 {
+		writeJSONError(w, http.StatusBadRequest, "issueNumber 必填")
+		return
+	}
+	if strings.TrimSpace(req.Feedback) == "" {
+		writeJSONError(w, http.StatusBadRequest, "反馈内容不能为空")
+		return
+	}
+
+	projectName := getCurrentProjectName()
+	logsDir := getProjectLogsDir(projectName)
+	designDir := filepath.Join(logsDir, "designs", fmt.Sprintf("issue-%d", req.IssueNumber))
+	feedbackPath := filepath.Join(designDir, "design-feedback.md")
+
+	os.MkdirAll(designDir, 0755)
+	content := fmt.Sprintf("# 设计反馈 (Issue #%d)\n\n%s\n\n---\n*反馈时间: %s*\n",
+		req.IssueNumber, req.Feedback, time.Now().Format("2006-01-02 15:04:05"))
+	if err := os.WriteFile(feedbackPath, []byte(content), 0644); err != nil {
+		writeJSONError(w, http.StatusInternalServerError, fmt.Sprintf("保存反馈失败: %v", err))
+		return
+	}
+
+	log.Printf("[design-feedback] Issue #%d 设计反馈已保存: %s", req.IssueNumber, feedbackPath)
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"success":     true,
+		"issueNumber": req.IssueNumber,
+		"message":     "反馈已保存",
+	})
+}
+
 func handleBuildDesignPreview(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		writeJSONError(w, http.StatusMethodNotAllowed, "Method not allowed")
@@ -1333,6 +1409,220 @@ func handleBuildDesignPreview(w http.ResponseWriter, r *http.Request) {
 	projectName := getCurrentProjectName()
 	logsDir := getProjectLogsDir(projectName)
 	inputDir := filepath.Join(logsDir, "designs", fmt.Sprintf("issue-%d", req.IssueNumber))
+
+	// 检测项目类型：Flutter 或 Phaser3
+	isFlutter := isFlutterProject(projectName)
+	isPhaser3 := isPhaser3Project(projectName)
+
+	if isFlutter {
+		buildFlutterDesignPreview(w, r, req.IssueNumber, projectName, logsDir, inputDir)
+		return
+	}
+
+	if isPhaser3 {
+		buildPhaser3DesignPreview(w, r, req.IssueNumber, projectName, logsDir, inputDir)
+		return
+	}
+
+	writeJSONError(w, http.StatusBadRequest, "不支持的项目类型，无法生成预览")
+}
+
+// isFlutterProject 判断当前项目是否为 Flutter 项目
+func isFlutterProject(projectName string) bool {
+	projectPath := getProjectPathByName(projectName)
+	pubspecPath := filepath.Join(projectPath, "pubspec.yaml")
+	if _, err := os.Stat(pubspecPath); err == nil {
+		return true
+	}
+	projectMutex.RLock()
+	idx := currentProjectIndex
+	if idx >= 0 && idx < len(config.Projects) {
+		p := config.Projects[idx]
+		if p.TechStack.Mobile == "flutter" || p.TechStack.Frontend == "flutter" {
+			projectMutex.RUnlock()
+			return true
+		}
+	}
+	projectMutex.RUnlock()
+	return false
+}
+
+// isPhaser3Project 判断当前项目是否为 Phaser3 项目
+func isPhaser3Project(projectName string) bool {
+	projectMutex.RLock()
+	idx := currentProjectIndex
+	if idx >= 0 && idx < len(config.Projects) {
+		p := config.Projects[idx]
+		if p.TechStack.Mobile == "phaser3" || p.TechStack.Frontend == "phaser3" {
+			projectMutex.RUnlock()
+			return true
+		}
+	}
+	projectMutex.RUnlock()
+	return false
+}
+
+// readPubspecPackageName 从项目 pubspec.yaml 中读取 Dart 包名
+func readPubspecPackageName(projectPath string) string {
+	data, err := os.ReadFile(filepath.Join(projectPath, "pubspec.yaml"))
+	if err != nil {
+		return ""
+	}
+	for _, line := range strings.Split(string(data), "\n") {
+		line = strings.TrimSpace(line)
+		if strings.HasPrefix(line, "name:") {
+			parts := strings.SplitN(line, ":", 2)
+			if len(parts) == 2 {
+				return strings.TrimSpace(parts[1])
+			}
+		}
+	}
+	return ""
+}
+
+// buildFlutterDesignPreview 为 Flutter 项目生成设计预览
+func buildFlutterDesignPreview(w http.ResponseWriter, r *http.Request, issueNumber int, projectName, logsDir, inputDir string) {
+	widgetsDir := filepath.Join(inputDir, "flutter-widgets")
+	if _, err := os.Stat(widgetsDir); os.IsNotExist(err) {
+		writeJSONError(w, http.StatusBadRequest, "未找到 Flutter 设计代码 (flutter-widgets/)")
+		return
+	}
+
+	// 创建临时 Flutter 预览项目
+	tmpDir, err := os.MkdirTemp("", fmt.Sprintf("flutter-preview-issue-%d-*", issueNumber))
+	if err != nil {
+		writeJSONError(w, http.StatusInternalServerError, fmt.Sprintf("创建临时目录失败: %v", err))
+		return
+	}
+	defer os.RemoveAll(tmpDir)
+
+	// 读取当前项目的 Dart 包名
+	projectPath := getProjectPathByName(projectName)
+	dartPkgName := readPubspecPackageName(projectPath)
+
+	// 复制通用 Flutter 预览模板（使用 templateDir+"/." 避免 filepath.Join 清理掉 .）
+	templateDir := filepath.Join(projectRoot, ".tools", "flutter_preview_generic")
+	cpCmd := exec.Command("cp", "-R", templateDir+"/.", tmpDir)
+	if out, err := cpCmd.CombinedOutput(); err != nil {
+		log.Printf("[build-preview] 复制模板失败: %v\n%s", err, string(out))
+		writeJSONError(w, http.StatusInternalServerError, fmt.Sprintf("复制模板失败: %v", err))
+		return
+	}
+
+	// 动态生成 pubspec.yaml，注入当前项目依赖（使 widget 中的 package:xxx 导入可解析）
+	var pubspecContent string
+	if dartPkgName != "" {
+		pubspecContent = fmt.Sprintf(`name: flutter_preview_generic
+
+description: "Flutter preview"
+
+publish_to: 'none'
+
+version: 1.0.0+1
+
+
+environment:
+
+  sdk: '>=3.4.0 <4.0.0'
+
+
+dependencies:
+
+  flutter:
+
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+
+  %s:
+
+    path: %s
+
+
+dev_dependencies:
+
+  flutter_test:
+
+    sdk: flutter
+
+  flutter_lints: ^5.0.0
+
+
+flutter:
+
+  uses-material-design: true
+
+`, dartPkgName, projectPath)
+	} else {
+		basePubspec, _ := os.ReadFile(filepath.Join(templateDir, "pubspec.yaml"))
+		pubspecContent = string(basePubspec)
+	}
+	if err := os.WriteFile(filepath.Join(tmpDir, "pubspec.yaml"), []byte(pubspecContent), 0644); err != nil {
+		log.Printf("[build-preview] 生成 pubspec.yaml 失败: %v", err)
+		writeJSONError(w, http.StatusInternalServerError, fmt.Sprintf("生成 pubspec.yaml 失败: %v", err))
+		return
+	}
+
+	// 复制 flutter-widgets/*.dart 到临时项目的 lib/preview/
+	previewDir := filepath.Join(tmpDir, "lib", "preview")
+	os.MkdirAll(previewDir, 0755)
+	cpWidgetsCmd := exec.Command("cp", "-R", widgetsDir+"/.", previewDir)
+	if out, err := cpWidgetsCmd.CombinedOutput(); err != nil {
+		log.Printf("[build-preview] 复制 widgets 失败: %v\n%s", err, string(out))
+		writeJSONError(w, http.StatusInternalServerError, fmt.Sprintf("复制 widgets 失败: %v", err))
+		return
+	}
+
+	// 生成 main.dart
+	mainDartPath := filepath.Join(tmpDir, "lib", "main.dart")
+	genScript := filepath.Join(projectRoot, ".tools", "generate_preview_main.py")
+	genCmd := exec.Command("python3", genScript, previewDir, mainDartPath)
+	if out, err := genCmd.CombinedOutput(); err != nil {
+		log.Printf("[build-preview] 生成 main.dart 失败: %v\n%s", err, string(out))
+		writeJSONError(w, http.StatusInternalServerError, fmt.Sprintf("生成预览入口失败: %v", err))
+		return
+	}
+
+	// 编译 Flutter Web
+	outputWebDir := filepath.Join(inputDir, "web")
+	os.RemoveAll(outputWebDir)
+	baseHref := fmt.Sprintf("/logs/%s/designs/issue-%d/web/", projectName, issueNumber)
+	buildCmd := exec.Command("flutter", "build", "web", "--release", "--base-href", baseHref)
+	buildCmd.Dir = tmpDir
+	buildOut, buildErr := buildCmd.CombinedOutput()
+	if buildErr != nil {
+		log.Printf("[build-preview] Flutter Web 编译失败: %v\n%s", buildErr, string(buildOut))
+		writeJSONError(w, http.StatusInternalServerError, fmt.Sprintf("Flutter Web 编译失败: %v\n%s", buildErr, string(buildOut)))
+		return
+	}
+
+	// 复制编译产物到日志目录
+	buildWebDir := filepath.Join(tmpDir, "build", "web")
+	if _, err := os.Stat(buildWebDir); os.IsNotExist(err) {
+		writeJSONError(w, http.StatusInternalServerError, "未找到 Flutter Web 编译产物")
+		return
+	}
+	cpOutCmd := exec.Command("cp", "-R", buildWebDir+"/.", outputWebDir)
+	if out, err := cpOutCmd.CombinedOutput(); err != nil {
+		log.Printf("[build-preview] 复制产物失败: %v\n%s", err, string(out))
+		writeJSONError(w, http.StatusInternalServerError, fmt.Sprintf("复制产物失败: %v", err))
+		return
+	}
+
+	log.Printf("[build-preview] Issue #%d Flutter 预览生成成功", issueNumber)
+
+	previewURL := fmt.Sprintf("/logs/%s/designs/issue-%d/web/", projectName, issueNumber)
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"success":     true,
+		"issueNumber": issueNumber,
+		"url":         previewURL,
+		"message":     "Flutter 预览生成成功",
+	})
+}
+
+// buildPhaser3DesignPreview 为 Phaser3 项目生成设计预览
+func buildPhaser3DesignPreview(w http.ResponseWriter, r *http.Request, issueNumber int, projectName, logsDir, inputDir string) {
 	outputDir := filepath.Join(inputDir, "preview")
 
 	// 检查设计代码是否存在
@@ -1343,12 +1633,12 @@ func handleBuildDesignPreview(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 调用 generate_preview.py
-	scriptPath := filepath.Join(".tools", "phaser3_preview", "generate_preview.py")
+	scriptPath := filepath.Join(projectRoot, ".tools", "phaser3_preview", "generate_preview.py")
 	cmd := exec.Command("python3", scriptPath,
 		"--input", inputDir,
 		"--output", outputDir,
-		"--issue", strconv.Itoa(req.IssueNumber))
-	cmd.Dir = "."
+		"--issue", strconv.Itoa(issueNumber))
+	cmd.Dir = projectRoot
 
 	output, err := cmd.CombinedOutput()
 	if err != nil {
@@ -1357,15 +1647,15 @@ func handleBuildDesignPreview(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Printf("[build-preview] Issue #%d 预览生成成功\n%s", req.IssueNumber, string(output))
+	log.Printf("[build-preview] Issue #%d 预览生成成功\n%s", issueNumber, string(output))
 
-	previewURL := fmt.Sprintf("/logs/%s/designs/issue-%d/preview/", projectName, req.IssueNumber)
+	previewURL := fmt.Sprintf("/logs/%s/designs/issue-%d/preview/", projectName, issueNumber)
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]interface{}{
-		"success":    true,
-		"issueNumber": req.IssueNumber,
-		"url":        previewURL,
-		"message":    "预览生成成功",
+		"success":     true,
+		"issueNumber": issueNumber,
+		"url":         previewURL,
+		"message":     "预览生成成功",
 	})
 }
 
