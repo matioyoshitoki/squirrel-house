@@ -344,23 +344,20 @@ func (e *Engine) runTmuxStep(ctx context.Context, step Step, dir, cmdStr, logFil
 		}
 	}
 
-	// tmux new-session 不会将父进程 Env 传递给 session 中的子进程
-	// 需要在命令前显式 export 环境变量
-	var envExports strings.Builder
+	// 收集需要传递给 tmux session 的 AGENT_ 环境变量（用 -e 选项）
+	var tmuxEnv []string
 	for _, e := range env {
-		// 只导出以 AGENT_ 开头的环境变量，避免污染
 		if strings.Contains(e, "=") && strings.HasPrefix(strings.SplitN(e, "=", 2)[0], "AGENT_") {
-			envExports.WriteString(fmt.Sprintf("export %s; ", e))
+			tmuxEnv = append(tmuxEnv, e)
 		}
 	}
-	log.Printf("[workflow] tmux env exports: %s", envExports.String())
 
 	// 包装命令：输出同时写到日志文件，最后记录 exit code
 	wrappedCmd := cmdStr
 	if logFile != "" {
-		wrappedCmd = fmt.Sprintf("%s(%s) 2>&1 | tee -a %s; echo $? > %s", envExports.String(), cmdStr, logFile, exitCodeFile)
+		wrappedCmd = fmt.Sprintf("(%s) 2>&1 | tee -a %s; echo $? > %s", cmdStr, logFile, exitCodeFile)
 	} else {
-		wrappedCmd = fmt.Sprintf("%s(%s); echo $? > %s", envExports.String(), cmdStr, exitCodeFile)
+		wrappedCmd = fmt.Sprintf("(%s); echo $? > %s", cmdStr, exitCodeFile)
 	}
 
 	// 清理可能存在的同名 session
@@ -376,8 +373,13 @@ func (e *Engine) runTmuxStep(ctx context.Context, step Step, dir, cmdStr, logFil
 		}
 	}
 
-	// 启动 tmux session
-	startCmd := exec.Command("tmux", "new-session", "-d", "-s", sessionName, "-c", dir, execCmd)
+	// 启动 tmux session，使用 -e 传递环境变量（避免 bash 字符串注入问题）
+	args := []string{"new-session", "-d", "-s", sessionName, "-c", dir}
+	for _, e := range tmuxEnv {
+		args = append(args, "-e", e)
+	}
+	args = append(args, execCmd)
+	startCmd := exec.Command("tmux", args...)
 	startCmd.Env = env
 	var startStderr bytes.Buffer
 	startCmd.Stderr = &startStderr

@@ -31,6 +31,7 @@ steps:
     label: 环境就绪检查
     type: shell
     dir: '{{ .Vars.tmpDir }}'
+    outputKey: envCheckStatus
     command: |
       echo "=== 环境就绪检查 ==="
       MISSING=0
@@ -64,12 +65,26 @@ steps:
       if [ "$MISSING" -eq 1 ]; then
         echo "⚠️ 部分关键文件缺失，agent 可能需要额外处理"
       fi
+
+      # 如果 review report 不存在，直接生成默认报告并标记跳过 agent
+      if [ ! -f "{{ .Vars.reviewReport }}" ]; then
+        echo "review_report_missing: generating default noop report"
+        echo "## Rework 结论" > logs/rework-noop.md
+        echo "" >> logs/rework-noop.md
+        echo "结论: NO_REVIEW_REPORT" >> logs/rework-noop.md
+        echo "" >> logs/rework-noop.md
+        echo "review report 不存在，无需执行修复。时间: $(date -Iseconds)" >> logs/rework-noop.md
+        echo "SKIP_AGENT"
+      else
+        echo "READY"
+      fi
     ignoreError: true
 
   - id: runAgent
     label: 运行 rework agent
     type: shell
     tmux: true
+    condition: '{{ eq (.State.envCheckStatus | trim) "READY" }}'
     dir: '{{ .Vars.tmpDir }}'
     command: |
       kimi --agent-file {{ .Vars.agentFile | shellquote }} \
@@ -110,6 +125,7 @@ steps:
   - id: checkAgentOutput
     label: 检查 agent 是否有文件修改产出
     type: shell
+    condition: '{{ eq (.State.envCheckStatus | trim) "READY" }}'
     dir: '{{ .Vars.tmpDir }}'
     command: |
       if git diff --quiet HEAD && git diff --cached --quiet; then
@@ -122,6 +138,7 @@ steps:
   - id: preCommitChecks
     label: 提交前强制检查
     type: shell
+    condition: '{{ eq (.State.envCheckStatus | trim) "READY" }}'
     dir: '{{ .Vars.tmpDir }}'
     command: |
       echo "=== Pre-Commit Checks ==="

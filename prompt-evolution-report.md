@@ -1,81 +1,83 @@
 # Prompt 演进报告 — type-one
 
-生成时间: 2026-05-19T08:05:32+08:00
-分析范围: 2026-05-18T22:46:30+08:00 至 2026-05-19T08:03:55+08:00
+生成时间: 2026-05-19T12:00:13+08:00
+分析范围: 2026-05-19T08:03:55+08:00 至 2026-05-19T12:00:13+08:00
 
 ## 统计摘要
 
-- 分析日志数: 8
+- 分析日志数: 7
 - Agent 类型分布:
-  - review: 3 个任务
+  - review: 2 个任务
   - rework: 5 个任务
 - 趋势变化 (与上期对比):
-  - avgStepsDelta: -21.75
-  - errorRateDelta: -1.75
-  - successRateDelta: -0.375
+  - avgStepsDelta: +5.18
+  - errorRateDelta: +0.14
+  - successRateDelta: +0.30
 
 ## 问题诊断
 
-### 问题 1: rework 任务零产出（successRate 0%）
+### 问题 1: rework 任务产出率仍过低（successRate 20%）
 
-**证据**: 5 个 rework 任务，avgSteps=1，totalWrites=0，successRate=0%。totalToolCalls 中 ReadFile 11 次、Shell 1 次，说明 agent 有少量文件读取活动，但未产生任何文件修改或写入。
-
-**根因分析**:
-- developer.md 中 rework 模式虽要求启动确认和强制产出，但 agent 未执行 WriteFile 即终止。统计表明 agent 在极早阶段（平均 1 步）就以纯文本输出结束任务，未触发任何文件写入。
-- "必须有文件修改产出"的规则依赖 agent 自觉遵守，缺少更早的强制触发点；且"停止并报告"的表述易被 agent 误解为纯文本输出即可。
-
-**改进建议**:
-1. 在 `prompts/developer.md` 中将 rework 启动确认（写 `logs/rework-start.txt`）明确为不可跳过的第 2 步，并增加"提前终止也必须 WriteFile"的铁律，同时规定 3 步内无写操作即触发熔断。（已修改）
-2. 在 `workflows/rework.yaml` 中增加 `diagnoseAgentRun` 步骤，检测日志中是否有 WriteFile/StrReplaceFile，零写操作时记录诊断信息，帮助定位 agent 提前终止根因。（已修改）
-
-### 问题 2: review 任务产出率过低（successRate 33.3%）
-
-**证据**: 3 个 review 任务，avgSteps=7，totalToolCalls 中 ReadFile 35 次、Shell 11 次，但 totalWrites 仅 1 次，successRate=33.3%。agent 投入大量步数阅读文件，却只有 1 个任务产出了审查报告。
+**证据**: 5 个 rework 任务，successRate=0.2，avgSteps=4.8。totalWrites=7 全部集中在 1 个任务中，其余 4 个任务零产出。对比上期（successRate=0%, avgSteps=1），虽有改善但仍不可接受。
 
 **根因分析**:
-- reviewer.md 已多次强调 WriteFile，但仍有 2/3 的任务未执行。说明 agent 在错误路径（gh 失败、PR 不存在等）或探索过程中以纯文本输出终止，绕过了强制写入约束。
-- workflow 的诊断步骤 `diagnoseAgentRun` 仅检查是否有工具调用，不检查是否有 WriteFile，导致"有活动但无产出"的任务未被兜底。
+- developer.md 上期已增加"3 步无写操作即熔断"和"强制 WriteFile"规则，但 80% 的任务仍在极早阶段终止。
+- avgSteps=4.8 接近启动确认所需的 2 步（读 report + 写 start.txt），说明 agent 在完成启动后就退出了，没有进入实际修复阶段。
+- 4 个零产出任务可能的原因是：(a) review report 不存在或无法读取，agent 按"停止并报告"规则以纯文本终止；(b) review report 无 Blocking/Major 问题，agent 直接纯文本输出"无需修复"；(c) agent 在启动确认后因步数/错误顾虑提前放弃。
+- "停止并报告"的表述在 developer.md 中被 agent 理解为纯文本输出，绕过了 WriteFile 强制约束。
 
 **改进建议**:
-1. 在 `prompts/reviewer.md` 的"快速开始"和"执行约束"中增加"提前终止也必须 WriteFile"的明确规则，并将零产出熔断中的"空报告"要求升级为必须包含时间戳和当前状态的正式报告。（已修改）
-2. 在 `workflows/review.yaml` 的 `diagnoseAgentRun` 中增加 `WRITE_COUNT` 检测，当 agent 有工具调用但无写操作时，生成默认失败报告并标注"可能因 prompt 约束提前终止且未执行强制写入"。（已修改）
+1. **统一终止规则为 WriteFile**: 在 `prompts/developer.md` 的"效率约束"开头增加统一规则：所有"停止并报告"一律指执行 WriteFile 写入报告文件后结束。特别针对 rework 模式，将"review report 无法读取，立即停止并报告"明确改为"立即停止并执行 WriteFile 写 `logs/rework-halted.md`"。（已修改）
+2. **增加无问题路径和步数下限**: 在 `prompts/developer.md` 的 rework 专属规则中增加：(a) review report 无 Blocking/Major 问题时必须 WriteFile 写 `logs/rework-noop.md`；(b) rework 任务少于 5 步结束时必须回退检查。防止 agent 在读完 report 后未经 WriteFile 直接结束。（已修改）
+3. **workflow 前置拦截**: 在 `workflows/rework.yaml` 的 `envReadinessCheck` 中，如果 review report 不存在，直接生成默认的 `logs/rework-noop.md` 并跳过 agent 运行，避免启动无意义的零产出任务。（已修改）
 
-### 问题 3: 整体成功率趋势恶化（successRateDelta -0.375）
+### 问题 2: review 任务步数膨胀（avgSteps 17.5，+10.5 vs 上期）
 
-**证据**: 趋势指标显示 successRateDelta=-0.375，avgStepsDelta=-21.75，errorRateDelta=-1.75。
+**证据**: 2 个 review 任务，avgSteps=17.5，ReadFile 33 次（16.5/任务），Shell 23 次（11.5/任务），totalErrors=1。虽然 successRate 从 33.3% 提升到 100%，但步数翻倍，Shell 调用远超合理范围。
 
 **根因分析**:
-- 步数大幅下降（-21.75）伴随成功率下降，说明 agent 倾向于在更早阶段终止任务，但终止方式不是 WriteFile，而是纯文本输出。这与 prompt 中"停止并报告"的表述被 agent 误解为"纯文本报告"有关。
-- errorRate 下降（-1.75）并非真正的改善，而是 agent 提前终止避免了后续错误，属于"以零产出换取零错误"的虚假改善。
+- reviewer.md 上期修改成功解决了零产出问题（successRate 33%→100%），但 agent 在审查过程中过度探索。
+- Shell 23 次/2 任务 = 11.5 次每任务，显著超出合理范围（正常 4-6 次）。可能是 `gh pr diff` 重复调用、测试命令多次执行或错误后重试。
+- ReadFile 33 次/2 任务 = 16.5 次每任务，说明 agent 读取了大量规范文档，缺少读取预算约束。
+- 与 developer.md 不同，reviewer.md 没有 Shell/ReadFile 的硬性上限，agent 缺乏预算意识。
 
 **改进建议**:
-1. 对所有 agent prompt 中的"停止并报告"类表述进行审计，统一替换为"停止并执行 WriteFile 写报告"。（本次已针对 review/developer 修改）
-2. 在 dashboard 统计中增加"纯文本终止率"指标，区分"工具调用后无 WriteFile"和"完全无工具调用"两种零产出模式，帮助更精准定位问题。（建议下次迭代评估）
+1. **增加工具调用预算**: 在 `prompts/reviewer.md` 中增加硬性预算：Shell 每任务最多 8 次（当前 11.5），ReadFile 每任务最多 12 次（当前 16.5）。达到预警线时强制进入收尾阶段。（已修改）
+2. **缓存 gh diff 结果**: 在 reviewer.md 的"快速开始"第 3 步中，要求 agent 将 `gh pr diff` 结果写入临时文件，后续引用时直接 ReadFile，禁止重复调用 `gh pr diff`。（已修改）
+
+### 问题 3: 整体错误率上升（errorRateDelta +0.14）
+
+**证据**: trends.errorRateDelta=0.142857，review 任务错误率 50%（1/2）。
+
+**根因分析**:
+- review 任务的 1 个错误可能来自 gh 命令失败、文档路径不存在或 Shell 输出过大。
+- 虽然 reviewer.md 已有错误处理规则，但 agent 在遇到错误时仍可能消耗额外步数尝试恢复（avgSteps 17.5 佐证）。
+- Shell/ReadFile 预算的缺失使 agent 没有足够强的约束来避免错误路径上的反复试探。
+
+**改进建议**:
+1. 通过 reviewer.md 新增的 Shell/ReadFile 预算约束，强制 agent 在工具调用达到上限前进入收尾阶段，减少错误发生的机会。
+2. 下次迭代建议 dashboard 增加"错误类型分布"统计（如 gh 失败、文件不存在、输出过大等），帮助更精准定位 review 错误的根因。
 
 ## 已应用改进
 
 1. **`prompts/developer.md`**:
-   - 强化 rework 模式启动确认：第 1 步读 review report，第 2 步必须 WriteFile 写 `logs/rework-start.txt`，禁止纯文本代替。
-   - 新增"3 步无写操作即熔断"规则：如果任务已执行 3 步仍未调用任何写操作，立即 WriteFile 写 `logs/rework-halted.md` 并结束。
-   - 强化"提前终止也必须 WriteFile"规则：任何停止方式都必须是 WriteFile。
+   - 新增"统一终止规则"：所有"停止并报告"一律指执行 WriteFile 写入报告文件，禁止纯文本输出。
+   - rework 专属规则：review report 无法读取时，明确必须 WriteFile 写 `logs/rework-halted.md`。
+   - 新增"review report 无 Blocking/Major 问题"处理路径：必须 WriteFile 写 `logs/rework-noop.md`。
+   - 新增"rework 步数下限"：少于 5 步结束时必须回退检查。
 
 2. **`prompts/reviewer.md`**:
-   - 在"快速开始"中新增第 7 步："提前终止也必须 WriteFile"。
-   - 在"执行约束"中升级零产出熔断要求：禁止以纯文本解释代替 WriteFile，报告必须包含时间戳和当前状态。
-   - 更新统计引用为当前 33% 成功率，强化警示。
+   - 新增"工具调用预算"：Shell 每任务最多 8 次（预警线 6 次），ReadFile 每任务最多 12 次（预警线 10 次）。
+   - 要求 `gh pr diff` 结果写入临时文件缓存，禁止重复调用。
 
-3. **`workflows/review.yaml`**:
-   - `diagnoseAgentRun` 增加 `WRITE_COUNT` 检测（统计 WriteFile/StrReplaceFile 出现次数）。
-   - 当 `STEP_COUNT>0` 但 `WRITE_COUNT=0` 时，生成兜底失败报告，明确标注"agent 执行了工具调用但未产生 WriteFile/StrReplaceFile 输出"。
-
-4. **`workflows/rework.yaml`**:
-   - 在 `runAgent` 与 `checkAgentOutput` 之间新增 `diagnoseAgentRun` 步骤。
-   - 统计日志中的工具调用和写操作次数，写入 `logs/rework-diagnose.md`，为零产出任务提供诊断线索。
+3. **`workflows/rework.yaml`**:
+   - `envReadinessCheck` 增加 `outputKey: envCheckStatus`，当 review report 不存在时直接生成 `logs/rework-noop.md` 并输出 `SKIP_AGENT`。
+   - `runAgent`、`checkAgentOutput`、`preCommitChecks` 增加 `condition`，仅在 `envCheckStatus == READY` 时执行，避免无 review report 时的无效启动和失败。
 
 ## 趋势追踪
 
-- **与上次对比**: 恶化（successRateDelta=-0.375，rework 从低成功率跌至 0%，review 维持在 33.3%）
+- **与上次对比**: 改善（successRateDelta=+0.30，review 从 33%→100%，rework 从 0%→20%），但代价是 avgStepsDelta=+5.18 和 errorRateDelta=+0.14。review 的零产出问题已根治，rework 仍需观察。
 - **建议下次重点关注**:
-  - rework 任务在 prompt 修改后是否恢复产出（目标：successRate > 0%）
-  - review 任务的 WriteFile 执行率是否提升（目标：successRate > 50%）
-  - 新增 diagnose 文件是否揭示了 agent 提前终止的具体原因
+  - rework 任务在 prompt 修改后是否突破 20% 产出率（目标：>50%）
+  - review 任务在 Shell/ReadFile 预算约束下 avgSteps 是否回落到 12 以下
+  - review 任务的 errorRate 是否因预算约束而下降

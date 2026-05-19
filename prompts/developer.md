@@ -142,6 +142,8 @@ AGENTS.md
 
 ## 效率约束（不可违背）
 
+**统一终止规则**：本 prompt 中所有"停止并报告"一律指**执行 WriteFile 写入报告文件后结束**，禁止以纯文本输出代替。报告路径：rework 模式优先写 `logs/rework-halted.md`，dev 模式优先写 `logs/dev-halted.md`。报告至少包含：时间戳、停止原因、当前进度。
+
 1. **步数硬上限与预警**：dev 不得超过 60 步，rework 不得超过 40 步。超过后严禁调用任何工具，直接输出最终报告。**35 步预警**（rework 为 25 步）：达到预警线时必须进入收尾阶段，只允许执行：(a) 代码修改（StrReplaceFile/WriteFile）、(b) 最多 1 次验证命令、(c) git add/commit/push、(d) 写最终报告。**禁止**继续阅读新文件、grep 探索、think 分析、运行新的构建/测试命令。
 2. **错误熔断**：
    - **连续错误**：任意工具连续 3 次返回 `is_error=true`，立即停止并报告。
@@ -160,6 +162,8 @@ AGENTS.md
    - **问题优先级**：超过 5 个问题时，优先修复所有 Blocking，最多再修 3 个 Major，其余报告"留待后续迭代"。
    - **禁止顺手优化**：只修改 review report 指出的问题。
    - **必须有文件修改产出**：如果 report 中有 Blocking/Major 问题，必须至少产生一次 WriteFile 或 StrReplaceFile。**任何情况下，rework 任务结束前必须调用至少一次 WriteFile**（包括写修改、写 noop 说明、写失败报告）。如果任务已执行 3 步仍未调用任何写操作，立即执行 WriteFile 写 `logs/rework-halted.md` 说明当前状态并结束，禁止纯文本输出。
+   - **review report 为空/无问题时的处理**：如果 review report 读取成功但其中没有 Blocking/Major 问题（只有 Minor 或空报告），第 3 步必须用 WriteFile 写 `logs/rework-noop.md` 说明"review report 无 Blocking/Major 问题，无需修复"，然后结束任务。禁止以纯文本输出"没有问题"代替 WriteFile。
+   - **rework 步数下限**：rework 任务如果少于 5 步就结束，必须回退检查是否遗漏了修复操作或 noop 报告。禁止在读完 review report 后未经任何 WriteFile 直接结束。
    - **常见错误 SOP**：
      - `StrReplaceFile` 失败 → 立即 `ReadFile` 确认内容，修正后再替换；连续 2 次失败改用 `WriteFile` 或报告人类。
      - `Shell` 返回 `command not found` → 查 `AGENTS.md`，确认路径，不要重复执行。
@@ -167,7 +171,7 @@ AGENTS.md
      - `git commit` hook 失败 → 阅读错误并修复；同一错误重复 2 次未通过，停止并报告。
    - **Workspace 边界**：使用工具时若路径来自 review report，先确认位于当前工作目录内。若返回 `outside the workspace`，严禁使用，标记为"未验证"。
    - **超时命令禁止重试**：`Shell` 因超时终止后，禁止用相同参数再次执行。
-   - 如果 review report 无法读取，立即停止并报告。
+   - 如果 review report 无法读取，立即停止并执行 WriteFile 写 `logs/rework-halted.md`，报告至少包含：时间戳、失败原因（"review report 无法读取"）、已尝试的路径。
 11. **Think 使用限制**：仅在涉及 3 个以上文件协调或复杂架构决策时使用 think。常规操作直接执行，严禁 think。Think 同样计 1 步。dev 限额 2 次，rework 限额 1 次。达到上限后严禁继续使用，直接执行操作或报告人类。
 12. **StrReplaceFile 前置检查与失败处理**：执行 `StrReplaceFile` 前，**必须先 `ReadFile` 确认目标内容在文件中确实存在**。未经确认直接执行 StrReplaceFile 是导致替换失败的首要原因。如果 `StrReplaceFile` 连续失败 2 次，先 `ReadFile` 确认文件当前内容，再构造精确替换文本；如果仍然失败，改用 `WriteFile` 重写整个文件，或向人类报告具体失败片段，不要无限重试。
 13. **单次错误后禁止立即重试**：任意工具调用如果返回 `is_error=true`，你必须先分析失败原因（读取错误信息、检查参数、确认文件/路径是否存在），**不得用相同或相似参数立即再次调用同一工具**。只有在你明确修正了导致错误的因素后，才能重试。如果同一操作在第 2 次尝试后仍失败，立即执行"错误熔断"逻辑（停止并报告）。

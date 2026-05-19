@@ -269,7 +269,7 @@ AGENTS.md
 
 1. **环境预检查（第 1 步）**：运行 `gh auth status` 和 `gh pr view "$AGENT_PR_NUMBER" --json number`。如果失败，**禁止继续执行任何审查命令，必须立即执行 WriteFile**：输出极简失败报告到 **`logs/review-report-$AGENT_PR_NUMBER-fail.md`**（或 `AGENT_REVIEW_REPORT` 指定的路径）。报告至少包含：时间戳、失败原因、PR 号。**禁止以纯文本输出代替 WriteFile**——统计数据表明 review 任务已连续出现零产出失败，这是严重违规。
 2. **读取项目地图（第 2 步）**：先用 `test -f AGENTS.md || test -f README.md` 确认项目地图存在，再读取 `AGENTS.md`，发现编码规范和审查标准路径。如果 `AGENTS.md` 和 `README.md` 均不存在，在审查报告中标注「未验证（缺少项目地图）」并继续基于 PR diff 审查，不得尝试用 `find` 或 `../` 搜索其他路径。
-3. **获取 PR diff（第 3 步）**：运行 `gh pr diff <number> --name-only` 和 `gh pr diff <number> | head -100`，了解变更范围。
+3. **获取 PR diff（第 3 步）**：运行 `gh pr diff <number> --name-only` 和 `gh pr diff <number> | head -100`，了解变更范围。**将 diff 内容写入临时文件**（如 `/tmp/pr-diff-<number>.txt`），后续审查中需要引用 diff 时直接 ReadFile 该临时文件，禁止重复调用 `gh pr diff` 浪费 Shell 预算。
 4. **确定审查模式（第 4 步）**：检查任务上下文中是否提供了「上一轮 review report」路径，或运行 `ls logs/review-report-<pr_number>*.md` 查看是否存在历史报告。如果存在 → 后续审查模式，**必须立即读取该报告**；不存在 → 首次审查模式。
 5. **开始审查（第 5 步起）**：直接切入具体文件审查，禁止在第 5 步之后还在"探索项目结构"或"试探路径"。
 6. **强制写入（第 6 步）**：无论前 5 步是否成功、无论审查范围多大，第 6 步必须是 `WriteFile` 写入审查报告。即使 gh 完全不可用、AGENTS.md 不存在，也必须写入一个说明"无法执行审查"的报告。**avgSteps=0 的零产出任务是不可接受的**。
@@ -278,6 +278,10 @@ AGENTS.md
 **如果前 5 步内没有完成上述步骤，说明你陷入了犹豫，必须立即收缩范围，基于已有信息直接输出审查结论。**
 
 ## 执行约束
+
+**工具调用预算**（硬性上限，超出后必须立即收尾输出报告）：
+- **Shell 命令**：每任务最多 **8 次**（当前统计平均 11.5 次，导致步数膨胀）。包括 `gh`、`git`、`make`、`test` 等所有 Shell 调用。达到 6 次时进入预警，禁止运行新的构建/测试命令。
+- **ReadFile**：每任务最多 **12 次**（当前统计平均 16.5 次）。不含 PR diff 和 review report 的必要读取，但包括所有规范文档、源代码、历史报告的读取。达到 10 次时停止读取新文档，基于已有信息输出结论。
 
 1. **环境预检查**：运行任何 `gh` 命令前，先执行 `gh auth status` 确认 GitHub CLI 已认证。然后执行 `gh pr view "$AGENT_PR_NUMBER" --json number`（或当前 PR 号）确认 PR 可访问。如果认证失败或 PR 不存在，**立即停止审查，生成失败报告说明原因，不要继续尝试其他命令**。如果因网络超时失败，最多重试 1 次，仍失败则停止并报告网络问题。
 2. **文档存在性检查**：读取规范文档前，先用 `Shell` 命令（如 `ls -la <路径>` 或 `test -f <路径>`）确认文件存在。如果文件不存在，跳过该维度并在报告中标注"未验证（文件缺失）"，不要直接执行 `ReadFile` 导致错误浪费步数。
