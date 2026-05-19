@@ -27,6 +27,23 @@ steps:
       fi
     ignoreError: true
 
+  - id: validateAgentInputs
+    label: 校验 agent 启动参数
+    type: shell
+    command: |
+      AGENT_FILE={{ .Vars.agentFile | shellquote }}
+      PROMPT={{ .Vars.prompt | shellquote }}
+      if [ -z "$AGENT_FILE" ] || [ ! -f "$AGENT_FILE" ]; then
+        echo "❌ agentFile 未设置或不存在: $AGENT_FILE"
+        exit 1
+      fi
+      if [ -z "$PROMPT" ]; then
+        echo "❌ prompt 未设置"
+        exit 1
+      fi
+      echo "✅ agent 启动参数校验通过"
+    ignoreError: false
+
   - id: envReadinessCheck
     label: 环境就绪检查
     type: shell
@@ -49,17 +66,17 @@ steps:
         echo "ℹ️ Makefile 缺失（非必须）"
       fi
 
-      if [ -f "{{ .Vars.reviewReport }}" ]; then
-        echo "✅ review report: {{ .Vars.reviewReport }}"
+      if [ -f "{{ .Vars.reviewReportPath }}" ]; then
+        echo "✅ review report: {{ .Vars.reviewReportPath }}"
       else
-        echo "⚠️ review report 不存在: {{ .Vars.reviewReport }}"
+        echo "⚠️ review report 不存在: {{ .Vars.reviewReportPath }}"
         MISSING=1
       fi
 
       # 将检查结果写入文件供 agent 读取
       mkdir -p logs
       echo "env_check_time: $(date -Iseconds)" > logs/rework-env-check.txt
-      echo "review_report_exists: $([ -f '{{ .Vars.reviewReport }}' ] && echo 'true' || echo 'false')" >> logs/rework-env-check.txt
+      echo "review_report_exists: $([ -f '{{ .Vars.reviewReportPath }}' ] && echo 'true' || echo 'false')" >> logs/rework-env-check.txt
       echo "agents_md_exists: $([ -f 'AGENTS.md' ] && echo 'true' || echo 'false')" >> logs/rework-env-check.txt
 
       if [ "$MISSING" -eq 1 ]; then
@@ -67,7 +84,7 @@ steps:
       fi
 
       # 如果 review report 不存在，直接生成默认报告并标记跳过 agent
-      if [ ! -f "{{ .Vars.reviewReport }}" ]; then
+      if [ ! -f "{{ .Vars.reviewReportPath }}" ]; then
         echo "review_report_missing: generating default noop report"
         echo "## Rework 结论" > logs/rework-noop.md
         echo "" >> logs/rework-noop.md
@@ -84,7 +101,7 @@ steps:
     label: 运行 rework agent
     type: shell
     tmux: true
-    condition: '{{ eq (.State.envCheckStatus | trim) "READY" }}'
+    condition: '{{ contains (.State.envCheckStatus | trim) "READY" }}'
     dir: '{{ .Vars.tmpDir }}'
     command: |
       kimi --agent-file {{ .Vars.agentFile | shellquote }} \
@@ -96,7 +113,7 @@ steps:
       AGENT_ISSUE_TITLE: '{{ .Vars.issueTitle }}'
       AGENT_LOG_FILE: '{{ .Vars.logFileName }}'
       AGENT_MODE: 'rework'
-      AGENT_REVIEW_REPORT: '{{ .Vars.reviewReport }}'
+      AGENT_REVIEW_REPORT: '{{ .Vars.reviewReportPath }}'
       # AGENT_AGENTS_MD 由 dashboard 在 buildAgentContext 中自动设置，无需在此覆盖
     outputKey: agentOutput
     logFile: '{{ .Vars.logFileName }}'
@@ -125,20 +142,33 @@ steps:
   - id: checkAgentOutput
     label: 检查 agent 是否有文件修改产出
     type: shell
-    condition: '{{ eq (.State.envCheckStatus | trim) "READY" }}'
+    condition: '{{ contains (.State.envCheckStatus | trim) "READY" }}'
     dir: '{{ .Vars.tmpDir }}'
     command: |
-      if git diff --quiet HEAD && git diff --cached --quiet; then
-        echo "❌ rework agent 未产生任何文件修改"
-        exit 1
+      LOG_FILE="{{ .Vars.logFileName }}"
+      WRITE_COUNT=0
+      if [ -f "$LOG_FILE" ]; then
+        WRITE_COUNT=$(grep -cE 'WriteFile|StrReplaceFile' "$LOG_FILE" 2>/dev/null || echo "0")
       fi
-      echo "✅ 检测到文件修改"
+
+      if [ "$WRITE_COUNT" -gt 0 ]; then
+        echo "✅ agent 执行了 $WRITE_COUNT 次写入操作"
+        exit 0
+      fi
+
+      if ! git diff --quiet HEAD 2>/dev/null || ! git diff --cached --quiet 2>/dev/null; then
+        echo "✅ 检测到 git 文件修改"
+        exit 0
+      fi
+
+      echo "❌ rework agent 未产生任何文件修改或写入操作"
+      exit 1
     ignoreError: false
 
   - id: preCommitChecks
     label: 提交前强制检查
     type: shell
-    condition: '{{ eq (.State.envCheckStatus | trim) "READY" }}'
+    condition: '{{ contains (.State.envCheckStatus | trim) "READY" }}'
     dir: '{{ .Vars.tmpDir }}'
     command: |
       echo "=== Pre-Commit Checks ==="

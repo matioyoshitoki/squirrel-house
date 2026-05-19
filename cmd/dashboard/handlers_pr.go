@@ -550,19 +550,37 @@ func startReworkTask(prNumber int, branch string, reportStr string, projectName 
 			"ReviewReport":  reportStr,
 		})
 
+		reviewReportPath := filepath.Join(logsDir, fmt.Sprintf("review-report-%d.md", prNumber))
+		if _, err := os.Stat(reviewReportPath); os.IsNotExist(err) {
+			// 非时间戳文件被 clearReviewFailedState 删除，回退到最新的带时间戳文件
+			matches, _ := filepath.Glob(filepath.Join(logsDir, fmt.Sprintf("review-report-%d-*.md", prNumber)))
+			if len(matches) > 0 {
+				// 按修改时间排序，取最新
+				latest := matches[0]
+				latestMod := time.Time{}
+				for _, m := range matches {
+					if fi, err := os.Stat(m); err == nil && fi.ModTime().After(latestMod) {
+						latest = m
+						latestMod = fi.ModTime()
+					}
+				}
+				reviewReportPath = latest
+			}
+		}
 		vars := map[string]interface{}{
-			"prNumber":     prNumber,
-			"branch":       branch,
-			"issueNumber":  issueNumber,
-			"issueTitle":   issueTitle,
-			"tmpDir":       tmpDir,
-			"worktreeCmd":  worktreeCmd,
-			"logFileName":  logFileName,
-			"agentFile":    agentFile,
-			"prompt":       prompt,
-			"reviewReport": reportStr,
-			"commentBody":  commentBody,
-			"taskKind":     taskKind,
+			"prNumber":         prNumber,
+			"branch":           branch,
+			"issueNumber":      issueNumber,
+			"issueTitle":       issueTitle,
+			"tmpDir":           tmpDir,
+			"worktreeCmd":      worktreeCmd,
+			"logFileName":      logFileName,
+			"agentFile":        agentFile,
+			"prompt":           prompt,
+			"reviewReport":     reportStr,
+			"reviewReportPath": reviewReportPath,
+			"commentBody":      commentBody,
+			"taskKind":         taskKind,
 		}
 		for k, v := range agentCtx {
 			vars[k] = v

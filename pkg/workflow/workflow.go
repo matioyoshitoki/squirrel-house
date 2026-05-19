@@ -153,8 +153,9 @@ var funcMap = template.FuncMap{
 	"shellquote": func(s string) string {
 		return "'" + strings.ReplaceAll(s, "'", "'\\''") + "'"
 	},
-	"trim": strings.TrimSpace,
-	"now":  func() int64 { return time.Now().Unix() },
+	"trim":     strings.TrimSpace,
+	"contains": strings.Contains,
+	"now":      func() int64 { return time.Now().Unix() },
 }
 
 func (e *Engine) renderString(s string) (string, error) {

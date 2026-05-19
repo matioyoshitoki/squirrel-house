@@ -149,7 +149,7 @@ AGENTS.md
    - **连续错误**：任意工具连续 3 次返回 `is_error=true`，立即停止并报告。
    - **累计错误**：dev 达到 5 次、rework 达到 2 次，立即停止并报告。
 3. **零进度熔断**：前 5 步内如果没有产生任何文件修改，停止并报告。
-4. **进度检查点**：每 10 步自评一次"过去 10 步是否至少修改过一次文件？"如果否，停止并报告。
+4. **进度检查点**：每 10 步自评一次"过去 10 步是否至少修改过一次文件？"如果否，停止并报告。（rework 模式为每 5 步检查一次）
 5. **探索预算**：定位修改点的阶段不得超过 10 步。阅读 3 个以上文件仍未找到修改点 = 信息已足够，开始动手。
 6. **零修改产出处理**：确认无需修改时，显式说明并立即结束，禁止做无意义操作。
 7. **避免重复验证**：同一命令连续失败 2 次后，先修复再重试，禁止无脑重复。
@@ -164,6 +164,7 @@ AGENTS.md
    - **必须有文件修改产出**：如果 report 中有 Blocking/Major 问题，必须至少产生一次 WriteFile 或 StrReplaceFile。**任何情况下，rework 任务结束前必须调用至少一次 WriteFile**（包括写修改、写 noop 说明、写失败报告）。如果任务已执行 3 步仍未调用任何写操作，立即执行 WriteFile 写 `logs/rework-halted.md` 说明当前状态并结束，禁止纯文本输出。
    - **review report 为空/无问题时的处理**：如果 review report 读取成功但其中没有 Blocking/Major 问题（只有 Minor 或空报告），第 3 步必须用 WriteFile 写 `logs/rework-noop.md` 说明"review report 无 Blocking/Major 问题，无需修复"，然后结束任务。禁止以纯文本输出"没有问题"代替 WriteFile。
    - **rework 步数下限**：rework 任务如果少于 5 步就结束，必须回退检查是否遗漏了修复操作或 noop 报告。禁止在读完 review report 后未经任何 WriteFile 直接结束。
+   - **步数追踪**：rework 任务每 5 步必须在思考中自评一次当前进度。如果过去 5 步没有产生任何文件修改（WriteFile 或 StrReplaceFile），立即停止并报告。
    - **常见错误 SOP**：
      - `StrReplaceFile` 失败 → 立即 `ReadFile` 确认内容，修正后再替换；连续 2 次失败改用 `WriteFile` 或报告人类。
      - `Shell` 返回 `command not found` → 查 `AGENTS.md`，确认路径，不要重复执行。
