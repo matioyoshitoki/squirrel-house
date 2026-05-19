@@ -81,7 +81,7 @@ templates:
     {{ .ContextPrompt }}Issue #{{ .IssueNumber }}: {{ .IssueTitle }}
 
     **你的任务类型：返工修复任务（Rework Agent）**
-    目标：根据审查报告修复 PR 中的代码问题，修复后重新提交。
+    目标：根据审查报告修复 PR 中的代码问题。workflow 会自动负责提交和推送，你只需要专注修改代码。
 
     这是 PR #{{ .PRNumber }} 的返工任务。
     分支: {{ .Branch }}
@@ -91,8 +91,7 @@ templates:
     2. 根据审查报告中的问题进行代码修改。修复范围控制：优先修复所有 Blocking 问题，最多再修复 3 个 Major 问题，其余明确报告为"留待后续迭代"。
     3. 修改完成后，**仅从以下命令中选择 1 个与修改最直接相关的命令执行验证**。如果验证环境不具备、命令未找到或超时，跳过验证直接提交。**严禁顺序执行多个命令或运行全量测试。**
     {{ .TestCommands }}
-    4. 提交并推送：git add -A && git commit -m "fix: 修复 PR #{{ .PRNumber }} review 问题" && git push origin {{ .Branch }}
-       注意：如果 git commit 触发 pre-commit hook 失败，必须阅读错误输出并修复后重新 commit。同一 hook 错误不要重复 commit 超过 2 次。
+    4. **不要执行 git add / git commit / git push**。workflow 会在你完成后自动提交和推送。你只需要确保文件修改正确即可。
 
     审查报告：
     {{ .ReviewReport }}

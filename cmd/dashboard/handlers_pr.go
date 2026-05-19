@@ -244,14 +244,16 @@ func startReviewTask(prNumber int, branch string, projectName string) string {
 		})
 
 		vars := map[string]interface{}{
-			"prNumber":    prNumber,
-			"branch":      branch,
-			"tmpDir":      tmpDir,
-			"logsDir":     logsDir,
-			"logFileName": logFileName,
-			"agentFile":   agentFile,
-			"prompt":      prompt,
-			"worktreeCmd": worktreeCmd,
+			"prNumber":     prNumber,
+			"branch":       branch,
+			"tmpDir":       tmpDir,
+			"logsDir":      logsDir,
+			"logFileName":  logFileName,
+			"agentFile":    agentFile,
+			"prompt":       prompt,
+			"worktreeCmd":  worktreeCmd,
+			"platformType": platform.Name(),
+			"platformCLI":  platform.CLIName(),
 		}
 		for k, v := range agentCtx {
 			vars[k] = v

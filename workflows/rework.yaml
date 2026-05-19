@@ -148,7 +148,8 @@ steps:
       LOG_FILE="{{ .Vars.logFileName }}"
       WRITE_COUNT=0
       if [ -f "$LOG_FILE" ]; then
-        WRITE_COUNT=$(grep -cE 'WriteFile|StrReplaceFile' "$LOG_FILE" 2>/dev/null || echo "0")
+        # 匹配 WriteFile、StrReplaceFile 以及 kimi 的 edit 格式
+        WRITE_COUNT=$(grep -cE 'WriteFile|StrReplaceFile|"edit":' "$LOG_FILE" 2>/dev/null || echo "0")
       fi
 
       if [ "$WRITE_COUNT" -gt 0 ]; then
@@ -157,11 +158,18 @@ steps:
       fi
 
       if ! git diff --quiet HEAD 2>/dev/null || ! git diff --cached --quiet 2>/dev/null; then
-        echo "✅ 检测到 git 文件修改"
+        echo "✅ 检测到 git 未提交修改"
         exit 0
       fi
 
-      echo "❌ rework agent 未产生任何文件修改或写入操作"
+      # agent 可能已自行 commit，检查是否有新提交
+      NEW_COMMITS=$(git log --oneline origin/{{ .Vars.branch }}..HEAD 2>/dev/null | wc -l)
+      if [ "$NEW_COMMITS" -gt 0 ]; then
+        echo "✅ 检测到 $NEW_COMMITS 个新提交"
+        exit 0
+      fi
+
+      echo "❌ rework agent 未产生任何文件修改、写入操作或新提交"
       exit 1
     ignoreError: false
 

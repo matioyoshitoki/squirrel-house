@@ -58,38 +58,32 @@ steps:
     ignoreError: false
 
   - id: envReadinessCheck
-    label: GitHub 环境就绪检查
+    label: 平台环境就绪检查
     type: shell
     dir: '{{ .Vars.tmpDir }}'
     outputKey: envCheckStatus
     command: |
-      echo "=== GitHub 环境就绪检查 ==="
+      echo "=== 平台环境就绪检查 ==="
       PR_NUMBER="{{ .Vars.prNumber }}"
+      PLATFORM="{{ .Vars.platformType }}"
+      CLI="{{ .Vars.platformCLI }}"
       mkdir -p logs
-      REPORT_FILE="logs/review-report-${PR_NUMBER}-fail.md"
 
-      if ! gh auth status >/dev/null 2>&1; then
-        echo "gh_auth_failed: GitHub CLI 未认证"
-        echo "## 审查结论" > "$REPORT_FILE"
-        echo "" >> "$REPORT_FILE"
-        echo "审查结论: FAIL" >> "$REPORT_FILE"
-        echo "" >> "$REPORT_FILE"
-        echo "## 失败原因" >> "$REPORT_FILE"
-        echo "GitHub CLI 未认证，无法获取 PR 信息。时间: $(date -Iseconds)" >> "$REPORT_FILE"
-        echo "SKIP_AGENT"
+      if ! $CLI auth status >/dev/null 2>&1; then
+        echo "auth_failed: $CLI CLI 未认证"
         exit 0
       fi
 
-      if ! gh pr view "$PR_NUMBER" --json number >/dev/null 2>&1; then
-        echo "pr_not_found: PR #${PR_NUMBER} 不存在或无法访问"
-        echo "## 审查结论" > "$REPORT_FILE"
-        echo "" >> "$REPORT_FILE"
-        echo "审查结论: FAIL" >> "$REPORT_FILE"
-        echo "" >> "$REPORT_FILE"
-        echo "## 失败原因" >> "$REPORT_FILE"
-        echo "PR #${PR_NUMBER} 不存在或无法访问。时间: $(date -Iseconds)" >> "$REPORT_FILE"
-        echo "SKIP_AGENT"
-        exit 0
+      if [ "$PLATFORM" = "gitlab" ]; then
+        if ! glab mr view "$PR_NUMBER" >/dev/null 2>&1; then
+          echo "mr_not_found: MR #${PR_NUMBER} 不存在或无法访问"
+          exit 0
+        fi
+      else
+        if ! gh pr view "$PR_NUMBER" --json number >/dev/null 2>&1; then
+          echo "pr_not_found: PR #${PR_NUMBER} 不存在或无法访问"
+          exit 0
+        fi
       fi
 
       echo "READY"
@@ -99,7 +93,6 @@ steps:
     label: 运行 reviewer agent
     type: shell
     tmux: true
-    condition: '{{ contains (.State.envCheckStatus | trim) "READY" }}'
     dir: '{{ .Vars.tmpDir }}'
     command: |
       kimi --agent-file {{ .Vars.agentFile | shellquote }} \

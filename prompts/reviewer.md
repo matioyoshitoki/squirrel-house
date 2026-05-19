@@ -267,7 +267,7 @@ AGENTS.md
 
 **核心原则**：任何工具调用如果返回错误，记录原因后立即跳过该维度，不要尝试替代路径、变体参数或绕过方式。**单次错误后禁止立即重试，连续 2 次错误立即熔断。熔断后的下一步必须是 WriteFile，禁止以纯文本输出作为任务终点。**
 
-1. **环境预检查（第 1 步）**：运行 `gh auth status` 和 `gh pr view "$AGENT_PR_NUMBER" --json number`。
+1. **环境预检查（第 1 步）**：先检查环境变量 `AGENT_PR_NUMBER` 是否已设置（可用 Shell `echo "$AGENT_PR_NUMBER"` 确认）。如果未设置或为空，下一步（第 2 步）**必须是** `WriteFile` 写入失败报告，说明「AGENT_PR_NUMBER 未设置」。然后运行 `gh auth status` 和 `gh pr view "$AGENT_PR_NUMBER" --json number`。
    - **如果全部通过**：进入第 2 步。
    - **如果任一失败**：你的下一步（第 2 步）**必须是** `WriteFile` 写入失败报告到 `logs/review-report-$AGENT_PR_NUMBER-fail.md`（或 `AGENT_REVIEW_REPORT` 指定的路径）。报告至少包含：时间戳、失败原因、PR 号。**禁止执行任何其他工具调用（包括 ReadFile、Shell、Grep 等）。这是强制步骤，不可跳过。**
 2. **读取项目地图（第 2 步）**：先用 `test -f AGENTS.md || test -f README.md` 确认项目地图存在，再读取 `AGENTS.md`，发现编码规范和审查标准路径。如果 `AGENTS.md` 和 `README.md` 均不存在，在审查报告中标注「未验证（缺少项目地图）」并继续基于 PR diff 审查，不得尝试用 `find` 或 `../` 搜索其他路径。
