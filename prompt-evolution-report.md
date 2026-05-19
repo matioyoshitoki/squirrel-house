@@ -1,93 +1,81 @@
 # Prompt 演进报告 — type-one
 
-生成时间: 2026-05-18 20:57:22
-分析范围: 2026-05-18T17:19:59+08:00 至 2026-05-18T20:57:22+08:00
+生成时间: 2026-05-19T08:05:32+08:00
+分析范围: 2026-05-18T22:46:30+08:00 至 2026-05-19T08:03:55+08:00
 
 ## 统计摘要
 
-- 分析日志数: 5
+- 分析日志数: 8
 - Agent 类型分布:
-  - dev: 1 任务（avgSteps 69, successRate 100%, totalErrors 0, Shell 34 次）
-  - review: 2 任务（avgSteps 0, successRate 0%, totalErrors 0, totalWrites 0）
-  - rework: 2 任务（avgSteps 32, successRate 100%, totalErrors 1, ReadFile 32 次）
+  - review: 3 个任务
+  - rework: 5 个任务
+- 趋势变化 (与上期对比):
+  - avgStepsDelta: -21.75
+  - errorRateDelta: -1.75
+  - successRateDelta: -0.375
 
 ## 问题诊断
 
-### 问题 1: review agent 完全零执行（successRate 0%, avgSteps 0）
+### 问题 1: rework 任务零产出（successRate 0%）
 
-**证据**: review 执行 2 次，avgSteps=0，totalToolCalls={}，totalWrites=0。与上次报告（avgSteps 5.75, successRate 25%）相比，情况**恶化**。
-
-**根因分析**:
-- 上次已强化 reviewer prompt 的零产出保护和 workflow 的 `AGENT_REVIEW_REPORT` 环境变量传递，但本次 review agent 连最基本的工具调用都没有，说明问题不在"agent 忘记写文件"，而在 **agent 根本没有启动或启动后立即崩溃**。
-- `workflows/review.yaml` 的 `runAgent` 步骤使用 tmux 模式运行 kimi，但**没有任何前置校验和后置诊断**确认 agent 是否真实执行。如果 agent 文件路径、prompt 路径或环境变量配置有误，agent 会静默失败。
-- `reviewer.md` 第 270 行仍有"如果失败，立即停止"表述，与后续"WriteFile"指令存在潜在的执行顺序歧义——agent 可能将"停止"理解为"结束任务"，从而跳过 WriteFile。
-
-**改进建议**:
-1. 在 `workflows/review.yaml` 的 `runAgent` 前增加 `validateAgentInputs` 步骤，校验 `agentFile` 和 `prompt` 文件存在性，提前暴露配置错误；在 `runAgent` 后增加 `diagnoseAgentRun` 步骤，检查日志是否存在、是否有工具调用痕迹，若 agent 完全未执行则生成默认失败报告，阻断零产出。（已修改 `workflows/review.yaml`）
-2. 在 `prompts/reviewer.md` 中将"如果失败，立即停止"改为"如果失败，禁止继续审查分析，必须立即执行 WriteFile"，彻底消除"停止即结束"的歧义；并在"快速开始"中新增第 6 步"强制写入"，要求无论前 5 步成败，第 6 步必须是 WriteFile。（已修改 `prompts/reviewer.md`）
-
-### 问题 2: dev agent 单任务全面预算失控（69 步 / 34 Shell / 16 Think）
-
-**证据**: dev 1 个任务 avgSteps=69（突破 60 步上限 15%），Shell=34（突破 25 次上限 36%），Think=16（突破 3 次上限 433%）。虽然 successRate=100%，但资源效率极差。
+**证据**: 5 个 rework 任务，avgSteps=1，totalWrites=0，successRate=0%。totalToolCalls 中 ReadFile 11 次、Shell 1 次，说明 agent 有少量文件读取活动，但未产生任何文件修改或写入。
 
 **根因分析**:
-- `prompts/developer.md` 虽在"铁律"中设定了 60 步 / 3 Think / 25 Shell 的上限，但 **agent 完全未内化这些约束**。16 次 think 表明 agent 将 think 当作了常规思考工具；34 次 Shell 表明 agent 仍在用 Shell 完成本可用 ReadFile/Grep 完成的操作。
-- 上次报告已将 dev Shell 预算设为 25 次，但本次单任务即突破到 34 次，说明 25 次的上限对当前 agent 模型的约束力不足。同理，3 次 Think 上限被突破到 16 次，完全失效。
-- 40 步预警未能阻止 69 步的失控，说明预警阈值太晚，agent 在 40 步时已完全失去预算感知。
+- developer.md 中 rework 模式虽要求启动确认和强制产出，但 agent 未执行 WriteFile 即终止。统计表明 agent 在极早阶段（平均 1 步）就以纯文本输出结束任务，未触发任何文件写入。
+- "必须有文件修改产出"的规则依赖 agent 自觉遵守，缺少更早的强制触发点；且"停止并报告"的表述易被 agent 误解为纯文本输出即可。
 
 **改进建议**:
-1. 将 `prompts/developer.md` 的 Think 上限从 3 次收紧至 2 次（第 3 次触发熔断），并增加"Think 滥用快速自检"：每次 think 前必须在思考中回答"是否涉及 3 个以上文件协调或复杂架构决策？如否，此为滥用，必须跳过 think 直接执行"。（已修改 `prompts/developer.md`）
-2. 将 dev 模式 Shell 预算从 25 次收紧至 20 次，并新增"Shell 使用审批"机制：超过 15 次后，每次 Shell 必须在思考中说明"为什么当前操作不能用 ReadFile/Grep/StrReplaceFile 替代"。（已修改 `prompts/developer.md`）
-3. 将"40 步预警"提前至"35 步预警"，因为在 69 步的失控案例中，40 步时 agent 已完全失去预算感知，需要更早的强制干预；同时更新所有预算引用数字以匹配新限制。（已修改 `prompts/developer.md`）
+1. 在 `prompts/developer.md` 中将 rework 启动确认（写 `logs/rework-start.txt`）明确为不可跳过的第 2 步，并增加"提前终止也必须 WriteFile"的铁律，同时规定 3 步内无写操作即触发熔断。（已修改）
+2. 在 `workflows/rework.yaml` 中增加 `diagnoseAgentRun` 步骤，检测日志中是否有 WriteFile/StrReplaceFile，零写操作时记录诊断信息，帮助定位 agent 提前终止根因。（已修改）
 
-### 问题 3: rework agent 错误率 50%（1/2 任务出错）
+### 问题 2: review 任务产出率过低（successRate 33.3%）
 
-**证据**: rework 2 次任务中有 1 次错误（50% 错误率），平均 32 步，Shell 调用总计 19 次（平均 9.5 次）。
+**证据**: 3 个 review 任务，avgSteps=7，totalToolCalls 中 ReadFile 35 次、Shell 11 次，但 totalWrites 仅 1 次，successRate=33.3%。agent 投入大量步数阅读文件，却只有 1 个任务产出了审查报告。
 
 **根因分析**:
-- rework 与 dev 共用 `prompts/developer.md`，而 developer.md 的"rework 常见错误快速诊断清单"虽已覆盖 StrReplaceFile / Shell / 超时等场景，但 **缺少"环境预检查"指引**。agent 可能在环境未就绪时执行命令，导致早期错误。
-- `workflows/rework.yaml` 的 `installDeps` 步骤使用 `|| true` 忽略错误，agent 可能误以为依赖已就绪，后续命令因环境缺失而失败。
-- 50% 的错误率意味着每 2 个任务就有 1 个遇到工具调用错误，而 rework 的累计错误熔断阈值原为 3 次，对于仅有 40 步预算的 rework 模式过于宽松，未能及时止损。
+- reviewer.md 已多次强调 WriteFile，但仍有 2/3 的任务未执行。说明 agent 在错误路径（gh 失败、PR 不存在等）或探索过程中以纯文本输出终止，绕过了强制写入约束。
+- workflow 的诊断步骤 `diagnoseAgentRun` 仅检查是否有工具调用，不检查是否有 WriteFile，导致"有活动但无产出"的任务未被兜底。
 
 **改进建议**:
-1. 在 `workflows/rework.yaml` 的 `installDeps` 后增加 `envReadinessCheck` 步骤：确认关键文件（AGENTS.md、reviewReport 等）存在，并将检查结果写入 `logs/rework-env-check.txt` 供 agent 读取，减少 agent 因环境假设错误导致的工具调用失败。（已修改 `workflows/rework.yaml`）
-2. 在 `prompts/developer.md` 的 rework 章节中，将"累计错误熔断"从 3 次强化为"累计 2 次错误即熔断"，因为 rework 预算仅 40 步，容错空间比 dev 更小。（已修改 `prompts/developer.md`）
+1. 在 `prompts/reviewer.md` 的"快速开始"和"执行约束"中增加"提前终止也必须 WriteFile"的明确规则，并将零产出熔断中的"空报告"要求升级为必须包含时间戳和当前状态的正式报告。（已修改）
+2. 在 `workflows/review.yaml` 的 `diagnoseAgentRun` 中增加 `WRITE_COUNT` 检测，当 agent 有工具调用但无写操作时，生成默认失败报告并标注"可能因 prompt 约束提前终止且未执行强制写入"。（已修改）
+
+### 问题 3: 整体成功率趋势恶化（successRateDelta -0.375）
+
+**证据**: 趋势指标显示 successRateDelta=-0.375，avgStepsDelta=-21.75，errorRateDelta=-1.75。
+
+**根因分析**:
+- 步数大幅下降（-21.75）伴随成功率下降，说明 agent 倾向于在更早阶段终止任务，但终止方式不是 WriteFile，而是纯文本输出。这与 prompt 中"停止并报告"的表述被 agent 误解为"纯文本报告"有关。
+- errorRate 下降（-1.75）并非真正的改善，而是 agent 提前终止避免了后续错误，属于"以零产出换取零错误"的虚假改善。
+
+**改进建议**:
+1. 对所有 agent prompt 中的"停止并报告"类表述进行审计，统一替换为"停止并执行 WriteFile 写报告"。（本次已针对 review/developer 修改）
+2. 在 dashboard 统计中增加"纯文本终止率"指标，区分"工具调用后无 WriteFile"和"完全无工具调用"两种零产出模式，帮助更精准定位问题。（建议下次迭代评估）
 
 ## 已应用改进
 
-本次分析后直接修改了以下文件：
+1. **`prompts/developer.md`**:
+   - 强化 rework 模式启动确认：第 1 步读 review report，第 2 步必须 WriteFile 写 `logs/rework-start.txt`，禁止纯文本代替。
+   - 新增"3 步无写操作即熔断"规则：如果任务已执行 3 步仍未调用任何写操作，立即 WriteFile 写 `logs/rework-halted.md` 并结束。
+   - 强化"提前终止也必须 WriteFile"规则：任何停止方式都必须是 WriteFile。
 
-1. **`prompts/developer.md`** — 全面收紧预算约束与预警阈值
-   - Think 上限从 3 次收紧至 2 次（rework 保持 1 次），第 3 次触发熔断
-   - 增加"Think 滥用快速自检"：每次 think 前必须回答是否为复杂架构决策
-   - dev 模式 Shell 预算从 25 次收紧至 20 次，更新所有 SetTodoList 引用
-   - 新增"Shell 使用审批"机制：超过 15 次后必须说明不能用非 Shell 工具替代的理由
-   - "40 步预警"提前至"35 步预警"，更早强制进入收尾阶段
-   - rework 累计错误熔断从 3 次收紧至 2 次
-   - 更新所有统计数据引用（69 步、16 Think、34 Shell），以最新失控数据警示 agent
+2. **`prompts/reviewer.md`**:
+   - 在"快速开始"中新增第 7 步："提前终止也必须 WriteFile"。
+   - 在"执行约束"中升级零产出熔断要求：禁止以纯文本解释代替 WriteFile，报告必须包含时间戳和当前状态。
+   - 更新统计引用为当前 33% 成功率，强化警示。
 
-2. **`prompts/reviewer.md`** — 彻底消除零产出歧义
-   - 将"如果失败，立即停止，在第 2 步 WriteFile"改为"如果失败，禁止继续审查分析，必须立即执行 WriteFile"
-   - 在"快速开始"中新增第 6 步"强制写入"：无论前 5 步成败，第 6 步必须是 WriteFile
-   - 明确警示 avgSteps=0 的零产出任务是不可接受的
+3. **`workflows/review.yaml`**:
+   - `diagnoseAgentRun` 增加 `WRITE_COUNT` 检测（统计 WriteFile/StrReplaceFile 出现次数）。
+   - 当 `STEP_COUNT>0` 但 `WRITE_COUNT=0` 时，生成兜底失败报告，明确标注"agent 执行了工具调用但未产生 WriteFile/StrReplaceFile 输出"。
 
-3. **`workflows/review.yaml`** — 增加 agent 启动与执行诊断
-   - 新增 `validateAgentInputs` 步骤（`runAgent` 前）：校验 `agentFile` 和 `prompt` 文件存在性，配置错误时提前失败
-   - 新增 `diagnoseAgentRun` 步骤（`runAgent` 后）：检查日志文件是否存在、是否有工具调用痕迹；若 agent 未执行，自动生成默认失败报告到 `review-report-<pr>.md`，阻断零产出统计
-
-4. **`workflows/rework.yaml`** — 增加环境就绪检查
-   - 新增 `envReadinessCheck` 步骤（`installDeps` 后）：检查 AGENTS.md、Makefile、reviewReport 等关键文件存在性
-   - 将检查结果写入 `logs/rework-env-check.txt`，供 rework agent 启动时读取，减少因环境假设错误导致的工具调用失败
+4. **`workflows/rework.yaml`**:
+   - 在 `runAgent` 与 `checkAgentOutput` 之间新增 `diagnoseAgentRun` 步骤。
+   - 统计日志中的工具调用和写操作次数，写入 `logs/rework-diagnose.md`，为零产出任务提供诊断线索。
 
 ## 趋势追踪
 
-- **与上次对比**:
-  - review **恶化**（successRate 25% → 0%，avgSteps 5.75 → 0），从"低产出"恶化为"完全零执行"，是最紧急的回归问题。
-  - dev **成功率改善**（successRate 50% → 100%），但**效率恶化**（avgSteps 40 → 69，且单任务 Shell 34 次、Think 16 次），说明 agent 在有产出的同时完全无视了预算约束。
-  - rework **新增问题**（错误率 50%），此前无 rework 统计数据，本次首次暴露环境错误和容错阈值问题。
-  - 整体趋势数据（avgStepsDelta -1.18, errorRateDelta -2.36）主要受历史数据稀释，本次窗口内的实际表现并不乐观。
-
+- **与上次对比**: 恶化（successRateDelta=-0.375，rework 从低成功率跌至 0%，review 维持在 33.3%）
 - **建议下次重点关注**:
-  - review agent 的启动问题是否解决：successRate 是否从 0% 回升至 50% 以上，avgSteps 是否大于 0
-  - dev agent 的预算遵守情况：步数是否回归 60 以内，Shell 是否控制在 20 次以内，Think 是否在 2 次以内
-  - rework agent 的错误率是否从 50% 降至 20% 以下
+  - rework 任务在 prompt 修改后是否恢复产出（目标：successRate > 0%）
+  - review 任务的 WriteFile 执行率是否提升（目标：successRate > 50%）
+  - 新增 diagnose 文件是否揭示了 agent 提前终止的具体原因

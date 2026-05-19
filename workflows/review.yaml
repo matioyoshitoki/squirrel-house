@@ -50,8 +50,8 @@ steps:
         echo "❌ agentFile 未设置或不存在: {{ .Vars.agentFile }}"
         exit 1
       fi
-      if [ -z "{{ .Vars.prompt }}" ] || [ ! -f "{{ .Vars.prompt }}" ]; then
-        echo "❌ prompt 文件未设置或不存在: {{ .Vars.prompt }}"
+      if [ -z "{{ .Vars.prompt }}" ]; then
+        echo "❌ prompt 未设置"
         exit 1
       fi
       echo "✅ agent 启动参数校验通过"
@@ -75,6 +75,7 @@ steps:
       # AGENT_AGENTS_MD 由 dashboard 在 buildAgentContext 中自动设置，无需在此覆盖
     outputKey: agentOutput
     logFile: '{{ .Vars.logFileName }}'
+    ignoreError: true
 
   - id: diagnoseAgentRun
     label: 诊断 agent 是否真实执行
@@ -84,11 +85,13 @@ steps:
       LOG_FILE="{{ .Vars.logFileName }}"
       REPORT_FILE="{{ .Vars.tmpDir }}/logs/review-report-{{ .Vars.prNumber }}.md"
 
+      # 确保报告目录存在
+      mkdir -p "{{ .Vars.tmpDir }}/logs"
+
       # 检查日志文件是否存在且有内容
       if [ ! -f "$LOG_FILE" ] || [ ! -s "$LOG_FILE" ]; then
         echo "❌ review agent 日志为空或不存在，agent 可能未成功启动"
         # 生成默认失败报告，避免零产出
-        mkdir -p "{{ .Vars.tmpDir }}/logs"
         echo "## 审查结论" > "$REPORT_FILE"
         echo "" >> "$REPORT_FILE"
         echo "审查结论: FAIL" >> "$REPORT_FILE"
@@ -98,17 +101,20 @@ steps:
       else
         # 粗略统计工具调用次数（根据 kimi 日志特征）
         STEP_COUNT=$(grep -cE 'tool_call|ToolCall|tool_use|Using tool' "$LOG_FILE" 2>/dev/null || echo "0")
-        echo "✅ review agent 日志已生成，估计工具调用次数: $STEP_COUNT"
-        if [ "$STEP_COUNT" -eq 0 ]; then
-          echo "⚠️ 日志中未检测到工具调用，agent 可能未实际执行审查"
-          # 同样生成默认失败报告
-          mkdir -p "{{ .Vars.tmpDir }}/logs"
+        WRITE_COUNT=$(grep -cE 'WriteFile|StrReplaceFile' "$LOG_FILE" 2>/dev/null || echo "0")
+        echo "✅ review agent 日志已生成，估计工具调用次数: $STEP_COUNT, 写操作次数: $WRITE_COUNT"
+        if [ "$STEP_COUNT" -eq 0 ] || [ "$WRITE_COUNT" -eq 0 ]; then
+          echo "⚠️ 未检测到有效审查产出，生成默认失败报告"
           echo "## 审查结论" > "$REPORT_FILE"
           echo "" >> "$REPORT_FILE"
           echo "审查结论: FAIL" >> "$REPORT_FILE"
           echo "" >> "$REPORT_FILE"
           echo "## 失败原因" >> "$REPORT_FILE"
-          echo "agent 日志存在但未检测到工具调用，可能启动后未执行或执行异常。时间: $(date -Iseconds)" >> "$REPORT_FILE"
+          if [ "$STEP_COUNT" -eq 0 ]; then
+            echo "agent 日志存在但未检测到工具调用，可能启动后未执行或执行异常。时间: $(date -Iseconds)" >> "$REPORT_FILE"
+          else
+            echo "agent 执行了工具调用但未产生 WriteFile/StrReplaceFile 输出。可能因 prompt 约束提前终止且未执行强制写入。时间: $(date -Iseconds)" >> "$REPORT_FILE"
+          fi
         fi
       fi
     ignoreError: true

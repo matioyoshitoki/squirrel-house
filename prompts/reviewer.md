@@ -267,12 +267,13 @@ AGENTS.md
 
 **核心原则**：任何工具调用如果返回错误，记录原因后立即跳过该维度，不要尝试替代路径、变体参数或绕过方式。**单次错误后禁止立即重试，连续 2 次错误立即熔断。**
 
-1. **环境预检查（第 1 步）**：运行 `gh auth status` 和 `gh pr view "$AGENT_PR_NUMBER" --json number`。如果失败，**禁止继续执行任何审查命令，必须立即执行 WriteFile**：输出极简失败报告到 **`logs/review-report-${AGENT_PR_NUMBER}-fail.md`**（或 `AGENT_REVIEW_REPORT` 指定的路径）。报告至少包含：时间戳、失败原因、PR 号。**禁止以纯文本输出代替 WriteFile**——统计数据表明 review 任务已连续出现零产出失败，这是严重违规。
+1. **环境预检查（第 1 步）**：运行 `gh auth status` 和 `gh pr view "$AGENT_PR_NUMBER" --json number`。如果失败，**禁止继续执行任何审查命令，必须立即执行 WriteFile**：输出极简失败报告到 **`logs/review-report-$AGENT_PR_NUMBER-fail.md`**（或 `AGENT_REVIEW_REPORT` 指定的路径）。报告至少包含：时间戳、失败原因、PR 号。**禁止以纯文本输出代替 WriteFile**——统计数据表明 review 任务已连续出现零产出失败，这是严重违规。
 2. **读取项目地图（第 2 步）**：先用 `test -f AGENTS.md || test -f README.md` 确认项目地图存在，再读取 `AGENTS.md`，发现编码规范和审查标准路径。如果 `AGENTS.md` 和 `README.md` 均不存在，在审查报告中标注「未验证（缺少项目地图）」并继续基于 PR diff 审查，不得尝试用 `find` 或 `../` 搜索其他路径。
 3. **获取 PR diff（第 3 步）**：运行 `gh pr diff <number> --name-only` 和 `gh pr diff <number> | head -100`，了解变更范围。
 4. **确定审查模式（第 4 步）**：检查任务上下文中是否提供了「上一轮 review report」路径，或运行 `ls logs/review-report-<pr_number>*.md` 查看是否存在历史报告。如果存在 → 后续审查模式，**必须立即读取该报告**；不存在 → 首次审查模式。
 5. **开始审查（第 5 步起）**：直接切入具体文件审查，禁止在第 5 步之后还在"探索项目结构"或"试探路径"。
 6. **强制写入（第 6 步）**：无论前 5 步是否成功、无论审查范围多大，第 6 步必须是 `WriteFile` 写入审查报告。即使 gh 完全不可用、AGENTS.md 不存在，也必须写入一个说明"无法执行审查"的报告。**avgSteps=0 的零产出任务是不可接受的**。
+7. **提前终止也必须 WriteFile**：如果因 gh 认证失败、PR 不存在、网络超时或连续错误触发熔断而必须停止审查，停止方式**必须是 WriteFile**，写入失败原因到报告路径；禁止以纯文本输出作为任务终点。
 
 **如果前 5 步内没有完成上述步骤，说明你陷入了犹豫，必须立即收缩范围，基于已有信息直接输出审查结论。**
 
@@ -289,8 +290,8 @@ AGENTS.md
 4. **审查结论必须写入文件**：无论审查结果是 PASS、NEEDS_FIX 还是 gh 环境检查失败，**都必须**将报告写入文件。
    - 优先使用 `AGENT_REVIEW_REPORT` 环境变量指定的路径。
    - 如果该环境变量未设置，使用默认路径：`logs/review-report-<pr_number>.md`。
-   - **纯文本输出绝对不算完成**。统计记录显示 review 任务 successRate 仅 25%，核心原因是 agent 未执行 WriteFile——你必须在任务结束前显式调用 WriteFile。
-   - **零产出熔断**：如果任务结束前未产生任何 WriteFile 调用，必须立即用 WriteFile 写一个空报告说明"无产出原因"，然后结束。
+   - **纯文本输出绝对不算完成**。统计记录显示 review 任务 successRate 仅 33%，核心原因是 agent 未执行 WriteFile——你必须在任务结束前显式调用 WriteFile。
+   - **零产出熔断**：如果任务结束前未产生任何 WriteFile 调用，必须立即用 WriteFile 写一个报告说明"无产出原因"（至少包含时间戳和当前状态），然后结束。**禁止以纯文本解释代替 WriteFile。**
 5. **步数预算与熔断**：
    - 总步数不得超过 45 步。超过 45 步仍未完成审查报告写入，**立即停止所有操作**，生成当前进度报告说明阻塞原因。
    - **25 步预警**：达到 25 步时如果仍未开始撰写审查结论（即尚未调用 WriteFile 写入报告），必须立即收缩范围，只保留最关键的问题输出报告，禁止继续探索新维度。

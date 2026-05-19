@@ -293,8 +293,8 @@ func runServer(ln net.Listener) {
 		// 忽略后续信号，专心等待任务完成
 		signal.Ignore(syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
 
-		// 等待所有 running 任务完成（SIGINT/SIGTERM 超时更短：2 分钟）
-		waitForRunningTasksWithTimeout(2*time.Minute, 5*time.Second)
+		// 等待所有 running 任务完成（PM2 kill_timeout 为 5min，预留 1min 缓冲）
+		waitForRunningTasksWithTimeout(4*time.Minute, 5*time.Second)
 
 		log.Printf("👋 进程退出")
 		return

@@ -12,18 +12,18 @@ steps:
     dir: '{{ .Vars.tmpDir }}'
     command: |
       if [ -f "pnpm-lock.yaml" ] && [ ! -d "node_modules" ]; then
-        pnpm install || npm install || true
+        pnpm install || npm install
       elif [ -f "package-lock.json" ] && [ ! -d "node_modules" ]; then
-        npm install || true
+        npm install
       fi
       if [ -f "apps/mobile/pubspec.yaml" ]; then
-        (cd apps/mobile && flutter pub get) || true
+        cd apps/mobile && flutter pub get
       fi
       if [ -f "packages/design-system/pubspec.yaml" ]; then
-        (cd packages/design-system && flutter pub get) || true
+        cd packages/design-system && flutter pub get
       fi
       if [ -f "apps/phaser3/package.json" ] && [ ! -d "apps/phaser3/node_modules" ]; then
-        (cd apps/phaser3 && pnpm install || npm install) || true
+        cd apps/phaser3 && (pnpm install || npm install)
       fi
     ignoreError: true
 
@@ -85,6 +85,27 @@ steps:
       # AGENT_AGENTS_MD 由 dashboard 在 buildAgentContext 中自动设置，无需在此覆盖
     outputKey: agentOutput
     logFile: '{{ .Vars.logFileName }}'
+
+  - id: diagnoseAgentRun
+    label: 诊断 rework agent 执行状态
+    type: shell
+    dir: '{{ .Vars.tmpDir }}'
+    command: |
+      LOG_FILE="{{ .Vars.logFileName }}"
+      DIAGNOSE_FILE="logs/rework-diagnose.md"
+      mkdir -p logs
+
+      if [ -f "$LOG_FILE" ] && [ -s "$LOG_FILE" ]; then
+        STEP_COUNT=$(grep -cE 'tool_call|ToolCall|tool_use|Using tool' "$LOG_FILE" 2>/dev/null || echo "0")
+        WRITE_COUNT=$(grep -cE 'WriteFile|StrReplaceFile' "$LOG_FILE" 2>/dev/null || echo "0")
+        echo "rework agent 工具调用: $STEP_COUNT, 写操作: $WRITE_COUNT" > "$DIAGNOSE_FILE"
+        if [ "$WRITE_COUNT" -eq 0 ]; then
+          echo "⚠️ agent 未执行任何 WriteFile/StrReplaceFile，可能因 prompt 约束提前终止且未执行强制写入" >> "$DIAGNOSE_FILE"
+        fi
+      else
+        echo "❌ rework agent 日志为空或不存在" > "$DIAGNOSE_FILE"
+      fi
+    ignoreError: true
 
   - id: checkAgentOutput
     label: 检查 agent 是否有文件修改产出

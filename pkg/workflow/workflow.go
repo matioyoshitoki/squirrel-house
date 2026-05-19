@@ -330,18 +330,7 @@ func (e *Engine) runTmuxStep(ctx context.Context, step Step, dir, cmdStr, logFil
 	exitCodeFile := filepath.Join(os.TempDir(), fmt.Sprintf("nwops-exit-%s-%d", taskID, time.Now().UnixNano()))
 	defer os.Remove(exitCodeFile)
 
-	// 包装命令：输出同时写到日志文件，最后记录 exit code
-	wrappedCmd := cmdStr
-	if logFile != "" {
-		wrappedCmd = fmt.Sprintf("(%s) 2>&1 | tee -a %s; echo $? > %s", cmdStr, logFile, exitCodeFile)
-	} else {
-		wrappedCmd = fmt.Sprintf("(%s); echo $? > %s", cmdStr, exitCodeFile)
-	}
-
-	// 清理可能存在的同名 session
-	_ = exec.Command("tmux", "kill-session", "-t", sessionName).Run()
-
-	// 构建环境变量
+	// 构建环境变量（必须在包装命令之前，以便注入到命令中）
 	env := ensureToolPaths(os.Environ())
 	for k, v := range step.Env {
 		rv, _ := e.renderString(v)
@@ -354,6 +343,28 @@ func (e *Engine) runTmuxStep(ctx context.Context, step Step, dir, cmdStr, logFil
 			}
 		}
 	}
+
+	// tmux new-session 不会将父进程 Env 传递给 session 中的子进程
+	// 需要在命令前显式 export 环境变量
+	var envExports strings.Builder
+	for _, e := range env {
+		// 只导出以 AGENT_ 开头的环境变量，避免污染
+		if strings.Contains(e, "=") && strings.HasPrefix(strings.SplitN(e, "=", 2)[0], "AGENT_") {
+			envExports.WriteString(fmt.Sprintf("export %s; ", e))
+		}
+	}
+	log.Printf("[workflow] tmux env exports: %s", envExports.String())
+
+	// 包装命令：输出同时写到日志文件，最后记录 exit code
+	wrappedCmd := cmdStr
+	if logFile != "" {
+		wrappedCmd = fmt.Sprintf("%s(%s) 2>&1 | tee -a %s; echo $? > %s", envExports.String(), cmdStr, logFile, exitCodeFile)
+	} else {
+		wrappedCmd = fmt.Sprintf("%s(%s); echo $? > %s", envExports.String(), cmdStr, exitCodeFile)
+	}
+
+	// 清理可能存在的同名 session
+	_ = exec.Command("tmux", "kill-session", "-t", sessionName).Run()
 
 	// 如果命令太长，写入临时脚本文件执行（避免 tmux "command too long"）
 	execCmd := wrappedCmd
