@@ -155,24 +155,25 @@ func startReviewTask(prNumber int, branch string, projectName string) string {
 	}
 
 	go func() {
+		projectPath := getProjectPathByName(projectName)
 		tmpDir, _ := os.MkdirTemp("", fmt.Sprintf("review-pr-%d-*", prNumber))
-		if err := cleanWorktreeForBranch(getProjectPath(), branch); err != nil {
+		if err := cleanWorktreeForBranch(projectPath, branch); err != nil {
 			appendToFile(logFileName, []byte(fmt.Sprintf("\n❌ clean worktree failed: %v\n", err)))
 			updateTaskStatus(TaskTypeReview, prNumber, "failed")
 			return
 		}
 
 		fetchCmd := exec.Command("git", "fetch", "origin")
-		fetchCmd.Dir = getProjectPath()
+		fetchCmd.Dir = projectPath
 		fetchCmd.Run()
 
 		baseRef := fmt.Sprintf("origin/%s", branch)
 		worktreeCmd := fmt.Sprintf("git worktree add -B %s %s %s", branch, tmpDir, baseRef)
 		wtCmd := exec.Command("bash", "-c", worktreeCmd)
-		wtCmd.Dir = getProjectPath()
+		wtCmd.Dir = projectPath
 		wtCmd.Run()
 
-		platform := getPlatform(getProjectPath())
+		platform := getPlatform(projectPath)
 		if err := platform.AuthStatus(); err != nil {
 			appendToFile(logFileName, []byte(fmt.Sprintf("\n❌ %s CLI 未认证: %v\n", platform.CLIName(), err)))
 			updateTaskStatus(TaskTypeReview, prNumber, "failed")

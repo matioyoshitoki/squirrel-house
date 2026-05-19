@@ -172,8 +172,8 @@ var taskRegistry = map[TaskType]taskSpec{
 		OnFinished: func(t *Task) {
 			notifyDevTaskFinished(t.TargetID, t.TargetTitle, t.Status, "rework")
 			if t.Status == "success" && t.PRNumber > 0 {
-				clearReviewFailedState(t.PRNumber)
-				createNewPRComment(getProjectPath(), t.PRNumber, "## 修复完成\n\n已根据审查报告修复问题并推送代码，请重新 Review。\n\n---\n*由 Agent Control Center 自动生成*")
+				clearReviewFailedState(t.PRNumber, t.ProjectName)
+				createNewPRComment(getProjectPathByName(t.ProjectName), t.PRNumber, "## 修复完成\n\n已根据审查报告修复问题并推送代码，请重新 Review。\n\n---\n*由 Agent Control Center 自动生成*")
 			}
 		},
 		AfterSuccess: []HookConfig{

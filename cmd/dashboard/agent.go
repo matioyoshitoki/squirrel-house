@@ -212,6 +212,8 @@ func adaptPromptForPlatform(prompt string, platform Platform) string {
 		{"gh issue create", "glab issue create"},
 		{"gh issue view", "glab issue view"},
 		{"gh issue list", "glab issue list"},
+		// glab 不支持 --json，使用 -F json
+		{"--json number", "-F json"},
 		{"GitHub CLI", "GitLab CLI"},
 		{"GitHub Issue", "GitLab Issue"},
 		{"GitHub PR", "GitLab MR"},

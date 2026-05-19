@@ -708,8 +708,8 @@ func fallbackAgentContextPrompt(ctx map[string]string, issueNumber, prNumber int
 	return b.String()
 }
 
-func clearReviewFailedState(prNumber int) {
-	logsDir := getCurrentProjectLogsDir()
+func clearReviewFailedState(prNumber int, projectName string) {
+	logsDir := getProjectLogsDir(projectName)
 	stateFile := filepath.Join(logsDir, fmt.Sprintf("review-state-%d.json", prNumber))
 	os.Remove(stateFile)
 
