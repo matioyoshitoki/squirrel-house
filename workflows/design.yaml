@@ -19,16 +19,32 @@ steps:
     label: 校验 agent 启动参数
     type: shell
     command: |
-      if [ -z "{{ .Vars.agentFile }}" ] || [ ! -f "{{ .Vars.agentFile }}" ]; then
-        echo "❌ agentFile 未设置或不存在: {{ .Vars.agentFile }}"
+      AGENT_FILE={{ .Vars.agentFile | shellquote }}
+      PROMPT={{ .Vars.prompt | shellquote }}
+      if [ -z "$AGENT_FILE" ] || [ ! -f "$AGENT_FILE" ]; then
+        echo "❌ agentFile 未设置或不存在: $AGENT_FILE"
         exit 1
       fi
-      if [ -z "{{ .Vars.prompt }}" ]; then
+      if [ -z "$PROMPT" ]; then
         echo "❌ prompt 未设置"
         exit 1
       fi
       echo "✅ agent 启动参数校验通过"
     ignoreError: false
+
+  - id: checkProjectMap
+    label: 检查项目地图存在性
+    type: shell
+    dir: '{{ .Vars.tmpDir }}'
+    command: |
+      mkdir -p logs
+      if [ -f "AGENTS.md" ] || [ -f "README.md" ]; then
+        echo "✅ 项目地图存在"
+      else
+        echo "⚠️ project_map_missing: true（AGENTS.md 和 README.md 均不存在）" >> "logs/design-diagnose-{{ .Vars.issueNumber }}.md"
+        echo "⚠️ 未找到项目地图，agent 可能无法定位设计规范"
+      fi
+    ignoreError: true
 
   - id: runAgent
     label: 运行 ui-designer agent
@@ -90,30 +106,30 @@ steps:
       PROJECT_PATH="{{ .Vars.projectPath }}"
       if [ -f "$PROJECT_PATH/pubspec.yaml" ]; then
         DART_PKG=$(grep -m1 '^name:' "$PROJECT_PATH/pubspec.yaml" | sed 's/name:\s*//')
-        cat > "$PREVIEW_BUILD_DIR/pubspec.yaml" <<PUBSPEC
-        name: flutter_preview_generic
-        description: "Flutter preview"
-        publish_to: 'none'
-        version: 1.0.0+1
-
-        environment:
-          sdk: '>=3.4.0 <4.0.0'
-
-        dependencies:
-          flutter:
-            sdk: flutter
-          cupertino_icons: ^1.0.8
-          $DART_PKG:
-            path: $PROJECT_PATH
-
-        dev_dependencies:
-          flutter_test:
-            sdk: flutter
-          flutter_lints: ^5.0.0
-
-        flutter:
-          uses-material-design: true
-        PUBSPEC
+        printf '%s\n' \
+          'name: flutter_preview_generic' \
+          'description: "Flutter preview"' \
+          "publish_to: 'none'" \
+          'version: 1.0.0+1' \
+          '' \
+          'environment:' \
+          "  sdk: '>=3.4.0 <4.0.0'" \
+          '' \
+          'dependencies:' \
+          '  flutter:' \
+          '    sdk: flutter' \
+          '  cupertino_icons: ^1.0.8' \
+          "  $DART_PKG:" \
+          "    path: $PROJECT_PATH" \
+          '' \
+          'dev_dependencies:' \
+          '  flutter_test:' \
+          '    sdk: flutter' \
+          '  flutter_lints: ^5.0.0' \
+          '' \
+          'flutter:' \
+          '  uses-material-design: true' \
+          > "$PREVIEW_BUILD_DIR/pubspec.yaml"
       fi
 
       # ========== Flutter 项目预览 ==========

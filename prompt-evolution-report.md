@@ -1,50 +1,74 @@
 # Prompt 演进报告 — type-one
 
-生成时间: 2026-05-20T11:01:37+08:00
-分析范围: 2026-05-20T09:51:59 到 2026-05-20T10:57:55
+生成时间: 2026-05-20T15:23:53+08:00
+分析范围: 2026-05-20T10:57:55 到 2026-05-20T15:23:53
 
 ## 统计摘要
 
-- 分析日志数: 10
-- Agent 类型分布: review 5, rework 5
+- 分析日志数: 4
+- Agent 类型分布: design × 4
 
 ## 问题诊断
 
-### 问题 1: rework 高工具调用错误率
+### 问题 1: design agent 步数与 Think 调用严重超标
 
-**证据**: rework 任务共 5 个，其中 2 个任务出现错误（40% 任务错误率），累计 4 个工具调用错误。平均每个任务 0.8 个错误，已接近 developer.md 规定的 rework 错误上限（2 次）。对比 review agent 的 5 任务 3 错误，rework 的单位任务错误密度显著更高。
+**证据**:
+- avgSteps=44.5，最高 79 步，已超过 prompt 中 60 步的硬上限（超标 31%）
+- 平均 think 10.8 次/任务，超过 3 次限制 260%
+- avgStepsDelta +22.5，步数趋势显著恶化（较上期增加 22.5 步）
+- successRateDelta -0.25，有产出任务比例下降
 
-**根因分析**: developer.md 中虽已包含 rework 专属错误 SOP（第 0 步错误预判、常见错误处理），但存在三个缺口：
-1. **SetTodoList 计数器缺失错误维度**——agent 对错误预算缺乏显性跟踪，容易在不知不觉中触及熔断线；
-2. **缺少系统化的"错误前预防"机制**——agent 常在未确认文件存在性时直接执行 `ReadFile`/`StrReplaceFile`，或未检查命令可用性就执行 `Shell`；
-3. **常见错误 SOP 未按错误类型强制要求诊断步骤**——agent 可能在遇到路径错误时仍尝试替代路径，而非按规则直接跳过。
-
-**改进建议**:
-1. 在 `prompts/developer.md` 的 SetTodoList 中增加"错误"计数器，并在强制报数格式中同步体现；同时在"确认环境"步骤增加 `test -f "$AGENT_REVIEW_REPORT"` 的硬性预检要求。（涉及文件: `prompts/developer.md`）
-2. 扩展 `developer.md` 的 rework 常见错误 SOP，按"路径类/StrReplaceFile/Shell/git"四类错误分别规定强制诊断步骤，明确"命令执行前存在性检查"为前置动作。（涉及文件: `prompts/developer.md`）
-3. 在 `workflows/rework.yaml` 的 envReadinessCheck 中增加 review report 内容非空检查（< 50 字节视为异常），提前拦截空报告导致的 agent 困惑。（涉及文件: `workflows/rework.yaml`）
-
-### 问题 2: review Shell 调用密度偏高且逼近预算上限
-
-**证据**: review 任务平均 Shell 调用 15.6 次/任务（78/5），已触及 reviewer.md 规定的 15 次 Shell 上限。avgSteps=25.4，虽在合理范围，但 Shell 密度高意味着 agent 在用命令行做大量本可用 ReadFile/Grep 完成的工作。
-
-**根因分析**: reviewer.md 虽有"将 diff 内容写入临时文件"的要求，但缺乏对"diff 获取后禁止再用 Shell 过滤/浏览"的明确约束。agent 可能在获取 diff 后反复使用 `grep`、`head`、`cat` 等 Shell 命令处理输出，而非将 diff 保存后用 ReadFile/Grep 工具处理。
+**根因分析**:
+prompt 中的效率约束使用了"绝对不超过""严禁"等措辞，但缺乏 LLM 可实际感知的计数机制和强制性后果描述。agent 将约束视为"建议"而非"熔断规则"，导致在 40 步预警后仍继续探索，think 被当作"免费分析时间"反复使用。此外，60 步上限与 40 步预警之间的缓冲太大，agent 在 40 步时认为"还有 20 步预算"而继续执行非收尾操作。
 
 **改进建议**:
-1. 在 `prompts/reviewer.md` 的"Shell 命令输出硬限制"条款后，增加一条"diff 处理规范"：获取 `gh pr diff` 后必须立即写入临时文件，后续所有对 diff 内容的引用必须通过 `ReadFile` 或 `Grep` 完成，禁止再用 Shell 过滤 diff。（涉及文件: `prompts/reviewer.md`）
+1. **重写效率约束为不可违反的熔断规则**：将措辞从"绝对不超过"改为"如果超过 X，唯一允许的动作是立即输出报告并结束"。在 `prompts/ui-designer.md` 的效率约束章节，增加"超限即终止"条款，禁止任何"再确认一下""再试一次"的辩解行为。（涉及文件: `prompts/ui-designer.md`）
+2. **增加实时自监控清单**：要求 agent 每次工具调用后必须通过 `SetTodoList` 更新四项计数器（步数/Think/Shell/错误），使预算消耗显性化。将计数器从 prompt 的"建议包含"提升为"必须包含且实时更新"。（涉及文件: `prompts/ui-designer.md`）
+3. **收紧收尾触发点**：将 40 步预警改为 35 步"强制收尾"，且明确收尾阶段只允许 WriteFile 已有计划和 git 操作，禁止 ReadFile/Grep/Shell 等任何新探索。（涉及文件: `prompts/ui-designer.md`）
+
+### 问题 2: design agent 错误率过高且 Shell 预算严重透支
+
+**证据**:
+- totalErrors=20，平均 5 次错误/任务，errorRateDelta +4.3（趋势恶化）
+- Shell 调用 126 次，平均 31.5 次/任务，超过 20 次限制 57%
+- topGitOp 为 `status`，说明大量 git 操作消耗了 Shell 预算
+
+**根因分析**:
+prompt 虽然规定了"累计 5 次错误立即停止"，但未明确禁止"重试"行为，agent 可能在同一类操作上反复失败（如读取不存在的路径、执行错误的命令）。Shell 预算超限的直接原因是 agent 未将 git status、ls、test、grep 等操作计入"Shell 预算"，或认为小命令"不耗预算"。错误预判条款虽有列举，但放在 prompt 末尾，agent 启动时未形成肌肉记忆。
+
+**改进建议**:
+1. **增加"禁止重试"硬性规则**：在 `prompts/ui-designer.md` 中明确"同一目标的操作失败后，禁止换参数、换路径重试。必须记录错误、跳过该目标、继续下一任务"。将错误上限从"5 次熔断"细化为"3 次预警+收尾，5 次立即终止"。（涉及文件: `prompts/ui-designer.md`）
+2. **缩减设计探索预算并增加早期产出压力**：将"设计探索预算"从 10 步缩减至 6 步；增加"启动后 12 步内必须完成第一个 WriteFile"的硬性要求，防止 agent 在前 20 步只做阅读和分析而不产出。（涉及文件: `prompts/ui-designer.md`）
+3. **在 workflow 中前置环境校验**：在 `workflows/design.yaml` 的 `runAgent` 之前增加一个轻量环境检查步骤，确认 `AGENTS.md` 或 `README.md` 至少存在一个，避免 agent 因找不到项目地图而在前 5 步就产生多次错误。（涉及文件: `workflows/design.yaml`）
+
+### 问题 3: 视觉自查与核心设计产出的步骤竞争
+
+**证据**:
+- 视觉自查触发条件为"当前步数 ≤ 35"，但平均步数已达 44.5，说明大量任务要么跳过自查、要么在步骤极度紧张时触发自查
+- 单个任务最多调用 `preview_flutter_widget` 3 次，每次调用含编译和截图，可能消耗 5-10 步
+
+**根因分析**:
+视觉自查的触发步数（35）与平均步数（44.5）过于接近，导致自查与核心设计产出争夺步骤预算。agent 为了"满足自查要求"可能在 35 步前匆忙产出不完整的 Widget，反而降低设计质量。
+
+**改进建议**:
+1. **提前视觉自查的触发窗口**：将触发条件从"当前步数 ≤ 35"收紧为"当前步数 ≤ 25，且核心资产已全部 WriteFile 完成"。如果 25 步时核心资产未完成，自动放弃自查，优先保证资产完整。（涉及文件: `prompts/ui-designer.md`）
+2. **减少截图验证次数**：将"最多 3 次"缩减为"最多 1 次（默认状态）+ 1 次重试"，释放步骤预算给核心设计工作。（涉及文件: `prompts/ui-designer.md`）
 
 ## 已应用改进
 
-### 1. `prompts/developer.md` — 强化 rework 错误预防机制
-- **SetTodoList 计数器扩展**: 将初始计数器从三项扩展为四项，增加 `"错误: 0/5（rework 0/2）"`，使 agent 对错误预算有显性感知。
-- **环境确认增加预检**: 在"确认环境"步骤中，明确要求 rework 模式下额外执行 `test -f "$AGENT_REVIEW_REPORT"`，确保 review report 存在且可访问后再读取。
-- **rework 启动确认增加路径验证**: 将原来的"第 1 步 ReadFile"改为"第 1 步先确认路径存在，第 2 步 ReadFile，第 3 步 WriteFile"，避免在文件不存在时直接 ReadFile 导致错误。
-- **常见错误 SOP 结构化扩展**: 按错误类型（路径类、StrReplaceFile、Shell command not found、Shell 超时/非零、git commit hook）分别规定强制诊断步骤，并增加"命令执行前存在性检查"要求。
+### 1. `prompts/ui-designer.md` — 强化效率约束与错误预防
+- **更新统计数据锚点**：将步数引用从"平均 20 步"更新为"平均 45 步，最高 79 步"，Think 引用从隐性提示改为"当前实际平均 10.8 次，严重违反限制"，Shell 引用增加"当前实际平均 31.5 次"，用真实数据增强 agent 的紧迫感。
+- **增加实时计数器要求**：在 SetTodoList 中明确要求包含四项计数器"步数: 0/60""Think: 0/3""Shell: 0/20""错误: 0/5"，且每次工具调用后必须更新，使预算显性化。
+- **细化错误熔断机制**：将原来"5 次立即停止"细化为"3 次错误进入只读/收尾模式，5 次立即终止"。增加"禁止重试"条款：同一操作失败后不得换参数重试。
+- **缩短探索预算与增加早期产出压力**：设计探索预算从 10 步缩减到 6 步；新增"启动后 12 步内必须完成第一个 WriteFile"的硬性约束。
+- **收紧收尾与自查窗口**：40 步预警改为 35 步强制收尾；视觉自查触发条件从 ≤35 改为 ≤25，且仅当核心资产已完成。
+- **加密进度检查点**：进度自评从"每 10 步"加密到"每 5 步"。
+- **强化超限后果描述**：所有上限约束均增加"超过后唯一动作是输出报告并结束，不得继续任何工具调用"的强制表述。
 
-### 2. `workflows/rework.yaml` — 增加 review report 非空检查
-- 在 `envReadinessCheck` 步骤中，当 review report 存在时，额外检查其字节数是否小于 50 字节。若过短，在环境检查日志中标记 `review_report_empty: true`，供 agent 和人类快速识别空报告场景。
+### 2. `workflows/design.yaml` — 增加前置文件存在性检查
+- 在 `validateAgentInputs` 步骤之后、`runAgent` 之前，新增 `checkProjectMap` 步骤，用 `test -f AGENTS.md || test -f README.md` 确认项目地图至少存在一份。若不存在，在诊断日志中标记 `project_map_missing: true`，帮助人类快速定位"无头苍蝇"式探索的根因。
 
 ## 趋势追踪
 
-- 与上次对比: avgSteps 下降 18.25 步，errorRate 下降 0.8，整体呈改善趋势。successRate 维持 100%，零产出问题已得到控制。
-- 建议下次重点关注: **rework agent 的错误类型分布**。当前统计仅知 rework 有 4 个错误，但缺少具体错误分类（路径类、StrReplaceFile、Shell、网络等）。建议在日志采集侧增加错误类型标签，以便 prompt-evolution agent 做更精准的根因定位。
+- 与上次对比: 上期（review/rework）avgSteps 下降 18.25 步，errorRate 下降 0.8，呈改善趋势；本期（design）avgSteps 上升 22.5 步，errorRate 上升 4.3，successRate 下降 0.25，design agent 表现显著恶化，成为当前最大瓶颈。
+- 建议下次重点关注: **design agent 的步数与错误分布**。当前仅知 design 有 20 个错误，但缺少具体错误分类（路径类、StrReplaceFile、Shell、编译等）。建议在日志采集侧增加错误类型标签，以便下次演进时做更精准的根因定位。同时观察本次 prompt 收紧后，avgSteps 和 errorRate 是否能在下一轮统计中回落。
