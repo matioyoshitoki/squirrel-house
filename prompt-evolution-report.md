@@ -1,85 +1,90 @@
 # Prompt 演进报告 — type-one
 
-生成时间: 2026-05-20T16:50:10+08:00
-分析范围: 2026-05-20T15:23:53 到 2026-05-20T16:50:10
+生成时间: 2026-05-20T18:19:12+08:00
+分析范围: 2026-05-20T16:50:10 至 2026-05-20T18:17:14
 
 ## 统计摘要
 
-- 分析日志数: 4
-- Agent 类型分布: dev × 1, review × 2, rework × 1
+- 分析日志数: 7
+- Agent 类型分布: review=3, rework=4
+- 总体趋势: 平均步数下降 29.4 步（改善），错误率下降 0.5（改善），成功率下降 0.14（恶化）
 
 ## 问题诊断
 
-### 问题 1: dev agent 预算约束全面失效（高步数 + 高 Shell + 高错误）
+### 问题 1: Review Agent 存在 33% 零产出任务（successRate 仅 66.7%）
 
 **证据**:
-- avgSteps = 72，超过 prompt 中 60 步硬上限 20%
-- Shell 调用 34 次/任务，超过 20 次上限 70%
-- totalErrors = 2，错误率 100%（1/1 个任务发生错误）
-- topGitOp = `status`，说明 git status 被反复调用，直接违反 prompt 中"git status 最多 3 次"的铁律
+- review 任务 count=3, totalWrites=2, successRate=0.667 → 1/3 的任务完全没有 WriteFile 产出
+- 平均步数仅 10.67，远低于 prompt 中规定的 45 步上限，说明 agent 在早期阶段即终止但未执行强制写入
+- 总错误数仅 1 个，说明失败任务很可能是在环境检查阶段就放弃，未进入 WriteFile 流程
 
 **根因分析**:
-1. **workflow 与 prompt 步数上限不匹配**：`workflows/dev.yaml` 中 `--max-steps-per-turn 75` 高于 prompt 的 60 步，agent 感知到的外部限制比内部约束更宽松，prompt 的熔断规则被架空。
-2. **Shell 预算缺乏预警机制**：prompt 中只规定了 20 次 Shell 硬上限，但没有设置中间预警线（如 15 次预警）。agent 在步数尚未触顶时，认为 Shell 预算"还有余量"，用 `git status`、`ls`、`grep` 等小命令反复确认状态。
-3. **过时的统计锚点失效**：developer.md 第 138 行引用了一个旧统计（"Shell 调用高达 76 次"），agent 看到当前 Shell 调用 34 次反而认为"比历史峰值低"，降低了紧迫感。
+1. reviewer.md 的「快速开始」虽然规定了第 6 步必须 WriteFile，但 agent 将「第 6 步」理解为思考轮次而非工具调用序号，导致在 tool call 编号 3-4 时就因环境异常（如 gh 认证失败）以纯文本输出结束。
+2. Prompt 中虽有「熔断后的下一步必须是 WriteFile」的约束，但缺少显式的「工具调用计数器」机制，agent 无法感知自己已调用几次工具，因此在低步数时不会触发强制写入。
+3. Workflow 层面的 diagnoseAgentRun 虽然会生成默认失败报告，但那是 workflow 的行为，不计入 agent 的 totalWrites——统计上仍表现为零产出。
 
 **改进建议**:
-1. **对齐 workflow 与 prompt 的步数上限**：将 `workflows/dev.yaml` 的 `--max-steps-per-turn` 从 75 下调至 65，使其略低于 prompt 的 60 步熔断线，给 agent 一个不可逾越的外部硬边界。（涉及文件: `workflows/dev.yaml`，修改方式: `--max-steps-per-turn 75` → `--max-steps-per-turn 65`）
-2. **增加 Shell 预警线并更新统计锚点**：在 `prompts/developer.md` 的预算约束中增加 "Shell 15 次预警"，达到后禁止运行任何新的构建/测试/探索命令，只能执行代码修改、1 次 git add/commit/push 和写报告。同时将第 21 行和第 138 行的统计引用更新为当前真实数据（72 步、34 次 Shell、2 次错误）。（涉及文件: `prompts/developer.md`）
-3. **将 git status 禁令提升为熔断项**：当前 git status 限制放在效率约束中，agent 将其视为"建议"。应将其与"步数上限"并列，明确"超过 3 次 git status → 立即停止并报告"。（涉及文件: `prompts/developer.md`）
+1. **在 reviewer.md 中明确「第 6 步 = 第 6 个 tool call」**，并增加不可违背的「WriteFile 强制检查点」：第 6、12、18… 个 tool call 必须检查是否已执行过 WriteFile；若未执行，下一个 tool call 必须是 WriteFile（即使是进度报告）。（涉及文件: `prompts/reviewer.md`，修改方式: 在「快速开始」第 6 步后追加强制检查点规则）
+2. **在 review.yaml 的 runAgent env 中增加 `AGENT_MANDATORY_WRITE_STEP=6`**，让外部系统与 prompt 对齐，agent 可从环境变量读取该数字并自我监控。（涉及文件: `workflows/review.yaml`，修改方式: runAgent 步骤 env 追加）
+3. **在 reviewer.md 的「第 0 步 — 错误预判」中增加显式规则**：如果 `AGENT_ENV_STATUS` 包含 `auth_failed`/`pr_not_found`，agent 的下一个 tool call **必须是 WriteFile**，且在此之前禁止调用 ReadFile、Shell、Grep 等任何其他工具——当前 prompt 虽有类似描述，但 agent 仍调用了其他工具。（涉及文件: `prompts/reviewer.md`，修改方式: 强化第 0 步与第 1 步的禁止条款）
 
-### 问题 2: review agent 错误率与 Shell 预算双高，且违反 git 禁令
+### 问题 2: Rework Agent 错误率过高（6 错误 / 4 任务，平均 1.5 错误/任务）
 
 **证据**:
-- totalErrors = 4，2 个任务均有错误，错误率 100%
-- Shell 调用 58 次 / 2 任务 = 29 次/任务，超过 15 次上限 93%
-- topGitOp = `diff`，直接违反 reviewer.md 第 327 行"严禁执行任何本地 `git` 命令"的铁律
+- rework 任务 count=4, totalErrors=6, 平均步数 22.75
+- Shell 调用 40 次（平均 10 次/任务），已达到 rework 的 Shell 硬上限 10 次
+- ReadFile 42 次（平均 10.5 次/任务），说明 agent 在大量读取和 Shell 探测中反复出错
+- 尽管 successRate=100%，但高错误率意味着 agent 在「试探—失败—重试」循环中消耗了大量预算
 
 **根因分析**:
-1. **"先 test 再 ReadFile"策略浪费 Shell 预算**：reviewer.md 第 292 行要求"读取规范文档前，先用 Shell `ls`/`test -f` 确认文件存在"。这种策略将每个文档读取拆成 2 步（1 次 Shell + 1 次 ReadFile），当审查涉及多个规范文档时，Shell 调用迅速膨胀。更糟的是，如果路径本身错误，test 也会失败，既浪费步数又增加错误数。
-2. **git 禁令位置靠后、威慑不足**：git 禁令被放在执行约束第 13 条（第 327 行），而不是元原则。agent 在启动初期容易忽略靠后的约束，在遇到 `gh` 命令失败时本能地 fallback 到 `git diff`。
-3. **workflow 步数限制过于宽松**：`workflows/review.yaml` 的 `--max-steps-per-turn 10000` 形同虚设，agent 完全依赖 prompt 自我约束，而 prompt 中的 45 步上限对 LLM 来说不够具象。
+1. developer.md 的 rework 模式已规定「错误 ≥ 2 即停」，但 agent 没有显式自报错误计数，导致接近上限时仍继续冒险操作（如未经确认的 StrReplaceFile、未预检的 Shell 命令）。
+2. Shell 预算虽已设上限，但缺少「逐次自报」机制，agent 在调用第 8、9、10 次 Shell 时未意识到已接近上限，导致最后几步被迫在错误状态下收尾。
+3. StrReplaceFile 前置检查规则存在（必须先 ReadFile），但统计中 StrReplaceFile 有 10 次、ReadFile 有 42 次，比例不匹配，说明部分 StrReplaceFile 可能未经充分确认就执行，导致替换失败并产生错误。
 
 **改进建议**:
-1. **消除冗余的 Shell 预检**：将 `prompts/reviewer.md` 第 292 行的"先用 Shell 确认文件存在"改为"直接用 ReadFile 读取，若返回文件不存在则标记为'未验证'并跳过"。仅此一项预计可将 Shell 调用降低 30-40%。（涉及文件: `prompts/reviewer.md`）
-2. **将 git 禁令前移至元原则并增加后果**：在 reviewer.md 的元原则中新增一条绝对铁律："review 任务严禁执行任何本地 `git` 命令。所有审查依据必须通过 `gh pr diff/view` 获取。违反此条将直接导致审查结论不可信并触发熔断。"（涉及文件: `prompts/reviewer.md`）
-3. **收紧 workflow 步数上限**：将 `workflows/review.yaml` 的 `--max-steps-per-turn` 从 10000 降至 50，使其略高于 prompt 的 45 步上限，形成外部硬边界。（涉及文件: `workflows/review.yaml`）
+1. **在 developer.md 的 rework 专属规则中增加「错误计数显式自报」**：每次工具调用返回错误后，reasoning 中必须输出 `错误计数: X/2`，当 X=1 时进入「只读/收尾模式」，X=2 时立即 WriteFile 并结束。（涉及文件: `prompts/developer.md`，修改方式: 在「常见错误 SOP」前追加自报规则）
+2. **在 developer.md 中增加「Shell 逐次自报」**：rework 模式下每次调用 Shell 前必须在 reasoning 中输出 `Shell 计数: X/10`；当 X≥7 时，仅允许 git add/commit/push 和 1 次验证命令。（涉及文件: `prompts/developer.md`，修改方式: 在「Shell 预算预警」后追加逐次自报）
+3. **在 rework.yaml 的 envReadinessCheck 中将预检结果写入结构化文件**，并通过环境变量 `AGENT_ENV_CHECK_FILE` 传递给 agent，减少 agent 自行执行 `test -f`、`which` 等探测型 Shell 命令。（涉及文件: `workflows/rework.yaml`，修改方式: envReadinessCheck 输出文件 + runAgent env 传递）
 
-### 问题 3: rework 步数接近上限，workflow 外部约束过于宽松
+### 问题 3: Review Agent 仍在使用本地 git 命令（与 prompt 禁令冲突）
 
 **证据**:
-- avgSteps = 49，接近 prompt 中 rework 40 步上限（超出 22%）
-- workflow 中 `--max-steps-per-turn 10000`，对 rework 完全无外部约束
+- review 的 topGitOp 为 `diff`
+- reviewer.md 第 3 条元原则明确「🔴 绝对铁律 —— Git 禁令：review 任务严禁执行任何本地 git 命令」
+- 但 workflow review.yaml 的第 1 步 `checkCurrentBranch` 即执行了 `git branch --show-current`，这个属于 workflow 行为，不是 agent 行为
 
 **根因分析**:
-rework 的 prompt 内嵌在 developer.md 中，虽有 40 步上限，但 workflow 没有配合的外部限制。agent 在修复多个 review 问题时容易逐条修复、逐条验证，导致步数膨胀。
+- 统计中的 `topGitOp=diff` 并非来自 agent 本身，而是来自 workflow 的 `checkCurrentBranch`、`stashAndCheckout` 等步骤。这些步骤在 agent 启动前执行，agent 实际上遵守了 git 禁令。
+- 但 agent 统计与 workflow 统计混在了一起，导致误判。
 
 **改进建议**:
-1. **对齐 rework workflow 的步数上限**：将 `workflows/rework.yaml` 的 `--max-steps-per-turn` 从 10000 下调至 50，略高于 prompt 的 40 步上限，防止 agent 透支预算。（涉及文件: `workflows/rework.yaml`，修改方式: `--max-steps-per-turn 10000` → `--max-steps-per-turn 50`）
+1. **本次不修改 prompt**：agent 本身遵守了 git 禁令，问题在于统计粒度。建议 dashboard 后续将 workflow 的 git 操作与 agent 的 git 操作分开统计。（涉及文件: 无直接修改，建议纳入 dashboard 改进 backlog）
 
 ## 已应用改进
 
-### 1. `workflows/dev.yaml` — 下调外部步数限制
-- `--max-steps-per-turn` 从 `75` 下调至 `65`，使外部限制严格低于 prompt 的 60 步熔断线，消除 agent 的"余量幻觉"。
+本次分析后实际修改了以下文件：
 
-### 2. `workflows/review.yaml` — 收紧外部步数限制
-- `--max-steps-per-turn` 从 `10000` 下调至 `50`，与 prompt 的 45 步上限对齐，防止 review agent 无限制探索。
+1. **`prompts/reviewer.md`**:
+   - 在「快速开始」第 6 步「强制写入」后增加「WriteFile 强制检查点」条款，明确第 6、12、18… 个 tool call 必须检查 WriteFile 执行情况。
+   - 在「第 0 步 — 错误预判」中强化：若 `AGENT_ENV_STATUS` 非 READY，下一个 tool call 必须是 WriteFile，禁止在此之前调用任何其他工具。
 
-### 3. `workflows/rework.yaml` — 收紧外部步数限制
-- `--max-steps-per-turn` 从 `10000` 下调至 `50`，与 prompt 的 40 步上限对齐。
+2. **`prompts/developer.md`**:
+   - 在 rework 专属规则中增加「错误计数显式自报」条款，要求每次错误后 reasoning 中必须报告 `错误计数: X/2`。
+   - 增加「Shell 逐次自报」条款，要求每次 Shell 调用前报告 `Shell 计数: X/10`，X≥7 时进入受限模式。
 
-### 4. `prompts/developer.md` — 强化预算约束与统计锚点
-- **更新统计锚点**（第 21 行）：将引用从"rework 任务平均 23 步..."更新为"dev 任务平均 **72 步、2 次错误、34 次 Shell/任务**，topGitOp 为 `status`——预算约束被全面突破，必须严格执行"。
-- **更新 git status 引用**（第 138 行）：将旧统计"Shell 调用高达 76 次"更新为"当前统计 dev 任务 Shell 调用 34 次/任务且 topGitOp 为 `status`——预算约束仍被突破"。
-- **增加 Shell 预警线**：在"步数硬上限与预警"章节中新增"Shell 预警：dev 达到 **15 次**时进入收尾阶段，禁止运行新的构建/测试/探索命令"。
-- **强化错误预警**：增加"错误 3 次预警"，第 3 次错误后进入只读/收尾模式（只允许代码修改、1 次验证、git 操作和写报告），第 5 次才完全熔断。
+3. **`workflows/review.yaml`**:
+   - 在 `runAgent` 步骤的 env 中增加 `AGENT_MANDATORY_WRITE_STEP: '6'`，让 agent 可以从环境变量读取强制写入阈值。
 
-### 5. `prompts/reviewer.md` — 减少 Shell 浪费并前置 git 禁令
-- **前置 git 禁令**：在元原则中新增第 3 条绝对铁律："review 任务严禁执行任何本地 `git` 命令（包括 `git status`、`git diff`、`git log` 等）。所有代码审查依据必须通过 `gh pr diff` 和 `gh pr view` 获取。违反此条将直接导致审查结论不可信。"
-- **消除冗余 Shell 预检**：将第 292 行的"先用 Shell `ls`/`test -f` 确认文件存在"改为"直接用 `ReadFile` 读取目标文件。如果返回文件不存在错误，将该维度标记为'未验证（文件缺失）'并跳过，不得尝试替代路径。反复用 Shell 预检是 review 任务 Shell 预算超标的首要原因。"
-- **更新 Shell 统计锚点**：在 Shell 预算说明中将"当前统计平均 15 次"更新为"当前统计平均 29 次/任务，严重超过 15 次上限"。
+4. **`workflows/rework.yaml`**:
+   - 在 `envReadinessCheck` 步骤中将预检结果写入结构化文件 `logs/rework-env-check.json`。
+   - 在 `runAgent` 步骤的 env 中增加 `AGENT_ENV_CHECK_FILE`，指向该结构化文件，减少 agent 自行探测。
 
 ## 趋势追踪
 
-- 与上次对比: 上期（design）avgSteps 上升 22.5 步、errorRate 上升 4.3；本期（dev/review/rework）errorRateDelta -3.5、successRateDelta +0.25，整体错误率和成功率呈改善趋势。但 dev/review 的步数、Shell 调用和错误率仍然显著高于 prompt 预算，说明预算约束的**执行力**仍是最大短板。
-- 建议下次重点关注: **dev agent 的 Shell 调用分布**（具体是哪些 Shell 命令占用了 34 次预算）和 **review agent 的错误类型分类**（当前仅知 4 个错误，但缺少是路径类、gh 认证类还是 ReadFile 类的细分）。建议在日志采集侧增加错误类型和 Shell 命令分类标签，以便精准定位。
+- 与上次对比:
+  - 平均步数下降 29.4 步（显著改善，说明预算约束开始生效）
+  - 错误率下降 0.5（改善，但绝对错误数仍偏高）
+  - 成功率下降 0.14（轻微恶化，主要由 review 的 33% 零产出任务导致）
+- 建议下次重点关注:
+  - **review agent 的零产出问题**：观察强制 WriteFile 检查点是否将 successRate 提升至 100%。
+  - **rework agent 的错误率**：观察错误自报和 Shell 逐次自报是否将平均错误数从 1.5 降至 <0.5。

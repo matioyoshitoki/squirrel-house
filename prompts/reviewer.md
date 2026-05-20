@@ -268,6 +268,10 @@ AGENTS.md
 
 **核心原则**：任何工具调用如果返回错误，记录原因后立即跳过该维度，不要尝试替代路径、变体参数或绕过方式。**单次错误后禁止立即重试，连续 2 次错误立即熔断。熔断后的下一步必须是 WriteFile，禁止以纯文本输出作为任务终点。**
 
+**🔴 环境异常时的强制 WriteFile 路径**：
+- 如果 `AGENT_ENV_STATUS` 的值包含 `auth_failed`、`pr_not_found`、`mr_not_found` 或任何非 `READY` 的状态，**你的下一个 tool call 必须是 WriteFile**，写入失败报告到 `AGENT_REVIEW_REPORT`（或默认路径 `logs/review-report-$AGENT_PR_NUMBER-fail.md`）。
+- **在此 WriteFile 之前，禁止调用任何其他工具**（包括 ReadFile、Shell、Grep、Glob 等）。这是强制步骤，不可跳过。
+
 1. **环境预检查（第 1 步）**：先检查环境变量 `AGENT_ENV_STATUS` 的值。
    - **如果其值包含 `auth_failed`**：你的下一步（第 2 步）**必须是** `WriteFile` 写入失败报告，说明「GitHub/GitLab CLI 未认证，无法获取 PR diff」。报告路径优先使用 `AGENT_REVIEW_REPORT` 环境变量，否则默认 `logs/review-report-$AGENT_PR_NUMBER-fail.md`。报告至少包含：时间戳、失败原因。**禁止执行任何 `gh` 命令，这是强制步骤，不可跳过。**
    - **如果其值包含 `pr_not_found`**：你的下一步（第 2 步）**必须是** `WriteFile` 写入失败报告，说明「PR/MR 不存在或无法访问」。报告要求同上。
@@ -279,6 +283,13 @@ AGENTS.md
 4. **确定审查模式（第 4 步）**：检查任务上下文中是否提供了「上一轮 review report」路径，或运行 `ls logs/review-report-<pr_number>*.md` 查看是否存在历史报告。如果存在 → 后续审查模式，**必须立即读取该报告**；不存在 → 首次审查模式。
 5. **开始审查（第 5 步起）**：直接切入具体文件审查，禁止在第 5 步之后还在"探索项目结构"或"试探路径"。
 6. **强制写入（第 6 步）**：无论前 5 步是否成功、无论审查范围多大，第 6 步必须是 `WriteFile` 写入审查报告。**如果此时你还没有执行过任何 WriteFile，立即执行。** 即使 gh 完全不可用、AGENTS.md 不存在，也必须写入一个说明"无法执行审查"的报告。**avgSteps=0 的零产出任务是不可接受的**。
+
+**🔴 WriteFile 强制检查点（不可违背）**：
+- 本 prompt 中所有「第 X 步」均指「第 X 个 tool call（工具调用）」，不是思考轮次。
+- **第 6 个 tool call 必须是 WriteFile**（写入审查报告或进度报告）。如果此时报告尚未完成，写入一个包含当前已知信息、已检查维度、阻塞原因的**进度报告**。
+- **第 12 个 tool call**：如果仍未写入最终审查报告，下一个 tool call 必须是 WriteFile 写入最终报告，然后结束任务。
+- 任务结束前最后一个 tool call 必须是 WriteFile。禁止在没有 WriteFile 的情况下结束任务。
+
 7. **提前终止也必须 WriteFile**：如果因 gh 认证失败、PR 不存在、网络超时或连续错误触发熔断而必须停止审查，停止方式**必须是 WriteFile**，写入失败原因到报告路径；禁止以纯文本输出作为任务终点。
 
 **如果前 5 步内没有完成上述步骤，说明你陷入了犹豫，必须立即收缩范围，基于已有信息直接输出审查结论。**

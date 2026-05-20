@@ -84,6 +84,22 @@ steps:
       echo "review_report_exists: $([ -f '{{ .Vars.reviewReportPath }}' ] && echo 'true' || echo 'false')" >> logs/rework-env-check.txt
       echo "agents_md_exists: $([ -f 'AGENTS.md' ] && echo 'true' || echo 'false')" >> logs/rework-env-check.txt
 
+      # 同时写入结构化 JSON 文件，减少 agent 自行探测的次数
+      REVIEW_EXISTS=$([ -f '{{ .Vars.reviewReportPath }}' ] && echo 'true' || echo 'false')
+      AGENTS_EXISTS=$([ -f 'AGENTS.md' ] && echo 'true' || echo 'false')
+      MAKEFILE_EXISTS=$([ -f 'Makefile' ] && echo 'true' || echo 'false')
+      MISSING_VAL=$([ "$MISSING" -eq 1 ] && echo 'true' || echo 'false')
+      cat > logs/rework-env-check.json <<JSON_EOF
+{
+  "env_check_time": "$(date -Iseconds)",
+  "review_report_exists": ${REVIEW_EXISTS},
+  "review_report_path": "{{ .Vars.reviewReportPath }}",
+  "agents_md_exists": ${AGENTS_EXISTS},
+  "makefile_exists": ${MAKEFILE_EXISTS},
+  "missing_critical": ${MISSING_VAL}
+}
+JSON_EOF
+
       if [ "$MISSING" -eq 1 ]; then
         echo "⚠️ 部分关键文件缺失，agent 可能需要额外处理"
       fi
@@ -119,6 +135,7 @@ steps:
       AGENT_LOG_FILE: '{{ .Vars.logFileName }}'
       AGENT_MODE: 'rework'
       AGENT_REVIEW_REPORT: '{{ .Vars.reviewReportPath }}'
+      AGENT_ENV_CHECK_FILE: '{{ .Vars.tmpDir }}/logs/rework-env-check.json'
       # AGENT_AGENTS_MD 由 dashboard 在 buildAgentContext 中自动设置，无需在此覆盖
     outputKey: agentOutput
     logFile: '{{ .Vars.logFileName }}'

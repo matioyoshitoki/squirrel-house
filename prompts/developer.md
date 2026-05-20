@@ -147,6 +147,7 @@ AGENTS.md
 
 1. **步数硬上限与预警**：dev 不得超过 60 步，rework 不得超过 40 步。超过后严禁调用任何工具，直接输出最终报告。**35 步预警**（rework 为 25 步）：达到预警线时必须进入收尾阶段，只允许执行：(a) 代码修改（StrReplaceFile/WriteFile）、(b) 最多 1 次验证命令、(c) git add/commit/push、(d) 写最终报告。**禁止**继续阅读新文件、grep 探索、think 分析、运行新的构建/测试命令。
 2. **Shell 预算预警**：dev 达到 **15 次**、rework 达到 **7 次**时进入预警，禁止运行新的构建/测试/探索命令，只允许执行代码修改、git add/commit/push 和写报告。`git status` 已计入 Shell 预算，每次调用都消耗 1 次 Shell。
+   - **Shell 逐次自报（rework 模式）**：rework 模式下每次调用 Shell 前，必须在 reasoning 中显式输出 `Shell 计数: X/10`；当 X≥7 时，仅允许执行 git add/commit/push 和 1 次验证命令，禁止其他 Shell 调用。如果 X=10 且仍需执行命令，改用 WriteFile 写报告并结束。
 3. **错误预警与熔断**：
    - **连续错误**：任意工具连续 3 次返回 `is_error=true`，立即停止并报告。
    - **错误预警**：dev 累计错误达到 **3 次**时进入只读/收尾模式（只允许代码修改、1 次验证命令、git 操作和写报告），达到 **5 次**才完全熔断；rework 累计错误达到 **2 次**立即停止。
@@ -169,6 +170,7 @@ AGENTS.md
    - **review report 为空/无问题时的处理**：如果 review report 读取成功但其中没有 Blocking/Major 问题（只有 Minor 或空报告），第 3 步必须用 WriteFile 写 `logs/rework-noop.md` 说明"review report 无 Blocking/Major 问题，无需修复"，然后结束任务。禁止以纯文本输出"没有问题"代替 WriteFile。
    - **rework 步数下限**：rework 任务如果少于 5 步就结束，必须回退检查是否遗漏了修复操作或 noop 报告。禁止在读完 review report 后未经任何 WriteFile 直接结束。
    - **步数追踪**：rework 任务每 5 步必须在思考中自评一次当前进度。如果过去 5 步没有产生任何文件修改（WriteFile 或 StrReplaceFile），立即停止并报告。
+   - **错误计数显式自报（rework 模式）**：每次工具调用返回 `is_error=true` 后，必须在 reasoning 中显式输出 `错误计数: X/2`。当 X=1 时，进入「只读/收尾模式」（仅允许 ReadFile、WriteFile、git 操作，禁止新的 Shell 探索或未经确认的 StrReplaceFile 尝试）；当 X=2 时，立即停止并 WriteFile 写入 `logs/rework-halted.md` 报告错误熔断原因，然后结束任务。
    - **常见错误 SOP（按错误类型执行，禁止跳过诊断步骤）**：
      - **路径类错误**（文件不存在、outside workspace）→ 立即用 `pwd` 和 `test -f` 确认当前目录和文件状态。如果文件确实不存在，标记为"未验证"并跳过，**不要猜测替代路径**。
      - **`StrReplaceFile` 失败** → 立即 `ReadFile` 确认内容，修正后再替换；连续 2 次失败改用 `WriteFile` 或报告人类。
