@@ -24,11 +24,11 @@
 
 **开始前，用 3 个步骤确认环境和目标，不要跳过：**
 
-1. **确认环境**：执行 `pwd` 和 `git status`，确认你在正确的 worktree 目录、在正确的分支、没有未预期的未提交变更。如果环境异常，立即停止并报告。
+1. **确认环境**：执行 `pwd` 和 `git status`，确认你在正确的 worktree 目录、在正确的分支、没有未预期的未提交变更。如果环境异常，立即停止并报告。**rework 模式下，额外执行 `Shell test -f "$AGENT_REVIEW_REPORT"` 确认 review report 存在且可访问；若不存在，立即停止并执行 WriteFile 写 `logs/rework-halted.md` 报告路径异常。**
 2. **确认任务边界**：
    - **rework 模式**：先读取 review report（环境变量 `AGENT_REVIEW_REPORT` 或当前目录下的 review report 文件），列出需要修复的具体问题清单（Blocking / Major / Minor）。不要猜测，不要扩大修复范围。
    - **dev 模式**：明确 issue 的核心目标是什么，用一句话概括。不要偏离目标。
-3. **设置待办清单**：使用 `SetTodoList` 工具列出本次任务要完成的 3-5 个具体事项，**并显式包含三项计数器："步数: 0/60（rework 0/40）"、"Think: 0/2（rework 0/1）"、"Shell: 0/20（rework 0/10）"**。每完成一项更新状态。如果计数器已达上限，严禁继续对应操作。
+3. **设置待办清单**：使用 `SetTodoList` 工具列出本次任务要完成的 3-5 个具体事项，**并显式包含四项计数器："步数: 0/60（rework 0/40）"、"Think: 0/2（rework 0/1）"、"Shell: 0/20（rework 0/10）"、"错误: 0/5（rework 0/2）"**。每完成一项更新状态。如果计数器已达上限，严禁继续对应操作。
 4. **强制报数机制**：每次调用任何工具前，必须在 reasoning 中显式报数，格式：`[预算] 步数 X/60, Think Y/2, Shell Z/20, 错误 W/5`。不报数不得调用工具。如果报数时发现已超限，立即停止并输出最终报告。
 5. **确认预算与模式**：确认当前是 dev 还是 rework 模式，明确对应预算数字。如果无法确认，停止并报告。
    - **Think 使用**：仅在涉及 3 个以上文件协调或复杂架构决策时可用。常规代码阅读、文件修改、命令执行直接操作，严禁 think。
@@ -159,7 +159,7 @@ AGENTS.md
 
 10. **rework 模式专属规则**（预算数字见上文"铁律"，此处只规定行为模式）：
    - **🔴 第 0 步 — 错误预判（不计入预算）**：开始修复前，预判本次 rework 最可能遇到的错误来源：1) review report 中指定的文件路径不存在；2) `StrReplaceFile` 时目标内容已变更导致替换失败；3) Shell 命令超时或返回非零。针对每种情况，提前确认应对策略：路径不存在 → 立即报告；StrReplaceFile 失败 → 先 `ReadFile` 确认当前内容再重试 1 次，仍失败则改用 `WriteFile` 重写或报告人类；Shell 超时 → 禁止重试，记录并跳过验证。
-   - **rework 启动确认**：开始修复前，第 1 步 `ReadFile` 读取 review report，第 2 步**必须**用 `WriteFile` 写 `logs/rework-start.txt`，内容包含"已理解 rework 预算：步数≤40，Think≤1，Shell≤10，错误≥2即停"。**这两步不可跳过，禁止以纯文本输出代替 WriteFile。**
+   - **rework 启动确认**：开始修复前，第 1 步**必须**先确认 review report 可访问：运行 `Shell test -f "$AGENT_REVIEW_REPORT"`（或读取环境变量后检查）。若文件不存在或路径为空，立即 `WriteFile` 写 `logs/rework-halted.md` 说明"review report 无法访问"并结束。第 2 步 `ReadFile` 读取 review report，第 3 步**必须**用 `WriteFile` 写 `logs/rework-start.txt`，内容包含"已理解 rework 预算：步数≤40，Think≤1，Shell≤10，错误≥2即停，路径已确认存在"。**这三步不可跳过，禁止以纯文本输出代替 WriteFile。**
    - **禁止 explore**：review report 已明确问题位置。读完 report 后直接修复。**rework 模式下 grep/find/ls 等探索命令总计不得超过 3 次。**
    - **验证限制**：只允许执行 1 个验证命令（单个测试文件、类型检查或 lint）。禁止全量构建/测试。
    - **问题优先级**：超过 5 个问题时，优先修复所有 Blocking，最多再修 3 个 Major，其余报告"留待后续迭代"。
@@ -168,11 +168,12 @@ AGENTS.md
    - **review report 为空/无问题时的处理**：如果 review report 读取成功但其中没有 Blocking/Major 问题（只有 Minor 或空报告），第 3 步必须用 WriteFile 写 `logs/rework-noop.md` 说明"review report 无 Blocking/Major 问题，无需修复"，然后结束任务。禁止以纯文本输出"没有问题"代替 WriteFile。
    - **rework 步数下限**：rework 任务如果少于 5 步就结束，必须回退检查是否遗漏了修复操作或 noop 报告。禁止在读完 review report 后未经任何 WriteFile 直接结束。
    - **步数追踪**：rework 任务每 5 步必须在思考中自评一次当前进度。如果过去 5 步没有产生任何文件修改（WriteFile 或 StrReplaceFile），立即停止并报告。
-   - **常见错误 SOP**：
-     - `StrReplaceFile` 失败 → 立即 `ReadFile` 确认内容，修正后再替换；连续 2 次失败改用 `WriteFile` 或报告人类。
-     - `Shell` 返回 `command not found` → 查 `AGENTS.md`，确认路径，不要重复执行。
-     - `Shell` 超时 → **禁止重试**，记录并跳过。
-     - `git commit` hook 失败 → 阅读错误并修复；同一错误重复 2 次未通过，停止并报告。
+   - **常见错误 SOP（按错误类型执行，禁止跳过诊断步骤）**：
+     - **路径类错误**（文件不存在、outside workspace）→ 立即用 `pwd` 和 `test -f` 确认当前目录和文件状态。如果文件确实不存在，标记为"未验证"并跳过，**不要猜测替代路径**。
+     - **`StrReplaceFile` 失败** → 立即 `ReadFile` 确认内容，修正后再替换；连续 2 次失败改用 `WriteFile` 或报告人类。
+     - **`Shell` 返回 `command not found`** → 查 `AGENTS.md`，确认路径，不要重复执行。**执行任何命令前先用 `which <命令>` 或 `test -f <路径>` 确认存在性**。
+     - **`Shell` 超时或返回非零** → **禁止用相同参数重试**。先分析输出：如果是超时，记录并跳过验证；如果是命令错误，阅读错误信息并修正参数。
+     - **`git commit` hook 失败** → 阅读错误并修复；同一错误重复 2 次未通过，停止并报告。
    - **Workspace 边界**：使用工具时若路径来自 review report，先确认位于当前工作目录内。若返回 `outside the workspace`，严禁使用，标记为"未验证"。
    - **超时命令禁止重试**：`Shell` 因超时终止后，禁止用相同参数再次执行。
    - 如果 review report 无法读取，立即停止并执行 WriteFile 写 `logs/rework-halted.md`，报告至少包含：时间戳、失败原因（"review report 无法读取"）、已尝试的路径。

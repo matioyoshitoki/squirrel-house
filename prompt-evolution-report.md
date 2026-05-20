@@ -1,65 +1,50 @@
 # Prompt 演进报告 — type-one
 
-生成时间: 2026-05-20 09:53:35
-分析范围: 2026-05-20T08:20:58 到 2026-05-20T09:51:59
+生成时间: 2026-05-20T11:01:37+08:00
+分析范围: 2026-05-20T09:51:59 到 2026-05-20T10:57:55
 
 ## 统计摘要
 
-- 分析日志数: 4
-- Agent 类型分布: dev: 1, review: 2, rework: 1
+- 分析日志数: 10
+- Agent 类型分布: review 5, rework 5
 
 ## 问题诊断
 
-### 问题 1: dev 任务步数严重超标（134 步 vs 60 步限制）
-**证据**: 
-- dev 任务平均 **134 步**，超出 prompt 规定的 60 步上限 **123%**
-- Shell 调用 **64 次**，超出 20 次上限 **220%**
-- 累计错误 **6 次**，超出 5 次错误熔断线
-- topGitOp 为 `commit`，但 Shell 调用总量异常高
+### 问题 1: rework 高工具调用错误率
 
-**根因分析**:
-1. **缺乏外部硬约束**: `workflows/dev.yaml` 中 `--max-steps-per-turn 10000` 给了 agent 极大的自由度，当 agent 未严格遵守 prompt 中的内部预算时，没有任何外部机制兜底。
-2. **预算自我监控失效**: prompt 中虽然规定了 60 步/20 Shell/5 错误的上限，但 agent 在每次工具调用前没有强制报数的习惯，导致逐步失控。
-3. **Shell 使用边界模糊**: prompt 未明确列出 Shell 的常见误用场景，agent 可能用 `ls`、`find`、`cat`、`git status` 等本可用其他工具替代的命令消耗了大量 Shell 预算。
+**证据**: rework 任务共 5 个，其中 2 个任务出现错误（40% 任务错误率），累计 4 个工具调用错误。平均每个任务 0.8 个错误，已接近 developer.md 规定的 rework 错误上限（2 次）。对比 review agent 的 5 任务 3 错误，rework 的单位任务错误密度显著更高。
+
+**根因分析**: developer.md 中虽已包含 rework 专属错误 SOP（第 0 步错误预判、常见错误处理），但存在三个缺口：
+1. **SetTodoList 计数器缺失错误维度**——agent 对错误预算缺乏显性跟踪，容易在不知不觉中触及熔断线；
+2. **缺少系统化的"错误前预防"机制**——agent 常在未确认文件存在性时直接执行 `ReadFile`/`StrReplaceFile`，或未检查命令可用性就执行 `Shell`；
+3. **常见错误 SOP 未按错误类型强制要求诊断步骤**——agent 可能在遇到路径错误时仍尝试替代路径，而非按规则直接跳过。
 
 **改进建议**:
-1. **workflow 硬兜底**: 将 `workflows/dev.yaml` 的 `--max-steps-per-turn` 从 `10000` 降至 `75`，作为 prompt 60 步上限的外部保险。（已应用）
-2. **强制报数机制**: 在 `prompts/developer.md` 的任务启动检查清单中新增规则：每次调用工具前必须在 reasoning 中显式报数 `[预算] 步数 X/60, Think Y/2, Shell Z/20, 错误 W/5`，不报数不得执行。（已应用）
-3. **Shell 白名单**: 在 `prompts/developer.md` 的效率约束中新增第 9 条，明确禁止使用 Shell 的场景（`ls`/`find` 浏览目录、`cat` 读文件、反复 `git status`、未修复就重试同一命令），将 Shell 严格限制在构建/测试/安装依赖/git 操作四类。（已应用）
+1. 在 `prompts/developer.md` 的 SetTodoList 中增加"错误"计数器，并在强制报数格式中同步体现；同时在"确认环境"步骤增加 `test -f "$AGENT_REVIEW_REPORT"` 的硬性预检要求。（涉及文件: `prompts/developer.md`）
+2. 扩展 `developer.md` 的 rework 常见错误 SOP，按"路径类/StrReplaceFile/Shell/git"四类错误分别规定强制诊断步骤，明确"命令执行前存在性检查"为前置动作。（涉及文件: `prompts/developer.md`）
+3. 在 `workflows/rework.yaml` 的 envReadinessCheck 中增加 review report 内容非空检查（< 50 字节视为异常），提前拦截空报告导致的 agent 困惑。（涉及文件: `workflows/rework.yaml`）
 
-### 问题 2: dev 任务 StrReplaceFile 效率低下
-**证据**:
-- `StrReplaceFile` 调用 **33 次**，`ReadFile` 调用 **51 次**
-- 6 个错误中有相当一部分可能来自未经确认的 StrReplaceFile 替换失败
+### 问题 2: review Shell 调用密度偏高且逼近预算上限
 
-**根因分析**:
-- 虽然 prompt 要求"执行 StrReplaceFile 前必须先 ReadFile"，但对于小文件，多次 ReadFile → StrReplaceFile 的往返效率极低，且容易因微小差异导致替换失败。
-- agent 缺乏"小文件直接重写"的策略指引，倾向于逐段替换，增加了步骤和错误概率。
+**证据**: review 任务平均 Shell 调用 15.6 次/任务（78/5），已触及 reviewer.md 规定的 15 次 Shell 上限。avgSteps=25.4，虽在合理范围，但 Shell 密度高意味着 agent 在用命令行做大量本可用 ReadFile/Grep 完成的工作。
+
+**根因分析**: reviewer.md 虽有"将 diff 内容写入临时文件"的要求，但缺乏对"diff 获取后禁止再用 Shell 过滤/浏览"的明确约束。agent 可能在获取 diff 后反复使用 `grep`、`head`、`cat` 等 Shell 命令处理输出，而非将 diff 保存后用 ReadFile/Grep 工具处理。
 
 **改进建议**:
-1. **小文件优先重写**: 在 `prompts/developer.md` 的 StrReplaceFile 规则中增加：对于小于 100 行的文件，优先使用 `WriteFile` 重写整个文件，减少往返。（已应用）
-2. **下次迭代评估**: 如果下次统计仍显示 ReadFile/StrReplaceFile 比例低于 1:1（每次替换前都读取），考虑在 prompt 中增加"批量替换"指引，要求一次 ReadFile 后尽量在同一回合完成该文件的所有修改。
+1. 在 `prompts/reviewer.md` 的"Shell 命令输出硬限制"条款后，增加一条"diff 处理规范"：获取 `gh pr diff` 后必须立即写入临时文件，后续所有对 diff 内容的引用必须通过 `ReadFile` 或 `Grep` 完成，禁止再用 Shell 过滤 diff。（涉及文件: `prompts/reviewer.md`）
 
 ## 已应用改进
 
-### 1. `workflows/dev.yaml`
-- 修改: `--max-steps-per-turn 10000` → `--max-steps-per-turn 75`
-- 原因: 作为 dev agent 60 步预算的外部硬兜底，防止 agent 自我监控失效时无限消耗步骤。
+### 1. `prompts/developer.md` — 强化 rework 错误预防机制
+- **SetTodoList 计数器扩展**: 将初始计数器从三项扩展为四项，增加 `"错误: 0/5（rework 0/2）"`，使 agent 对错误预算有显性感知。
+- **环境确认增加预检**: 在"确认环境"步骤中，明确要求 rework 模式下额外执行 `test -f "$AGENT_REVIEW_REPORT"`，确保 review report 存在且可访问后再读取。
+- **rework 启动确认增加路径验证**: 将原来的"第 1 步 ReadFile"改为"第 1 步先确认路径存在，第 2 步 ReadFile，第 3 步 WriteFile"，避免在文件不存在时直接 ReadFile 导致错误。
+- **常见错误 SOP 结构化扩展**: 按错误类型（路径类、StrReplaceFile、Shell command not found、Shell 超时/非零、git commit hook）分别规定强制诊断步骤，并增加"命令执行前存在性检查"要求。
 
-### 2. `prompts/developer.md`
-- **新增"强制报数机制"**（任务启动检查清单第 4 条）: 要求每次调用工具前在 reasoning 中报数，格式固定，不报数不得执行。
-- **新增"Shell 白名单与常见误用"**（效率约束第 9 条）: 明确禁止使用 Shell 的四种典型误用，将 Shell 严格限定在四类合法用途。
-- **优化"StrReplaceFile 前置检查与失败处理"**: 增加"小于 100 行的文件优先用 WriteFile 重写"指引，减少低效往返。
+### 2. `workflows/rework.yaml` — 增加 review report 非空检查
+- 在 `envReadinessCheck` 步骤中，当 review report 存在时，额外检查其字节数是否小于 50 字节。若过短，在环境检查日志中标记 `review_report_empty: true`，供 agent 和人类快速识别空报告场景。
 
 ## 趋势追踪
 
-- 与上次对比:
-  - `avgStepsDelta`: **+19.5**（平均步数增加，趋势恶化）
-  - `errorRateDelta`: **-0.36**（错误率下降，趋势改善）
-  - `successRateDelta`: **+0.14**（成功率上升，趋势改善）
-- 综合判断: 成功率在提升，但 dev 任务的步数失控是本次最突出的问题。本次改进的核心目标是将 dev 任务的步数从 134 拉回到 60 以内。
-
-- 建议下次重点关注:
-  1. **dev agent 的预算遵守率**: 观察强制报数机制和 workflow 硬兜底是否有效将步数控制在 75 以下。
-  2. **Shell 调用次数**: 观察 Shell 白名单是否能将 Shell 调用从 64 次降至 20 次以内。
-  3. **StrReplaceFile 成功率**: 观察小文件重写指引是否能减少 StrReplaceFile 相关的错误和往返。
+- 与上次对比: avgSteps 下降 18.25 步，errorRate 下降 0.8，整体呈改善趋势。successRate 维持 100%，零产出问题已得到控制。
+- 建议下次重点关注: **rework agent 的错误类型分布**。当前统计仅知 rework 有 4 个错误，但缺少具体错误分类（路径类、StrReplaceFile、Shell、网络等）。建议在日志采集侧增加错误类型标签，以便 prompt-evolution agent 做更精准的根因定位。

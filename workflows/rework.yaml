@@ -68,6 +68,11 @@ steps:
 
       if [ -f "{{ .Vars.reviewReportPath }}" ]; then
         echo "✅ review report: {{ .Vars.reviewReportPath }}"
+        REPORT_SIZE=$(wc -c < "{{ .Vars.reviewReportPath }}")
+        if [ "$REPORT_SIZE" -lt 50 ]; then
+          echo "⚠️ review report 内容过短（${REPORT_SIZE} 字节），可能为空报告"
+          echo "review_report_empty: true" >> logs/rework-env-check.txt
+        fi
       else
         echo "⚠️ review report 不存在: {{ .Vars.reviewReportPath }}"
         MISSING=1
