@@ -1,4 +1,4 @@
-import { escapeHtml, formatDuration, formatBytes, getIssueType, getIssueTypeDisplay } from './utils.js';
+import { escapeHtml, formatDuration, formatBytes, getIssueType, getIssueTypeDisplay, getRepoBaseUrl } from './utils.js';
 
 const CARD = 'card card-hover p-4';
 const EMPTY = 'card p-8 text-center text-sm text-muted-foreground';
@@ -32,7 +32,7 @@ export function renderRunningTasks(tasks, currentProject, designAssetsCache) {
 
         return '<div class="' + CARD + ' pulse-running" data-issue="' + task.targetId + '">' +
             '<div class="flex items-start justify-between gap-3 mb-2">' +
-                '<a href="' + (currentProject && currentProject.repo ? 'https://github.com/' + currentProject.repo + '/issues/' : '#') + '' + task.targetId + '" ' +
+                '<a href="' + (currentProject && currentProject.repo ? getRepoBaseUrl(currentProject) + '/issues/' : '#') + '' + task.targetId + '" ' +
                    'class="text-sm font-semibold text-foreground hover:text-primary transition-colors" target="_blank">' +
                     '#' + task.targetId + ': ' + escapeHtml(task.targetTitle) +
                 '</a>' +
@@ -201,7 +201,7 @@ function renderIssueGroup(containerId, issues, runningIds, currentProject, desig
 
         return '<div class="' + CARD + '" data-issue="' + issue.number + '">' +
             '<div class="flex items-start justify-between gap-3 mb-2">' +
-                '<a href="' + (currentProject && currentProject.repo ? 'https://github.com/' + currentProject.repo + '/issues/' : '#') + '' + issue.number + '" ' +
+                '<a href="' + (currentProject && currentProject.repo ? getRepoBaseUrl(currentProject) + '/issues/' : '#') + '' + issue.number + '" ' +
                    'class="text-sm font-semibold text-foreground hover:text-primary transition-colors" target="_blank">' +
                     '#' + issue.number + ': ' + escapeHtml(issue.title) +
                 '</a>' +

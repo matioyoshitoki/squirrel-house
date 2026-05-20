@@ -43,6 +43,15 @@ export function getIssueTypeDisplay(type) {
     return map[type] || map.feature;
 }
 
+export function getRepoBaseUrl(project) {
+    if (!project || !project.repo) return '';
+    if (project.repo.startsWith('http://') || project.repo.startsWith('https://')) {
+        return project.repo.replace(/\/$/, '');
+    }
+    const host = project.platform === 'gitlab' ? 'https://gitlab.com' : 'https://github.com';
+    return host + '/' + project.repo;
+}
+
 export function updateRunningTimes() {
     document.querySelectorAll('.running-time').forEach(el => {
         const start = Number(el.dataset.start);

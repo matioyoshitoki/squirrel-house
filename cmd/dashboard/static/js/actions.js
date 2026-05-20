@@ -1,7 +1,7 @@
 import { api } from './api.js';
 import { store } from './state.js';
 import { showToast, showGlobalLoading, hideGlobalLoading, setButtonLoading, showConfirmDialog } from './ui.js';
-import { escapeHtml } from './utils.js';
+import { escapeHtml, getRepoBaseUrl } from './utils.js';
 import { openLogTerminalByFile } from './terminal.js';
 
 // ─── Refresh helpers (lightweight data loaders) ───
@@ -360,8 +360,8 @@ export async function startDesign(event, issueNumber, issueTitle) {
 
 export function viewIssue(number) {
     const proj = store.get('currentProject');
-    const repo = proj && proj.repo ? proj.repo : '';
-    window.open(repo ? 'https://github.com/' + repo + '/issues/' + number : '#', '_blank');
+    const base = getRepoBaseUrl(proj);
+    window.open(base ? base + '/issues/' + number : '#', '_blank');
 }
 
 export async function viewReviewReport(number) {

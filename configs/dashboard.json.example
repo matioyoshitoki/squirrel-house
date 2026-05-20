@@ -14,7 +14,8 @@
         "db": "postgres+typeorm",
         "packageManager": "pnpm"
       },
-      "repo": "MatioYoshitoki/new-world"
+      "repo": "MatioYoshitoki/new-world",
+      "platform": "github"
     },
     {
       "name": "social-world",
@@ -28,7 +29,8 @@
         "db": "mysql+typeorm",
         "packageManager": "pnpm"
       },
-      "repo": "MatioYoshitoki/social-world"
+      "repo": "MatioYoshitoki/social-world",
+      "platform": "github"
     }
   ]
 }

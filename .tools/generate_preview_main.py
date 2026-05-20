@@ -54,6 +54,11 @@ def extract_widgets(dart_file, all_types):
         ctor_m = None
         for cm in ctor_re.finditer(content):
             if cm.start() >= class_start and cm.end() <= class_end:
+                # 排除 "return EditProfileSheet(...)" 这类方法调用，只匹配构造函数
+                line_start = content.rfind('\n', 0, cm.start()) + 1
+                line_prefix = content[line_start:cm.start()].strip()
+                if line_prefix.startswith('return'):
+                    continue
                 ctor_m = cm
         
         params = []

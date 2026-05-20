@@ -1500,6 +1500,47 @@ func buildFlutterDesignPreview(w http.ResponseWriter, r *http.Request, issueNumb
 	projectPath := getProjectPathByName(projectName)
 	dartPkgName := readPubspecPackageName(projectPath)
 
+	// 检查是否存在 design/issue-N 分支，如果有则导出到临时目录作为依赖
+	// 这样预览编译能使用 agent 生成的完整代码（包括 app_strings.dart、di.config.dart 等）
+	designBranch := fmt.Sprintf("design/issue-%d", issueNumber)
+	useDesignBranch := false
+	var designBranchPath string
+	checkBranchCmd := exec.Command("git", "-C", projectPath, "rev-parse", "--verify", designBranch)
+	if err := checkBranchCmd.Run(); err == nil {
+		designBranchPath, err = os.MkdirTemp("", fmt.Sprintf("type-one-design-%d-*", issueNumber))
+		if err == nil {
+			archiveCmd := exec.Command("git", "-C", projectPath, "archive", designBranch)
+			archiveCmd.Dir = projectPath
+			tarCmd := exec.Command("tar", "-x", "-C", designBranchPath)
+			archiveOut, _ := archiveCmd.StdoutPipe()
+			tarCmd.Stdin = archiveOut
+			_ = tarCmd.Start()
+			_ = archiveCmd.Run()
+			_ = tarCmd.Wait()
+
+			// 尝试生成 injectable 的 di.config.dart（如果项目使用 injectable）
+			if _, err := os.Stat(filepath.Join(designBranchPath, "lib", "core", "di", "di.dart")); err == nil {
+				if _, err := os.Stat(filepath.Join(designBranchPath, "lib", "core", "di", "di.config.dart")); err != nil {
+					log.Printf("[build-preview] 尝试生成 di.config.dart...")
+					getCmd := exec.Command("flutter", "pub", "get")
+					getCmd.Dir = designBranchPath
+					_ = getCmd.Run()
+					genCmd := exec.Command("flutter", "pub", "run", "build_runner", "build", "--delete-conflicting-outputs")
+					genCmd.Dir = designBranchPath
+					_ = genCmd.Run()
+				}
+			}
+
+			useDesignBranch = true
+			projectPath = designBranchPath
+			log.Printf("[build-preview] 使用 %s 分支代码作为依赖: %s", designBranch, designBranchPath)
+		}
+	}
+	if !useDesignBranch {
+		log.Printf("[build-preview] %s 分支不存在，使用当前项目代码", designBranch)
+	}
+
+
 	// 复制通用 Flutter 预览模板（使用 templateDir+"/." 避免 filepath.Join 清理掉 .）
 	templateDir := filepath.Join(projectRoot, ".tools", "flutter_preview_generic")
 	cpCmd := exec.Command("cp", "-R", templateDir+"/.", tmpDir)
