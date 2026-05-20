@@ -1518,16 +1518,27 @@ func buildFlutterDesignPreview(w http.ResponseWriter, r *http.Request, issueNumb
 			_ = archiveCmd.Run()
 			_ = tarCmd.Wait()
 
-			// 尝试生成 injectable 的 di.config.dart（如果项目使用 injectable）
-			if _, err := os.Stat(filepath.Join(designBranchPath, "lib", "core", "di", "di.dart")); err == nil {
-				if _, err := os.Stat(filepath.Join(designBranchPath, "lib", "core", "di", "di.config.dart")); err != nil {
-					log.Printf("[build-preview] 尝试生成 di.config.dart...")
-					getCmd := exec.Command("flutter", "pub", "get")
-					getCmd.Dir = designBranchPath
-					_ = getCmd.Run()
-					genCmd := exec.Command("flutter", "pub", "run", "build_runner", "build", "--delete-conflicting-outputs")
-					genCmd.Dir = designBranchPath
-					_ = genCmd.Run()
+			// 如果项目使用 injectable 但缺少 di.config.dart，生成最小化占位文件
+			// 避免运行 build_runner（需要 30+ 秒，会导致网关 504 超时）
+			// 预览 widget 不会触发依赖注入初始化，空实现即可满足编译
+			diDartPath := filepath.Join(designBranchPath, "lib", "core", "di", "di.dart")
+			diConfigPath := filepath.Join(designBranchPath, "lib", "core", "di", "di.config.dart")
+			if _, err := os.Stat(diDartPath); err == nil {
+				if _, err := os.Stat(diConfigPath); err != nil {
+					log.Printf("[build-preview] 生成最小化 di.config.dart...")
+					_ = os.WriteFile(diConfigPath, []byte(`// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint
+import 'package:get_it/get_it.dart' as _i174;
+import 'package:injectable/injectable.dart' as _i526;
+
+_i174.GetIt $initGetIt(
+  _i174.GetIt getIt, {
+  String? environment,
+  _i526.EnvironmentFilter? environmentFilter,
+}) {
+  return getIt;
+}
+`), 0644)
 				}
 			}
 
