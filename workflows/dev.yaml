@@ -34,7 +34,7 @@ steps:
     dir: '{{ .Vars.tmpDir }}'
     command: |
       kimi --agent-file {{ .Vars.agentFile | shellquote }} \
-           --max-steps-per-turn 75 \
+           --max-steps-per-turn 65 \
            --print \
            -p {{ .Vars.prompt | shellquote }}
     env:

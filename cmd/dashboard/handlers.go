@@ -1507,7 +1507,7 @@ func buildFlutterDesignPreview(w http.ResponseWriter, r *http.Request, issueNumb
 	var designBranchPath string
 	checkBranchCmd := exec.Command("git", "-C", projectPath, "rev-parse", "--verify", designBranch)
 	if err := checkBranchCmd.Run(); err == nil {
-		designBranchPath, err = os.MkdirTemp("", fmt.Sprintf("type-one-design-%d-*", issueNumber))
+		designBranchPath, err = os.MkdirTemp("", fmt.Sprintf("%s-design-%d-*", projectName, issueNumber))
 		if err == nil {
 			archiveCmd := exec.Command("git", "-C", projectPath, "archive", designBranch)
 			archiveCmd.Dir = projectPath
@@ -1553,7 +1553,7 @@ _i174.GetIt $initGetIt(
 
 
 	// 复制通用 Flutter 预览模板（使用 templateDir+"/." 避免 filepath.Join 清理掉 .）
-	templateDir := filepath.Join(projectRoot, ".tools", "flutter_preview_generic")
+	templateDir := filepath.Join(projectRoot, config.FlutterPreviewTemplate)
 	cpCmd := exec.Command("cp", "-R", templateDir+"/.", tmpDir)
 	if out, err := cpCmd.CombinedOutput(); err != nil {
 		log.Printf("[build-preview] 复制模板失败: %v\n%s", err, string(out))

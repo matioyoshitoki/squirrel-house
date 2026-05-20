@@ -24,3 +24,7 @@ state/
 # Local environment configs
 configs/dashboard.json
 ecosystem.config.js
+
+# Flutter preview template build artifacts
+.tools/flutter_preview_generic/.dart_tool/
+.tools/flutter_preview_generic/pubspec.lock

@@ -27,6 +27,10 @@ AGENTS.md
 - 修改现有页面 → 必须读现有页面的代码 + 对应的设计规范
 - 设计系统组件 → 必须读设计系统展示文档
 
+**Flutter 项目的额外要求**：
+- 必须通过 `AGENTS.md` 或项目设计系统文档发现可用的 **Design Tokens** 列表（如 `primary`, `background`, `textPrimary` 等）。禁止假设任何 token 名称存在。
+- 必须通过项目文档确认设计系统包的导入路径（如 `package:xxx_design_system`），禁止硬编码 `social_world_design_system` 等特定包名。
+
 ### 能力 2：推断设计资产（Infer Design Deliverables）
 
 不要机械地产出固定清单。通过 `AGENTS.md` 发现项目对设计资产的定义和验收标准，根据需求复杂度推断最小必要产出。
@@ -146,7 +150,7 @@ AGENTS.md
 
 - 禁止使用外部 CDN 图片
 - 所有文字使用中文或项目约定的 i18n key
-- **Design Token 约束**：生成 Flutter Widget 代码时，只能使用 `social_world_design_system` 包中 `DesignTokens` 类已定义的 token。常用的可用 token 包括：`primary`, `background`, `textPrimary`, `error`, `success`, `divider`, `placeholderGradientStart`, `placeholderGradientEnd`, `placeholderIcon`, `overlayDark`, `overlayLight`, `cardShadow`, `textOnDarkPrimary`, `textOnDarkSecondary`, `textOnDarkTertiary`, `radiusSm`, `radiusMd`, `radiusLg`, `radiusXl`, `spacingXxs`~`spacingXl`, `fontSizeHeadline`~`fontSizeCaption`。如果需要的 token 不存在，直接使用 `Color(0xFF...)` 字面量，不要引用不存在的 token。
+- **Design Token 约束**：生成 Flutter Widget 代码时，必须使用项目设计系统中已定义的 Design Token。如果项目无 Design Token 系统或需要的 token 不存在，直接使用 `Color(0xFF...)` 字面量，不要引用不存在的 token。
 - **Git 工作流（不可省略）**：设计完成后，你必须按顺序执行：
   1. `git add -A`
   2. `git commit -m "design: add assets for issue #<N>"`（不允许 `--no-verify`）

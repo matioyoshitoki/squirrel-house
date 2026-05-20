@@ -114,9 +114,32 @@ Harness 层的 `ui-designer` Agent 在启动时会主动搜索并阅读项目内
 │   │   ├── README.md          ← 推荐：设计系统总入口
 │   │   ├── colors.md
 │   │   ├── typography.md
-│   │   └── components.md
+│   │   ├── components.md
+│   │   └── tokens.md          ← Flutter Design Tokens 定义（如使用 design_system 包）
 │   └── ui-design-spec.md      ← 项目级覆盖规范（可选）
 ```
+
+**Flutter 项目的 Token 文档示例**（`docs/design-system/tokens.md`）：
+
+```markdown
+# Design Tokens
+
+本项目使用 `my_app_design_system` 包中的 `DesignTokens` 类。
+
+## 颜色
+- `primary` — 主品牌色
+- `background` — 页面背景色
+- `textPrimary` — 主要文本色
+- `error` — 错误状态色
+
+## 圆角
+- `radiusSm` / `radiusMd` / `radiusLg`
+
+## 间距
+- `spacingXs` ~ `spacingXl`
+```
+
+> **注意**：Harness 层 prompt 不再硬编码任何 token 名称。Agent 必须读取本项目 `tokens.md` 才能获知可用 token 列表。如果 token 文档缺失，Agent 应直接使用 `Color(0xFF...)` 字面量并在 `design-spec.md` 中标注「未找到项目 Token 文档，使用硬编码色值」。
 
 如果项目同时存在 Harness 规范（本文档）和项目级规范，**以项目级规范为准**。
 

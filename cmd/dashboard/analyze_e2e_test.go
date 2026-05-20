@@ -2,11 +2,16 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"testing"
 )
 
 func TestAnalyzeE2ELog(t *testing.T) {
-	a := parseLogFile("logs/social-world/e2e-issue-64-20260427-003255.log")
+	logPath := "logs/test-project/e2e-issue-64-20260427-003255.log"
+	if _, err := os.Stat(logPath); os.IsNotExist(err) {
+		t.Skipf("日志文件不存在: %s", logPath)
+	}
+	a := parseLogFile(logPath)
 	if a == nil {
 		t.Fatal("failed to parse")
 	}

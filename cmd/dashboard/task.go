@@ -367,7 +367,10 @@ func saveTaskState() {
 	}
 
 	stateFile := taskStateFile()
-	os.MkdirAll(filepath.Dir(stateFile), 0755)
+	if err := os.MkdirAll(filepath.Dir(stateFile), 0755); err != nil {
+		log.Printf("⚠️ 创建状态目录失败: %v", err)
+		return
+	}
 
 	// 先加载现有状态，避免覆盖其他项目的任务
 	var allTasks map[string]*Task

@@ -7,18 +7,6 @@ let currentDesignIssue = null;
 let _designEscHandler = null;
 const _loadingAssets = new Set();
 
-// 项目级设计资产分组配置
-const PROJECT_GROUPS = {
-    'new-world-monorepo': [
-        { key: 'preview', title: '🔥 交互预览', types: ['phaser3-web', 'flutter-web', 'html'] },
-        { key: 'visual', title: '🖼️ 设计图与截图', types: ['image'] },
-        { key: 'code', title: '💻 代码', types: ['code'], collapsed: true },
-        { key: 'docs', title: '📝 文档', types: ['markdown'] },
-        { key: 'config', title: '⚙️ 配置与数据', types: ['json'] },
-        { key: 'other', title: '📎 其他', types: ['file', 'font', 'audio'] },
-    ],
-};
-
 const DEFAULT_GROUPS = [
     { key: 'preview', title: '🔥 交互预览', types: ['flutter-web', 'phaser3-web', 'html'] },
     { key: 'docs', title: '🌐 原型与文档', types: ['markdown'] },
@@ -107,7 +95,7 @@ export async function openDesignViewer(issueNumber) {
     window.currentDesignIssue = issueNumber; // 暴露给 inline onclick
 
     const projectName = store.get('currentProject')?.name || '';
-    const groups = PROJECT_GROUPS[projectName] || DEFAULT_GROUPS;
+    const groups = DEFAULT_GROUPS;
 
     let firstUrl = null;
     let firstExt = null;
@@ -562,7 +550,7 @@ export async function buildDesignPreviewHandler(issueNumber) {
             const fileList = document.getElementById('design-file-list');
             if (fileList) {
                 const projectName = store.get('currentProject')?.name || '';
-                const groups = (projectName === 'new-world-monorepo') ? PROJECT_GROUPS['new-world-monorepo'] : DEFAULT_GROUPS;
+                const groups = DEFAULT_GROUPS;
                 let firstUrl = null, firstExt = null, html = '';
                 groups.forEach(group => {
                     const items = [];

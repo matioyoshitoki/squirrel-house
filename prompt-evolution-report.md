@@ -1,74 +1,85 @@
 # Prompt 演进报告 — type-one
 
-生成时间: 2026-05-20T15:23:53+08:00
-分析范围: 2026-05-20T10:57:55 到 2026-05-20T15:23:53
+生成时间: 2026-05-20T16:50:10+08:00
+分析范围: 2026-05-20T15:23:53 到 2026-05-20T16:50:10
 
 ## 统计摘要
 
 - 分析日志数: 4
-- Agent 类型分布: design × 4
+- Agent 类型分布: dev × 1, review × 2, rework × 1
 
 ## 问题诊断
 
-### 问题 1: design agent 步数与 Think 调用严重超标
+### 问题 1: dev agent 预算约束全面失效（高步数 + 高 Shell + 高错误）
 
 **证据**:
-- avgSteps=44.5，最高 79 步，已超过 prompt 中 60 步的硬上限（超标 31%）
-- 平均 think 10.8 次/任务，超过 3 次限制 260%
-- avgStepsDelta +22.5，步数趋势显著恶化（较上期增加 22.5 步）
-- successRateDelta -0.25，有产出任务比例下降
+- avgSteps = 72，超过 prompt 中 60 步硬上限 20%
+- Shell 调用 34 次/任务，超过 20 次上限 70%
+- totalErrors = 2，错误率 100%（1/1 个任务发生错误）
+- topGitOp = `status`，说明 git status 被反复调用，直接违反 prompt 中"git status 最多 3 次"的铁律
 
 **根因分析**:
-prompt 中的效率约束使用了"绝对不超过""严禁"等措辞，但缺乏 LLM 可实际感知的计数机制和强制性后果描述。agent 将约束视为"建议"而非"熔断规则"，导致在 40 步预警后仍继续探索，think 被当作"免费分析时间"反复使用。此外，60 步上限与 40 步预警之间的缓冲太大，agent 在 40 步时认为"还有 20 步预算"而继续执行非收尾操作。
+1. **workflow 与 prompt 步数上限不匹配**：`workflows/dev.yaml` 中 `--max-steps-per-turn 75` 高于 prompt 的 60 步，agent 感知到的外部限制比内部约束更宽松，prompt 的熔断规则被架空。
+2. **Shell 预算缺乏预警机制**：prompt 中只规定了 20 次 Shell 硬上限，但没有设置中间预警线（如 15 次预警）。agent 在步数尚未触顶时，认为 Shell 预算"还有余量"，用 `git status`、`ls`、`grep` 等小命令反复确认状态。
+3. **过时的统计锚点失效**：developer.md 第 138 行引用了一个旧统计（"Shell 调用高达 76 次"），agent 看到当前 Shell 调用 34 次反而认为"比历史峰值低"，降低了紧迫感。
 
 **改进建议**:
-1. **重写效率约束为不可违反的熔断规则**：将措辞从"绝对不超过"改为"如果超过 X，唯一允许的动作是立即输出报告并结束"。在 `prompts/ui-designer.md` 的效率约束章节，增加"超限即终止"条款，禁止任何"再确认一下""再试一次"的辩解行为。（涉及文件: `prompts/ui-designer.md`）
-2. **增加实时自监控清单**：要求 agent 每次工具调用后必须通过 `SetTodoList` 更新四项计数器（步数/Think/Shell/错误），使预算消耗显性化。将计数器从 prompt 的"建议包含"提升为"必须包含且实时更新"。（涉及文件: `prompts/ui-designer.md`）
-3. **收紧收尾触发点**：将 40 步预警改为 35 步"强制收尾"，且明确收尾阶段只允许 WriteFile 已有计划和 git 操作，禁止 ReadFile/Grep/Shell 等任何新探索。（涉及文件: `prompts/ui-designer.md`）
+1. **对齐 workflow 与 prompt 的步数上限**：将 `workflows/dev.yaml` 的 `--max-steps-per-turn` 从 75 下调至 65，使其略低于 prompt 的 60 步熔断线，给 agent 一个不可逾越的外部硬边界。（涉及文件: `workflows/dev.yaml`，修改方式: `--max-steps-per-turn 75` → `--max-steps-per-turn 65`）
+2. **增加 Shell 预警线并更新统计锚点**：在 `prompts/developer.md` 的预算约束中增加 "Shell 15 次预警"，达到后禁止运行任何新的构建/测试/探索命令，只能执行代码修改、1 次 git add/commit/push 和写报告。同时将第 21 行和第 138 行的统计引用更新为当前真实数据（72 步、34 次 Shell、2 次错误）。（涉及文件: `prompts/developer.md`）
+3. **将 git status 禁令提升为熔断项**：当前 git status 限制放在效率约束中，agent 将其视为"建议"。应将其与"步数上限"并列，明确"超过 3 次 git status → 立即停止并报告"。（涉及文件: `prompts/developer.md`）
 
-### 问题 2: design agent 错误率过高且 Shell 预算严重透支
+### 问题 2: review agent 错误率与 Shell 预算双高，且违反 git 禁令
 
 **证据**:
-- totalErrors=20，平均 5 次错误/任务，errorRateDelta +4.3（趋势恶化）
-- Shell 调用 126 次，平均 31.5 次/任务，超过 20 次限制 57%
-- topGitOp 为 `status`，说明大量 git 操作消耗了 Shell 预算
+- totalErrors = 4，2 个任务均有错误，错误率 100%
+- Shell 调用 58 次 / 2 任务 = 29 次/任务，超过 15 次上限 93%
+- topGitOp = `diff`，直接违反 reviewer.md 第 327 行"严禁执行任何本地 `git` 命令"的铁律
 
 **根因分析**:
-prompt 虽然规定了"累计 5 次错误立即停止"，但未明确禁止"重试"行为，agent 可能在同一类操作上反复失败（如读取不存在的路径、执行错误的命令）。Shell 预算超限的直接原因是 agent 未将 git status、ls、test、grep 等操作计入"Shell 预算"，或认为小命令"不耗预算"。错误预判条款虽有列举，但放在 prompt 末尾，agent 启动时未形成肌肉记忆。
+1. **"先 test 再 ReadFile"策略浪费 Shell 预算**：reviewer.md 第 292 行要求"读取规范文档前，先用 Shell `ls`/`test -f` 确认文件存在"。这种策略将每个文档读取拆成 2 步（1 次 Shell + 1 次 ReadFile），当审查涉及多个规范文档时，Shell 调用迅速膨胀。更糟的是，如果路径本身错误，test 也会失败，既浪费步数又增加错误数。
+2. **git 禁令位置靠后、威慑不足**：git 禁令被放在执行约束第 13 条（第 327 行），而不是元原则。agent 在启动初期容易忽略靠后的约束，在遇到 `gh` 命令失败时本能地 fallback 到 `git diff`。
+3. **workflow 步数限制过于宽松**：`workflows/review.yaml` 的 `--max-steps-per-turn 10000` 形同虚设，agent 完全依赖 prompt 自我约束，而 prompt 中的 45 步上限对 LLM 来说不够具象。
 
 **改进建议**:
-1. **增加"禁止重试"硬性规则**：在 `prompts/ui-designer.md` 中明确"同一目标的操作失败后，禁止换参数、换路径重试。必须记录错误、跳过该目标、继续下一任务"。将错误上限从"5 次熔断"细化为"3 次预警+收尾，5 次立即终止"。（涉及文件: `prompts/ui-designer.md`）
-2. **缩减设计探索预算并增加早期产出压力**：将"设计探索预算"从 10 步缩减至 6 步；增加"启动后 12 步内必须完成第一个 WriteFile"的硬性要求，防止 agent 在前 20 步只做阅读和分析而不产出。（涉及文件: `prompts/ui-designer.md`）
-3. **在 workflow 中前置环境校验**：在 `workflows/design.yaml` 的 `runAgent` 之前增加一个轻量环境检查步骤，确认 `AGENTS.md` 或 `README.md` 至少存在一个，避免 agent 因找不到项目地图而在前 5 步就产生多次错误。（涉及文件: `workflows/design.yaml`）
+1. **消除冗余的 Shell 预检**：将 `prompts/reviewer.md` 第 292 行的"先用 Shell 确认文件存在"改为"直接用 ReadFile 读取，若返回文件不存在则标记为'未验证'并跳过"。仅此一项预计可将 Shell 调用降低 30-40%。（涉及文件: `prompts/reviewer.md`）
+2. **将 git 禁令前移至元原则并增加后果**：在 reviewer.md 的元原则中新增一条绝对铁律："review 任务严禁执行任何本地 `git` 命令。所有审查依据必须通过 `gh pr diff/view` 获取。违反此条将直接导致审查结论不可信并触发熔断。"（涉及文件: `prompts/reviewer.md`）
+3. **收紧 workflow 步数上限**：将 `workflows/review.yaml` 的 `--max-steps-per-turn` 从 10000 降至 50，使其略高于 prompt 的 45 步上限，形成外部硬边界。（涉及文件: `workflows/review.yaml`）
 
-### 问题 3: 视觉自查与核心设计产出的步骤竞争
+### 问题 3: rework 步数接近上限，workflow 外部约束过于宽松
 
 **证据**:
-- 视觉自查触发条件为"当前步数 ≤ 35"，但平均步数已达 44.5，说明大量任务要么跳过自查、要么在步骤极度紧张时触发自查
-- 单个任务最多调用 `preview_flutter_widget` 3 次，每次调用含编译和截图，可能消耗 5-10 步
+- avgSteps = 49，接近 prompt 中 rework 40 步上限（超出 22%）
+- workflow 中 `--max-steps-per-turn 10000`，对 rework 完全无外部约束
 
 **根因分析**:
-视觉自查的触发步数（35）与平均步数（44.5）过于接近，导致自查与核心设计产出争夺步骤预算。agent 为了"满足自查要求"可能在 35 步前匆忙产出不完整的 Widget，反而降低设计质量。
+rework 的 prompt 内嵌在 developer.md 中，虽有 40 步上限，但 workflow 没有配合的外部限制。agent 在修复多个 review 问题时容易逐条修复、逐条验证，导致步数膨胀。
 
 **改进建议**:
-1. **提前视觉自查的触发窗口**：将触发条件从"当前步数 ≤ 35"收紧为"当前步数 ≤ 25，且核心资产已全部 WriteFile 完成"。如果 25 步时核心资产未完成，自动放弃自查，优先保证资产完整。（涉及文件: `prompts/ui-designer.md`）
-2. **减少截图验证次数**：将"最多 3 次"缩减为"最多 1 次（默认状态）+ 1 次重试"，释放步骤预算给核心设计工作。（涉及文件: `prompts/ui-designer.md`）
+1. **对齐 rework workflow 的步数上限**：将 `workflows/rework.yaml` 的 `--max-steps-per-turn` 从 10000 下调至 50，略高于 prompt 的 40 步上限，防止 agent 透支预算。（涉及文件: `workflows/rework.yaml`，修改方式: `--max-steps-per-turn 10000` → `--max-steps-per-turn 50`）
 
 ## 已应用改进
 
-### 1. `prompts/ui-designer.md` — 强化效率约束与错误预防
-- **更新统计数据锚点**：将步数引用从"平均 20 步"更新为"平均 45 步，最高 79 步"，Think 引用从隐性提示改为"当前实际平均 10.8 次，严重违反限制"，Shell 引用增加"当前实际平均 31.5 次"，用真实数据增强 agent 的紧迫感。
-- **增加实时计数器要求**：在 SetTodoList 中明确要求包含四项计数器"步数: 0/60""Think: 0/3""Shell: 0/20""错误: 0/5"，且每次工具调用后必须更新，使预算显性化。
-- **细化错误熔断机制**：将原来"5 次立即停止"细化为"3 次错误进入只读/收尾模式，5 次立即终止"。增加"禁止重试"条款：同一操作失败后不得换参数重试。
-- **缩短探索预算与增加早期产出压力**：设计探索预算从 10 步缩减到 6 步；新增"启动后 12 步内必须完成第一个 WriteFile"的硬性约束。
-- **收紧收尾与自查窗口**：40 步预警改为 35 步强制收尾；视觉自查触发条件从 ≤35 改为 ≤25，且仅当核心资产已完成。
-- **加密进度检查点**：进度自评从"每 10 步"加密到"每 5 步"。
-- **强化超限后果描述**：所有上限约束均增加"超过后唯一动作是输出报告并结束，不得继续任何工具调用"的强制表述。
+### 1. `workflows/dev.yaml` — 下调外部步数限制
+- `--max-steps-per-turn` 从 `75` 下调至 `65`，使外部限制严格低于 prompt 的 60 步熔断线，消除 agent 的"余量幻觉"。
 
-### 2. `workflows/design.yaml` — 增加前置文件存在性检查
-- 在 `validateAgentInputs` 步骤之后、`runAgent` 之前，新增 `checkProjectMap` 步骤，用 `test -f AGENTS.md || test -f README.md` 确认项目地图至少存在一份。若不存在，在诊断日志中标记 `project_map_missing: true`，帮助人类快速定位"无头苍蝇"式探索的根因。
+### 2. `workflows/review.yaml` — 收紧外部步数限制
+- `--max-steps-per-turn` 从 `10000` 下调至 `50`，与 prompt 的 45 步上限对齐，防止 review agent 无限制探索。
+
+### 3. `workflows/rework.yaml` — 收紧外部步数限制
+- `--max-steps-per-turn` 从 `10000` 下调至 `50`，与 prompt 的 40 步上限对齐。
+
+### 4. `prompts/developer.md` — 强化预算约束与统计锚点
+- **更新统计锚点**（第 21 行）：将引用从"rework 任务平均 23 步..."更新为"dev 任务平均 **72 步、2 次错误、34 次 Shell/任务**，topGitOp 为 `status`——预算约束被全面突破，必须严格执行"。
+- **更新 git status 引用**（第 138 行）：将旧统计"Shell 调用高达 76 次"更新为"当前统计 dev 任务 Shell 调用 34 次/任务且 topGitOp 为 `status`——预算约束仍被突破"。
+- **增加 Shell 预警线**：在"步数硬上限与预警"章节中新增"Shell 预警：dev 达到 **15 次**时进入收尾阶段，禁止运行新的构建/测试/探索命令"。
+- **强化错误预警**：增加"错误 3 次预警"，第 3 次错误后进入只读/收尾模式（只允许代码修改、1 次验证、git 操作和写报告），第 5 次才完全熔断。
+
+### 5. `prompts/reviewer.md` — 减少 Shell 浪费并前置 git 禁令
+- **前置 git 禁令**：在元原则中新增第 3 条绝对铁律："review 任务严禁执行任何本地 `git` 命令（包括 `git status`、`git diff`、`git log` 等）。所有代码审查依据必须通过 `gh pr diff` 和 `gh pr view` 获取。违反此条将直接导致审查结论不可信。"
+- **消除冗余 Shell 预检**：将第 292 行的"先用 Shell `ls`/`test -f` 确认文件存在"改为"直接用 `ReadFile` 读取目标文件。如果返回文件不存在错误，将该维度标记为'未验证（文件缺失）'并跳过，不得尝试替代路径。反复用 Shell 预检是 review 任务 Shell 预算超标的首要原因。"
+- **更新 Shell 统计锚点**：在 Shell 预算说明中将"当前统计平均 15 次"更新为"当前统计平均 29 次/任务，严重超过 15 次上限"。
 
 ## 趋势追踪
 
-- 与上次对比: 上期（review/rework）avgSteps 下降 18.25 步，errorRate 下降 0.8，呈改善趋势；本期（design）avgSteps 上升 22.5 步，errorRate 上升 4.3，successRate 下降 0.25，design agent 表现显著恶化，成为当前最大瓶颈。
-- 建议下次重点关注: **design agent 的步数与错误分布**。当前仅知 design 有 20 个错误，但缺少具体错误分类（路径类、StrReplaceFile、Shell、编译等）。建议在日志采集侧增加错误类型标签，以便下次演进时做更精准的根因定位。同时观察本次 prompt 收紧后，avgSteps 和 errorRate 是否能在下一轮统计中回落。
+- 与上次对比: 上期（design）avgSteps 上升 22.5 步、errorRate 上升 4.3；本期（dev/review/rework）errorRateDelta -3.5、successRateDelta +0.25，整体错误率和成功率呈改善趋势。但 dev/review 的步数、Shell 调用和错误率仍然显著高于 prompt 预算，说明预算约束的**执行力**仍是最大短板。
+- 建议下次重点关注: **dev agent 的 Shell 调用分布**（具体是哪些 Shell 命令占用了 34 次预算）和 **review agent 的错误类型分类**（当前仅知 4 个错误，但缺少是路径类、gh 认证类还是 ReadFile 类的细分）。建议在日志采集侧增加错误类型和 Shell 命令分类标签，以便精准定位。

@@ -94,7 +94,7 @@ steps:
     dir: '{{ .Vars.tmpDir }}'
     command: |
       export PATH="/opt/flutter/bin:$PATH"
-      BASE_TEMPLATE="/root/squirrel-house/.tools/flutter_preview_generic"
+      BASE_TEMPLATE="{{ .Vars.projectRoot }}/.tools/flutter_preview_generic"
       DESIGNS_DIR="designs/issue-{{ .Vars.issueNumber }}"
       # 创建临时预览编译目录（避免多任务同时修改共享模板）
       PREVIEW_BUILD_DIR=$(mktemp -d -t "flutter-preview-{{ .Vars.issueNumber }}-XXXXXX")

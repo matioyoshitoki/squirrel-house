@@ -25,9 +25,10 @@ var staticFS embed.FS
 
 // Config 项目配置
 type Config struct {
-	Port       string    `json:"port"`
-	LarkChatID string    `json:"larkChatId"`
-	Projects   []Project `json:"projects"`
+	Port                   string    `json:"port"`
+	LarkChatID             string    `json:"larkChatId"`
+	Projects               []Project `json:"projects"`
+	FlutterPreviewTemplate string    `json:"flutterPreviewTemplate,omitempty"`
 }
 
 type TechStack struct {
@@ -433,14 +434,8 @@ func findProjectRoot() string {
 func loadConfig() {
 	// 默认配置
 	config = Config{
-		Port: "9090",
-		Projects: []Project{
-			{
-				Name:        "new-world-api",
-				Path:        "../new-world-server/new-world-api",
-				Description: "New-World 游戏后端 API",
-			},
-		},
+		Port:     "9090",
+		Projects: []Project{},
 	}
 
 	// 尝试从配置文件加载
@@ -450,6 +445,11 @@ func loadConfig() {
 		log.Printf("📋 已加载配置文件: %s", configPath)
 	} else {
 		log.Printf("⚠️ 无法加载配置文件 %s: %v，使用默认配置", configPath, err)
+	}
+
+	// 默认值填充
+	if config.FlutterPreviewTemplate == "" {
+		config.FlutterPreviewTemplate = ".tools/flutter_preview_generic"
 	}
 
 	// 环境变量覆盖

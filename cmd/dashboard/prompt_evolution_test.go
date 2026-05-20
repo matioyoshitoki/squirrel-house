@@ -51,7 +51,10 @@ StepBegin(n=1)
 StepBegin(n=2)
     function=FunctionBody(name='Shell', arguments='{"command": "ls"}')
         think='Let me check the directory'
-    return_value=ToolError(error='command not found')
+    return_value=ToolReturnValue(
+        is_error=True,
+        output='command not found'
+    )
 StepBegin(n=3)
     function=FunctionBody(name='WriteFile', arguments='{"path": "out.go", "content": "package main"}')
         name='WriteFile',
@@ -285,15 +288,15 @@ func TestCheckAndTriggerPromptEvolution_NotTrigger(t *testing.T) {
 func TestAnalyzeLogs_Integration(t *testing.T) {
 	// 这个测试使用实际的日志文件来验证 analyzeLogs
 	// 只在存在实际日志时运行
-	logsDir := "logs/new-world-monorepo"
+	logsDir := "logs/test-project"
 	entries, err := os.ReadDir(logsDir)
 	if err != nil || len(entries) == 0 {
 		t.Skip("无实际日志文件，跳过集成测试")
 	}
 
-	report := analyzeLogs("new-world-monorepo", time.Time{})
+	report := analyzeLogs("test-project", time.Time{})
 	require.NotNil(t, report)
-	assert.Equal(t, "new-world-monorepo", report.ProjectName)
+	assert.Equal(t, "test-project", report.ProjectName)
 	assert.Greater(t, report.TotalLogs, 0)
 
 	// 打印统计信息供人工检查
@@ -314,15 +317,15 @@ func TestAnalyzeLogs_WithRealLogs(t *testing.T) {
 	os.Chdir(rootDir)
 	defer os.Chdir(origDir)
 
-	logsDir := getProjectLogsDir("new-world-monorepo")
+	logsDir := getProjectLogsDir("test-project")
 	entries, err := os.ReadDir(logsDir)
 	if err != nil || len(entries) == 0 {
 		t.Skipf("无实际日志文件在 %s", logsDir)
 	}
 
-	report := analyzeLogs("new-world-monorepo", time.Time{})
+	report := analyzeLogs("test-project", time.Time{})
 	require.NotNil(t, report)
-	assert.Equal(t, "new-world-monorepo", report.ProjectName)
+	assert.Equal(t, "test-project", report.ProjectName)
 	assert.Greater(t, report.TotalLogs, 0)
 
 	t.Logf("Total logs analyzed: %d", report.TotalLogs)

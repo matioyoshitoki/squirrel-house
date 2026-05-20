@@ -17,6 +17,10 @@ func setupTaskStateTest(t *testing.T) {
 	os.Chdir(tmpDir)
 	setupTestTasks(t)
 
+	// 重置 shuttingDown 状态，避免 saveTaskState 被跳过
+	oldShuttingDown := isShuttingDown
+	isShuttingDown = false
+
 	// 设置统一的项目上下文，避免 getCurrentProjectName() 返回不一致的值
 	oldConfig := config
 	oldIndex := currentProjectIndex
@@ -31,6 +35,7 @@ func setupTaskStateTest(t *testing.T) {
 		projectMutex.Lock()
 		currentProjectIndex = oldIndex
 		projectMutex.Unlock()
+		isShuttingDown = oldShuttingDown
 	})
 }
 

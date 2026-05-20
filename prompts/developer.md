@@ -18,7 +18,7 @@
    - **Shell 上限**：dev **20 次**，rework **10 次**。能用 ReadFile/Grep/StrReplaceFile 完成的工作，绝不用 Shell。
    - **git status 上限**：全任务最多 **3 次**。
    
-   > ⚠️ 最新统计：rework 任务平均 **23 步、0.5 次错误、9 次 Shell/任务**——预算约束整体有效，但仍需严格执行。不要试探上限。
+   > ⚠️ 最新统计：dev 任务平均 **72 步、2 次错误、34 次 Shell/任务**，topGitOp 为 `status`——**预算约束被全面突破**，必须严格执行。不要试探上限。
 
 ## 任务启动检查清单（第 1-3 步必须完成）
 
@@ -135,7 +135,7 @@ AGENTS.md
 **关键约束**：
 - 不要离开当前工作目录（worktree 目录）
 - **Git 操作白名单**：只允许执行 `git status`、`git diff`、`git add`、`git commit`、`git push`。禁止执行 `git log`、`git blame`、`git show` 等历史浏览命令——工作树状态通过 `git status` 和 `git diff` 即可确认，无需查看提交历史。
-- **Git 操作频率限制**：`git status` 全任务最多调用 **3 次**（任务开始时 1 次、关键修改完成后 1 次、任务结束前 1 次）。统计报告显示 dev 任务 Shell 调用高达 76 次且 topGitOp 为 `status`，说明 agent 在用 `git status` 代替有效的进度判断——这是步数失控的典型症状。
+- **Git 操作频率限制**：`git status` 全任务最多调用 **3 次**（任务开始时 1 次、关键修改完成后 1 次、任务结束前 1 次）。当前统计 dev 任务 Shell 调用 34 次/任务且 topGitOp 为 `status`——预算约束仍被突破，agent 在用 `git status` 代替有效的进度判断——这是步数失控的典型症状。
 - 如果 `git commit` 遇到 pre-commit hook 失败，必须阅读错误输出，修复问题后重新 commit
 - 如果 `git push` 遇到 pre-push hook 失败，同样阅读错误、修复、重试
 - 如果 commit 后又有新修改，重复 add → commit → push
@@ -146,9 +146,10 @@ AGENTS.md
 **统一终止规则**：本 prompt 中所有"停止并报告"一律指**执行 WriteFile 写入报告文件后结束**，禁止以纯文本输出代替。报告路径：rework 模式优先写 `logs/rework-halted.md`，dev 模式优先写 `logs/dev-halted.md`。报告至少包含：时间戳、停止原因、当前进度。
 
 1. **步数硬上限与预警**：dev 不得超过 60 步，rework 不得超过 40 步。超过后严禁调用任何工具，直接输出最终报告。**35 步预警**（rework 为 25 步）：达到预警线时必须进入收尾阶段，只允许执行：(a) 代码修改（StrReplaceFile/WriteFile）、(b) 最多 1 次验证命令、(c) git add/commit/push、(d) 写最终报告。**禁止**继续阅读新文件、grep 探索、think 分析、运行新的构建/测试命令。
-2. **错误熔断**：
+2. **Shell 预算预警**：dev 达到 **15 次**、rework 达到 **7 次**时进入预警，禁止运行新的构建/测试/探索命令，只允许执行代码修改、git add/commit/push 和写报告。`git status` 已计入 Shell 预算，每次调用都消耗 1 次 Shell。
+3. **错误预警与熔断**：
    - **连续错误**：任意工具连续 3 次返回 `is_error=true`，立即停止并报告。
-   - **累计错误**：dev 达到 5 次、rework 达到 2 次，立即停止并报告。
+   - **错误预警**：dev 累计错误达到 **3 次**时进入只读/收尾模式（只允许代码修改、1 次验证命令、git 操作和写报告），达到 **5 次**才完全熔断；rework 累计错误达到 **2 次**立即停止。
 3. **零进度熔断**：前 5 步内如果没有产生任何文件修改，停止并报告。
 4. **进度检查点**：每 10 步自评一次"过去 10 步是否至少修改过一次文件？"如果否，停止并报告。（rework 模式为每 5 步检查一次）
 5. **探索预算**：定位修改点的阶段不得超过 10 步（dev）/ **6 步（rework）**。阅读 3 个以上文件仍未找到修改点 = 信息已足够，开始动手。

@@ -134,7 +134,7 @@ func makeTask(taskType TaskType, targetID int, status string) *Task {
 		ID:          taskID(taskType, targetID),
 		Type:        taskType,
 		Status:      status,
-		ProjectName: "social-world",
+		ProjectName: "test-project",
 		TargetID:    targetID,
 		Branch:      "feat/issue-5",
 		Kind:        "full-stack",
