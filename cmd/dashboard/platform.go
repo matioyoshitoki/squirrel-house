@@ -42,6 +42,7 @@ type Platform interface {
 
 	// MR / PR
 	ListOpenMRs() ([]MergeRequest, error)
+	ListMergedMRs() ([]MergeRequest, error)
 	ViewMR(iid int) (*MergeRequest, error)
 	FindMRByBranch(branch string) (int, error)
 	GetMRDiffFiles(iid int) ([]string, error)
@@ -174,8 +175,8 @@ func (g *githubPlatform) AuthStatus() error {
 	return err
 }
 
-func (g *githubPlatform) ListOpenMRs() ([]MergeRequest, error) {
-	output, err := g.run("pr", "list", "--state", "open", "--json", "number,title,state,baseRefName,headRefName,url,createdAt,author")
+func (g *githubPlatform) listPRs(state string) ([]MergeRequest, error) {
+	output, err := g.run("pr", "list", "--state", state, "--json", "number,title,state,baseRefName,headRefName,url,createdAt,author")
 	if err != nil {
 		return nil, fmt.Errorf("list PRs: %w, output: %s", err, string(output))
 	}
@@ -203,6 +204,14 @@ func (g *githubPlatform) ListOpenMRs() ([]MergeRequest, error) {
 		}
 	}
 	return result, nil
+}
+
+func (g *githubPlatform) ListOpenMRs() ([]MergeRequest, error) {
+	return g.listPRs("open")
+}
+
+func (g *githubPlatform) ListMergedMRs() ([]MergeRequest, error) {
+	return g.listPRs("merged")
 }
 
 func (g *githubPlatform) ViewMR(iid int) (*MergeRequest, error) {
@@ -399,8 +408,12 @@ func (gl *gitlabPlatform) AuthStatus() error {
 	return nil
 }
 
-func (gl *gitlabPlatform) ListOpenMRs() ([]MergeRequest, error) {
-	output, err := gl.run("mr", "list", "-F", "json")
+func (gl *gitlabPlatform) listMRs(state string) ([]MergeRequest, error) {
+	args := []string{"mr", "list", "-F", "json"}
+	if state == "merged" {
+		args = append(args, "--merged")
+	}
+	output, err := gl.run(args...)
 	if err != nil {
 		return nil, fmt.Errorf("list MRs: %w, output: %s", err, string(output))
 	}
@@ -429,6 +442,14 @@ func (gl *gitlabPlatform) ListOpenMRs() ([]MergeRequest, error) {
 		}
 	}
 	return result, nil
+}
+
+func (gl *gitlabPlatform) ListOpenMRs() ([]MergeRequest, error) {
+	return gl.listMRs("")
+}
+
+func (gl *gitlabPlatform) ListMergedMRs() ([]MergeRequest, error) {
+	return gl.listMRs("merged")
 }
 
 func (gl *gitlabPlatform) ViewMR(iid int) (*MergeRequest, error) {

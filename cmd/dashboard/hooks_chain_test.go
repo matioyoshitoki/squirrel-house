@@ -216,8 +216,8 @@ func TestHookChain_ReworkSuccess_NoPR(t *testing.T) {
 	}
 }
 
-// E2E → Review (success, dev-triggered, has PR)
-func TestHookChain_E2ESuccess_DevTriggered_WithPR(t *testing.T) {
+// E2E → no Review (E2E 已改为独立任务，不再自动触发 Review)
+func TestHookChain_E2ESuccess_NoReviewHook(t *testing.T) {
 	mockDisp, _, _, mockFinder := setupHookTest(t)
 	mockFinder.findPRFn = func(branch string) int { return 58 }
 
@@ -226,40 +226,12 @@ func TestHookChain_E2ESuccess_DevTriggered_WithPR(t *testing.T) {
 	spec := taskRegistry[TaskTypeE2E]
 	triggerHooks(task, spec, map[string]interface{}{}, nil, true)
 
-	if !mockDisp.wasCalled(TaskTypeReview) {
-		t.Error("expected Review hook to be triggered after E2E success")
-	}
-}
-
-// E2E → no Review (manual trigger)
-func TestHookChain_E2ESuccess_ManualTrigger(t *testing.T) {
-	mockDisp, _, _, mockFinder := setupHookTest(t)
-	mockFinder.findPRFn = func(branch string) int { return 58 }
-
-	task := makeTask(TaskTypeE2E, 5, "success")
-	task.Metadata["triggeredBy"] = "manual"
-	spec := taskRegistry[TaskTypeE2E]
-	triggerHooks(task, spec, map[string]interface{}{}, nil, true)
-
 	if mockDisp.wasCalled(TaskTypeReview) {
-		t.Error("expected Review hook NOT to be triggered for manual E2E")
+		t.Error("expected Review hook NOT to be triggered (E2E is now an independent task)")
 	}
 }
 
-// E2E → no Review (no open PR)
-func TestHookChain_E2ESuccess_NoPR(t *testing.T) {
-	mockDisp, _, _, mockFinder := setupHookTest(t)
-	mockFinder.findPRFn = func(branch string) int { return 0 }
 
-	task := makeTask(TaskTypeE2E, 5, "success")
-	task.Metadata["triggeredBy"] = "dev-5"
-	spec := taskRegistry[TaskTypeE2E]
-	triggerHooks(task, spec, map[string]interface{}{}, nil, true)
-
-	if mockDisp.wasCalled(TaskTypeReview) {
-		t.Error("expected Review hook NOT to be triggered when no PR found")
-	}
-}
 
 // Review → Rework (NEEDS_FIX)
 func TestHookChain_ReviewNonPass_TriggersRework(t *testing.T) {
@@ -376,14 +348,14 @@ func TestHookChain_ReviewPass_NoHooks(t *testing.T) {
 	}
 }
 
-// Hook template variable rendering (using E2E → Review hook)
+// Hook template variable rendering (using Dev → Review hook)
 func TestHookChain_TemplateVarsRendered(t *testing.T) {
 	mockDisp, _, _, mockFinder := setupHookTest(t)
 	mockFinder.findPRFn = func(branch string) int { return 30 }
 
-	task := makeTask(TaskTypeE2E, 5, "success")
-	task.Metadata["triggeredBy"] = "dev-5"
-	spec := taskRegistry[TaskTypeE2E]
+	task := makeTask(TaskTypeDev, 5, "success")
+	task.Branch = "feat/issue-5"
+	spec := taskRegistry[TaskTypeDev]
 	vars := map[string]interface{}{
 		"issueNumber": "5",
 		"branch":      "feat/issue-5",

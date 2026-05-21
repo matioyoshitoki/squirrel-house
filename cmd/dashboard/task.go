@@ -261,40 +261,12 @@ var taskRegistry = map[TaskType]taskSpec{
 				reportContent = fmt.Sprintf("E2E 测试完成，状态: %s\n\n日志: %s", t.Status, filepath.Base(t.LogFile))
 			}
 
-			// 2. 查找关联 PR
-			prNumber := prFinderImpl.findPR(t.Branch)
-
-			// 3. 如果有 PR，添加评论（推送报告原文）
-			if prNumber > 0 {
-				addE2EPRComment(getProjectPath(), prNumber, reportContent)
-			}
-
-			// 4. 飞书通知（推送报告原文）
-			notifyE2EFinished(t.TargetID, t.TargetTitle, t.Status, reportContent, prNumber)
+			// 2. 飞书通知（推送报告原文）
+			// E2E 是独立任务，不再关联 PR 评论
+			notifyE2EFinished(t.TargetID, t.TargetTitle, t.Status, reportContent, 0)
 		},
-		AfterSuccess: []HookConfig{
-			{
-				// E2E 成功后自动触发 Review
-				TargetType: TaskTypeReview,
-				Condition: func(t *Task, sourceVars map[string]interface{}, wfCtx *workflow.Context) bool {
-					// 只处理由 dev/rework 任务触发的 E2E（手动触发的不自动 Review）
-					triggeredBy, _ := t.Metadata["triggeredBy"].(string)
-					if !strings.HasPrefix(triggeredBy, "dev-") && !strings.HasPrefix(triggeredBy, "rework-") {
-						log.Printf("[hook] E2E 由 %s 触发，非 dev/rework 任务，跳过自动 Review", triggeredBy)
-						return false
-					}
-					prNumber := prFinderImpl.findPR(t.Branch)
-					if prNumber == 0 {
-						log.Printf("[hook] E2E 任务分支 %s 未找到关联 PR，跳过自动 Review", t.Branch)
-						return false
-					}
-					log.Printf("[hook] E2E 成功，将自动触发 PR #%d Review", prNumber)
-					return true
-				},
-				Vars: map[string]string{}, // 不需要变量，startReviewTaskFromHook 直接读取 e2eTask
-			},
-		},
-
+		// E2E 是独立任务，成功后不再自动触发 Review
+		AfterSuccess: []HookConfig{},
 	},
 	TaskTypePromptEvolution: {
 		WorkflowName: "prompt-evolution",

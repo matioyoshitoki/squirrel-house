@@ -34,7 +34,7 @@ steps:
     dir: '{{ .Vars.tmpDir }}'
     command: |
       kimi --agent-file {{ .Vars.agentFile | shellquote }} \
-           --max-steps-per-turn 65 \
+           --max-steps-per-turn 55 \
            --print \
            -p {{ .Vars.prompt | shellquote }}
     env:
@@ -86,20 +86,12 @@ steps:
         fi
       done
 
-      # 4. 检查 Maestro E2E flow（如果涉及新页面/交互）
-      # 简化检查：如果 Mobile 有新增 page 文件但 .maestro 没有新增，发出警告
-      NEW_PAGES=$(git diff --name-only --cached 2>/dev/null | grep "apps/mobile/lib/presentation/pages/" | grep "^A" | wc -l || echo 0)
-      NEW_MAESTRO=$(git diff --name-only --cached 2>/dev/null | grep ".maestro/flows/" | wc -l || echo 0)
-      if [ "$NEW_PAGES" -gt 0 ] && [ "$NEW_MAESTRO" -eq 0 ]; then
-        echo "⚠️ 新增页面但未新增 Maestro E2E flow（如果页面不在核心流程中可忽略）"
-      fi
-
-      # 5. 运行 lint（如果 Makefile 存在）
+      # 4. 运行 lint（如果 Makefile 存在）
       if [ -f "Makefile" ]; then
         make lint 2>&1 | tail -20 || echo "⚠️ lint 检查失败（可能是环境缺失）"
       fi
 
-      # 6. 运行测试（如果 Makefile 存在）
+      # 5. 运行测试（如果 Makefile 存在）
       if [ -f "Makefile" ]; then
         make test 2>&1 | tail -30 || echo "⚠️ 测试运行失败（可能是环境缺失）"
       fi

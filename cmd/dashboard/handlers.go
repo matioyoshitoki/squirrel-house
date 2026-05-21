@@ -1731,32 +1731,55 @@ func handleRunE2E(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// 1. 推断分支
+	projectName := getCurrentProjectName()
+	projectPath := getProjectPath()
+
+	// 1. 读取 E2E issue 详情（title、body 作为测试范围）
+	platform := getPlatform(projectPath)
+	issue, err := platform.ViewIssue(req.IssueNumber)
+	if err != nil {
+		log.Printf("[e2e] 读取 Issue #%d 失败: %v", req.IssueNumber, err)
+		writeJSONError(w, http.StatusBadRequest, fmt.Sprintf("读取 Issue #%d 失败: %v", req.IssueNumber, err))
+		return
+	}
+
+	// 2. 推断分支：优先使用传入参数，否则从 issue body 中解析，最后默认 main
 	branch := req.Branch
 	if branch == "" {
-		// 优先从已有的 dev task 获取分支
-		if devTask, ok := getTask(TaskTypeDev, req.IssueNumber); ok && devTask.Branch != "" {
-			branch = devTask.Branch
-		} else {
-			branch = fmt.Sprintf("feat/issue-%d", req.IssueNumber)
+		// 尝试从 issue body 解析 Branch: xxx
+		if issue.Body != "" {
+			for _, line := range strings.Split(issue.Body, "\n") {
+				line = strings.TrimSpace(line)
+				if strings.HasPrefix(strings.ToLower(line), "branch:") {
+					branch = strings.TrimSpace(strings.TrimPrefix(line, "Branch:"))
+					branch = strings.TrimSpace(strings.TrimPrefix(branch, "branch:"))
+					break
+				}
+			}
+		}
+		if branch == "" {
+			branch = getProjectDefaultBranch()
+			if branch == "" {
+				branch = "main"
+			}
 		}
 	}
 
-	// 2. 推断任务类型
+	// 3. 推断任务类型
 	taskKind := req.TaskKind
 	if taskKind == "" {
-		taskKind = getIssueClassification(req.IssueNumber)
+		taskKind = classifyIssue(*issue)
 	}
 
-	// 3. 检查是否已有 running 的 E2E 任务
+	// 4. 检查是否已有 running 的 E2E 任务
 	if existing, ok := getTask(TaskTypeE2E, req.IssueNumber); ok && existing.Status == "running" {
 		writeJSONError(w, http.StatusConflict, fmt.Sprintf("E2E 任务 e2e-%d 已在运行中", req.IssueNumber))
 		return
 	}
 
-	// 5. 启动 E2E 任务（统一入口，和 hook 自动触发同一路径）
-	worktreePath := getProjectPath()
-	startE2ETask(req.IssueNumber, branch, taskKind, "manual", worktreePath, getCurrentProjectName())
+	// 5. 启动 E2E 任务（独立入口，E2E 不再作为其他任务的附属流程）
+	worktreePath := projectPath
+	startE2ETask(req.IssueNumber, issue.Title, issue.Body, branch, taskKind, "manual", worktreePath, projectName)
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]interface{}{

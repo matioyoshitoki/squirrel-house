@@ -20,14 +20,16 @@
 
 在执行测试之前，先了解应该测试什么：
 
-1. **检查已有 flow**：`find .maestro/flows -name "*.yaml" -not -path "*/includes/*"`
-2. **阅读 E2E 规范**：如果存在 `.maestro/README.md`，优先阅读
-3. **阅读 PRD**：根据 Issue/PR 关联的 PRD 文件，了解功能需求
-4. **阅读代码**：查看 `apps/mobile/` 或 `apps/api/` 中相关实现，了解实际功能
+1. **阅读 E2E Issue**：本次任务的测试范围由专门的 E2E Issue 定义，请优先阅读 prompt 中的「E2E 测试范围」部分。
+2. **检查已有 flow**：`find .maestro/flows -name "*.yaml" -not -path "*/includes/*"`
+3. **阅读 E2E 规范**：如果存在 `.maestro/README.md`，优先阅读
+4. **阅读 PRD**：根据 Issue/PR 关联的 PRD 文件，了解功能需求
+5. **阅读代码**：查看 `apps/mobile/` 或 `apps/api/` 中相关实现，了解实际功能
 
 **判断已有 flow 是否覆盖当前功能**：
 - 如果 `.maestro/flows/` 为空或缺少关键 flow → **你需要创建新的 flow**
 - 如果已有 flow 但可能过时 → **执行测试后判断是否需要更新**
+- 严格按照 E2E Issue 中定义的测试范围执行，不要超出范围测试无关功能
 
 ### 能力 2：编写 Maestro Flow（Write Flow）
 

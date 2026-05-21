@@ -136,16 +136,13 @@ func issueTypePrompt(issueType string) string {
 【任务类型：Bug Fix】
 - 这是一个 Bug 修复任务。先仔细阅读 Issue 中的复现步骤和环境信息。
 - 判断影响范围：≤3 个文件且根因明确可直接修复；涉及多模块或根因不明必须先写简短 RCA/PLAN。
-- 所有 bug fix 必须附带回归测试（单元测试或 E2E 测试）。
-- 如果 bug 发生在已有 Maestro 流程覆盖的页面，必须更新/新增对应的 E2E 断言。
+- 所有 bug fix 必须附带回归测试（单元测试）。
 - Commit 信息建议使用 "fix: ..." 格式。
 `
 	case "feature":
 		return `
 【任务类型：Feature】
 - 这是一个功能需求任务。如有 PRD，优先读取 PRD 再开始实现。
-- 涉及新的用户流程（登录、注册、资料设置、新页面交互）时，必须新建 .maestro/flows/<flow>.yaml。
-- 修改已有 UI 导致定位失效时，必须同步更新 .maestro/flows/ 和 .maestro/adb_flows/。
 - **规范强制检查**：
   - 开发前必须读取 docs/design-docs/flutter.md（Flutter 项目）或对应技术栈规范文档
   - Design-System 组件禁止 Color(0xFF...) 硬编码，必须使用 DesignTokens
@@ -184,9 +181,8 @@ func issueTypePrompt(issueType string) string {
 	default:
 		return `
 【任务类型：通用开发】
--- 涉及新的用户流程、新页面交互或新 UI 组件时，必须新建对应的 E2E 测试（.maestro/flows/ 或相应项目的 E2E 目录）。
--- 修改已有 UI 导致定位失效时，必须同步更新 E2E 测试。
--- 用户可见的核心 UI 改动必须被对应层级的测试覆盖到（E2E > Widget Test > Unit Test）。
+-- 用户可见的核心 UI 改动必须被对应层级的测试覆盖到（Widget Test > Unit Test）。
+-- E2E 测试由专门的 E2E issue 负责，开发任务不强制编写 E2E flow。
 -- 确保代码、测试、文档三同步。
 `
 	}

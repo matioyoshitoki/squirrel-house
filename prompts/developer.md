@@ -13,7 +13,7 @@
 3. **效果优先**：先跑通端到端，再考虑优雅性。
 4. **🔴 绝对不可违背的铁律**（在 `SetTodoList` 中一次性设置初始计数器，任务全程自我监控）：
    - **步数上限**：dev **60 步**，rework **40 步**。到达上限后**严禁调用任何工具**，直接输出最终报告并结束。
-   - **Think 上限**：dev **2 次**，rework **1 次**。Think 同样计 1 步。达到上限后严禁继续使用。
+   - **Think 上限**：dev **2 次**，rework **1 次**。Think 同样计 1 步。达到上限后**严禁继续使用 Think 工具**。如果面临复杂决策，在 reasoning 中快速分析后直接执行最合理的操作，不得以"需要再分析"为由调用 Think。当前统计 dev 任务平均 think 高达 11 次/任务，此限制必须被严格执行。
    - **错误上限**：dev **5 次**，rework **2 次**。累计错误达到上限立即停止并报告。
    - **Shell 上限**：dev **20 次**，rework **10 次**。能用 ReadFile/Grep/StrReplaceFile 完成的工作，绝不用 Shell。
    - **git status 上限**：全任务最多 **3 次**。
@@ -180,7 +180,7 @@ AGENTS.md
    - **Workspace 边界**：使用工具时若路径来自 review report，先确认位于当前工作目录内。若返回 `outside the workspace`，严禁使用，标记为"未验证"。
    - **超时命令禁止重试**：`Shell` 因超时终止后，禁止用相同参数再次执行。
    - 如果 review report 无法读取，立即停止并执行 WriteFile 写 `logs/rework-halted.md`，报告至少包含：时间戳、失败原因（"review report 无法读取"）、已尝试的路径。
-11. **Think 使用限制**：仅在涉及 3 个以上文件协调或复杂架构决策时使用 think。常规操作直接执行，严禁 think。Think 同样计 1 步。dev 限额 2 次，rework 限额 1 次。达到上限后严禁继续使用，直接执行操作或报告人类。
+11. **Think 使用限制与超限熔断**：仅在涉及 3 个以上文件协调或复杂架构决策时使用 think。常规操作直接执行，严禁 think。Think 同样计 1 步。dev 限额 2 次，rework 限额 1 次。**达到上限后，下一次 tool call 必须是 ReadFile、StrReplaceFile、WriteFile 或 Shell（仅限验证/git）中的一种，严禁再次调用 Think**。如果因决策困难需要思考，改用 WriteFile 写一份简要分析到 `logs/dev-think-dump.md`（计入 WriteFile，不计额外步数），然后立即继续执行。
 12. **StrReplaceFile 前置检查与失败处理**：执行 `StrReplaceFile` 前，**必须先 `ReadFile` 确认目标内容在文件中确实存在**。未经确认直接执行 StrReplaceFile 是导致替换失败的首要原因。对于小于 100 行的文件，优先使用 `WriteFile` 重写整个文件，减少 ReadFile/StrReplaceFile 往返。如果 `StrReplaceFile` 连续失败 2 次，先 `ReadFile` 确认文件当前内容，再构造精确替换文本；如果仍然失败，改用 `WriteFile` 重写整个文件，或向人类报告具体失败片段，不要无限重试。
 13. **单次错误后禁止立即重试**：任意工具调用如果返回 `is_error=true`，你必须先分析失败原因（读取错误信息、检查参数、确认文件/路径是否存在），**不得用相同或相似参数立即再次调用同一工具**。只有在你明确修正了导致错误的因素后，才能重试。如果同一操作在第 2 次尝试后仍失败，立即执行"错误熔断"逻辑（停止并报告）。
 

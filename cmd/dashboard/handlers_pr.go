@@ -79,7 +79,13 @@ func buildReworkTestCommands(ts TechStack) string {
 
 func handlePullRequests(w http.ResponseWriter, r *http.Request) {
 	platform := getPlatform(getProjectPath())
-	mrs, err := platform.ListOpenMRs()
+	var mrs []MergeRequest
+	var err error
+	if r.URL.Query().Get("state") == "merged" {
+		mrs, err = platform.ListMergedMRs()
+	} else {
+		mrs, err = platform.ListOpenMRs()
+	}
 	if err != nil {
 		msg := fmt.Sprintf("获取 PR/MR 列表失败: %v", err)
 		log.Printf("⚠️ %s", msg)

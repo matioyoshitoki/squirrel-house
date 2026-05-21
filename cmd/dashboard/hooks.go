@@ -113,8 +113,9 @@ func startHookTask(targetType TaskType, sourceTask *Task, vars map[string]interf
 	hookDispatcher.Dispatch(targetType, sourceTask, vars)
 }
 
-// startE2ETask 启动 E2E 任务（统一入口：hook 触发 + 手动触发）
-func startE2ETask(issueNumber int, branch string, taskKind string, triggeredBy string, worktreePath string, projectName string) {
+// startE2ETask 启动 E2E 任务（统一入口：手动触发）
+// E2E 是独立任务，由专门的 E2E issue 定义测试范围，不再依附于功能 issue 的附属流程。
+func startE2ETask(issueNumber int, issueTitle, issueBody, branch string, taskKind string, triggeredBy string, worktreePath string, projectName string) {
 	// 检查是否已有 running 的 E2E 任务
 	if existing, ok := getTask(TaskTypeE2E, issueNumber); ok && existing.Status == "running" {
 		log.Printf("[e2e] E2E 任务已在运行: e2e-%d", issueNumber)
@@ -149,9 +150,13 @@ func startE2ETask(issueNumber int, branch string, taskKind string, triggeredBy s
 	}
 	f.Close()
 
-	logMsg := fmt.Sprintf("[%s] E2E 任务启动 (由 %s)\n分支: %s\n项目: %s\n日志: %s\n\n",
-		time.Now().Format("2006-01-02 15:04:05"), triggeredBy, branch, projectName, logFileName)
+	logMsg := fmt.Sprintf("[%s] E2E 任务启动 (由 %s)\nIssue: #%d %s\n分支: %s\n项目: %s\n日志: %s\n\n",
+		time.Now().Format("2006-01-02 15:04:05"), triggeredBy, issueNumber, issueTitle, branch, projectName, logFileName)
 	os.WriteFile(logFileName, []byte(logMsg), 0644)
+
+	if issueTitle == "" {
+		issueTitle = fmt.Sprintf("E2E Issue #%d", issueNumber)
+	}
 
 	e2eTask := &Task{
 		ID:          taskID(TaskTypeE2E, issueNumber),
@@ -159,7 +164,7 @@ func startE2ETask(issueNumber int, branch string, taskKind string, triggeredBy s
 		Status:      "running",
 		ProjectName: projectName,
 		TargetID:    issueNumber,
-		TargetTitle: fmt.Sprintf("E2E for Issue #%d", issueNumber),
+		TargetTitle: issueTitle,
 		Branch:      branch,
 		StartTime:   time.Now(),
 		LogFile:     logFileName,
@@ -167,6 +172,7 @@ func startE2ETask(issueNumber int, branch string, taskKind string, triggeredBy s
 			"triggeredBy": triggeredBy,
 			"branch":      branch,
 			"taskKind":    taskKind,
+			"issueBody":   issueBody,
 		},
 	}
 
@@ -187,10 +193,17 @@ func startE2ETask(issueNumber int, branch string, taskKind string, triggeredBy s
 
 	agentCtx := buildAgentContext(worktreePath, issueNumber, 0)
 	ctxPrompt := formatAgentContextPrompt(agentCtx, issueNumber, 0)
-	e2ePrompt := fmt.Sprintf("%s\n\n**你的任务类型：E2E 测试任务（E2E Tester Agent）**\n目标：执行 Maestro E2E 测试，分析失败原因，生成详细报告。\n\nIssue #%d，分支: %s\n", ctxPrompt, issueNumber, branch)
+
+	// 构建 E2E prompt，包含 issue body 中定义的测试范围
+	var scopeSection string
+	if issueBody != "" {
+		scopeSection = fmt.Sprintf("\n## E2E 测试范围（来自 Issue #%d）\n\n%s\n", issueNumber, issueBody)
+	}
+	e2ePrompt := fmt.Sprintf("%s\n\n**你的任务类型：E2E 测试任务（E2E Tester Agent）**\n目标：执行 Maestro E2E 测试，分析失败原因，生成详细报告。\n\nIssue #%d: %s\n分支: %s\n%s", ctxPrompt, issueNumber, issueTitle, branch, scopeSection)
 
 	e2eVars := map[string]interface{}{
 		"issueNumber":  issueNumber,
+		"issueTitle":   issueTitle,
 		"branch":       branch,
 		"logFileName":  logFileName,
 		"taskKind":     taskKind,
@@ -205,7 +218,7 @@ func startE2ETask(issueNumber int, branch string, taskKind string, triggeredBy s
 	log.Printf("[e2e] E2E 任务已启动: e2e-%d", issueNumber)
 }
 
-// startE2ETaskFromHook 从 dev workflow 的 hook 启动 E2E 任务
+// startE2ETaskFromHook 从 hook 启动 E2E 任务（保留兼容性，但 E2E 已改为独立 issue 驱动）
 func startE2ETaskFromHook(sourceTask *Task, vars map[string]interface{}) {
 	branch, _ := vars["branch"].(string)
 	taskKind, _ := vars["taskKind"].(string)
@@ -229,7 +242,8 @@ func startE2ETaskFromHook(sourceTask *Task, vars map[string]interface{}) {
 	}
 
 	triggeredBy := fmt.Sprintf("%s-%d", sourceTask.Type, sourceTask.TargetID)
-	startE2ETask(issueNum, branch, taskKind, triggeredBy, worktreePath, sourceTask.ProjectName)
+	// Hook 触发时无 issue title/body，传空值（E2E 已主要走独立 issue 手动触发）
+	startE2ETask(issueNum, "", "", branch, taskKind, triggeredBy, worktreePath, sourceTask.ProjectName)
 }
 
 // startReviewTaskFromHook E2E 成功后自动触发 Review

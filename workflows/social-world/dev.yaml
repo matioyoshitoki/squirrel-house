@@ -97,7 +97,6 @@ steps:
       git push origin {{ .Vars.branch }} || true
     ignoreError: true
 
-  # 保留 worktree 供 E2E 复用，不在此清理
   # - id: cleanupWorktree
   #   label: 清理 worktree
   #   type: shell
