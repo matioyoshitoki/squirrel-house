@@ -90,76 +90,56 @@ steps:
         # 需要临时注入 mock 实现才能打包出可运行的预览
         if [ -f "$DESIGN_DIR/index.ts" ]; then
           cp "$DESIGN_DIR/index.ts" "$DESIGN_DIR/index.ts.bak"
-          cat > "$DESIGN_DIR/index.ts" << 'TSEOF'
-import * as React from 'react';
-
-export const cx = (...inputs: any[]) => {
-  return inputs.flat().filter(Boolean).map((x: any) => {
-    if (typeof x === 'string') return x;
-    if (typeof x === 'object' && x !== null && !Array.isArray(x)) {
-      return Object.entries(x).filter(([_, v]) => v).map(([k]) => k).join(' ');
-    }
-    return String(x);
-  }).join(' ');
-};
-
-export const mergeProps = (a: any, b: any) => {
-  const result = { ...a };
-  for (const [k, v] of Object.entries(b || {})) {
-    if (typeof v === 'function' && typeof result[k] === 'function') {
-      const orig = result[k];
-      result[k] = (...args: any[]) => { orig(...args); (v as any)(...args); };
-    } else if (typeof v === 'object' && v !== null && typeof result[k] === 'object' && result[k] !== null && !Array.isArray(v)) {
-      result[k] = { ...result[k], ...v };
-    } else {
-      result[k] = v;
-    }
-  }
-  return result;
-};
-
-export const useId = (prefix = 'nw') => {
-  const [id] = React.useState(() => prefix + '-' + Math.random().toString(36).slice(2, 9));
-  return id;
-};
-
-export const callAllHandlers = (...fns: any[]) => (event: any) => fns.forEach(fn => fn?.(event));
-
-export const getValidChildren = (children: any) => React.Children.toArray(children).filter((c: any) => React.isValidElement(c));
-
-export const canUseDOM = () => typeof window !== 'undefined' && !!(window.document && window.document.createElement);
-
-export const UIConfigContext = React.createContext<any>({ prefixCls: 'nw', locale: 'zh-CN', theme: { colorMode: 'light', cssVarPrefix: 'nw' }, autoInjectCSS: true });
-export const ConfigProvider = ({ config, children }: any) => {
-  const parent = React.useContext(UIConfigContext);
-  const value = mergeProps(parent, config || {});
-  return React.createElement(UIConfigContext.Provider, { value }, children);
-};
-export const useConfig = () => React.useContext(UIConfigContext);
-export const createUI = (initialConfig: any) => ({
-  config: initialConfig || {},
-  setConfig: () => {},
-  getTheme: () => 'light'
-});
-export const DEFAULT_CONFIG = {};
-
-export const registerComponent = () => {};
-export const getComponent = () => null;
-
-export const ThemeContext = React.createContext<any>({ colorMode: 'light', setColorMode: () => {}, toggleColorMode: () => {} });
-export const ThemeProvider = ({ initialColorMode = 'light', children }: any) => {
-  const [colorMode, setColorMode] = React.useState(initialColorMode);
-  const toggleColorMode = () => setColorMode((m: string) => m === 'light' ? 'dark' : 'light');
-  React.useEffect(() => {
-    if (typeof document !== 'undefined') {
-      document.documentElement.setAttribute('data-theme', colorMode);
-    }
-  }, [colorMode]);
-  return React.createElement(ThemeContext.Provider, { value: { colorMode, setColorMode, toggleColorMode } }, children);
-};
-export const useTheme = () => React.useContext(ThemeContext);
-export const setTheme = () => {};
-TSEOF
+          echo 'aW1wb3J0ICogYXMgUmVhY3QgZnJvbSAncmVhY3QnOwoKZXhwb3J0IGNvbnN0IGN4ID0gKC4uLmlucHV0
+          czogYW55W10pID0+IHsKICByZXR1cm4gaW5wdXRzLmZsYXQoKS5maWx0ZXIoQm9vbGVhbikubWFwKCh4
+          OiBhbnkpID0+IHsKICAgIGlmICh0eXBlb2YgeCA9PT0gJ3N0cmluZycpIHJldHVybiB4OwogICAgaWYg
+          KHR5cGVvZiB4ID09PSAnb2JqZWN0JyAmJiB4ICE9PSBudWxsICYmICFBcnJheS5pc0FycmF5KHgpKSB7
+          CiAgICAgIHJldHVybiBPYmplY3QuZW50cmllcyh4KS5maWx0ZXIoKFtfLCB2XSkgPT4gdikubWFwKChb
+          a10pID0+IGspLmpvaW4oJyAnKTsKICAgIH0KICAgIHJldHVybiBTdHJpbmcoeCk7CiAgfSkuam9pbign
+          ICcpOwp9OwoKZXhwb3J0IGNvbnN0IG1lcmdlUHJvcHMgPSAoYTogYW55LCBiOiBhbnkpID0+IHsKICBj
+          b25zdCByZXN1bHQgPSB7IC4uLmEgfTsKICBmb3IgKGNvbnN0IFtrLCB2XSBvZiBPYmplY3QuZW50cmll
+          cyhiIHx8IHt9KSkgewogICAgaWYgKHR5cGVvZiB2ID09PSAnZnVuY3Rpb24nICYmIHR5cGVvZiByZXN1
+          bHRba10gPT09ICdmdW5jdGlvbicpIHsKICAgICAgY29uc3Qgb3JpZyA9IHJlc3VsdFtrXTsKICAgICAg
+          cmVzdWx0W2tdID0gKC4uLmFyZ3M6IGFueVtdKSA9PiB7IG9yaWcoLi4uYXJncyk7ICh2IGFzIGFueSko
+          Li4uYXJncyk7IH07CiAgICB9IGVsc2UgaWYgKHR5cGVvZiB2ID09PSAnb2JqZWN0JyAmJiB2ICE9PSBu
+          dWxsICYmIHR5cGVvZiByZXN1bHRba10gPT09ICdvYmplY3QnICYmIHJlc3VsdFtrXSAhPT0gbnVsbCAm
+          JiAhQXJyYXkuaXNBcnJheSh2KSkgewogICAgICByZXN1bHRba10gPSB7IC4uLnJlc3VsdFtrXSwgLi4u
+          diB9OwogICAgfSBlbHNlIHsKICAgICAgcmVzdWx0W2tdID0gdjsKICAgIH0KICB9CiAgcmV0dXJuIHJl
+          c3VsdDsKfTsKCmV4cG9ydCBjb25zdCB1c2VJZCA9IChwcmVmaXggPSAnbncnKSA9PiB7CiAgY29uc3Qg
+          W2lkXSA9IFJlYWN0LnVzZVN0YXRlKCgpID0+IHByZWZpeCArICctJyArIE1hdGgucmFuZG9tKCkudG9T
+          dHJpbmcoMzYpLnNsaWNlKDIsIDkpKTsKICByZXR1cm4gaWQ7Cn07CgpleHBvcnQgY29uc3QgY2FsbEFs
+          bEhhbmRsZXJzID0gKC4uLmZuczogYW55W10pID0+IChldmVudDogYW55KSA9PiBmbnMuZm9yRWFjaChm
+          biA9PiBmbj8uKGV2ZW50KSk7CgpleHBvcnQgY29uc3QgZ2V0VmFsaWRDaGlsZHJlbiA9IChjaGlsZHJl
+          bjogYW55KSA9PiBSZWFjdC5DaGlsZHJlbi50b0FycmF5KGNoaWxkcmVuKS5maWx0ZXIoKGM6IGFueSkg
+          PT4gUmVhY3QuaXNWYWxpZEVsZW1lbnQoYykpOwoKZXhwb3J0IGNvbnN0IGNhblVzZURPTSA9ICgpID0+
+          IHR5cGVvZiB3aW5kb3cgIT09ICd1bmRlZmluZWQnICYmICEhKHdpbmRvdy5kb2N1bWVudCAmJiB3aW5k
+          b3cuZG9jdW1lbnQuY3JlYXRlRWxlbWVudCk7CgpleHBvcnQgY29uc3QgVUlDb25maWdDb250ZXh0ID0g
+          UmVhY3QuY3JlYXRlQ29udGV4dDxhbnk+KHsgcHJlZml4Q2xzOiAnbncnLCBsb2NhbGU6ICd6aC1DTics
+          IHRoZW1lOiB7IGNvbG9yTW9kZTogJ2xpZ2h0JywgY3NzVmFyUHJlZml4OiAnbncnIH0sIGF1dG9Jbmpl
+          Y3RDU1M6IHRydWUgfSk7CmV4cG9ydCBjb25zdCBDb25maWdQcm92aWRlciA9ICh7IGNvbmZpZywgY2hp
+          bGRyZW4gfTogYW55KSA9PiB7CiAgY29uc3QgcGFyZW50ID0gUmVhY3QudXNlQ29udGV4dChVSUNvbmZp
+          Z0NvbnRleHQpOwogIGNvbnN0IHZhbHVlID0gbWVyZ2VQcm9wcyhwYXJlbnQsIGNvbmZpZyB8fCB7fSk7
+          CiAgcmV0dXJuIFJlYWN0LmNyZWF0ZUVsZW1lbnQoVUlDb25maWdDb250ZXh0LlByb3ZpZGVyLCB7IHZh
+          bHVlIH0sIGNoaWxkcmVuKTsKfTsKZXhwb3J0IGNvbnN0IHVzZUNvbmZpZyA9ICgpID0+IFJlYWN0LnVz
+          ZUNvbnRleHQoVUlDb25maWdDb250ZXh0KTsKZXhwb3J0IGNvbnN0IGNyZWF0ZVVJID0gKGluaXRpYWxD
+          b25maWc6IGFueSkgPT4gKHsKICBjb25maWc6IGluaXRpYWxDb25maWcgfHwge30sCiAgc2V0Q29uZmln
+          OiAoKSA9PiB7fSwKICBnZXRUaGVtZTogKCkgPT4gJ2xpZ2h0Jwp9KTsKZXhwb3J0IGNvbnN0IERFRkFV
+          TFRfQ09ORklHID0ge307CgpleHBvcnQgY29uc3QgcmVnaXN0ZXJDb21wb25lbnQgPSAoKSA9PiB7fTsK
+          ZXhwb3J0IGNvbnN0IGdldENvbXBvbmVudCA9ICgpID0+IG51bGw7CgpleHBvcnQgY29uc3QgVGhlbWVD
+          b250ZXh0ID0gUmVhY3QuY3JlYXRlQ29udGV4dDxhbnk+KHsgY29sb3JNb2RlOiAnbGlnaHQnLCBzZXRD
+          b2xvck1vZGU6ICgpID0+IHt9LCB0b2dnbGVDb2xvck1vZGU6ICgpID0+IHt9IH0pOwpleHBvcnQgY29u
+          c3QgVGhlbWVQcm92aWRlciA9ICh7IGluaXRpYWxDb2xvck1vZGUgPSAnbGlnaHQnLCBjaGlsZHJlbiB9
+          OiBhbnkpID0+IHsKICBjb25zdCBbY29sb3JNb2RlLCBzZXRDb2xvck1vZGVdID0gUmVhY3QudXNlU3Rh
+          dGUoaW5pdGlhbENvbG9yTW9kZSk7CiAgY29uc3QgdG9nZ2xlQ29sb3JNb2RlID0gKCkgPT4gc2V0Q29s
+          b3JNb2RlKChtOiBzdHJpbmcpID0+IG0gPT09ICdsaWdodCcgPyAnZGFyaycgOiAnbGlnaHQnKTsKICBS
+          ZWFjdC51c2VFZmZlY3QoKCkgPT4gewogICAgaWYgKHR5cGVvZiBkb2N1bWVudCAhPT0gJ3VuZGVmaW5l
+          ZCcpIHsKICAgICAgZG9jdW1lbnQuZG9jdW1lbnRFbGVtZW50LnNldEF0dHJpYnV0ZSgnZGF0YS10aGVt
+          ZScsIGNvbG9yTW9kZSk7CiAgICB9CiAgfSwgW2NvbG9yTW9kZV0pOwogIHJldHVybiBSZWFjdC5jcmVh
+          dGVFbGVtZW50KFRoZW1lQ29udGV4dC5Qcm92aWRlciwgeyB2YWx1ZTogeyBjb2xvck1vZGUsIHNldENv
+          bG9yTW9kZSwgdG9nZ2xlQ29sb3JNb2RlIH0gfSwgY2hpbGRyZW4pOwp9OwpleHBvcnQgY29uc3QgdXNl
+          VGhlbWUgPSAoKSA9PiBSZWFjdC51c2VDb250ZXh0KFRoZW1lQ29udGV4dCk7CmV4cG9ydCBjb25zdCBz
+          ZXRUaGVtZSA9ICgpID0+IHt9Owo=
+          ' | base64 -d > "$DESIGN_DIR/index.ts"
         fi
 
         npx esbuild "$DESIGN_DIR/examples/usage-example.tsx" \

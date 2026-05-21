@@ -142,18 +142,41 @@ function renderIssueGroup(containerId, issues, runningIds, currentProject, desig
     }
 
     container.innerHTML = issues.map(issue => {
-        const isRunning = runningIds.has(issue.number);
         const labelsHtml = issue.labels.map(l => '<span class="badge bg-secondary border-secondary text-muted-foreground">' + l.name + '</span>').join('');
         const classification = issue.classification || 'full-stack';
+        const isE2EIssue = issue.labels.some(l => l.name === 'e2e');
+
+        // E2E issue：独立的测试任务，只显示 E2E 相关按钮
+        if (isE2EIssue) {
+            const e2eRunning = runningTasks.find(t => t.type === 'e2e' && t.targetId === issue.number);
+            const isE2ERunning = e2eRunning && e2eRunning.status === 'running';
+            let e2eActions = '<button class="btn btn-sm btn-ghost" onclick="viewIssue(' + issue.number + ')">查看</button>';
+            if (isE2ERunning) {
+                e2eActions = '<button class="btn btn-sm btn-outline" disabled>🧪 E2E 运行中</button>' + e2eActions;
+            } else {
+                e2eActions = '<button class="btn btn-sm btn-primary" onclick="runE2E(event, ' + issue.number + ', \'\', \'' + classification + '\')">🧪 运行 E2E</button>' + e2eActions;
+            }
+            return '<div class="' + CARD + '" data-issue="' + issue.number + '">' +
+                '<div class="flex items-start justify-between gap-3 mb-2">' +
+                    '<a href="' + (currentProject && currentProject.repo ? getRepoBaseUrl(currentProject) + '/issues/' : '#') + '' + issue.number + '" ' +
+                       'class="text-sm font-semibold text-foreground hover:text-primary transition-colors" target="_blank">' +
+                        '#' + issue.number + ': ' + escapeHtml(issue.title) +
+                    '</a>' +
+                '</div>' +
+                '<div class="mb-2 text-xs text-muted-foreground">' + new Date(issue.updatedAt).toLocaleString() + '</div>' +
+                '<div class="flex flex-wrap gap-1.5 mb-3">' + labelsHtml + '</div>' +
+                '<div class="flex flex-wrap gap-2">' + e2eActions + '</div>' +
+            '</div>';
+        }
+
+        // 普通功能 issue
+        const isRunning = runningIds.has(issue.number);
         const designTask = runningTasks.find(t => t.type === 'design' && t.targetId === issue.number);
         const isDesigning = designTask && designTask.status === 'running';
         const issueType = getIssueType(issue.labels, issue.title, issue.body);
         const display = getIssueTypeDisplay(issueType);
 
         let actionsHtml = '<button class="btn btn-sm btn-ghost" onclick="viewIssue(' + issue.number + ')">查看</button>';
-
-        const e2eRunning = runningTasks.find(t => t.type === 'e2e' && t.targetId === issue.number);
-        const isE2ERunning = e2eRunning && e2eRunning.status === 'running';
 
         if (isRunning) {
             actionsHtml = '<button class="btn btn-sm btn-outline" disabled>运行中</button>' + actionsHtml;
@@ -183,18 +206,10 @@ function renderIssueGroup(containerId, issues, runningIds, currentProject, desig
                 if (isDesigning) {
                     devBtn = '<button class="btn btn-sm btn-outline" disabled title="设计任务进行中，建议等待完成后再开发">' + display.text + '（等待设计）</button>';
                 }
-                let e2eBtn = '';
-                if (classification !== 'backend-only') {
-                    if (isE2ERunning) {
-                        e2eBtn = '<button class="btn btn-sm btn-outline" disabled>🧪 E2E 中</button>';
-                    } else {
-                        e2eBtn = '<button class="btn btn-sm btn-outline" onclick="runE2E(event, ' + issue.number + ', \'\', \'' + classification + '\')">🧪 运行 E2E</button>';
-                    }
-                }
                 if (classification === 'backend-only') {
                     actionsHtml = devBtn + actionsHtml;
                 } else {
-                    actionsHtml = devBtn + e2eBtn + viewDesignBtn + designBtn + actionsHtml;
+                    actionsHtml = devBtn + viewDesignBtn + designBtn + actionsHtml;
                 }
             }
         }

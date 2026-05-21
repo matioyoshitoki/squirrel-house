@@ -169,7 +169,8 @@ AGENTS.md
    - **必须有文件修改产出**：如果 report 中有 Blocking/Major 问题，必须至少产生一次 WriteFile 或 StrReplaceFile。**任何情况下，rework 任务结束前必须调用至少一次 WriteFile**（包括写修改、写 noop 说明、写失败报告）。如果任务已执行 3 步仍未调用任何写操作，立即执行 WriteFile 写 `logs/rework-halted.md` 说明当前状态并结束，禁止纯文本输出。
    - **review report 为空/无问题时的处理**：如果 review report 读取成功但其中没有 Blocking/Major 问题（只有 Minor 或空报告），第 3 步必须用 WriteFile 写 `logs/rework-noop.md` 说明"review report 无 Blocking/Major 问题，无需修复"，然后结束任务。禁止以纯文本输出"没有问题"代替 WriteFile。
    - **rework 步数下限**：rework 任务如果少于 5 步就结束，必须回退检查是否遗漏了修复操作或 noop 报告。禁止在读完 review report 后未经任何 WriteFile 直接结束。
-   - **步数追踪**：rework 任务每 5 步必须在思考中自评一次当前进度。如果过去 5 步没有产生任何文件修改（WriteFile 或 StrReplaceFile），立即停止并报告。
+   - **产出检查点**：rework 任务在第 5 步、第 10 步、第 15 步、第 20 步、第 25 步、第 30 步、第 35 步、第 40 步时，必须在 reasoning 中自评"过去 5 步是否产生过至少一次文件修改（WriteFile 或 StrReplaceFile）？"。如果答案为否，立即停止所有操作，执行 WriteFile 写入 `logs/rework-halted.md` 说明阻塞原因，然后结束任务。禁止以纯文本输出代替 WriteFile。
+   - **第 4 步强制开始修复**：读完 review report 并完成 `logs/rework-start.txt` 后，第 4 步**必须**是 ReadFile 待修复文件或 WriteFile/StrReplaceFile 执行修复。禁止在第 4 步之后继续阅读其他文档、执行 grep/find 探索、或调用 Think 分析。如果 report 中问题位置明确，直接读取文件并修改；如果位置不明确，立即 WriteFile 报告"review report 路径不明确"并结束。
    - **错误计数显式自报（rework 模式）**：每次工具调用返回 `is_error=true` 后，必须在 reasoning 中显式输出 `错误计数: X/2`。当 X=1 时，进入「只读/收尾模式」（仅允许 ReadFile、WriteFile、git 操作，禁止新的 Shell 探索或未经确认的 StrReplaceFile 尝试）；当 X=2 时，立即停止并 WriteFile 写入 `logs/rework-halted.md` 报告错误熔断原因，然后结束任务。
    - **常见错误 SOP（按错误类型执行，禁止跳过诊断步骤）**：
      - **路径类错误**（文件不存在、outside workspace）→ 立即用 `pwd` 和 `test -f` 确认当前目录和文件状态。如果文件确实不存在，标记为"未验证"并跳过，**不要猜测替代路径**。

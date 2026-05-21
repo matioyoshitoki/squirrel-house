@@ -240,8 +240,13 @@ onEvent('connected', () => {
     loadAll();
 });
 
-onEvent('task:changed', () => {
+onEvent('task:changed', (data) => {
     loadTasks();
+    // 设计任务成功完成后，强制刷新对应 issue 的设计资产缓存
+    // 防止资产目录在首次加载后才生成导致按钮不显示
+    if (data && data.type === 'design' && data.status === 'success' && data.targetId) {
+        loadDesignAssets(data.targetId);
+    }
 });
 
 onEvent('pr:merged', () => {

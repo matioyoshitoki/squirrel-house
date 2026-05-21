@@ -230,20 +230,11 @@
         <div class="flex items-center justify-between border-b border-border px-4 py-2.5">
           <div class="flex items-center gap-3">
             <span id="design-filename" class="text-xs font-mono text-muted-foreground">选择文件</span>
-            <button id="run-e2e-btn" class="hidden btn btn-xs btn-outline" onclick="window.runE2EFlow()">🧪 运行 E2E</button>
-            <span id="e2e-status" class="hidden text-xs"></span>
             <button id="build-preview-btn" class="hidden btn btn-xs btn-primary" onclick="window.buildDesignPreviewHandler(window.currentDesignIssue || 0)">🎨 生成预览</button>
             <span id="preview-status" class="hidden text-xs"></span>
             <button id="design-feedback-btn" class="hidden btn btn-xs btn-outline" onclick="window.showDesignFeedbackForm(window.currentDesignIssue || 0)">✏️ 反馈设计问题</button>
           </div>
           <button id="close-design-btn" class="btn btn-sm btn-ghost">关闭</button>
-        </div>
-        <div id="e2e-log-panel" class="hidden flex-1 flex-col overflow-hidden bg-[#0b1120]">
-          <div class="flex items-center justify-between border-b border-border/50 bg-[#0d1117] px-3 py-1.5">
-            <span class="text-[0.7rem] font-mono text-muted-foreground">E2E 日志</span>
-            <button class="text-[0.7rem] text-muted-foreground hover:text-foreground" onclick="document.getElementById('e2e-log-panel').classList.add('hidden');document.getElementById('design-preview-body').classList.remove('hidden')">关闭</button>
-          </div>
-          <pre id="e2e-log-content" class="flex-1 overflow-auto whitespace-pre-wrap p-3 font-mono text-[0.75rem] leading-relaxed text-foreground"></pre>
         </div>
         <div id="design-preview-body" class="flex flex-1 items-center justify-center overflow-auto bg-[#0b1120] p-4">
           <div class="text-sm text-muted-foreground">选择左侧文件预览</div>

@@ -5,7 +5,7 @@ import { showToast } from './ui.js';
 
 let currentDesignIssue = null;
 let _designEscHandler = null;
-const _loadingAssets = new Set();
+const _loadingPromises = new Map();
 
 const DEFAULT_GROUPS = [
     { key: 'preview', title: '🔥 交互预览', types: ['flutter-web', 'phaser3-web', 'html'] },
@@ -20,56 +20,65 @@ const DEFAULT_GROUPS = [
  * "查看设计" buttons / badges into already-rendered cards.
  */
 export async function loadDesignAssets(issueNumber) {
-    if (_loadingAssets.has(issueNumber)) return store.get('designAssetsCache')[issueNumber];
-    _loadingAssets.add(issueNumber);
-    try {
-        const data = await api.designAssets(issueNumber);
-        const assets = data.assets || [];
-        const cache = store.get('designAssetsCache');
-        cache[issueNumber] = assets.length > 0 ? assets : null;
-        store.set({ designAssetsCache: { ...cache } });
+    if (_loadingPromises.has(issueNumber)) {
+        return _loadingPromises.get(issueNumber);
+    }
 
-        // Update issue cards
-        const issueCard = document.querySelector(`[data-issue="${issueNumber}"]`);
-        const prCard = document.querySelector(`[data-design-issue="${issueNumber}"]`);
+    const promise = (async () => {
+        try {
+            const data = await api.designAssets(issueNumber);
+            const assets = data.assets || [];
+            const cache = store.get('designAssetsCache');
+            cache[issueNumber] = assets.length > 0 ? assets : null;
+            store.set({ designAssetsCache: { ...cache } });
 
-        [issueCard, prCard].forEach(card => {
-            if (card && assets.length > 0) {
-                // Insert badge if not present
-                const header = card.querySelector('.flex.items-start.justify-between');
-                if (header && !header.querySelector('.design-ready-badge')) {
-                    const badge = document.createElement('span');
-                    badge.className = 'inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-semibold bg-primary/15 text-primary design-ready-badge';
-                    badge.style.marginLeft = '0.5rem';
-                    badge.innerHTML = '🎨 设计资产已就绪';
-                    header.appendChild(badge);
-                }
+            // Update issue cards
+            const issueCard = document.querySelector(`[data-issue="${issueNumber}"]`);
+            const prCard = document.querySelector(`[data-design-issue="${issueNumber}"]`);
 
-                // Insert "查看设计" button if not present
-                const actions = card.querySelector('.flex.flex-wrap.gap-2');
-                if (actions && !actions.querySelector('.design-view-btn')) {
-                    const btn = document.createElement('button');
-                    btn.className = 'btn btn-sm btn-primary design-view-btn';
-                    btn.innerHTML = '🖼️ 查看设计';
-                    btn.onclick = () => openDesignViewer(issueNumber);
-                    const startDesignBtn = Array.from(actions.children).find(el => el.innerHTML && el.innerHTML.includes('开始设计'));
-                    if (startDesignBtn) {
-                        actions.insertBefore(btn, startDesignBtn);
-                    } else {
-                        actions.insertBefore(btn, actions.firstChild);
+            [issueCard, prCard].forEach(card => {
+                if (card && assets.length > 0) {
+                    // Insert badge if not present
+                    const header = card.querySelector('.flex.items-start.justify-between');
+                    if (header && !header.querySelector('.design-ready-badge')) {
+                        const badge = document.createElement('span');
+                        badge.className = 'inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-semibold bg-primary/15 text-primary design-ready-badge';
+                        badge.style.marginLeft = '0.5rem';
+                        badge.innerHTML = '🎨 设计资产已就绪';
+                        header.appendChild(badge);
+                    }
+
+                    // Insert "查看设计" button if not present
+                    const actions = card.querySelector('.flex.flex-wrap.gap-2');
+                    if (actions && !actions.querySelector('.design-view-btn')) {
+                        const btn = document.createElement('button');
+                        btn.className = 'btn btn-sm btn-primary design-view-btn';
+                        btn.innerHTML = '🖼️ 查看设计';
+                        btn.onclick = () => openDesignViewer(issueNumber);
+                        const startDesignBtn = Array.from(actions.children).find(el => el.innerHTML && el.innerHTML.includes('开始设计'));
+                        if (startDesignBtn) {
+                            actions.insertBefore(btn, startDesignBtn);
+                        } else {
+                            actions.insertBefore(btn, actions.firstChild);
+                        }
                     }
                 }
-            }
-        });
+            });
 
-        return store.get('designAssetsCache')[issueNumber];
-    } catch (e) {
-        const cache = store.get('designAssetsCache');
-        cache[issueNumber] = null;
-        store.set({ designAssetsCache: { ...cache } });
-        return null;
+            return store.get('designAssetsCache')[issueNumber];
+        } catch (e) {
+            const cache = store.get('designAssetsCache');
+            cache[issueNumber] = null;
+            store.set({ designAssetsCache: { ...cache } });
+            return null;
+        }
+    })();
+
+    _loadingPromises.set(issueNumber, promise);
+    try {
+        return await promise;
     } finally {
-        _loadingAssets.delete(issueNumber);
+        _loadingPromises.delete(issueNumber);
     }
 }
 
@@ -155,17 +164,6 @@ export async function openDesignViewer(issueNumber) {
     // Close button
     const closeBtn = document.getElementById('close-design-btn');
     if (closeBtn) closeBtn.onclick = closeDesignViewer;
-
-    // E2E button: show for flutter/phaser projects that have interactive preview
-    const e2eBtn = document.getElementById('run-e2e-btn');
-    if (e2eBtn) {
-        const hasInteractivePreview = assets.some(a => a.type === 'flutter-web' || a.type === 'phaser3-web');
-        if (hasInteractivePreview) {
-            e2eBtn.classList.remove('hidden');
-        } else {
-            e2eBtn.classList.add('hidden');
-        }
-    }
 
     // Build Preview button: show for phaser3 projects that have code but no preview
     const buildPreviewBtn = document.getElementById('build-preview-btn');
@@ -420,96 +418,6 @@ export function highlightCode(code, ext) {
     return html;
 }
 
-let _e2eEventSource = null;
-
-/*
- * Run E2E tests for the current design issue.
- * Streams logs via SSE into the e2e-log-panel.
- */
-export async function runE2EFlow() {
-    if (!currentDesignIssue) return;
-
-    const btn = document.getElementById('run-e2e-btn');
-    const statusEl = document.getElementById('e2e-status');
-    const logPanel = document.getElementById('e2e-log-panel');
-    const logContent = document.getElementById('e2e-log-content');
-    const previewBody = document.getElementById('design-preview-body');
-
-    if (btn) {
-        btn.disabled = true;
-        btn.textContent = '🧪 启动中...';
-    }
-    if (statusEl) {
-        statusEl.classList.remove('hidden');
-        statusEl.textContent = '请求中...';
-    }
-
-    try {
-        const res = await fetch('/api/run-e2e', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ issueNumber: currentDesignIssue, flow: '' })
-        });
-        const data = await res.json();
-
-        if (!res.ok) {
-            showToast(data.error || 'E2E 启动失败', true);
-            if (btn) { btn.disabled = false; btn.textContent = '🧪 运行 E2E'; }
-            if (statusEl) statusEl.classList.add('hidden');
-            return;
-        }
-
-        // Switch to log view
-        if (previewBody) previewBody.classList.add('hidden');
-        if (logPanel) logPanel.classList.remove('hidden');
-        if (logPanel) logPanel.classList.add('flex');
-        if (logContent) logContent.textContent = '';
-        if (statusEl) statusEl.textContent = '运行中...';
-        if (btn) btn.textContent = '🧪 运行中...';
-
-        // Close previous SSE if any
-        if (_e2eEventSource) {
-            _e2eEventSource.close();
-        }
-
-        // Start SSE log tail
-        const es = new EventSource(`/api/log-tail?file=${encodeURIComponent(data.logFile)}`);
-        _e2eEventSource = es;
-
-        es.onmessage = (e) => {
-            if (logContent) {
-                logContent.textContent += e.data + '\n';
-                logContent.scrollTop = logContent.scrollHeight;
-            }
-        };
-
-        es.onerror = () => {
-            es.close();
-            if (statusEl) statusEl.textContent = '日志流断开';
-            if (btn) { btn.disabled = false; btn.textContent = '🧪 运行 E2E'; }
-        };
-
-        // Poll for completion (check log status every 5s)
-        const pollInterval = setInterval(async () => {
-            try {
-                const statusRes = await fetch(`/api/log-status?file=${encodeURIComponent(data.logFile)}`);
-                const statusData = await statusRes.json();
-                if (statusData.status !== 'running') {
-                    clearInterval(pollInterval);
-                    if (statusEl) statusEl.textContent = statusData.status === 'success' ? '✅ 完成' : '❌ 失败';
-                    if (btn) { btn.disabled = false; btn.textContent = '🧪 运行 E2E'; }
-                    es.close();
-                }
-            } catch (_) { /* ignore polling errors */ }
-        }, 5000);
-
-    } catch (e) {
-        showToast('E2E 请求失败: ' + e.message, true);
-        if (btn) { btn.disabled = false; btn.textContent = '🧪 运行 E2E'; }
-        if (statusEl) statusEl.classList.add('hidden');
-    }
-}
-
 /**
  * Build design preview for Phaser3 projects via dashboard API.
  */
@@ -626,6 +534,5 @@ window.closeDesignViewer = closeDesignViewer;
 window.toggleDesignGroup = toggleDesignGroup;
 window.selectDesignAsset = selectDesignAsset;
 window.highlightCode = highlightCode;
-window.runE2EFlow = runE2EFlow;
 window.buildDesignPreviewHandler = buildDesignPreviewHandler;
 window.showDesignFeedbackForm = showDesignFeedbackForm;
