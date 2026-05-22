@@ -47,6 +47,32 @@ steps:
     outputKey: agentOutput
     logFile: '{{ .Vars.logFileName }}'
 
+  - id: diagnoseAgentRun
+    label: 诊断 dev agent 执行状态
+    type: shell
+    dir: '{{ .Vars.tmpDir }}'
+    command: |
+      LOG_FILE="{{ .Vars.logFileName }}"
+      DIAGNOSE_FILE="logs/dev-diagnose.md"
+      mkdir -p logs
+
+      if [ -f "$LOG_FILE" ] && [ -s "$LOG_FILE" ]; then
+        STEP_COUNT=$(grep -cE 'tool_call|ToolCall|tool_use|Using tool' "$LOG_FILE" 2>/dev/null || echo "0")
+        WRITE_COUNT=$(grep -cE 'WriteFile|StrReplaceFile' "$LOG_FILE" 2>/dev/null || echo "0")
+        THINK_COUNT=$(grep -cE 'Think|think' "$LOG_FILE" 2>/dev/null || echo "0")
+        ERROR_COUNT=$(grep -cE 'is_error=true|error' "$LOG_FILE" 2>/dev/null || echo "0")
+        echo "dev agent 诊断: 步数=$STEP_COUNT, 写操作=$WRITE_COUNT, Think=$THINK_COUNT, 错误=$ERROR_COUNT" > "$DIAGNOSE_FILE"
+        if [ "$THINK_COUNT" -gt 2 ]; then
+          echo "⚠️ Think 次数超标（${THINK_COUNT} 次 > 限制 2 次），建议收紧 Think 限制" >> "$DIAGNOSE_FILE"
+        fi
+        if [ "$ERROR_COUNT" -gt 5 ]; then
+          echo "⚠️ 错误次数超标（${ERROR_COUNT} 次 > 限制 5 次），建议检查错误处理策略" >> "$DIAGNOSE_FILE"
+        fi
+      else
+        echo "❌ dev agent 日志为空或不存在" > "$DIAGNOSE_FILE"
+      fi
+    ignoreError: true
+
   - id: preCommitChecks
     label: 提交前强制检查
     type: shell

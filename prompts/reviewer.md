@@ -260,6 +260,8 @@ AGENTS.md
 
 **开始前，用 5 个步骤快速建立上下文，不要跳过：**
 
+**🔴 第 -1 步 — Git 禁令前置确认（不计入 5 步内）**：在执行任何工具调用之前，你必须在 reasoning 中显式声明：「已理解 Git 禁令：本任务严禁执行任何本地 `git` 命令（包括 `git status`、`git diff`、`git log`、`git show`、`git blame`、`git checkout`、`git add`、`git commit`、`git push` 等）。所有审查依据必须通过 `gh pr diff` 和 `gh pr view` 获取。」如果你对本任务中即将执行的命令是否属于 git 命令有任何疑问，默认视为禁止。
+
 **🔴 第 0 步 — 错误预判（不计入 5 步内）**：review 任务的常见错误来源为：
 - `gh` 命令因网络/认证失败 → **workflow 已通过 `AGENT_ENV_STATUS` 环境变量传递预检结果**，agent 不要再重复执行 `gh auth status`。如果 `AGENT_ENV_STATUS` 包含 `auth_failed` 或 `pr_not_found`，第 1 步直接 WriteFile 失败报告
 - 读取 review report 或规范文档时路径不存在 → 读取前先用 `test -f` 确认
@@ -339,7 +341,7 @@ AGENTS.md
 13. **🔴 Git 操作白名单（review 专属）**：review 任务只允许使用 `gh` 命令与远程 PR 交互，**严禁执行任何本地 `git` 命令**（包括 `git diff`、`git log`、`git status`、`git show` 等）。本地 worktree 的分支状态与远程 PR 可能不一致，`git diff` 的结果不可信。所有审查依据必须通过 `gh pr diff` 和 `gh pr view` 获取。
 14. **步数自报检查点**：每 10 步必须在思考中自报一次当前步数。review 任务平均应在 25-35 步内完成，如果超过 25 步仍未开始撰写审查结论，说明你陷入了过度探索，必须立即收缩范围，聚焦最关键的问题输出报告。
 15. **任务结束前强制检查**：在任务的最后一个思考轮次中，你必须明确回答以下问题："我是否已经执行了至少一次 WriteFile？" 如果答案为否，立即执行 WriteFile 写入报告（即使是空报告或失败报告）。**禁止在没有 WriteFile 的情况下结束任务，这是不可违背的铁律。**
-16. **Git 禁令自检**：在任务结束前，除确认 WriteFile 外，必须额外自检："我是否在本任务中执行过任何本地 git 命令（git status / git diff / git log / git show 等）？" 如果答案为"是"，必须在审查报告的「风险与建议」章节开头追加一条 Major 级别的声明："⚠️ 审查违规：本任务意外调用了本地 git 命令，审查结论可能不可信。" 并将审查结论强制降级为 NEEDS_MAJOR_FIX。统计报告已记录 review 任务的 topGitOp 为 diff，说明此禁令被违反——你必须严格执行本条自检。
+16. **Git 禁令自检**：在任务结束前，除确认 WriteFile 外，必须额外自检："本任务的所有工具调用记录中，是否包含任何以 `git` 为命令的 Shell 调用（包括 `git status`、`git diff`、`git log`、`git show`、`git blame`、`git checkout`、`git add`、`git commit`、`git push` 等）？" 如果答案为"是"，无论审查质量如何，必须在审查报告的「风险与建议」章节开头追加一条 Major 级别的声明："⚠️ 审查违规：本任务意外调用了本地 git 命令，审查结论可能不可信。" **并将审查结论强制降级为 NEEDS_MAJOR_FIX**。统计报告已记录 review 任务的 topGitOp 为 diff，说明此禁令被违反——你必须严格执行本条自检。
 
 ## 诚实性约束（不可违背）
 

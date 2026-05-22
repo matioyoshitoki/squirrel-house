@@ -150,6 +150,22 @@ steps:
             echo "agent 执行了工具调用但未产生 WriteFile/StrReplaceFile 输出。可能因 prompt 约束提前终止且未执行强制写入。时间: $(date -Iseconds)" >> "$REPORT_FILE"
           fi
         fi
+
+        # Git 禁令自动化检测
+        GIT_USAGE=$(grep -cE '\bgit\s+(status|diff|log|show|blame|checkout|add|commit|push)\b' "$LOG_FILE" 2>/dev/null || echo "0")
+        if [ "$GIT_USAGE" -gt 0 ]; then
+          echo "⚠️ 检测到 agent 使用了本地 git 命令（${GIT_USAGE} 次），违反 Git 禁令"
+          if [ -f "$REPORT_FILE" ]; then
+            # 强制降级审查结论
+            sed -i 's/审查结论: PASS/审查结论: NEEDS_MAJOR_FIX（违规：使用了本地 git 命令）/g' "$REPORT_FILE"
+            sed -i 's/审查结论: NEEDS_FIX/审查结论: NEEDS_MAJOR_FIX（违规：使用了本地 git 命令）/g' "$REPORT_FILE"
+            # 追加违规声明到报告末尾
+            echo "" >> "$REPORT_FILE"
+            echo "## Workflow 违规检测" >> "$REPORT_FILE"
+            echo "" >> "$REPORT_FILE"
+            echo "⚠️ 审查违规：workflow 检测到 agent 在本任务中使用了本地 git 命令 ${GIT_USAGE} 次。审查结论已强制降级为 NEEDS_MAJOR_FIX。" >> "$REPORT_FILE"
+          fi
+        fi
       fi
     ignoreError: true
 
