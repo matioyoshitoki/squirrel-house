@@ -1,89 +1,88 @@
 # Prompt 演进报告 — type-one
 
-生成时间: 2026-05-22T13:42:20+08:00
-分析范围: 2026-05-22T12:36:49 到 2026-05-22T13:40:22
+生成时间: 2026-05-22T14:46:58+08:00
+分析范围: 2026-05-22T13:40:23 到 2026-05-22T14:41:37
 
 ## 统计摘要
 
-- 分析日志数: 14
-- Agent 类型分布: review 7, rework 7
+- 分析日志数: 17
+- Agent 类型分布:
+  - `review`: 9 个任务
+  - `rework`: 8 个任务
 
 | 指标 | review | rework |
 |------|--------|--------|
-| 任务数 | 7 | 7 |
-| 平均步数 | 14.29 | 18.43 |
-| 成功率 | 85.7% | 100% |
-| 总错误数 | 1 | 5 |
-| 平均 ReadFile/任务 | 16.0 | 7.0 |
-| 平均 Shell/任务 | 5.0 | 6.86 |
-| 写入操作总计 | 9 (WriteFile) | 38 (WriteFile 14 + StrReplaceFile 24) |
-| topGitOp | commands | status |
+| 平均步数 | 9.11 | 6.375 |
+| 成功率 | 100% | 87.5% |
+| 总错误数 | 1 | 0 |
+| 平均 ReadFile/任务 | ~9.4 | ~1.75 |
+| 平均 Shell/任务 | ~3.9 | ~1.625 |
+| 常用 Git 操作 | commands | checkout |
 
 ## 问题诊断
 
-### 问题 1: rework 高错误率
+### 问题 1: reviewer.md 引用的历史统计数据与当前报告严重脱节
+**证据**: 
+- reviewer.md 第 303 行写道："当前统计平均 29 次/任务，严重超过上限"，而本次 review 的 Shell 平均仅 **3.9 次/任务**。
+- reviewer.md 第 304 行写道："当前统计平均 16 次/任务"，而本次 review 的 ReadFile 平均仅 **9.4 次/任务**。
+- reviewer.md 第 346 行写道："统计报告已记录 review 任务的 topGitOp 为 diff"，而本次报告 review 的 topGitOp 实际为 **commands**（且 review.yaml workflow 本身在执行 `git branch`、`git checkout`、`git worktree remove` 等命令，统计口径可能包含 workflow 层面的 git 操作）。
 
-**证据**: 7 个 rework 任务共产生 5 个工具调用错误，错误涉及任务比例 71%（topIssues 中标记为 43% 的任务级错误率）。尽管 successRate 为 100%（最终均有文件修改产出），但高错误率表明 agent 在执行过程中频繁遭遇工具调用失败，消耗了额外的步数和预算。
-
-**根因分析**:
-- `developer.md` 虽已设定 rework 错误上限为 2 次，但统计数据表明该约束未被严格遵守。
-- rework 任务中 `StrReplaceFile` 使用频繁（24 次），而 "old string not found" 是常见失败模式。agent 可能在未充分 `ReadFile` 确认的情况下直接执行替换，或在遇到路径错误后尝试替代路径。
-- rework 平均 Shell 调用 6.86 次/任务，接近 10 次上限，表明环境探索和验证步骤仍偏多。
-
-**改进建议**:
-1. **在 `developer.md` 中增加 StrReplaceFile 强制声明**: 每次 StrReplaceFile 前必须在 reasoning 中显式声明「已 ReadFile 确认目标内容存在，准备替换」。如果 ReadFile 后发现内容已变化，必须重新评估修复策略，禁止强行替换。（已应用）
-2. **强化 rework 错误熔断刚性**: `developer.md` 中已更新：rework 错误达到 1 次时，下一个 tool call 必须是 ReadFile 确认状态或 WriteFile 记录错误，禁止新的 Shell 探索或未经确认的 StrReplaceFile；达到 2 次时，立即停止所有操作，下一个且唯一的 tool call 必须是 WriteFile 写入 `logs/rework-halted.md`。（已应用）
-3. **在 `workflows/rework.yaml` 中增加错误分类统计**: `diagnoseAgentRun` 步骤已增强，现在会统计总错误数、StrReplaceFile 失败次数、文件缺失次数和 Shell 失败次数，便于下次分析精准定位主要错误来源。（已应用）
-
-### 问题 2: review ReadFile 预算不足与零产出风险
-
-**证据**: review 任务平均 ReadFile 16.0 次/任务，超过了 `reviewer.md` 中设定的 15 次上限。successRate 为 85.7%，即 7 个任务中有 1 个零产出。totalWrites 仅 9 次，平均 1.29 次/任务。
-
-**根因分析**:
-- `reviewer.md` 中的 ReadFile 预算（15 次）已低于实际平均值（16 次）。审查任务需要读取 AGENTS.md、规范文档、PR diff、历史 review report 等多个文件，预算紧张可能导致 agent 在后期被迫跳过必要阅读，或以其他方式（如多次 Shell 调用）变相补偿。
-- 零产出任务的存在说明，尽管 prompt 中已有多层 WriteFile 强制要求（第 6 步、最后一步等），在某些异常路径下（如 gh 命令失败、环境状态非 READY）agent 仍可能未正确执行 WriteFile。
+**根因分析**: 
+prompt 中嵌入了具体的历史统计数据作为行为约束的背景论据，但当实际统计数据已经大幅改善后，这些过时的引用会产生两种负面效果：
+1. **虚假紧迫感**：agent 可能因看到"严重超过上限"而过度紧缩行为，反而影响审查深度。
+2. **认知失调**：agent 在执行 Git 禁令自检时，看到 prompt 说"topGitOp 为 diff"，但实际自身并未调用 git，可能产生困惑；或更糟，误以为 workflow 的 git 命令是自己调用的，导致错误的自我降级。
 
 **改进建议**:
-1. **提升 ReadFile 预算并引入文档缓存策略**: `reviewer.md` 中 ReadFile 上限已从 15 次提升到 20 次，并增加「文档缓存策略」：对需要多次引用的规范文档，首次 ReadFile 后将关键摘要写入临时文件，后续引用该摘要而非重复 ReadFile。（已应用）
-2. **增加第 8 步 WriteFile 二次检查点**: `reviewer.md` 的快速开始流程中新增第 7 步：如果第 8 个 tool call 仍未完成最终审查报告写入，下一个 tool call 必须是 WriteFile 写入进度报告，禁止继续探索新文件或执行新命令。（已应用）
+1. ✅ **已应用** — 将 reviewer.md 中的"当前统计平均 29/16 次"改为"历史统计曾平均...最新统计已降至约 4/9 次/任务"，保留上限约束的严肃性，同时让 agent 了解最新效率水平。（涉及文件: `prompts/reviewer.md`，修改方式: StrReplaceFile）
+2. ✅ **已应用** — 在 Git 禁令自检段落中增加显式说明："统计报告中的 `topGitOp` 可能包含 workflow 自动执行的 git 命令，agent 自检时应严格依据自身实际调用的 Shell 命令判断"，避免误报导致的自我降级。（涉及文件: `prompts/reviewer.md`，修改方式: StrReplaceFile）
+3. **后续建议** — 建立 prompt 中统计引用的版本化标注（如 `[统计截止: 2026-05-22]`），并在每次 prompt-evolution 分析时强制扫描所有具体数字引用，防止再次过期。
 
-### 问题 3: review 与 rework 的 Git 操作统计异常
+### 问题 2: developer.md 中 rework 模式的步骤编号存在双重定义冲突
+**证据**: 
+- rework successRate = **87.5%**，存在一个零产出任务；rework 平均步数仅 **6.375**，说明大部分任务快速结束。
+- developer.md 第 181-182 行规定："第 3 步必须写 `logs/rework-start.txt`"。
+- developer.md 第 187 行规定：如果 review report 无 Blocking/Major 问题，"第 3 步必须写 `logs/rework-noop.md`"。
 
-**证据**: review 的 topGitOp 为 `commands`，rework 的 topGitOp 为 `status`。reviewer.md 明确禁止 review 任务执行任何本地 git 命令。
-
-**根因分析**:
-- review 的 `commands` 可能包含 `gh pr diff` / `gh pr view` 等 GitHub CLI 命令，这些命令在日志解析中可能被归入 git 相关操作类别。
-- rework 的 `status` 直接表明 developer.md 中 "git status 全任务最多 3 次" 的约束仍被突破（7 个任务共 35 次 Shell 调用，部分为 git status）。
+**根因分析**: 
+同一个"第 3 步"被赋予了两个互斥的 WriteFile 目标（rework-start.txt vs rework-noop.md）。当 review report 无 Blocking/Major 问题时，agent 读完 report（第 2 步）后面临二选一：
+- 若遵守"第 3 步写 start.txt"，则 noop.md 被推迟到第 4 步，但 prompt 明确说"第 3 步必须写 noop.md"，导致 agent 可能困惑或遗漏。
+- 若直接写 noop.md 而跳过 start.txt，则违反了"第 3 步必须写 start.txt"的铁律。
+这种步骤冲突在 rework 这种低步数（平均 6.375 步）的场景下极易导致 agent 提前以纯文本结束任务，从而触发零产出统计。
 
 **改进建议**:
-1. **在 `developer.md` 中强化 git status 预算执行**: 当前虽已设定 "git status 全任务最多 3 次"，但统计表明 agent 仍在用 `git status` 代替有效的进度判断。建议在 reasoning 中增加每次 git status 调用前的强制声明：「git status 计数 X/3，调用理由：...」。
-2. **优化日志解析的 Git 操作分类**: 建议 `cmd/dashboard/*.go` 中将 `gh` 命令与本地 `git` 命令分开统计，避免 review 任务的合法 `gh` 命令被误判为 Git 禁令违规。
+1. ✅ **已应用** — 将"review report 为空/无问题"的处理从"第 3 步"改为"第 4 步"，明确顺序：第 1 步确认 report 存在 → 第 2 步读取 report → 第 3 步写 start.txt → 第 4 步写 noop.md（如无需修复）。（涉及文件: `prompts/developer.md`，修改方式: StrReplaceFile）
+2. **后续建议** — 在 rework.yaml 的 `diagnoseAgentRun` 步骤中，对"agent 日志存在但 WriteFile 次数为 0"的情况增加更详细的分类诊断（如区分"未启动修复"、"report 无问题但未写 noop"、"StrReplaceFile 全部失败"），帮助精确定位零产出根因。（涉及文件: `workflows/rework.yaml`，修改方式: 增强 diagnose 脚本）
 
-> 注：问题 3 的建议 1 涉及 reasoning 习惯，建议 2 涉及 dashboard 统计逻辑，需更多数据支撑后再实施。本次暂不修改。
+### 问题 3: topIssues 为 null，失败模式捕获机制未生效
+**证据**: 
+- 报告 `topIssues: null`，但 rework 存在一个零产出任务，review 也存在 1 个总错误。
+
+**根因分析**: 
+失败模式聚合逻辑可能未在日志中提取和归类常见的错误/失败模式（如 `old string not found`、`file_not_found`、`outside the workspace`、`exit code` 等）。没有 topIssues，prompt-evolution agent 难以做跨任务的根因关联。
+
+**改进建议**:
+1. **后续建议** — 检查 dashboard 的统计生成逻辑（`cmd/dashboard/*.go`），确保在汇总日志时提取并归类常见的 `is_error=true` 模式、零产出原因、以及 workflow 层面的 SKIP_AGENT / 失败原因，填充 `topIssues` 字段。（涉及文件: `cmd/dashboard/*.go`，修改方式: 增强日志模式提取）
+2. **后续建议** — 作为兜底，在 rework.yaml 的 `diagnoseAgentRun` 和 review.yaml 的 `diagnoseAgentRun` 中增加结构化的失败原因标签（如 `FAIL_REASON=str_replace_fail` / `fail_reason=no_write_op`），便于下游统计直接读取。
 
 ## 已应用改进
 
-本次分析后，已直接修改以下文件：
+1. **`prompts/reviewer.md`**:
+   - 更新 Shell 预算说明：将"当前统计平均 29 次/任务"改为"历史统计曾平均 29 次/任务，最新统计已降至约 4 次/任务"。
+   - 更新 ReadFile 预算说明：将"当前统计平均 16 次/任务"改为"历史统计曾平均 16 次/任务，最新统计约 9 次/任务"。
+   - 更新 Git 禁令自检段落：增加说明，提示 agent 统计报告中的 `topGitOp` 可能包含 workflow 自动执行的 git 命令，自检应基于自身实际调用记录。
 
-1. **`prompts/developer.md`**:
-   - 在 rework 第 0 步错误预判中，增加 StrReplaceFile 强制声明要求：每次替换前必须在 reasoning 中声明「已 ReadFile 确认目标内容存在，准备替换」。
-   - 在铁律部分强化错误上限执行：rework 错误达到 1 次时进入只读/收尾模式，达到 2 次时下一个且唯一的 tool call 必须是 WriteFile 写入 halted 报告。
-   - 在 rework 错误计数显式自报部分，明确 X=2 时「立即停止所有操作」，严禁继续其他操作。
-
-2. **`prompts/reviewer.md`**:
-   - ReadFile 上限从 15 次提升到 20 次，并增加「文档缓存策略」指引。
-   - 在快速开始流程中新增第 7 步：第 8 个 tool call 仍未 WriteFile 时必须写入进度报告。
-
-3. **`workflows/rework.yaml`**:
-   - 在 `diagnoseAgentRun` 步骤中增加错误分类统计：总错误数、StrReplaceFile 失败次数、文件缺失次数、Shell 失败次数。
+2. **`prompts/developer.md`**:
+   - 修正 rework 模式"review report 为空/无问题"的处理步骤：将"第 3 步必须写 `logs/rework-noop.md`"改为"完成第 3 步写 `logs/rework-start.txt` 之后的下一步（第 4 步）必须写 `logs/rework-noop.md`"，消除步骤编号冲突。
 
 ## 趋势追踪
 
-- 与上次对比:
-  - 平均步数减少 4.64（改善）
-  - 错误率减少 1.32（改善）
-  - 成功率下降 0.07（轻微恶化，可能受 review 零产出任务影响）
-- 建议下次重点关注:
-  - **rework 错误分类数据**：观察 `diagnoseAgentRun` 新增的错误分类统计，确认 StrReplaceFile 失败是否为首要错误来源。
-  - **review ReadFile 与产出**：观察提升 ReadFile 预算至 20 次后，review 的平均 ReadFile 次数是否下降（因缓存策略）以及 successRate 是否回升至 100%。
-  - **git status 频率**：观察 developer.md 强化约束后，rework 的 topGitOp 是否从 `status` 转变为构建/测试命令。
+- **与上次对比**: 
+  - 平均步数下降 **8.53**（大幅优化，说明预算约束生效）
+  - 错误率下降 **0.37**（显著改善）
+  - 成功率提升 **1.26%**（温和上升，整体稳定）
+  - 趋势全面向好，prompt 中施加的预算硬上限和步数预警机制正在产生效果。
+
+- **建议下次重点关注**:
+  1. **dev agent**: 本次统计周期内无 dev 任务数据，无法评估 developer.md 中 dev 模式约束的有效性。建议下次关注 dev 的 avgSteps、successRate 和 topGitOp。
+  2. **rework 零产出根因**: 虽然已修复步骤冲突，但仍需观察下一轮统计中 rework successRate 是否回升至 100%。
+  3. **topIssues 数据完整性**: 推动 dashboard 统计逻辑补充失败模式提取，使 prompt-evolution 分析能基于更细粒度的失败根因做关联。
