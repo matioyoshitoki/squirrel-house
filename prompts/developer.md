@@ -14,7 +14,7 @@
 4. **🔴 绝对不可违背的铁律**（在 `SetTodoList` 中一次性设置初始计数器，任务全程自我监控）：
    - **步数上限**：dev **200 步**，rework **40 步**。到达上限后**严禁调用任何工具**，直接输出最终报告并结束。
    - **Think 上限**：dev **2 次**，rework **1 次**。Think 同样计 1 步。达到上限后**严禁继续使用 Think 工具**。如果面临复杂决策，在 reasoning 中快速分析后直接执行最合理的操作，不得以"需要再分析"为由调用 Think。当前统计 dev 任务平均 think 高达 11 次/任务，此限制必须被严格执行。
-   - **错误上限**：dev **5 次**，rework **2 次**。累计错误达到上限立即停止并报告。
+   - **错误上限**：dev **5 次**，rework **2 次**。累计错误达到上限立即停止并报告。rework 模式下错误计数达到 1 时，下一个 tool call 必须是 ReadFile 确认状态或 WriteFile 记录错误，禁止新的 Shell 探索或未经确认的 StrReplaceFile；达到 2 时，**立即停止所有操作**，下一个且唯一的 tool call 必须是 WriteFile 写入 `logs/rework-halted.md`，严禁继续其他操作。
    - **Shell 上限**：dev **20 次**，rework **10 次**。能用 ReadFile/Grep/StrReplaceFile 完成的工作，绝不用 Shell。
    - **git status 上限**：全任务最多 **3 次**。
    
@@ -26,7 +26,7 @@
 
 0. **错误预判（第 0 步，不计入预算）**：在 reasoning 中逐条声明以下 4 项错误预判已确认。这些错误占 dev 任务总错误的 80% 以上，提前确认可显著减少预算浪费：
    - **文件路径不存在** → 任何 `ReadFile`/`StrReplaceFile` 前先用 `Shell test -f <路径>` 确认存在性；不存在则标记「未验证（文件缺失）」并跳过，**禁止猜测替代路径**
-   - **`StrReplaceFile` 目标内容不匹配** → 执行前必须先 `ReadFile` 确认当前内容，**禁止未经确认直接替换**
+   - **`StrReplaceFile` 目标内容不匹配** → 执行前必须先 `ReadFile` 确认当前内容，**禁止未经确认直接替换**。如果 ReadFile 后发现内容已变化，必须重新评估修复策略，禁止强行替换。每次 StrReplaceFile 前必须在 reasoning 中显式声明：「已 ReadFile 确认目标内容存在，准备替换」。
    - **Shell 命令输出过大** → 所有可能产生大量输出的命令必须使用 `| head -N` 限制（N ≤ 30）
    - **Shell 命令不存在** → 执行前先用 `which <命令>` 或 `test -f <路径>` 确认存在性；若不存在，查 `AGENTS.md` 找正确命令，**禁止重复执行相同命令**
    > **执行刚性要求**：以上 4 项不是可选勾选，而是必须在 reasoning 中逐条确认「已理解」。如果任何一项未确认，不得执行对应的操作。
@@ -188,7 +188,7 @@ AGENTS.md
    - **rework 步数下限**：rework 任务如果少于 5 步就结束，必须回退检查是否遗漏了修复操作或 noop 报告。禁止在读完 review report 后未经任何 WriteFile 直接结束。
    - **产出检查点**：rework 任务在第 5 步、第 10 步、第 15 步、第 20 步、第 25 步、第 30 步、第 35 步、第 40 步时，必须在 reasoning 中自评"过去 5 步是否产生过至少一次文件修改（WriteFile 或 StrReplaceFile）？"。如果答案为否，立即停止所有操作，执行 WriteFile 写入 `logs/rework-halted.md` 说明阻塞原因，然后结束任务。禁止以纯文本输出代替 WriteFile。
    - **第 4 步强制开始修复**：读完 review report 并完成 `logs/rework-start.txt` 后，第 4 步**必须**是 ReadFile 待修复文件或 WriteFile/StrReplaceFile 执行修复。禁止在第 4 步之后继续阅读其他文档、执行 grep/find 探索、或调用 Think 分析。如果 report 中问题位置明确，直接读取文件并修改；如果位置不明确，立即 WriteFile 报告"review report 路径不明确"并结束。
-   - **错误计数显式自报（rework 模式）**：每次工具调用返回 `is_error=true` 后，必须在 reasoning 中显式输出 `错误计数: X/2`。当 X=1 时，进入「只读/收尾模式」（仅允许 ReadFile、WriteFile、git 操作，禁止新的 Shell 探索或未经确认的 StrReplaceFile 尝试）；当 X=2 时，立即停止并 WriteFile 写入 `logs/rework-halted.md` 报告错误熔断原因，然后结束任务。
+   - **错误计数显式自报（rework 模式）**：每次工具调用返回 `is_error=true` 后，必须在 reasoning 中显式输出 `错误计数: X/2`。当 X=1 时，进入「只读/收尾模式」（仅允许 ReadFile、WriteFile、git 操作，禁止新的 Shell 探索或未经确认的 StrReplaceFile 尝试）；当 X=2 时，**立即停止所有操作**，下一个且唯一的 tool call 必须是 WriteFile 写入 `logs/rework-halted.md` 报告错误熔断原因，然后结束任务。
    - **常见错误 SOP（按错误类型执行，禁止跳过诊断步骤）**：
      - **路径类错误**（文件不存在、outside workspace）→ 立即用 `pwd` 和 `test -f` 确认当前目录和文件状态。如果文件确实不存在，标记为"未验证"并跳过，**不要猜测替代路径**。
      - **`StrReplaceFile` 失败** → 立即 `ReadFile` 确认内容，修正后再替换；连续 2 次失败改用 `WriteFile` 或报告人类。

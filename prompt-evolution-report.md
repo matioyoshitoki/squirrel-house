@@ -1,92 +1,89 @@
 # Prompt 演进报告 — type-one
 
-生成时间: 2026-05-22T12:40:33+08:00
-分析范围: 2026-05-22T10:56:37 至 2026-05-22T12:36:49
+生成时间: 2026-05-22T13:42:20+08:00
+分析范围: 2026-05-22T12:36:49 到 2026-05-22T13:40:22
 
 ## 统计摘要
 
-- 分析日志数: 4
-- Agent 类型分布:
-  - dev: 1 任务
-  - review: 2 任务
-  - rework: 1 任务
+- 分析日志数: 14
+- Agent 类型分布: review 7, rework 7
+
+| 指标 | review | rework |
+|------|--------|--------|
+| 任务数 | 7 | 7 |
+| 平均步数 | 14.29 | 18.43 |
+| 成功率 | 85.7% | 100% |
+| 总错误数 | 1 | 5 |
+| 平均 ReadFile/任务 | 16.0 | 7.0 |
+| 平均 Shell/任务 | 5.0 | 6.86 |
+| 写入操作总计 | 9 (WriteFile) | 38 (WriteFile 14 + StrReplaceFile 24) |
+| topGitOp | commands | status |
 
 ## 问题诊断
 
-### 问题 1: dev Think 严重超限导致高步数
+### 问题 1: rework 高错误率
 
-**证据**:
-- dev count=1, avgSteps=57, totalErrors=6, successRate=1
-- 该 dev 任务平均 think 高达 **19 次**，而 `developer.md` 明确规定 Think 上限为 **2 次**
-- topGitOp 为 `add`，说明 agent 执行了大量 git add 操作（可能伴随反复修改）
+**证据**: 7 个 rework 任务共产生 5 个工具调用错误，错误涉及任务比例 71%（topIssues 中标记为 43% 的任务级错误率）。尽管 successRate 为 100%（最终均有文件修改产出），但高错误率表明 agent 在执行过程中频繁遭遇工具调用失败，消耗了额外的步数和预算。
 
 **根因分析**:
-1. `developer.md` 中虽然规定了 Think 上限（dev 2 次），但缺乏**逐次显式自报**机制。agent 在 reasoning 中没有持续追踪 Think 计数，导致无意识超限。
-2. 现有熔断规则（"达到上限后严禁继续"）执行不力，agent 未能在第 2 次 Think 后切换到行动模式。
-3. Think 超限直接贡献了约 19 步（占 57 步的 33%），是高步数的首要原因。
+- `developer.md` 虽已设定 rework 错误上限为 2 次，但统计数据表明该约束未被严格遵守。
+- rework 任务中 `StrReplaceFile` 使用频繁（24 次），而 "old string not found" 是常见失败模式。agent 可能在未充分 `ReadFile` 确认的情况下直接执行替换，或在遇到路径错误后尝试替代路径。
+- rework 平均 Shell 调用 6.86 次/任务，接近 10 次上限，表明环境探索和验证步骤仍偏多。
 
 **改进建议**:
-1. 在 `prompts/developer.md` 的"Think 使用限制"中新增**逐次显式自报**机制：每次 Think 前必须在 reasoning 中输出 `Think 计数: X/2`，不报数不得调用。达到上限后，严禁再次调用 Think，改用 WriteFile 写简要分析后立刻执行。（已应用）
-2. 在 `prompts/developer.md` 的"错误预警与熔断"中新增**错误计数显式自报**机制：每次错误后必须在 reasoning 中输出 `错误计数: X/5`，X≥3 时进入只读/收尾模式，X=5 时立即停止。与 rework 模式对齐，提高 agent 对错误的敏感度。（已应用）
-3. 在 `workflows/dev.yaml` 中新增 `diagnoseAgentRun` 步骤（仿照 review/rework workflow），在 agent 运行结束后检测日志中的 Think 调用次数和错误次数，超限则生成预警报告，为下次迭代提供数据。（已应用）
+1. **在 `developer.md` 中增加 StrReplaceFile 强制声明**: 每次 StrReplaceFile 前必须在 reasoning 中显式声明「已 ReadFile 确认目标内容存在，准备替换」。如果 ReadFile 后发现内容已变化，必须重新评估修复策略，禁止强行替换。（已应用）
+2. **强化 rework 错误熔断刚性**: `developer.md` 中已更新：rework 错误达到 1 次时，下一个 tool call 必须是 ReadFile 确认状态或 WriteFile 记录错误，禁止新的 Shell 探索或未经确认的 StrReplaceFile；达到 2 次时，立即停止所有操作，下一个且唯一的 tool call 必须是 WriteFile 写入 `logs/rework-halted.md`。（已应用）
+3. **在 `workflows/rework.yaml` 中增加错误分类统计**: `diagnoseAgentRun` 步骤已增强，现在会统计总错误数、StrReplaceFile 失败次数、文件缺失次数和 Shell 失败次数，便于下次分析精准定位主要错误来源。（已应用）
 
-### 问题 2: review 违反 Git 禁令且错误率 50%
+### 问题 2: review ReadFile 预算不足与零产出风险
 
-**证据**:
-- review count=2, avgSteps=11, totalErrors=1, successRate=1
-- review 任务的 topGitOp 为 `diff`，而 `reviewer.md` 明确**严禁**执行任何本地 `git` 命令
-- 错误率 50%（1/2），说明有 1 个 review 任务在执行中遇到了错误
+**证据**: review 任务平均 ReadFile 16.0 次/任务，超过了 `reviewer.md` 中设定的 15 次上限。successRate 为 85.7%，即 7 个任务中有 1 个零产出。totalWrites 仅 9 次，平均 1.29 次/任务。
 
 **根因分析**:
-1. `reviewer.md` 中的 Git 禁令 enforcement 完全依赖**任务结束前自检**。agent 可能在任务过程中使用了 `git diff`，但在最终报告中未诚实声明。
-2. 现有 prompt 的惩罚机制（降级为 NEEDS_MAJOR_FIX）是事后性的，无法在 agent 执行过程中阻止违规行为。
-3. workflow 层面缺少对 agent 日志的自动化检测，未能发现违规使用 git 命令的行为。
+- `reviewer.md` 中的 ReadFile 预算（15 次）已低于实际平均值（16 次）。审查任务需要读取 AGENTS.md、规范文档、PR diff、历史 review report 等多个文件，预算紧张可能导致 agent 在后期被迫跳过必要阅读，或以其他方式（如多次 Shell 调用）变相补偿。
+- 零产出任务的存在说明，尽管 prompt 中已有多层 WriteFile 强制要求（第 6 步、最后一步等），在某些异常路径下（如 gh 命令失败、环境状态非 READY）agent 仍可能未正确执行 WriteFile。
 
 **改进建议**:
-1. 在 `prompts/reviewer.md` 的"快速开始"中将 Git 禁令提升为**前置确认项**：第 0 步之前，agent 必须在 reasoning 中声明"已理解 Git 禁令：本任务严禁任何本地 git 命令"。（已应用）
-2. 在 `workflows/review.yaml` 的 `diagnoseAgentRun` 步骤中，增加对 agent 日志的**自动化 Git 禁令检测**：统计 `git status|diff|log|show|blame` 等命令的出现次数，若检测到违规使用，自动将审查报告结论降级为 NEEDS_MAJOR_FIX，并追加违规声明。实现 workflow 层面的强制 enforcement。（已应用）
-3. 在 `prompts/reviewer.md` 的"任务结束前强制检查"中，将 Git 禁令自检从"是否使用过"改为"本任务工具调用中是否包含任何 git 命令"，并增加"若已使用，无论审查质量如何，结论强制降级"的明确措辞。（已应用）
+1. **提升 ReadFile 预算并引入文档缓存策略**: `reviewer.md` 中 ReadFile 上限已从 15 次提升到 20 次，并增加「文档缓存策略」：对需要多次引用的规范文档，首次 ReadFile 后将关键摘要写入临时文件，后续引用该摘要而非重复 ReadFile。（已应用）
+2. **增加第 8 步 WriteFile 二次检查点**: `reviewer.md` 的快速开始流程中新增第 7 步：如果第 8 个 tool call 仍未完成最终审查报告写入，下一个 tool call 必须是 WriteFile 写入进度报告，禁止继续探索新文件或执行新命令。（已应用）
 
-### 问题 3: dev 错误率 100%（6 errors/任务）
+### 问题 3: review 与 rework 的 Git 操作统计异常
 
-**证据**:
-- dev 任务 totalErrors=6，错误率 100%
-- 虽然 successRate=1（最终有产出），但 agent 经历了 6 次错误才完成，试错成本高
+**证据**: review 的 topGitOp 为 `commands`，rework 的 topGitOp 为 `status`。reviewer.md 明确禁止 review 任务执行任何本地 git 命令。
 
 **根因分析**:
-1. `developer.md` 已有"错误预判"和"常见错误快速诊断表"，但本次任务仍然发生了 6 次错误，说明错误预判的执行效果不够理想。
-2. 缺少像 rework 模式那样的**错误计数显式自报**机制，agent 对累计错误的感知不足，容易在错误模式下持续试探。
+- review 的 `commands` 可能包含 `gh pr diff` / `gh pr view` 等 GitHub CLI 命令，这些命令在日志解析中可能被归入 git 相关操作类别。
+- rework 的 `status` 直接表明 developer.md 中 "git status 全任务最多 3 次" 的约束仍被突破（7 个任务共 35 次 Shell 调用，部分为 git status）。
 
 **改进建议**:
-1. 已在问题 1 的改进建议 2 中覆盖：新增错误计数显式自报机制，与 rework 模式对齐。
-2. 在 `prompts/developer.md` 的"任务启动检查清单"中，将"错误预判"从"待办清单勾选"改为"必须在 reasoning 中逐条确认已完成"，增加执行刚性。（已应用）
+1. **在 `developer.md` 中强化 git status 预算执行**: 当前虽已设定 "git status 全任务最多 3 次"，但统计表明 agent 仍在用 `git status` 代替有效的进度判断。建议在 reasoning 中增加每次 git status 调用前的强制声明：「git status 计数 X/3，调用理由：...」。
+2. **优化日志解析的 Git 操作分类**: 建议 `cmd/dashboard/*.go` 中将 `gh` 命令与本地 `git` 命令分开统计，避免 review 任务的合法 `gh` 命令被误判为 Git 禁令违规。
+
+> 注：问题 3 的建议 1 涉及 reasoning 习惯，建议 2 涉及 dashboard 统计逻辑，需更多数据支撑后再实施。本次暂不修改。
 
 ## 已应用改进
 
-本次分析后直接修改了以下文件：
+本次分析后，已直接修改以下文件：
 
-1. **`prompts/developer.md`**
-   - 在"Think 使用限制与超限熔断"段落中新增**逐次显式自报**要求：每次 Think 前必须在 reasoning 中输出 `Think 计数: X/2`，不报数不得调用；达到上限后严禁再次调用 Think。
-   - 在"错误预警与熔断"段落中新增**错误计数显式自报**要求：每次错误后必须在 reasoning 中输出 `错误计数: X/5`；X=3 时进入只读/收尾模式，X=5 时立即停止并输出最终报告。
-   - 在"任务启动检查清单"中，将第 0 步的 4 项错误预判从"待办清单勾选"提升为"必须在 reasoning 中逐条声明已确认"，增强执行刚性。
+1. **`prompts/developer.md`**:
+   - 在 rework 第 0 步错误预判中，增加 StrReplaceFile 强制声明要求：每次替换前必须在 reasoning 中声明「已 ReadFile 确认目标内容存在，准备替换」。
+   - 在铁律部分强化错误上限执行：rework 错误达到 1 次时进入只读/收尾模式，达到 2 次时下一个且唯一的 tool call 必须是 WriteFile 写入 halted 报告。
+   - 在 rework 错误计数显式自报部分，明确 X=2 时「立即停止所有操作」，严禁继续其他操作。
 
-2. **`prompts/reviewer.md`**
-   - 在"快速开始"第 0 步之前新增**Git 禁令前置确认**：agent 必须在执行第一个工具调用前，在 reasoning 中显式声明"已理解 Git 禁令：本任务严禁执行任何本地 git 命令（git status/diff/log/show/blame/checkout/add/commit/push 等）"。
-   - 在"任务结束前强制检查"中强化 Git 禁令措辞：将自检问题改为"本任务的所有工具调用中，是否包含任何以 `git` 为命令的 Shell 调用？"，并增加"若答案为是，必须在「风险与建议」章节开头追加 Major 声明，且审查结论强制降级为 NEEDS_MAJOR_FIX"的强调。
+2. **`prompts/reviewer.md`**:
+   - ReadFile 上限从 15 次提升到 20 次，并增加「文档缓存策略」指引。
+   - 在快速开始流程中新增第 7 步：第 8 个 tool call 仍未 WriteFile 时必须写入进度报告。
 
-3. **`workflows/review.yaml`**
-   - 在 `diagnoseAgentRun` 步骤中新增**Git 禁令自动化检测**：统计日志中 `git status|diff|log|show|blame|checkout|add|commit|push` 的出现次数。若检测到违规使用，自动追加审查报告违规声明并将结论降级为 NEEDS_MAJOR_FIX。
-
-4. **`workflows/dev.yaml`**
-   - 在 `runAgent` 步骤之后新增 `diagnoseAgentRun` 步骤（仿照 review/rework workflow），检测 agent 日志中的工具调用次数、写操作次数、Think 调用次数和错误次数。若 Think 超过 2 次或错误超过 5 次，生成预警诊断报告，为后续 prompt 迭代提供数据支撑。
+3. **`workflows/rework.yaml`**:
+   - 在 `diagnoseAgentRun` 步骤中增加错误分类统计：总错误数、StrReplaceFile 失败次数、文件缺失次数、Shell 失败次数。
 
 ## 趋势追踪
 
 - 与上次对比:
-  - avgStepsDelta: **-19.25**（显著改善，说明上次对 design 和 dev 的 prompt 收紧生效）
-  - errorRateDelta: **-2.75**（显著改善，整体错误率下降）
-  - successRateDelta: 0（保持 100% 有产出）
+  - 平均步数减少 4.64（改善）
+  - 错误率减少 1.32（改善）
+  - 成功率下降 0.07（轻微恶化，可能受 review 零产出任务影响）
 - 建议下次重点关注:
-  - **dev agent 的 Think 次数**：本次修改了逐次显式自报机制，需验证 Think 是否被控制在 2 次以内。
-  - **review agent 的 Git 禁令遵守情况**：本次在 prompt 和 workflow 层面双管齐下，需验证 topGitOp 是否消失。
-  - **dev agent 的 errorRate**：虽然整体 errorRate 下降，但 dev 单任务仍有 6 次错误，需观察错误计数自报机制是否有效减少试探性错误。
+  - **rework 错误分类数据**：观察 `diagnoseAgentRun` 新增的错误分类统计，确认 StrReplaceFile 失败是否为首要错误来源。
+  - **review ReadFile 与产出**：观察提升 ReadFile 预算至 20 次后，review 的平均 ReadFile 次数是否下降（因缓存策略）以及 successRate 是否回升至 100%。
+  - **git status 频率**：观察 developer.md 强化约束后，rework 的 topGitOp 是否从 `status` 转变为构建/测试命令。
