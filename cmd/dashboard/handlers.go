@@ -837,13 +837,13 @@ func handleDesignAssets(w http.ResponseWriter, r *http.Request) {
 	projectName := getCurrentProjectName()
 	var assets []map[string]string
 
-	// 优先检查是否已有编译好的 Flutter Web 预览
-	flutterWebIndex := filepath.Join(assetsDir, "web", "index.html")
-	if _, err := os.Stat(flutterWebIndex); err == nil {
+	// 优先检查是否已有 Flutter 设计截图
+	flutterScreenshot := filepath.Join(assetsDir, "screenshots", "preview.png")
+	if _, err := os.Stat(flutterScreenshot); err == nil {
 		assets = append(assets, map[string]string{
-			"name": "Flutter Web 预览",
-			"url":  fmt.Sprintf("/logs/%s/designs/issue-%s/web/", projectName, issueNumber),
-			"type": "flutter-web",
+			"name": "Flutter 设计截图",
+			"url":  fmt.Sprintf("/logs/%s/designs/issue-%s/screenshots/preview.png", projectName, issueNumber),
+			"type": "image",
 		})
 	}
 
@@ -873,6 +873,13 @@ func handleDesignAssets(w http.ResponseWriter, r *http.Request) {
 		}
 		// 跳过 preview/ 目录及其所有子目录（Phaser3 Web 预览已单独处理）
 		if name == "preview" || strings.HasPrefix(name, "preview/") {
+			if d.IsDir() {
+				return filepath.SkipDir
+			}
+			return nil
+		}
+		// 跳过 screenshots/ 目录（Flutter 截图已在前面单独处理）
+		if name == "screenshots" || strings.HasPrefix(name, "screenshots/") {
 			if d.IsDir() {
 				return filepath.SkipDir
 			}
@@ -1488,6 +1495,18 @@ func buildFlutterDesignPreview(w http.ResponseWriter, r *http.Request, issueNumb
 		return
 	}
 
+	// 前置环境检查
+	if _, err := exec.LookPath("flutter"); err != nil {
+		log.Printf("[build-preview] ❌ flutter 命令未找到: %v", err)
+		writeJSONError(w, http.StatusInternalServerError, "环境错误: flutter 命令未找到，请检查 Flutter SDK 安装")
+		return
+	}
+	if _, err := exec.LookPath("python3"); err != nil {
+		log.Printf("[build-preview] ❌ python3 命令未找到: %v", err)
+		writeJSONError(w, http.StatusInternalServerError, "环境错误: python3 命令未找到")
+		return
+	}
+
 	// 创建临时 Flutter 预览项目
 	tmpDir, err := os.MkdirTemp("", fmt.Sprintf("flutter-preview-issue-%d-*", issueNumber))
 	if err != nil {
@@ -1501,7 +1520,6 @@ func buildFlutterDesignPreview(w http.ResponseWriter, r *http.Request, issueNumb
 	dartPkgName := readPubspecPackageName(projectPath)
 
 	// 检查是否存在 design/issue-N 分支，如果有则导出到临时目录作为依赖
-	// 这样预览编译能使用 agent 生成的完整代码（包括 app_strings.dart、di.config.dart 等）
 	designBranch := fmt.Sprintf("design/issue-%d", issueNumber)
 	useDesignBranch := false
 	var designBranchPath string
@@ -1509,24 +1527,28 @@ func buildFlutterDesignPreview(w http.ResponseWriter, r *http.Request, issueNumb
 	if err := checkBranchCmd.Run(); err == nil {
 		designBranchPath, err = os.MkdirTemp("", fmt.Sprintf("%s-design-%d-*", projectName, issueNumber))
 		if err == nil {
+			defer os.RemoveAll(designBranchPath)
+
 			archiveCmd := exec.Command("git", "-C", projectPath, "archive", designBranch)
 			archiveCmd.Dir = projectPath
 			tarCmd := exec.Command("tar", "-x", "-C", designBranchPath)
 			archiveOut, _ := archiveCmd.StdoutPipe()
 			tarCmd.Stdin = archiveOut
-			_ = tarCmd.Start()
-			_ = archiveCmd.Run()
-			_ = tarCmd.Wait()
-
-			// 如果项目使用 injectable 但缺少 di.config.dart，生成最小化占位文件
-			// 避免运行 build_runner（需要 30+ 秒，会导致网关 504 超时）
-			// 预览 widget 不会触发依赖注入初始化，空实现即可满足编译
-			diDartPath := filepath.Join(designBranchPath, "lib", "core", "di", "di.dart")
-			diConfigPath := filepath.Join(designBranchPath, "lib", "core", "di", "di.config.dart")
-			if _, err := os.Stat(diDartPath); err == nil {
-				if _, err := os.Stat(diConfigPath); err != nil {
-					log.Printf("[build-preview] 生成最小化 di.config.dart...")
-					_ = os.WriteFile(diConfigPath, []byte(`// GENERATED CODE - DO NOT MODIFY BY HAND
+			if err := tarCmd.Start(); err != nil {
+				log.Printf("[build-preview] tar 启动失败: %v", err)
+			} else if err := archiveCmd.Run(); err != nil {
+				log.Printf("[build-preview] git archive 失败: %v", err)
+			} else if err := tarCmd.Wait(); err != nil {
+				log.Printf("[build-preview] tar 解压失败: %v", err)
+			} else {
+				// 如果项目使用 injectable 但缺少 di.config.dart，生成最小化占位文件
+				diDartPath := filepath.Join(designBranchPath, "lib", "core", "di", "di.dart")
+				diConfigPath := filepath.Join(designBranchPath, "lib", "core", "di", "di.config.dart")
+				if _, err := os.Stat(diDartPath); err == nil {
+					if _, err := os.Stat(diConfigPath); err != nil {
+						log.Printf("[build-preview] 生成最小化 di.config.dart...")
+						_ = os.MkdirAll(filepath.Dir(diConfigPath), 0755)
+						if writeErr := os.WriteFile(diConfigPath, []byte(`// GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
@@ -1538,89 +1560,86 @@ _i174.GetIt $initGetIt(
 }) {
   return getIt;
 }
-`), 0644)
+`), 0644); writeErr != nil {
+							log.Printf("[build-preview] ⚠️ 写入 di.config.dart 失败: %v", writeErr)
+						}
+					}
 				}
+				useDesignBranch = true
+				projectPath = designBranchPath
+				log.Printf("[build-preview] 使用 %s 分支代码作为依赖: %s", designBranch, designBranchPath)
 			}
-
-			useDesignBranch = true
-			projectPath = designBranchPath
-			log.Printf("[build-preview] 使用 %s 分支代码作为依赖: %s", designBranch, designBranchPath)
 		}
 	}
 	if !useDesignBranch {
 		log.Printf("[build-preview] %s 分支不存在，使用当前项目代码", designBranch)
 	}
 
-
-	// 复制通用 Flutter 预览模板（使用 templateDir+"/." 避免 filepath.Join 清理掉 .）
+	// 复制通用 Flutter 预览模板
 	templateDir := filepath.Join(projectRoot, config.FlutterPreviewTemplate)
+	if _, err := os.Stat(templateDir); err != nil {
+		log.Printf("[build-preview] ❌ 预览模板目录不存在: %s", templateDir)
+		writeJSONError(w, http.StatusInternalServerError, fmt.Sprintf("预览模板不存在: %s", templateDir))
+		return
+	}
 	cpCmd := exec.Command("cp", "-R", templateDir+"/.", tmpDir)
 	if out, err := cpCmd.CombinedOutput(); err != nil {
-		log.Printf("[build-preview] 复制模板失败: %v\n%s", err, string(out))
+		log.Printf("[build-preview] ❌ 复制模板失败: %v\n%s", err, string(out))
 		writeJSONError(w, http.StatusInternalServerError, fmt.Sprintf("复制模板失败: %v", err))
 		return
 	}
 
-	// 动态生成 pubspec.yaml，注入当前项目依赖（使 widget 中的 package:xxx 导入可解析）
+	// 动态生成 pubspec.yaml
 	var pubspecContent string
 	if dartPkgName != "" {
 		pubspecContent = fmt.Sprintf(`name: flutter_preview_generic
-
 description: "Flutter preview"
-
 publish_to: 'none'
-
 version: 1.0.0+1
 
-
 environment:
-
   sdk: '>=3.4.0 <4.0.0'
 
-
 dependencies:
-
   flutter:
-
     sdk: flutter
-
   cupertino_icons: ^1.0.8
-
   %s:
-
     path: %s
 
-
 dev_dependencies:
-
   flutter_test:
-
     sdk: flutter
-
   flutter_lints: ^5.0.0
 
-
 flutter:
-
   uses-material-design: true
-
 `, dartPkgName, projectPath)
 	} else {
-		basePubspec, _ := os.ReadFile(filepath.Join(templateDir, "pubspec.yaml"))
+		basePubspec, err := os.ReadFile(filepath.Join(templateDir, "pubspec.yaml"))
+		if err != nil {
+			log.Printf("[build-preview] ❌ 读取模板 pubspec.yaml 失败: %v", err)
+			writeJSONError(w, http.StatusInternalServerError, fmt.Sprintf("读取模板 pubspec.yaml 失败: %v", err))
+			return
+		}
 		pubspecContent = string(basePubspec)
 	}
 	if err := os.WriteFile(filepath.Join(tmpDir, "pubspec.yaml"), []byte(pubspecContent), 0644); err != nil {
-		log.Printf("[build-preview] 生成 pubspec.yaml 失败: %v", err)
+		log.Printf("[build-preview] ❌ 生成 pubspec.yaml 失败: %v", err)
 		writeJSONError(w, http.StatusInternalServerError, fmt.Sprintf("生成 pubspec.yaml 失败: %v", err))
 		return
 	}
 
 	// 复制 flutter-widgets/*.dart 到临时项目的 lib/preview/
 	previewDir := filepath.Join(tmpDir, "lib", "preview")
-	os.MkdirAll(previewDir, 0755)
+	if err := os.MkdirAll(previewDir, 0755); err != nil {
+		log.Printf("[build-preview] ❌ 创建 preview 目录失败: %v", err)
+		writeJSONError(w, http.StatusInternalServerError, fmt.Sprintf("创建 preview 目录失败: %v", err))
+		return
+	}
 	cpWidgetsCmd := exec.Command("cp", "-R", widgetsDir+"/.", previewDir)
 	if out, err := cpWidgetsCmd.CombinedOutput(); err != nil {
-		log.Printf("[build-preview] 复制 widgets 失败: %v\n%s", err, string(out))
+		log.Printf("[build-preview] ❌ 复制 widgets 失败: %v\n%s", err, string(out))
 		writeJSONError(w, http.StatusInternalServerError, fmt.Sprintf("复制 widgets 失败: %v", err))
 		return
 	}
@@ -1630,49 +1649,90 @@ flutter:
 	genScript := filepath.Join(projectRoot, ".tools", "generate_preview_main.py")
 	genCmd := exec.Command("python3", genScript, previewDir, mainDartPath)
 	if out, err := genCmd.CombinedOutput(); err != nil {
-		log.Printf("[build-preview] 生成 main.dart 失败: %v\n%s", err, string(out))
-		writeJSONError(w, http.StatusInternalServerError, fmt.Sprintf("生成预览入口失败: %v", err))
+		log.Printf("[build-preview] ❌ 生成 main.dart 失败: %v\n%s", err, string(out))
+		writeJSONError(w, http.StatusInternalServerError, fmt.Sprintf("生成预览入口失败: %v\n输出: %s", err, string(out)))
+		return
+	}
+	// 前置校验：确保生成的 main.dart 能被 Dart 解析（基础语法检查）
+	mainDartBytes, err := os.ReadFile(mainDartPath)
+	if err != nil {
+		log.Printf("[build-preview] ❌ 读取生成的 main.dart 失败: %v", err)
+		writeJSONError(w, http.StatusInternalServerError, "读取生成的 main.dart 失败")
+		return
+	}
+	mainDartStr := string(mainDartBytes)
+	// 检查常见的生成错误：字符串字面量中的无转义换行
+	if idx := strings.Index(mainDartStr, "'\n"); idx != -1 {
+		log.Printf("[build-preview] ❌ 生成的 main.dart 包含无效字符串字面量（无转义换行），位置: %d", idx)
+		writeJSONError(w, http.StatusInternalServerError, "生成的预览代码包含语法错误，请检查 generate_preview_main.py")
 		return
 	}
 
 	// 编译 Flutter Web
-	outputWebDir := filepath.Join(inputDir, "web")
-	os.RemoveAll(outputWebDir)
-	baseHref := fmt.Sprintf("/logs/%s/designs/issue-%d/web/", projectName, issueNumber)
-	buildCmd := exec.Command("flutter", "build", "web", "--release", "--base-href", baseHref)
+	buildCmd := exec.Command("flutter", "build", "web", "--release")
 	buildCmd.Dir = tmpDir
 	buildOut, buildErr := buildCmd.CombinedOutput()
 	if buildErr != nil {
-		log.Printf("[build-preview] Flutter Web 编译失败: %v\n%s", buildErr, string(buildOut))
+		log.Printf("[build-preview] ❌ Flutter Web 编译失败: %v\n%s", buildErr, string(buildOut))
 		writeJSONError(w, http.StatusInternalServerError, fmt.Sprintf("Flutter Web 编译失败: %v\n%s", buildErr, string(buildOut)))
 		return
 	}
 
-	// 复制编译产物到日志目录
+	// 截图 Flutter Web 预览
 	buildWebDir := filepath.Join(tmpDir, "build", "web")
 	if _, err := os.Stat(buildWebDir); os.IsNotExist(err) {
 		writeJSONError(w, http.StatusInternalServerError, "未找到 Flutter Web 编译产物")
 		return
 	}
-	cpOutCmd := exec.Command("cp", "-R", buildWebDir+"/.", outputWebDir)
-	if out, err := cpOutCmd.CombinedOutput(); err != nil {
-		log.Printf("[build-preview] 复制产物失败: %v\n%s", err, string(out))
-		writeJSONError(w, http.StatusInternalServerError, fmt.Sprintf("复制产物失败: %v", err))
+
+	screenshotsDir := filepath.Join(inputDir, "screenshots")
+	os.MkdirAll(screenshotsDir, 0755)
+	screenshotPath := filepath.Join(screenshotsDir, "preview.png")
+
+	// 启动 HTTP server 并截图
+	shellScript := fmt.Sprintf(`
+cd %q
+python3 -m http.server 0 &
+HTTP_PID=$!
+sleep 2
+PORT=$(ss -tlnp | grep "pid=$HTTP_PID" | head -1 | awk '{print $4}' | cut -d':' -f2)
+if [ -z "$PORT" ]; then
+  PORT=$(lsof -Pan -p $HTTP_PID -iTCP -sTCP:LISTEN 2>/dev/null | grep LISTEN | awk '{print $9}' | cut -d':' -f2)
+fi
+if [ -n "$PORT" ]; then
+  npx --prefix /root/.kimi/plugins/flutter-mcp-preview playwright screenshot \
+    --full-page --wait-for-timeout 3000 \
+    "http://127.0.0.1:$PORT/" \
+    %q 2>&1
+fi
+kill $HTTP_PID 2>/dev/null || true
+`, buildWebDir, screenshotPath)
+
+	screenshotCmd := exec.Command("bash", "-c", shellScript)
+	screenshotOut, screenshotErr := screenshotCmd.CombinedOutput()
+	if screenshotErr != nil {
+		log.Printf("[build-preview] ❌ 截图失败: %v\n%s", screenshotErr, string(screenshotOut))
+		writeJSONError(w, http.StatusInternalServerError, fmt.Sprintf("截图失败: %v", screenshotErr))
 		return
 	}
 
-	log.Printf("[build-preview] Issue #%d Flutter 预览生成成功", issueNumber)
+	if _, err := os.Stat(screenshotPath); os.IsNotExist(err) {
+		log.Printf("[build-preview] ❌ 截图文件未生成\n%s", string(screenshotOut))
+		writeJSONError(w, http.StatusInternalServerError, "截图文件未生成")
+		return
+	}
 
-	previewURL := fmt.Sprintf("/logs/%s/designs/issue-%d/web/", projectName, issueNumber)
+	log.Printf("[build-preview] ✅ Issue #%d Flutter 截图生成成功", issueNumber)
+
+	previewURL := fmt.Sprintf("/logs/%s/designs/issue-%d/screenshots/preview.png", projectName, issueNumber)
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]interface{}{
 		"success":     true,
 		"issueNumber": issueNumber,
 		"url":         previewURL,
-		"message":     "Flutter 预览生成成功",
+		"message":     "Flutter 截图生成成功",
 	})
 }
-
 // buildPhaser3DesignPreview 为 Phaser3 项目生成设计预览
 func buildPhaser3DesignPreview(w http.ResponseWriter, r *http.Request, issueNumber int, projectName, logsDir, inputDir string) {
 	outputDir := filepath.Join(inputDir, "preview")

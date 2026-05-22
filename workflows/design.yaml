@@ -11,7 +11,7 @@ steps:
     type: shell
     command: |
       mkdir -p {{ .Vars.tmpDir }}/designs/issue-{{ .Vars.issueNumber }}
-      # 清理之前任务可能残留的预览目录，防止旧资产被复制到日志
+      # 清理之前任务可能残留的截图和预览目录，防止旧资产被复制到日志
       rm -rf {{ .Vars.tmpDir }}/designs/issue-{{ .Vars.issueNumber }}/web
       rm -rf {{ .Vars.tmpDir }}/designs/issue-{{ .Vars.issueNumber }}/preview
 
@@ -89,7 +89,7 @@ steps:
     ignoreError: true
 
   - id: buildFlutterPreview
-    label: 编译设计预览
+    label: 生成 Flutter 设计截图
     type: shell
     dir: '{{ .Vars.tmpDir }}'
     command: |
@@ -164,11 +164,32 @@ steps:
       if [ -f "$PREVIEW_BUILD_DIR/lib/main.dart" ]; then
         cd "$PREVIEW_BUILD_DIR"
         rm -rf "$PREVIEW_BUILD_DIR/build/web"
-        flutter build web --release --base-href "/logs/{{ .Vars.projectName }}/designs/issue-{{ .Vars.issueNumber }}/web/" 2>&1
+        flutter build web --release 2>&1
         if [ -d "$PREVIEW_BUILD_DIR/build/web" ]; then
-          mkdir -p "{{ .Vars.tmpDir }}/$DESIGNS_DIR/web"
-          cp -R "$PREVIEW_BUILD_DIR/build/web/"* "{{ .Vars.tmpDir }}/$DESIGNS_DIR/web/"
-          echo "✅ Flutter Web 预览编译完成"
+          # 启动临时 HTTP 服务用于截图
+          python3 -m http.server 0 --directory "$PREVIEW_BUILD_DIR/build/web" &
+          HTTP_PID=$!
+          sleep 2
+          # 获取实际分配的端口
+          PORT=$(ss -tlnp | grep "pid=$HTTP_PID" | head -1 | awk '{print $4}' | cut -d':' -f2)
+          if [ -z "$PORT" ]; then
+            PORT=$(lsof -Pan -p $HTTP_PID -iTCP -sTCP:LISTEN 2>/dev/null | grep LISTEN | awk '{print $9}' | cut -d':' -f2)
+          fi
+          if [ -n "$PORT" ]; then
+            mkdir -p "{{ .Vars.tmpDir }}/$DESIGNS_DIR/screenshots"
+            npx --prefix /root/.kimi/plugins/flutter-mcp-preview playwright screenshot \
+              --full-page --wait-for-timeout 3000 \
+              "http://127.0.0.1:$PORT/" \
+              "{{ .Vars.tmpDir }}/$DESIGNS_DIR/screenshots/preview.png" 2>&1
+            if [ -f "{{ .Vars.tmpDir }}/$DESIGNS_DIR/screenshots/preview.png" ]; then
+              echo "✅ Flutter 设计截图已生成"
+            else
+              echo "❌ 截图失败"
+            fi
+          else
+            echo "❌ 无法获取 HTTP 服务端口"
+          fi
+          kill $HTTP_PID 2>/dev/null || true
         else
           echo "❌ Flutter Web 编译失败"
         fi
@@ -177,9 +198,9 @@ steps:
       # 清理临时目录
       rm -rf "$PREVIEW_BUILD_DIR"
 
-      # 如果没有生成任何预览，记录日志
-      if [ ! -d "{{ .Vars.tmpDir }}/$DESIGNS_DIR/web" ]; then
-        echo "⚠️ 未找到 preview.dart / flutter-widgets，跳过 Flutter 预览编译"
+      # 如果没有生成任何截图，记录日志
+      if [ ! -f "{{ .Vars.tmpDir }}/$DESIGNS_DIR/screenshots/preview.png" ]; then
+        echo "⚠️ 未找到 preview.dart / flutter-widgets，跳过 Flutter 截图"
       fi
     ignoreError: true
     logFile: '{{ .Vars.logFileName }}.preview-build'

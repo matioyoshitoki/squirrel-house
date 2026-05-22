@@ -387,16 +387,20 @@ func getTask(taskType TaskType, targetID int) (*Task, bool) {
 	return t, ok
 }
 
+// saveTaskStateAsync 允许测试替换为同步版本，避免 goroutine 在 t.Cleanup 恢复工作目录后才执行
+var saveTaskStateAsync = func() { go saveTaskState() }
+
 // setTask 向统一任务表中写入任务（如果已存在 running 任务，返回 false）
 func setTask(task *Task) bool {
 	tasksMutex.Lock()
-	defer tasksMutex.Unlock()
 	key := taskKey(task.ProjectName, task.Type, task.TargetID)
 	if existing, ok := tasks[key]; ok && existing.Status == "running" {
+		tasksMutex.Unlock()
 		return false
 	}
 	tasks[key] = task
-	go saveTaskState()
+	tasksMutex.Unlock()
+	saveTaskStateAsync()
 	go broadcastTaskChanged(task, "started")
 	return true
 }
@@ -430,19 +434,20 @@ func countReviewFailuresFromLogs(prNumber int, projectName string) int {
 // updateTaskStatus 更新任务状态
 func updateTaskStatus(taskType TaskType, targetID int, status string) *Task {
 	tasksMutex.Lock()
-	defer tasksMutex.Unlock()
 	if t, ok := tasks[taskKey(getCurrentProjectName(), taskType, targetID)]; ok {
 		oldStatus := t.Status
 		t.Status = status
 		if status != "running" {
 			t.EndTime = time.Now()
 		}
-		go saveTaskState()
+		tasksMutex.Unlock()
+		saveTaskStateAsync()
 		if oldStatus != status {
 			go broadcastTaskChanged(t, "status_changed")
 		}
 		return t
 	}
+	tasksMutex.Unlock()
 	return nil
 }
 

@@ -29,7 +29,12 @@ func setupTaskStateTest(t *testing.T) {
 	currentProjectIndex = 0
 	projectMutex.Unlock()
 
+	// 将 saveTaskStateAsync 替换为同步版本，避免 goroutine 在 t.Cleanup 恢复工作目录后才执行
+	oldAsync := saveTaskStateAsync
+	saveTaskStateAsync = func() { saveTaskState() }
+
 	t.Cleanup(func() {
+		saveTaskStateAsync = oldAsync
 		os.Chdir(origWd)
 		config = oldConfig
 		projectMutex.Lock()

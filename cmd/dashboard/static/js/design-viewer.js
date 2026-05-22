@@ -239,6 +239,9 @@ export function selectDesignAsset(url, ext) {
     const body = document.getElementById('design-preview-body');
     if (!body) return;
 
+    // 重置可能影响布局的类
+    body.classList.remove('relative');
+
     // Update active thumbnail state
     document.querySelectorAll('.design-thumbnail').forEach(el => {
         const active = el.getAttribute('onclick') && el.getAttribute('onclick').includes(`'${url}'`);
@@ -258,7 +261,9 @@ export function selectDesignAsset(url, ext) {
     } else if (ext === 'html' || ext === 'flutter-web' || ext === 'phaser3-web') {
         // 加时间戳防止 iframe 缓存旧内容
         const cacheBustUrl = url + (url.includes('?') ? '&' : '?') + '_t=' + Date.now();
-        body.innerHTML = `<iframe class="h-full w-full rounded-lg border-none bg-white" src="${cacheBustUrl}"></iframe>`;
+        // 使用 absolute 定位确保 iframe 填满 flex 容器，避免 h-full 在 flex item 中失效
+        body.classList.add('relative');
+        body.innerHTML = `<iframe class="absolute inset-0 h-full w-full rounded-lg border-none bg-white" src="${cacheBustUrl}"></iframe>`;
     } else if (ext === 'audio') {
         body.innerHTML = `<audio class="w-full rounded-lg" controls src="${url}"></audio>`;
     } else if (ext === 'json') {
@@ -450,7 +455,7 @@ export async function buildDesignPreviewHandler(issueNumber) {
             await loadDesignAssets(issueNumber);
             // 直接选中新生成的 preview，避免重新渲染整个 overlay 导致的闪烁
             const assets = store.get('designAssetsCache')[issueNumber] || [];
-            const previewAsset = assets.find(a => a.type === 'phaser3-web' || a.type === 'flutter-web');
+            const previewAsset = assets.find(a => a.type === 'phaser3-web' || a.type === 'flutter-web' || a.type === 'image');
             if (previewAsset) {
                 selectDesignAsset(previewAsset.url, previewAsset.type);
             }

@@ -45,7 +45,7 @@ AGENTS.md
 2. **结构化 UI 组件代码** —
    - Phaser3 项目：产出 `designs/issue-<N>/src/ui/*.ts`（类型定义、色板常量、工具函数、组件接口）。Dashboard 会自动从这些代码生成可视化预览，**你不需要写 mockup.html 或 wireframe.svg**。
    - Flutter 项目：**必须**产出 `designs/issue-<N>/flutter-widgets/*.dart`，每个关键 Widget 一个独立文件（如 `conversation_list_item.dart`、`message_bubble.dart`、`chat_input_bar.dart`）。可选补充 `designs/issue-<N>/preview.dart` 作为聚合预览入口，但**禁止只写 `preview.dart` 而不拆分 `flutter-widgets/`**。
-3. **可交互原型或线框图**（可选）— 形式取决于项目技术栈和 AGENTS.md 中的规范。Flutter 项目需要产出 `preview.dart` 或 `flutter-widgets/` 用于编译 Web 预览。Phaser3 项目不需要此步骤，预览由 Dashboard 自动生成。
+3. **设计截图**（由 workflow 自动生成）— 对于 Flutter 项目，你产出 `flutter-widgets/` 或 `preview.dart` 后，workflow 会自动编译并生成截图，保存到 `designs/issue-<N>/screenshots/preview.png`。你**不需要**手动生成截图，也**不需要**编写 mockup.html 或 wireframe.svg。Phaser3 项目的预览由 Dashboard 自动生成。
 
 **绝对红线**：
 - **禁止修改现有源码文件**。design 阶段只允许新建文件，不允许 `StrReplaceFile` 或 `WriteFile` 覆盖项目中已存在的 `.dart`、`.ts`、`.tsx`、`.js` 等源码文件。
@@ -62,7 +62,7 @@ AGENTS.md
 
 ### 能力 3：视觉自查与验证（Flutter 项目专用）
 
-如果你为 Flutter 项目产出了 `flutter-widgets/` 或 `preview.dart`，在提交前**必须**使用 `/skill:flutter-mcp-preview` 进行视觉自查，确保开发 Agent 拿到的是可直接编码的高质量资产。
+如果你为 Flutter 项目产出了 `flutter-widgets/` 或 `preview.dart`，在提交前**建议**使用 `/skill:flutter-mcp-preview` 进行视觉自查，确保开发 Agent 拿到的是可直接编码的高质量资产。workflow 会自动生成设计截图，你无需手动保存截图文件。
 
 **触发条件**（同时满足）：
 - 项目技术栈为 Flutter
@@ -133,23 +133,28 @@ AGENTS.md
 7. **错误熔断**：
    - **连续错误熔断**：任意工具调用连续 2 次返回错误，立即停止执行并输出报告。
    - **累计错误熔断**：全任务累计错误达到 5 次立即停止。
-8. **早期产出压力**：启动后 **12 步内必须完成第一个 WriteFile** 设计资产产出。如果 12 步内仍未写入任何文件，立即停止探索，基于已有信息直接开始设计。
+8. **早期产出压力**：启动后 **10 步内必须完成第一个 WriteFile** 设计资产产出。如果 10 步内仍未写入任何文件，立即停止探索，基于已有信息直接开始设计。当前统计 design 错误率 100%，早期产出是降低错误预算消耗的关键。
 9. **进度检查点**：每执行 **5 步**，必须自评"过去 5 步是否产生了至少一次文件修改？"如果答案为否，立即停止并报告阻塞原因。
 10. **零修改产出处理**：如果探索后确认无需任何设计资产修改，必须显式说明"当前代码已符合要求，无需修改"并立即结束，不允许做无意义操作。
-11. **文档存在性检查**：读取任何规范文档或设计文件前，先用 `Shell` 命令（如 `test -f <路径>` 或 `ls -la <路径>`）确认文件存在。如果文件不存在，跳过该文件并在报告中标注"未验证（文件缺失）"，不要直接执行 `ReadFile` 导致错误浪费步数。
-12. **错误预判与强制 SOP（不计入步数）**：启动后第 1 步必须先完成以下错误预判确认，并在待办清单中勾选：
-    - [ ] `AGENTS.md` 或规范文档路径不存在 → 读取前先用 `test -f` 确认，不存在则基于 `README.md` 继续，**禁止直接 ReadFile 不存在的文件**
-    - [ ] `StrReplaceFile` 目标内容不匹配 → 执行前必须先 `ReadFile` 确认当前内容，**禁止未经确认直接替换**
-    - [ ] Shell 命令输出过大导致 `chunk exceed the limit` → 所有可能产生大量输出的命令必须使用 `| head -N` 限制（N ≤ 30）
-    - [ ] Flutter 预览编译失败 → 诚实报告限制，不要假装验证通过
+11. **文档存在性检查**：读取任何规范文档或设计文件前，先用 `Shell` 命令（如 `test -f <路径>` 或 `ls -la <路径>`）确认文件存在。如果文件不存在，跳过该文件并在报告中标注「未验证（文件缺失）」，不要直接执行 `ReadFile` 导致错误浪费步数。
 
-    **错误类型快速诊断表**：出现错误后，必须在 1 个思考轮次内完成诊断，禁止不经分析直接重试：
-    - `file_not_found` / `outside the workspace` → 立即用 `pwd` + `test -f` 确认路径，确认不存在则标记"未验证（文件缺失）"并跳过，**禁止猜测替代路径**
-    - `StrReplaceFile` 返回 `old string not found` → 立即 `ReadFile` 确认当前内容，修正后重试 1 次；仍失败则改用 `WriteFile` 重写或报告人类
-    - `Shell` 返回 `command not found` → 查 `AGENTS.md` 确认正确命令路径，**禁止重复执行相同命令**
-    - `Shell` 超时 → **禁止用相同参数重试**，记录并跳过验证
-    - `chunk exceed the limit` → 将命令改为限制输出版本（`| head -N`，N ≤ 30）后重试 1 次，仍失败则跳过
-13. **快速开始（第 1-3 步必须完成）**：
+## 启动前错误预判（不计入步数）
+
+启动后第 1 步必须先完成以下错误预判确认，并在待办清单中勾选。这些错误占 design 任务错误的 80% 以上，提前确认可显著减少预算浪费：
+
+- [ ] `AGENTS.md` 或规范文档路径不存在 → 读取前先用 `test -f` 确认，不存在则基于 `README.md` 继续，**禁止直接 ReadFile 不存在的文件**
+- [ ] `StrReplaceFile` 目标内容不匹配 → 执行前必须先 `ReadFile` 确认当前内容，**禁止未经确认直接替换**
+- [ ] Shell 命令输出过大导致 `chunk exceed the limit` → 所有可能产生大量输出的命令必须使用 `| head -N` 限制（N ≤ 30）
+- [ ] Flutter 预览编译失败 → 诚实报告限制，不要假装验证通过
+
+**错误类型快速诊断表**：出现错误后，必须在 1 个思考轮次内完成诊断，禁止不经分析直接重试：
+- `file_not_found` / `outside the workspace` → 立即用 `pwd` + `test -f` 确认路径，确认不存在则标记「未验证（文件缺失）」并跳过，**禁止猜测替代路径**
+- `StrReplaceFile` 返回 `old string not found` → 立即 `ReadFile` 确认当前内容，修正后重试 1 次；仍失败则改用 `WriteFile` 重写或报告人类
+- `Shell` 返回 `command not found` → 查 `AGENTS.md` 确认正确命令路径，**禁止重复执行相同命令**
+- `Shell` 超时 → **禁止用相同参数重试**，记录并跳过验证
+- `chunk exceed the limit` → 将命令改为限制输出版本（`| head -N`，N ≤ 30）后重试 1 次，仍失败则跳过
+
+## 快速开始（第 1-3 步必须完成）
     1. **确认环境**：执行 `pwd` 和 `git status`，确认在正确的 worktree 目录、分支无异常变更。
     2. **读取项目地图**：读取 `AGENTS.md` 发现设计规范路径和资产产出目录。如果 `AGENTS.md` 不存在，基于当前目录下的 `README.md` 继续。
     3. **设置待办清单**：使用 `SetTodoList` 列出本次任务要完成的 3-5 个具体事项，**并显式包含四项计数器："Think 预算: 0/3"、"步数预算: 0/60"、"Shell 预算: 0/15"、"错误: 0/5"**。每次工具调用后必须更新这些计数器，使预算消耗显性化。
