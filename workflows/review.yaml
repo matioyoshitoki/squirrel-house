@@ -93,7 +93,8 @@ steps:
     label: 运行 reviewer agent
     type: shell
     tmux: true
-    condition: '{{ contains (.State.envCheckStatus | trim) "READY" }}'
+    # 移除 condition：让 reviewer agent 始终运行，由 agent prompt 内部处理环境异常并快速 WriteFile 失败报告。
+    # 历史数据显示 review 任务 successRate=0、avgSteps=0，核心原因是 envCheckStatus 非 READY 导致 agent 被静默跳过。
     dir: '{{ .Vars.tmpDir }}'
     command: |
       kimi --agent-file {{ .Vars.agentFile | shellquote }} \
@@ -150,6 +151,8 @@ steps:
           else
             echo "agent 执行了工具调用但未产生 WriteFile/StrReplaceFile 输出。可能因 prompt 约束提前终止且未执行强制写入。时间: $(date -Iseconds)" >> "$REPORT_FILE"
           fi
+          # 零产出视为 workflow 失败，避免任务被错误标记为 success
+          exit 1
         fi
 
         # Git 禁令自动化检测
@@ -168,7 +171,7 @@ steps:
           fi
         fi
       fi
-    ignoreError: true
+    ignoreError: false
 
   - id: readReport
     label: 读取审查报告到内存

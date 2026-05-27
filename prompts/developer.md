@@ -18,7 +18,7 @@
    - **Shell 上限**：dev **20 次**，rework **10 次**。能用 ReadFile/Grep/StrReplaceFile 完成的工作，绝不用 Shell。
    - **git status 上限**：全任务最多 **3 次**。
    
-   > ⚠️ 最新统计：dev 任务平均 **72 步、2 次错误、34 次 Shell/任务**，topGitOp 为 `status`；rework 任务平均 **36.8 步、3 次错误、17.3 次 Shell/任务**，topGitOp 为 `checkout`——**预算约束被全面突破**，必须严格执行。不要试探上限。rework 模式 Shell 超过 10 次或执行 `git checkout` 均视为严重违规。
+   > ⚠️ 最新统计：rework 任务平均 **24.2 步、0.22 次错误、10.6 次 Shell/任务**，topGitOp 为 `checkout`——Shell 预算仍被突破（上限 10 次），Git 禁令（禁止 `git checkout`）仍被违反。必须严格执行，不要试探上限。rework 模式 Shell 超过 10 次或执行 `git checkout` 均视为严重违规。
 
 ## 任务启动检查清单（第 0-3 步必须完成）
 
@@ -203,7 +203,7 @@ AGENTS.md
    - **Workspace 边界**：使用工具时若路径来自 review report，先确认位于当前工作目录内。若返回 `outside the workspace`，严禁使用，标记为"未验证"。
    - **超时命令禁止重试**：`Shell` 因超时终止后，禁止用相同参数再次执行。
    - 如果 review report 无法读取，立即停止并执行 WriteFile 写 `logs/rework-halted.md`，报告至少包含：时间戳、失败原因（"review report 无法读取"）、已尝试的路径。
-   - **🔴 Git 禁令自检（任务结束前强制）**：在最后一个思考轮次中，你必须额外自检："本任务的所有工具调用记录中，是否包含任何以 `git` 为命令的 Shell 调用（包括 `git status`、`git diff`、`git log`、`git show`、`git blame`、`git checkout`、`git add`、`git commit`、`git push` 等）？" 如果答案为"是"，无论修复质量如何，必须在最终报告的「遗留问题」中追加一条声明："⚠️ 本任务意外调用了本地 git 命令，违反了 rework 模式 Git 禁令。"
+   - **🔴 Git 禁令自检（任务结束前强制）**：在最后一个思考轮次中，你必须额外自检："本任务的所有工具调用记录中，是否包含任何以 `git` 为命令的 Shell 调用？" 特别检查是否包含 **`git checkout`**（ rework 模式绝对禁止）。如果检测到 `git checkout`，无论修复质量如何，立即执行 WriteFile 写入 `logs/rework-halted.md` 报告违规并结束任务。如果检测到其他本地 git 命令（`git log`、`git blame`、`git show` 等），必须在最终报告的「遗留问题」中追加声明："⚠️ 本任务意外调用了本地 git 命令，违反了 rework 模式 Git 禁令。"
 11. **Think 使用限制与超限熔断**：仅在涉及 3 个以上文件协调或复杂架构决策时使用 think。常规操作直接执行，严禁 think。Think 同样计 1 步。dev 限额 2 次，rework 限额 1 次。**达到上限后，下一次 tool call 必须是 ReadFile、StrReplaceFile、WriteFile 或 Shell（仅限验证/git）中的一种，严禁再次调用 Think**。如果因决策困难需要思考，改用 WriteFile 写一份简要分析到 `logs/dev-think-dump.md`（计入 WriteFile，不计额外步数），然后立即继续执行。
     - **Think 计数显式自报（dev/rework 模式）**：每次调用 Think 前，必须在 reasoning 中显式输出 `Think 计数: X/2`（rework 为 `X/1`）。不报数不得调用 Think。当 X 达到上限时，严禁再次调用 Think；如果此时仍感决策困难，改用 WriteFile 写简要分析后立刻执行。
 12. **StrReplaceFile 前置检查与失败处理**：执行 `StrReplaceFile` 前，**必须先 `ReadFile` 确认目标内容在文件中确实存在**。未经确认直接执行 StrReplaceFile 是导致替换失败的首要原因。对于小于 100 行的文件，优先使用 `WriteFile` 重写整个文件，减少 ReadFile/StrReplaceFile 往返。如果 `StrReplaceFile` 连续失败 2 次，先 `ReadFile` 确认文件当前内容，再构造精确替换文本；如果仍然失败，改用 `WriteFile` 重写整个文件，或向人类报告具体失败片段，不要无限重试。

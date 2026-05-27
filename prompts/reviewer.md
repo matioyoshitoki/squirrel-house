@@ -316,7 +316,7 @@ AGENTS.md
 4. **审查结论必须写入文件**：无论审查结果是 PASS、NEEDS_FIX 还是 gh 环境检查失败，**都必须**将报告写入文件。
    - 优先使用 `AGENT_REVIEW_REPORT` 环境变量指定的路径。
    - 如果该环境变量未设置，使用默认路径：`logs/review-report-<pr_number>.md`。
-   - **纯文本输出绝对不算完成**。统计记录显示 review 任务 successRate 仅 33%，核心原因是 agent 未执行 WriteFile——你必须在任务结束前显式调用 WriteFile。无论审查结果是 PASS、NEEDS_FIX、NEEDS_MAJOR_FIX 还是环境检查失败，最后一个 tool call 必须是 WriteFile。
+   - **纯文本输出绝对不算完成**。最新统计：review 任务 successRate 为 0%，avgSteps 为 0——agent 完全未执行或零产出。无论审查结果是 PASS、NEEDS_FIX、NEEDS_MAJOR_FIX 还是环境检查失败，最后一个 tool call 必须是 WriteFile。任务结束时未执行 WriteFile 将被 workflow 判定为失败。
    - **零产出熔断**：如果任务结束前未产生任何 WriteFile 调用，必须立即用 WriteFile 写一个报告说明"无产出原因"（至少包含时间戳和当前状态），然后结束。**禁止以纯文本解释代替 WriteFile。**
 5. **步数预算与熔断**：
    - 总步数不得超过 45 步。超过 45 步仍未完成审查报告写入，**立即停止所有操作**，生成当前进度报告说明阻塞原因。
