@@ -1,87 +1,82 @@
 # Prompt 演进报告 — type-one
 
-生成时间: 2026-05-27 17:42:35 +0800
-分析范围: 2026-05-27T16:37:24 至 2026-05-27T17:42:35
+生成时间: 2026-05-27T18:55:00+08:00
+分析范围: 2026-05-27T17:42:36 至 2026-05-27T18:47:48
 
 ## 统计摘要
 
-- 分析日志数: 19
+- 分析日志数: 11
 - Agent 类型分布:
-  - review: 10 次
-  - rework: 9 次
-
-| Agent 类型 | 任务数 | 平均步数 | 成功率 | 总错误数 | Top Git Op |
-|-----------|--------|---------|--------|---------|-----------|
-| review    | 10     | 0.0     | 0%     | 0       | —         |
-| rework    | 9      | 24.2    | 100%   | 2       | checkout  |
-
-趋势对比（与上次统计）:
-- 平均步数变化: -6.3（改善）
-- 错误率变化: -0.13（改善）
-- 成功率变化: -0.14（恶化，主要受 review 零产出拖累）
+  - `review`: 6 个任务，avgSteps=9.17，successRate=66.7%，totalErrors=0，topGitOp="commands"
+  - `rework`: 5 个任务，avgSteps=26.2，successRate=100%，totalErrors=2（错误率 40%），topGitOp="checkout"
 
 ## 问题诊断
 
-### 问题 1: Review Agent 完全零产出
-**证据**: review 任务 count=10, avgSteps=0, successRate=0%, totalWrites=0。日志文件存在（平均 194 字节），但内容仅包含 Dashboard 写入的启动/结束信息，无任何 `StepBegin` 或工具调用记录。
+### 问题 1: Workflow git 命令检测误报导致合规 agent 被错误降级
+
+**证据**:
+- 对 review 日志（review-pr-10-20260527-*.log）进行精确提取，只扫描 `FunctionBody(name='Shell'...)` 的 arguments 后，真实 git 命令调用为 **0 次**；但 workflow 的 `grep -cE '\bgit\s+...'` 匹配到了 11–22 次 "git 命令" 文本——这些全部来自 agent reasoning 中的声明（如"本审查全程未使用任何本地 git 命令"）。
+- 对 23 个 rework 日志的同样精确提取显示，仅 **1 个任务**存在真实 `git checkout` 调用，其余 22 个任务的 `topGitOp="checkout"` 均为误报。
+- review.yaml 的 diagnoseAgentRun 在误匹配后会强制将审查结论降级为 `NEEDS_MAJOR_FIX`，直接影响 review 任务质量评估。
 
 **根因分析**:
-1. `review.yaml` 的 `runAgent` 步骤带有 condition `contains (.State.envCheckStatus | trim) "READY"`。当 `envReadinessCheck` 步骤因 worktree 目录无效、`gh` CLI 异常或 PR 不可访问等原因输出非 READY 时，agent 被静默跳过。
-2. Workflow 的 `diagnoseAgentRun` 虽然能检测到零产出并生成默认失败报告，但 `ignoreError: true` 导致整个 workflow 仍返回 success，任务被错误标记为 "✅ Review 完成"。
-3. Reviewer prompt 中复杂的强制写入机制（第 3/6/8/12 步 WriteFile 检查点）因 agent 根本未被执行而完全失效。
+- review.yaml 和 rework.yaml 的 diagnoseAgentRun 使用全文 grep 匹配 git 命令，未区分 agent 实际 Shell 工具调用与 reasoning/prompt/result 中的文本引用。
+- 这导致 agent 的合规自检声明反而触发违规检测，产生大量假阳性，掩盖了真实违规信号。
 
 **改进建议**:
-1. **移除 `runAgent` 的 condition**（已应用）：Reviewer prompt 已内置环境异常处理逻辑（第 1 步检查 `AGENT_ENV_STATUS`，非 READY 时直接 WriteFile 失败报告）。让 agent 始终运行，避免静默跳过。修改文件: `workflows/review.yaml`
-2. **零产出时 workflow 失败**（已应用）：将 `diagnoseAgentRun` 的 `ignoreError` 改为 `false`，并在检测到 `STEP_COUNT=0 || WRITE_COUNT=0` 时 `exit 1`，使零产出任务被正确标记为 failed。修改文件: `workflows/review.yaml`
-3. **更新统计引用并加强警示**（已应用）：Reviewer.md 中原引用 "successRate 仅 33%" 已严重过时，更新为 "successRate 为 0%，avgSteps 为 0——agent 完全未执行或零产出"，并增加 "任务结束时未执行 WriteFile 将被 workflow 判定为失败"。修改文件: `prompts/reviewer.md`
+1. **review.yaml / rework.yaml**: 将宽松 grep 替换为 Python 精确提取脚本，只统计 `FunctionBody(name='Shell'...)` 的 arguments 中的真实 git 命令。（**已应用**）
+2. **dashboard 统计逻辑**: 建议同步修正报告生成器中的 `topGitOp` 统计方式，采用同样的精确提取逻辑，避免后续 prompt 基于错误统计数据做出过度反应（如 developer.md 中引用的 "topGitOp 为 checkout" 警示语即来自误报数据）。
 
-### 问题 2: Rework Agent Shell 预算突破与 Git 禁令违反
-**证据**: rework Shell=95 次 / 9 任务 = 10.6 次/任务，超过 10 次硬性上限。`topGitOp=checkout`，而 `developer.md` 明确禁止 rework 模式执行 `git checkout`。
+### 问题 2: rework 任务在 worktree 环境异常时失控探索，步数膨胀
+
+**证据**:
+- rework avgSteps=26.2，接近 40 步上限；Shell 平均 8.4 次/任务，接近 10 次上限。
+- 逐 Shell 分析 rework-pr-10-20260527-140316.log 发现：agent 在发现 `.git` 缺失后，连续执行了 `git branch`、`git checkout`、手动复制 `.git` 目录、`git worktree list` 等 **30+ 次 Shell 调用**，严重违反 Git 禁令并耗尽预算。
+- 该任务是 5 个 rework 任务中 2 个错误来源之一，直接拉高错误率至 40%。
 
 **根因分析**:
-1. `developer.md` 中 rework 的 Shell 上限为 10 次，但历史统计引用（36.8 步、17.3 次 Shell）已过时，agent 可能因缺乏最新数据驱动警示而未严格执行。
-2. Git 禁令自检虽然存在，但对 `git checkout` 的违规仅要求在报告中声明，违规成本过低，agent 在任务上下文冲突时选择服从外部指令而非 prompt 铁律。
+- developer.md 虽禁止 `git checkout`，但未明确禁止 agent 在发现 worktree 损坏时"自行诊断并修复"环境。agent 将 worktree 异常视为可修复的本地问题，触发大量探索性 Shell 命令，完全偏离 rework 的核心目标（按 review report 修复代码）。
+- 缺少针对 worktree infrastructure 故障的熔断规则，使 agent 在错误路径上持续消耗步数，直至触达上限或最终失败。
 
 **改进建议**:
-1. **更新统计引用并维持高压线**（已应用）：将 `developer.md` 第 21 行统计更新为最新数据 "rework 任务平均 24.2 步、0.22 次错误、10.6 次 Shell/任务"，并强调 "Shell 预算仍被突破，Git 禁令仍被违反"。修改文件: `prompts/developer.md`
-2. **升级 Git 禁令违规代价**（已应用）：将 `git checkout` 的违规后果从"报告中声明"升级为"立即 WriteFile 写入 `logs/rework-halted.md` 并结束任务"，提高拒止执行的确定性。修改文件: `prompts/developer.md`
-3. **workflow 侧增加 Shell 审计**：在 `rework.yaml` 的 `diagnoseAgentRun` 中增加 Shell 调用次数统计，若超过 10 次在诊断报告中记录警告，供下次演进分析使用。修改文件: `workflows/rework.yaml`（待下次迭代评估）
+1. **developer.md（rework 模式）**: 新增 "Worktree 环境异常熔断" 铁律——发现 `.git` 缺失、目录损坏或不在正确分支时，**禁止**自行复制 `.git`、执行 `git checkout` 或手动修复 worktree；正确做法是立即停止修复，WriteFile 报告环境异常并结束任务。（**已应用**）
+2. **developer.md（错误预判）**: 将 "Worktree 环境异常" 列为第 5 项错误预判，在任务启动时即建立熔断意识。（**已应用**）
 
-### 问题 3: Review Workflow 环境检查与 worktree 可靠性
-**证据**: 10 次 review 任务全部因 `envCheckStatus` 非 READY 导致 agent 被跳过，但 Dashboard 层面的 `platform.AuthStatus()` 已通过。
+### 问题 3: review 任务空日志率过高，successRate 仅 66.7%
+
+**证据**:
+- review avgSteps=9.17，远低于正常审查所需的 25–35 步。
+- 在统计周期内，review-pr-10 系列存在大量 **194 字节空日志**（0 tool calls），约占 review 任务的 1/3。
+- successRate=66.7% 意味着 2/6 的任务被 workflow 判定为零产出（agent 未产生有效工具调用）。
 
 **根因分析**:
-- `startReviewTask` 中 `git worktree add` 的错误被忽略（`wtCmd.Run()` 无错误处理）。如果 worktree 创建失败（分支已被占用、origin/branch 不存在等），`tmpDir` 可能不是一个有效的 git 仓库，导致 workflow 中的 `gh pr view` 失败。
-- `envReadinessCheck` 在 `tmpDir` 中执行，而 `tmpDir` 的可靠性未经校验。
+- 空日志表明 agent 未成功启动或立即退出，属于 **基础设施/调度层问题**，非 prompt 设计缺陷。
+- review prompt 已具备完善的快速失败和 WriteFile 兜底机制（环境异常时第 1–2 步即写入失败报告），且正常任务的审查流程完整（50–108 次 tool calls）。
+- diagnoseAgentRun 对空日志的兜底（生成默认失败报告并 exit 1）导致这些任务被计入失败，拉低 successRate。
 
 **改进建议**:
-1. 在 `review.yaml` 的 `envReadinessCheck` 之前增加 `validateWorktree` 步骤：检查 `tmpDir` 是否为有效的 git 仓库（`test -d .git || git rev-parse --git-dir`）。如果无效，workflow 应立即失败并记录原因。
-2. 在 Dashboard 侧（`handlers_pr.go`）对 `git worktree add` 的返回值进行检查，如果失败则终止任务并记录错误，而非忽略错误继续执行。
+1. **dashboard/workflow 层面**: 建议对空日志（0 tool calls 且日志大小 < 1KB）任务单独标记为 `INFRA_FAILURE`，不计入 agent successRate，或触发自动重试，避免将基础设施问题误判为 agent 能力问题。
+2. **review prompt**: 当前已有充足的环境预检查和 WriteFile 兜底，暂不做额外修改；待基础设施稳定后再评估 avgSteps 是否回升至健康区间（25–35 步）。
 
 ## 已应用改进
 
-本次分析后直接修改了以下文件：
+1. **`workflows/review.yaml` + `workflows/rework.yaml` — 精确化 git 命令检测**
+   - 将 diagnoseAgentRun 中的宽松 `grep -cE '\bgit\s+...'` 替换为调用独立 Python 脚本 `scripts/detect-git-usage.py`。
+   - 该脚本精确提取 `FunctionBody(name='Shell'...)` 的 arguments 后再匹配 git 命令，消除因 agent reasoning 中出现 "git 命令" 声明文本而导致的假阳性降级。
 
-1. **`workflows/review.yaml`**
-   - 移除了 `runAgent` 步骤的 `condition`，确保 reviewer agent 不再被静默跳过。
-   - 修改 `diagnoseAgentRun`：当检测到零产出（`STEP_COUNT=0` 或 `WRITE_COUNT=0`）时，生成默认失败报告后执行 `exit 1`。
-   - 将 `diagnoseAgentRun` 的 `ignoreError` 从 `true` 改为 `false`，确保零产出任务被 workflow 引擎标记为失败。
-
-2. **`prompts/reviewer.md`**
-   - 更新第 319 行统计引用：将 "successRate 仅 33%" 更新为 "successRate 为 0%，avgSteps 为 0——agent 完全未执行或零产出"。
-   - 增加警示语："任务结束时未执行 WriteFile 将被 workflow 判定为失败。"
-
-3. **`prompts/developer.md`**
-   - 更新第 21 行统计引用：反映最新 rework 数据（24.2 步、10.6 次 Shell、checkout 违规）。
-   - 强化 Git 禁令自检（第 206 行）：将 `git checkout` 的违规后果从报告声明升级为强制写 halted 报告并结束任务。
+3. **`prompts/developer.md` — 新增 Worktree 环境异常熔断规则**
+   - 在 rework 模式专属规则中增加铁律：发现 worktree 异常（`.git` 缺失、目录损坏、不在正确分支）时，**禁止**自行修复，必须立即停止并 WriteFile 报告。
+   - 在错误预判清单中新增第 5 项 "Worktree 环境异常（rework 模式）"，提前建立熔断意识。
 
 ## 趋势追踪
 
-- **与上次对比**:
-  - rework 平均步数下降（约 -6.3），错误率下降（-0.13），说明前期 prompt 改进（预算限制、错误熔断）已产生效果。
-  - 成功率下降（-0.14），主要受 review agent 零产出拖累。review 任务在统计期间全部失败，是本次最突出的恶化点。
+- **与上次对比（16:37–17:42 → 17:42–18:47）**:
+  - `review` successRate 从 **0% → 66.7%**：显著改善，主要得益于 review.yaml 移除了 `envCheckStatus` 非 READY 时的 condition 阻断，避免 agent 被静默跳过。
+  - `rework` avgSteps 从 **24.2 → 26.2**：小幅回升，仍高于健康值（建议 < 20 步），需持续观察 worktree 熔断规则的效果。
+  - `rework` errorRate 从 **22.2%（2/9）→ 40%（2/5）**：样本量小导致波动，但真实违规和错误模式已明确。
+  - `review` 仍存在约 1/3 的任务为空日志（基础设施问题），拉低 avgSteps 和 successRate。
 
 - **建议下次重点关注**:
-  1. **review agent 成功率**：本次修改已移除 condition 并增加零产出熔断，下次统计应关注 review 的 avgSteps 是否从 0 提升到正常范围（25-35 步），successRate 是否恢复到合理水平。
-  2. **rework Shell 次数与 git checkout**：关注 developer.md 强化后的执行效果，特别是 `topGitOp` 是否不再是 `checkout`，以及 Shell/任务是否降至 10 次以下。
-  3. **worktree 可靠性**：如果 review 继续出现大量零步数任务，需进一步检查 Dashboard 侧 `git worktree add` 的错误处理逻辑。
+  1. **rework 的步数控制**：在 worktree 熔断规则生效后，观察 avgSteps 是否从 26.2 降至 20 以下。
+  2. **真实 git 违规率**：在修复检测误报后，统计真正的 `git checkout` 违规次数，评估 developer.md Git 禁令的实际执行效果。
+  3. **review 空日志根因**：协同 infrastructure 团队定位 agent 未启动或零产出的原因（tmux/kimi 调度层），将空日志任务排除在 agent 统计之外。
