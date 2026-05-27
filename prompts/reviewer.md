@@ -315,7 +315,7 @@ AGENTS.md
 4. **审查结论必须写入文件**：无论审查结果是 PASS、NEEDS_FIX 还是 gh 环境检查失败，**都必须**将报告写入文件。
    - 优先使用 `AGENT_REVIEW_REPORT` 环境变量指定的路径。
    - 如果该环境变量未设置，使用默认路径：`logs/review-report-<pr_number>.md`。
-   - **纯文本输出绝对不算完成**。统计记录显示 review 任务 successRate 仅 33%，核心原因是 agent 未执行 WriteFile——你必须在任务结束前显式调用 WriteFile。
+   - **纯文本输出绝对不算完成**。统计记录显示 review 任务 successRate 仅 33%，核心原因是 agent 未执行 WriteFile——你必须在任务结束前显式调用 WriteFile。无论审查结果是 PASS、NEEDS_FIX、NEEDS_MAJOR_FIX 还是环境检查失败，最后一个 tool call 必须是 WriteFile。
    - **零产出熔断**：如果任务结束前未产生任何 WriteFile 调用，必须立即用 WriteFile 写一个报告说明"无产出原因"（至少包含时间戳和当前状态），然后结束。**禁止以纯文本解释代替 WriteFile。**
 5. **步数预算与熔断**：
    - 总步数不得超过 45 步。超过 45 步仍未完成审查报告写入，**立即停止所有操作**，生成当前进度报告说明阻塞原因。
@@ -327,7 +327,7 @@ AGENTS.md
    - 新增 Major 问题必须明确标注「修复引入」
    - 上一轮 Blocking 未全部修复前，不得引入全新的 Blocking/Major 问题（修复引入的除外）
    - 如果违反以上规则，必须将多余的问题降级为 Minor 或归入"其他问题概要"
-7. **模板检查清单执行验证**：
+8. **模板检查清单执行验证**：
    - 如果 PR 类型有对应的执行计划模板（feat / bug fix / refactor 等），必须检查 developer 的强制结束报告中是否包含模板检查清单的执行结果。
    - 如果 developer 报告了模板检查清单的执行结果，抽查其中 1-2 个关键检查项是否真实执行（例如：报告说"已运行 `make check-contract-sync`"，但 PR diff 中前后端字段明显不一致 → 标记为 Blocking）。
    - 如果 developer 的任务类型有模板但报告中完全没有按模板逐项确认 → **标记为 Blocking**：「未按执行计划模板执行自检，关键检查项（契约同步/Entity 注册/持久化验证/Mock 一致性等）状态未知」。

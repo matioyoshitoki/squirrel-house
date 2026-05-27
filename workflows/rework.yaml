@@ -156,6 +156,20 @@ steps:
         SHELL_FAIL_COUNT=$(grep -cE 'command not found|exit code|timed out' "$LOG_FILE" 2>/dev/null || echo "0")
         echo "rework agent 工具调用: $STEP_COUNT, 写操作: $WRITE_COUNT, 错误: $ERROR_COUNT" > "$DIAGNOSE_FILE"
         echo "错误分类 — StrReplaceFile 失败: $STR_FAIL_COUNT, 文件缺失: $FILE_MISSING_COUNT, Shell 失败: $SHELL_FAIL_COUNT" >> "$DIAGNOSE_FILE"
+
+        # Git 禁令自动化检测（检测 agent 实际执行的本地 git 命令）
+        GIT_USAGE=$(grep -cE '\bgit\s+(checkout|log|blame|show|reset|revert|merge|rebase)\b' "$LOG_FILE" 2>/dev/null || echo "0")
+        if [ "$GIT_USAGE" -gt 0 ]; then
+          echo "⚠️ 检测到 agent 使用了禁用 git 命令（${GIT_USAGE} 次），违反 developer.md Git 禁令" >> "$DIAGNOSE_FILE"
+          # 如果存在 rework 报告，追加违规声明
+          for f in logs/rework-*.md; do
+            if [ -f "$f" ]; then
+              echo "" >> "$f"
+              echo "## Workflow 违规检测" >> "$f"
+              echo "⚠️ workflow 检测到 agent 在本任务中使用了禁用的本地 git 命令 ${GIT_USAGE} 次（如 git checkout）。developer.md 明确禁止此类操作。" >> "$f"
+            fi
+          done
+        fi
         if [ "$WRITE_COUNT" -eq 0 ]; then
           echo "⚠️ agent 未执行任何 WriteFile/StrReplaceFile，可能因 prompt 约束提前终止且未执行强制写入" >> "$DIAGNOSE_FILE"
           # 生成默认 noop 报告，避免零产出任务被统计为失败

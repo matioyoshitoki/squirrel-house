@@ -93,6 +93,7 @@ steps:
     label: 运行 reviewer agent
     type: shell
     tmux: true
+    condition: '{{ contains (.State.envCheckStatus | trim) "READY" }}'
     dir: '{{ .Vars.tmpDir }}'
     command: |
       kimi --agent-file {{ .Vars.agentFile | shellquote }} \

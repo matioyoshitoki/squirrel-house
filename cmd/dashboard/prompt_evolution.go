@@ -156,13 +156,13 @@ func parseLogFile(path string) *LogAnalysis {
 
 	// 正则表达式
 	stepRe := regexp.MustCompile(`StepBegin\(n=(\d+)\)`)
-	// 只匹配缩进后的 name='...'（排除 FunctionBody(name='...' 的单行格式）
-	toolRe := regexp.MustCompile(`^\s{6,}name=['"](\w+)['"]`)
+	// 匹配缩进后的 name='...'（包括多行和单行 FunctionBody 格式）
+	toolRe := regexp.MustCompile(`^\s{4,}name=['"](\w+)['"]`)
 	thinkRe := regexp.MustCompile(`think='([^']+)'`)
 	// 匹配 ToolError 以及 ToolReturnValue(is_error=True) 两种错误形态
 	toolErrorRe := regexp.MustCompile(`(?m)^\s+is_error=True,$`)
-	writeFileRe := regexp.MustCompile(`^\s{6,}name=['"]WriteFile['"]`)
-	strReplaceRe := regexp.MustCompile(`^\s{6,}name=['"]StrReplaceFile['"]`)
+	writeFileRe := regexp.MustCompile(`^\s{4,}name=['"]WriteFile['"]`)
+	strReplaceRe := regexp.MustCompile(`^\s{4,}name=['"]StrReplaceFile['"]`)
 	gitRe := regexp.MustCompile(`git\s+(\w+)`)
 	// 匹配 git diff --stat 输出中的文件变更统计（如 "3 files changed, 87 insertions(+), 1 deletion(-)"）
 	gitDiffStatRe := regexp.MustCompile(`(\d+)\s+files?\s+changed,\s+(\d+)\s+insertions?\(\+\)(?:,\s+(\d+)\s+deletions?\(-\))?`)
