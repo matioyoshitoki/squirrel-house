@@ -161,6 +161,8 @@ steps:
         GIT_USAGE=$(python3 /root/squirrel-house/scripts/detect-git-usage.py "$LOG_FILE" "checkout|log|blame|show|reset|revert|merge|rebase" 2>/dev/null || echo "0")
         if [ "$GIT_USAGE" -gt 0 ]; then
           echo "⚠️ 检测到 agent 使用了禁用 git 命令（${GIT_USAGE} 次），违反 developer.md Git 禁令" >> "$DIAGNOSE_FILE"
+          # 创建违规标记文件，阻止后续提交
+          touch logs/rework-git-violation.flag
           # 如果存在 rework 报告，追加违规声明
           for f in logs/rework-*.md; do
             if [ -f "$f" ]; then
@@ -219,6 +221,19 @@ steps:
       echo "rework_output_check_failed: true" >> logs/rework-diagnose.md
       exit 1
     ignoreError: true
+
+  - id: checkGitViolation
+    label: 检查 Git 禁令违规
+    type: shell
+    condition: '{{ contains (.State.envCheckStatus | trim) "READY" }}'
+    dir: '{{ .Vars.tmpDir }}'
+    command: |
+      if [ -f "logs/rework-git-violation.flag" ]; then
+        echo "❌ Git 禁令违规：agent 在本任务中使用了禁用的本地 git 命令（如 git checkout）。终止 workflow，禁止提交。"
+        exit 1
+      fi
+      echo "✅ 未检测到 Git 禁令违规"
+    ignoreError: false
 
   - id: preCommitChecks
     label: 提交前强制检查

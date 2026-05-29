@@ -1,231 +1,90 @@
-2026/04/21 09:59:44 📋 已加载配置文件
-2026/04/21 09:59:44 📍 已恢复上次选择的项目: social-world
-2026/04/21 09:59:44 ✅ 已加载 9 个 CTX 模板
-2026/04/21 09:59:44 🔍 开始重建任务状态 [social-world]...
-2026/04/21 09:59:44 📝 已从 state/tasks.json 恢复 67 个任务状态
-2026/04/21 09:59:44 📁 找到 232 个文件
-2026/04/21 09:59:44 📝 更新任务状态: review-53 -> interrupted (来自日志推断)
-2026/04/21 09:59:44 📝 更新任务状态: dev-1 -> success (来自日志推断)
-2026/04/21 09:59:44 📝 更新任务状态: dev-37 -> success (来自日志推断)
-2026/04/21 09:59:44 📝 更新任务状态: rework-16 -> success (来自日志推断)
-2026/04/21 09:59:44 📝 更新任务状态: rework-33 -> success (来自日志推断)
-2026/04/21 09:59:44 📝 更新任务状态: design-29 -> success (来自日志推断)
-2026/04/21 09:59:44 📝 更新任务状态: design-43 -> success (来自日志推断)
-2026/04/21 09:59:44 📝 更新任务状态: dev-2 -> success (来自日志推断)
-2026/04/21 09:59:44 📝 更新任务状态: rework-38 -> success (来自日志推断)
-2026/04/21 09:59:44 📝 更新任务状态: review-6 -> success (来自日志推断)
-2026/04/21 09:59:44 📝 更新任务状态: dev-17 -> success (来自日志推断)
-2026/04/21 09:59:44 📝 更新任务状态: rework-53 -> success (来自日志推断)
-2026/04/21 09:59:44 📝 更新任务状态: dev-29 -> success (来自日志推断)
-2026/04/21 09:59:44 📝 更新任务状态: dev-51 -> failed (来自日志推断)
-2026/04/21 09:59:44 📝 更新任务状态: review-38 -> success (来自日志推断)
-2026/04/21 09:59:44 📝 更新任务状态: review-44 -> success (来自日志推断)
-2026/04/21 09:59:44 📝 更新任务状态: review-11 -> success (来自日志推断)
-2026/04/21 09:59:44 📝 更新任务状态: review-15 -> success (来自日志推断)
-2026/04/21 09:59:44 📝 更新任务状态: rework-51 -> failed (来自日志推断)
-2026/04/21 09:59:44 📝 更新任务状态: dev-3 -> success (来自日志推断)
-2026/04/21 09:59:44 📝 更新任务状态: dev-8 -> success (来自日志推断)
-2026/04/21 09:59:44 📝 更新任务状态: review-30 -> success (来自日志推断)
-2026/04/21 09:59:44 📝 更新任务状态: rework-30 -> success (来自日志推断)
-2026/04/21 09:59:44 📝 更新任务状态: rework-31 -> success (来自日志推断)
-2026/04/21 09:59:44 📝 更新任务状态: dev-32 -> success (来自日志推断)
-2026/04/21 09:59:44 📝 更新任务状态: review-31 -> success (来自日志推断)
-2026/04/21 09:59:44 📝 更新任务状态: dev-13 -> interrupted (来自日志推断)
-2026/04/21 09:59:44 📝 更新任务状态: dev-43 -> interrupted (来自日志推断)
-2026/04/21 09:59:44 📝 更新任务状态: dev-44 -> failed (来自日志推断)
-2026/04/21 09:59:44 📝 更新任务状态: dev-19 -> success (来自日志推断)
-2026/04/21 09:59:44 📝 更新任务状态: dev-36 -> stopped (来自日志推断)
-2026/04/21 09:59:44 📝 更新任务状态: review-16 -> success (来自日志推断)
-2026/04/21 09:59:44 📝 更新任务状态: review-33 -> success (来自日志推断)
-2026/04/21 09:59:44 📝 更新任务状态: review-41 -> success (来自日志推断)
-2026/04/21 09:59:44 📝 更新任务状态: design-4 -> success (来自日志推断)
-2026/04/21 09:59:44 📝 更新任务状态: dev-12 -> interrupted (来自日志推断)
-2026/04/21 09:59:44 📝 更新任务状态: dev-18 -> success (来自日志推断)
-2026/04/21 09:59:44 📝 更新任务状态: dev-4 -> success (来自日志推断)
-2026/04/21 09:59:44 📝 更新任务状态: dev-9 -> failed (来自日志推断)
-2026/04/21 09:59:44 📝 更新任务状态: rework-44 -> failed (来自日志推断)
-2026/04/21 09:59:44 📝 更新任务状态: dev-10 -> success (来自日志推断)
-2026/04/21 09:59:44 📝 更新任务状态: review-42 -> success (来自日志推断)
-2026/04/21 09:59:44 📝 更新任务状态: review-51 -> success (来自日志推断)
-2026/04/21 09:59:44 📝 更新任务状态: rework-42 -> failed (来自日志推断)
-2026/04/21 09:59:44 📝 更新任务状态: dev-20 -> success (来自日志推断)
-2026/04/21 09:59:44 📝 更新任务状态: dev-39 -> success (来自日志推断)
-2026/04/21 09:59:44 📝 更新任务状态: dev-42 -> failed (来自日志推断)
-2026/04/21 09:59:44 📝 更新任务状态: review-36 -> success (来自日志推断)
-2026/04/21 09:59:44 📝 更新任务状态: dev-7 -> success (来自日志推断)
-2026/04/21 09:59:44 📝 更新任务状态: review-34 -> success (来自日志推断)
-2026/04/21 09:59:44 📝 更新任务状态: dev-35 -> success (来自日志推断)
-2026/04/21 09:59:44 📝 更新任务状态: review-14 -> success (来自日志推断)
-2026/04/21 09:59:44 📝 更新任务状态: review-40 -> success (来自日志推断)
-2026/04/21 09:59:44 📝 跳过过期的 Review Report: PR #11
-2026/04/21 09:59:44 📝 跳过过期的 Review Report: PR #14
-2026/04/21 09:59:44 📝 跳过过期的 Review Report: PR #15
-2026/04/21 09:59:44 📝 跳过过期的 Review Report: PR #16
-2026/04/21 09:59:44 📝 跳过过期的 Review Report: PR #31
-2026/04/21 09:59:44 📝 跳过过期的 Review Report: PR #33
-2026/04/21 09:59:44 📝 跳过过期的 Review Report: PR #34
-2026/04/21 09:59:44 📝 跳过过期的 Review Report: PR #36
-2026/04/21 09:59:44 📝 跳过过期的 Review Report: PR #38
-2026/04/21 09:59:44 📝 跳过过期的 Review Report: PR #40
-2026/04/21 09:59:44 📝 跳过过期的 Review Report: PR #41
-2026/04/21 09:59:44 📝 跳过过期的 Review Report: PR #42
-2026/04/21 09:59:44 📝 跳过过期的 Review Report: PR #44
-2026/04/21 09:59:44 📝 跳过过期的 Review Report: PR #51
-2026/04/21 09:59:44 📝 跳过过期的 Review Report: PR #6
-2026/04/21 09:59:44 📝 恢复 Review 返工状态: PR #10 -> success
-2026/04/21 09:59:44 📝 恢复 Review 返工状态: PR #11 -> success
-2026/04/21 09:59:44 📝 恢复 Review 返工状态: PR #14 -> success
-2026/04/21 09:59:44 📝 恢复 Review 返工状态: PR #15 -> success
-2026/04/21 09:59:44 📝 恢复 Review 返工状态: PR #42 -> failed
-2026/04/21 09:59:44 📝 恢复 Review 返工状态: PR #6 -> success
-2026/04/21 09:59:44 🚀 Agent Dashboard 启动于 http://localhost:8080
-2026/04/21 10:01:10 📡 收到 SIGHUP，启动热重启...
-2026/04/21 10:01:10 🚀 子进程已启动 (pid=52283)
-2026/04/21 10:01:10 📋 已加载配置文件
-2026/04/21 10:01:10 📍 已恢复上次选择的项目: social-world
-2026/04/21 10:01:10 ✅ 已加载 9 个 CTX 模板
-2026/04/21 10:01:10 🔍 开始重建任务状态 [social-world]...
-2026/04/21 10:01:10 📝 已从 state/tasks.json 恢复 67 个任务状态
-2026/04/21 10:01:10 📁 找到 232 个文件
-2026/04/21 10:01:10 📝 更新任务状态: review-15 -> success (来自日志推断)
-2026/04/21 10:01:10 📝 更新任务状态: review-44 -> success (来自日志推断)
-2026/04/21 10:01:10 📝 更新任务状态: review-36 -> success (来自日志推断)
-2026/04/21 10:01:10 📝 更新任务状态: review-38 -> success (来自日志推断)
-2026/04/21 10:01:10 📝 更新任务状态: rework-33 -> success (来自日志推断)
-2026/04/21 10:01:10 📝 更新任务状态: design-29 -> success (来自日志推断)
-2026/04/21 10:01:10 📝 更新任务状态: dev-13 -> interrupted (来自日志推断)
-2026/04/21 10:01:10 📝 更新任务状态: dev-2 -> success (来自日志推断)
-2026/04/21 10:01:10 📝 更新任务状态: dev-44 -> failed (来自日志推断)
-2026/04/21 10:01:10 📝 更新任务状态: rework-44 -> failed (来自日志推断)
-2026/04/21 10:01:10 📝 更新任务状态: dev-12 -> interrupted (来自日志推断)
-2026/04/21 10:01:10 📝 更新任务状态: dev-42 -> failed (来自日志推断)
-2026/04/21 10:01:10 📝 更新任务状态: dev-43 -> interrupted (来自日志推断)
-2026/04/21 10:01:10 📝 更新任务状态: review-30 -> success (来自日志推断)
-2026/04/21 10:01:10 📝 更新任务状态: review-42 -> success (来自日志推断)
-2026/04/21 10:01:10 📝 更新任务状态: rework-42 -> failed (来自日志推断)
-2026/04/21 10:01:10 📝 更新任务状态: dev-1 -> success (来自日志推断)
-2026/04/21 10:01:10 📝 更新任务状态: dev-20 -> success (来自日志推断)
-2026/04/21 10:01:10 📝 更新任务状态: dev-3 -> success (来自日志推断)
-2026/04/21 10:01:10 📝 更新任务状态: review-33 -> success (来自日志推断)
-2026/04/21 10:01:10 📝 更新任务状态: dev-51 -> failed (来自日志推断)
-2026/04/21 10:01:10 📝 更新任务状态: review-31 -> success (来自日志推断)
-2026/04/21 10:01:10 📝 更新任务状态: rework-53 -> success (来自日志推断)
-2026/04/21 10:01:10 📝 更新任务状态: review-16 -> success (来自日志推断)
-2026/04/21 10:01:10 📝 更新任务状态: dev-32 -> success (来自日志推断)
-2026/04/21 10:01:10 📝 更新任务状态: review-6 -> success (来自日志推断)
-2026/04/21 10:01:10 📝 更新任务状态: rework-30 -> success (来自日志推断)
-2026/04/21 10:01:10 📝 更新任务状态: dev-37 -> success (来自日志推断)
-2026/04/21 10:01:10 📝 更新任务状态: dev-4 -> success (来自日志推断)
-2026/04/21 10:01:10 📝 更新任务状态: review-41 -> success (来自日志推断)
-2026/04/21 10:01:10 📝 更新任务状态: dev-36 -> stopped (来自日志推断)
-2026/04/21 10:01:10 📝 更新任务状态: dev-7 -> success (来自日志推断)
-2026/04/21 10:01:10 📝 更新任务状态: dev-8 -> success (来自日志推断)
-2026/04/21 10:01:10 📝 更新任务状态: review-40 -> success (来自日志推断)
-2026/04/21 10:01:10 📝 更新任务状态: design-43 -> success (来自日志推断)
-2026/04/21 10:01:10 📝 更新任务状态: dev-17 -> success (来自日志推断)
-2026/04/21 10:01:10 📝 更新任务状态: dev-19 -> success (来自日志推断)
-2026/04/21 10:01:10 📝 更新任务状态: review-51 -> success (来自日志推断)
-2026/04/21 10:01:10 📝 更新任务状态: dev-35 -> success (来自日志推断)
-2026/04/21 10:01:10 📝 更新任务状态: dev-9 -> failed (来自日志推断)
-2026/04/21 10:01:10 📝 更新任务状态: review-11 -> success (来自日志推断)
-2026/04/21 10:01:10 📝 更新任务状态: rework-38 -> success (来自日志推断)
-2026/04/21 10:01:10 📝 更新任务状态: rework-51 -> failed (来自日志推断)
-2026/04/21 10:01:10 📝 更新任务状态: design-4 -> success (来自日志推断)
-2026/04/21 10:01:10 📝 更新任务状态: dev-10 -> success (来自日志推断)
-2026/04/21 10:01:10 📝 更新任务状态: dev-29 -> success (来自日志推断)
-2026/04/21 10:01:10 📝 更新任务状态: dev-39 -> success (来自日志推断)
-2026/04/21 10:01:10 📝 更新任务状态: review-14 -> success (来自日志推断)
-2026/04/21 10:01:10 📝 更新任务状态: rework-16 -> success (来自日志推断)
-2026/04/21 10:01:10 📝 更新任务状态: rework-31 -> success (来自日志推断)
-2026/04/21 10:01:10 📝 更新任务状态: dev-18 -> success (来自日志推断)
-2026/04/21 10:01:10 📝 更新任务状态: review-34 -> success (来自日志推断)
-2026/04/21 10:01:10 📝 更新任务状态: review-53 -> interrupted (来自日志推断)
-2026/04/21 10:01:10 📝 跳过过期的 Review Report: PR #11
-2026/04/21 10:01:10 📝 跳过过期的 Review Report: PR #14
-2026/04/21 10:01:10 📝 跳过过期的 Review Report: PR #15
-2026/04/21 10:01:10 📝 跳过过期的 Review Report: PR #16
-2026/04/21 10:01:10 📝 跳过过期的 Review Report: PR #31
-2026/04/21 10:01:10 📝 跳过过期的 Review Report: PR #33
-2026/04/21 10:01:10 📝 跳过过期的 Review Report: PR #34
-2026/04/21 10:01:10 📝 跳过过期的 Review Report: PR #36
-2026/04/21 10:01:10 📝 跳过过期的 Review Report: PR #38
-2026/04/21 10:01:10 📝 跳过过期的 Review Report: PR #40
-2026/04/21 10:01:10 📝 跳过过期的 Review Report: PR #41
-2026/04/21 10:01:10 📝 跳过过期的 Review Report: PR #42
-2026/04/21 10:01:10 📝 跳过过期的 Review Report: PR #44
-2026/04/21 10:01:10 📝 跳过过期的 Review Report: PR #51
-2026/04/21 10:01:10 📝 跳过过期的 Review Report: PR #6
-2026/04/21 10:01:10 📝 恢复 Review 返工状态: PR #10 -> success
-2026/04/21 10:01:10 📝 恢复 Review 返工状态: PR #11 -> success
-2026/04/21 10:01:10 📝 恢复 Review 返工状态: PR #14 -> success
-2026/04/21 10:01:10 📝 恢复 Review 返工状态: PR #15 -> success
-2026/04/21 10:01:10 📝 恢复 Review 返工状态: PR #42 -> failed
-2026/04/21 10:01:10 📝 恢复 Review 返工状态: PR #6 -> success
-2026/04/21 10:01:10 🔄 从父进程继承 listener (fd=3)
-2026/04/21 10:01:10 🚀 Agent Dashboard 启动于 http://localhost:8080
-2026/04/21 10:01:15 ✅ 所有 running 任务已完成，旧进程准备退出
-2026/04/21 10:01:15 👋 旧进程退出
-2026/04/21 10:03:06 ⚠️ 飞书通知发送失败: exit status 2, output: {
-  "ok": false,
-  "identity": "user",
-  "error": {
-    "type": "validation",
-    "message": "resolved identity \"user\" (via auto-detect or default-as) is not supported, this command only supports: bot\nhint: use --as bot"
-  }
-}
-2026/04/21 10:13:57 📄 PR #53 Review 报告来自 workflow state (readReport 步骤)
-2026/04/21 10:13:57 Review 任务结束: PR #53, 结果: needs_fix, 错误: <nil>
-2026/04/21 10:14:00 ✅ PR #53 评论已更新, output: https://github.com/MatioYoshitoki/social-world/pull/53#issuecomment-4285114988
-2026/04/21 10:14:00 ⚠️ 飞书通知发送失败: exit status 2, output: {
-  "ok": false,
-  "identity": "user",
-  "error": {
-    "type": "validation",
-    "message": "resolved identity \"user\" (via auto-detect or default-as) is not supported, this command only supports: bot\nhint: use --as bot"
-  }
-}
-2026/04/21 10:24:43 ⚠️ 飞书通知发送失败: exit status 2, output: {
-  "ok": false,
-  "identity": "user",
-  "error": {
-    "type": "validation",
-    "message": "resolved identity \"user\" (via auto-detect or default-as) is not supported, this command only supports: bot\nhint: use --as bot"
-  }
-}
-2026/04/21 10:24:48 [loadWorkflow] using project-specific workflow: workflows/social-world/rework.yaml
-2026/04/21 10:24:48 ⚠️ 飞书通知发送失败: exit status 2, output: {
-  "ok": false,
-  "identity": "user",
-  "error": {
-    "type": "validation",
-    "message": "resolved identity \"user\" (via auto-detect or default-as) is not supported, this command only supports: bot\nhint: use --as bot"
-  }
-}
-2026/04/21 10:39:12 📡 收到 SIGHUP，启动热重启...
-2026/04/21 10:39:12 🚀 子进程已启动 (pid=66072)
-2026/04/21 10:39:17 ⏳ 旧进程等待 1 个 running 任务完成...
-2026/04/21 10:39:22 ⏳ 旧进程等待 1 个 running 任务完成...
-2026/04/21 10:39:27 ⏳ 旧进程等待 1 个 running 任务完成...
-2026/04/21 10:39:32 ⏳ 旧进程等待 1 个 running 任务完成...
-2026/04/21 10:39:37 ⏳ 旧进程等待 1 个 running 任务完成...
-2026/04/21 10:39:42 ⏳ 旧进程等待 1 个 running 任务完成...
-2026/04/21 10:39:47 ⏳ 旧进程等待 1 个 running 任务完成...
-2026/04/21 10:39:52 ⏳ 旧进程等待 1 个 running 任务完成...
-2026/04/21 10:39:57 ⏳ 旧进程等待 1 个 running 任务完成...
-2026/04/21 10:40:02 ⏳ 旧进程等待 1 个 running 任务完成...
-2026/04/21 10:40:07 ⏳ 旧进程等待 1 个 running 任务完成...
-2026/04/21 10:40:12 ⏳ 旧进程等待 1 个 running 任务完成...
-2026/04/21 10:40:17 ⏳ 旧进程等待 1 个 running 任务完成...
-2026/04/21 10:40:22 ⏳ 旧进程等待 1 个 running 任务完成...
-2026/04/21 10:40:23 ✅ PR #53 的 review 状态已重置（返工完成，需重新 Review）
-2026/04/21 10:40:23 ⚠️ 飞书通知发送失败: exit status 2, output: {
-  "ok": false,
-  "identity": "user",
-  "error": {
-    "type": "validation",
-    "message": "resolved identity \"user\" (via auto-detect or default-as) is not supported, this command only supports: bot\nhint: use --as bot"
-  }
-}
-2026/04/21 10:40:25 ✅ PR #53 评论已添加, output: https://github.com/MatioYoshitoki/social-world/pull/53#issuecomment-4285583994
-2026/04/21 10:40:27 ✅ 所有 running 任务已完成，旧进程准备退出
-2026/04/21 10:40:27 👋 旧进程退出
+2026/05/29 09:54:22 📁 项目根目录: .
+2026/05/29 09:54:22 📋 已加载配置文件: configs/dashboard.json
+2026/05/29 09:54:22 📍 已恢复上次选择的项目: type-one
+2026/05/29 09:54:22 ✅ 已加载 9 个 CTX 模板
+2026/05/29 09:54:22 🔍 开始重建任务状态 [type-one]...
+2026/05/29 09:54:22 📝 已从 state/tasks.json 恢复 1 个任务状态
+2026/05/29 09:54:22 ✅ 任务状态重建完成，当前 1 个任务
+2026/05/29 09:54:22 🚀 Agent Dashboard 启动于 http://localhost:9090
+2026/05/29 09:54:22 [platform] 项目 /Users/turiseek/Desktop/type-one 使用平台: gitlab
+2026/05/29 10:02:35 [workflow] tmux new-session: session=nwops-review-10 dir=/var/folders/rc/0r3lm52x5ygf9n0crw1hb01w0000gn/T/review-pr-10-1404681777 cmdLen=1701
+2026/05/29 10:09:31 [workflow] runCleanups: 2 steps
+2026/05/29 10:09:31 [workflow] runCleanups: running step cleanupWorktree
+2026/05/29 10:09:31 [workflow] runCleanups: running step restoreBranch
+2026/05/29 10:09:31 📄 PR #10 Review 报告来自 workflow state (readReport 步骤)
+2026/05/29 10:09:31 📄 PR #10 Review 报告已保存到历史文件: /Users/turiseek/Desktop/squirrel-house/logs/type-one/review-report-10-20260529-100931.md
+2026/05/29 10:09:31 Review 任务结束: PR #10, 结果: needs_fix, 错误: <nil>
+2026/05/29 10:09:36 ℹ️ PR/MR #10 更新最新评论失败，尝试新建
+2026/05/29 10:09:43 ⚠️ 添加 PR/MR 评论失败: comment MR 10: exit status 1, output: POST https://gitlab-office.tanchat.live/api/v4/projects/reskin-framework/type-one/merge_requests/10/notes: 403 {error: insufficient_scope}, {error_description: The request requires higher privileges than provided by the access token.}, {scope: ai_workflows api read_api}
+
+2026/05/29 10:09:43 [hook] PR #10 Review 未通过，将自动触发 Rework
+2026/05/29 10:09:43 [hook] 触发 review-10 → rework (vars keys=[])
+2026/05/29 10:09:43 [hook] PR #10 将自动触发 Rework (来源: review)
+2026/05/29 10:09:43 [prompt-evolution] type-one: 计数 3/5, 上次分析 2562047h47m0s 前, 暂不触发
+2026/05/29 10:09:46 [getIssueClassification] 获取 Issue #6 失败: view issue 6: exit status 1, output: unknown shorthand flag: 'O' in -O
+
+Usage:  glab issue view <id> [flags]
+
+Flags:
+  -c, --comments        Show issue comments and activities
+  -F, --output string   Format output as: text, json (default "text")
+  -p, --page int        Page number (default 1)
+  -P, --per-page int    Number of items to list per page (default 20)
+  -s, --system-logs     Show system activities / logs
+  -w, --web             Open issue in a browser. Uses default browser or browser specified in BROWSER variable
+  
+
+2026/05/29 10:09:49 [rework] 添加返工评论失败: comment MR 10: exit status 1, output: POST https://gitlab-office.tanchat.live/api/v4/projects/reskin-framework/type-one/merge_requests/10/notes: 403 {error: insufficient_scope}, {error_description: The request requires higher privileges than provided by the access token.}, {scope: ai_workflows api read_api}
+
+2026/05/29 10:09:54 [rework] 添加 needs-work 标签失败: add label to MR 10: exit status 1, output: - Updating merge request !10
+PUT https://gitlab-office.tanchat.live/api/v4/projects/reskin-framework/type-one/merge_requests/10: 403 {error: insufficient_scope}, {error_description: The request requires higher privileges than provided by the access token.}, {scope: mcp mcp ai_workflows api read_api}
+
+2026/05/29 10:09:59 [workflow] tmux new-session: session=nwops-rework-10 dir=/var/folders/rc/0r3lm52x5ygf9n0crw1hb01w0000gn/T/rework-pr-10-3590891841 cmdLen=94
+2026/05/29 10:19:30 [workflow] runCleanups: 2 steps
+2026/05/29 10:19:30 [workflow] runCleanups: running step ensureCommitAndPush
+2026/05/29 10:19:37 [workflow] runCleanups: running step cleanupWorktree
+2026/05/29 10:19:39 [hook] Rework 成功，将自动触发 PR #10 Review
+2026/05/29 10:19:39 [hook] 触发 rework-10 → review (vars keys=[])
+2026/05/29 10:19:39 ✅ PR #10 的 review 状态已重置（返工完成，需重新 Review），历史 review report 已保留
+2026/05/29 10:19:40 [hook] E2E 任务 e2e-10 结束，将自动触发 PR #10 Review
+2026/05/29 10:19:42 ⚠️ 添加 PR/MR 评论失败: comment MR 10: exit status 1, output: POST https://gitlab-office.tanchat.live/api/v4/projects/reskin-framework/type-one/merge_requests/10/notes: 403 {error: insufficient_scope}, {error_description: The request requires higher privileges than provided by the access token.}, {scope: ai_workflows api read_api}
+
+2026/05/29 10:19:42 [prompt-evolution] type-one: 计数 4/5, 上次分析 2562047h47m0s 前, 暂不触发
+2026/05/29 10:19:58 [workflow] tmux new-session: session=nwops-review-10 dir=/var/folders/rc/0r3lm52x5ygf9n0crw1hb01w0000gn/T/review-pr-10-4063682498 cmdLen=1963
+2026/05/29 10:28:14 [workflow] runCleanups: 2 steps
+2026/05/29 10:28:14 [workflow] runCleanups: running step cleanupWorktree
+2026/05/29 10:28:14 [workflow] runCleanups: running step restoreBranch
+2026/05/29 10:28:14 📄 PR #10 Review 报告来自 workflow state (readReport 步骤)
+2026/05/29 10:28:14 📄 PR #10 Review 报告已保存到历史文件: /Users/turiseek/Desktop/squirrel-house/logs/type-one/review-report-10-20260529-102814.md
+2026/05/29 10:28:14 Review 任务结束: PR #10, 结果: needs_fix, 错误: <nil>
+2026/05/29 10:28:15 ℹ️ PR/MR #10 更新最新评论失败，尝试新建
+2026/05/29 10:28:17 ⚠️ 添加 PR/MR 评论失败: comment MR 10: exit status 1, output: POST https://gitlab-office.tanchat.live/api/v4/projects/reskin-framework/type-one/merge_requests/10/notes: 403 {error: insufficient_scope}, {error_description: The request requires higher privileges than provided by the access token.}, {scope: ai_workflows api read_api}
+
+2026/05/29 10:28:17 [hook] PR #10 Review 未通过，将自动触发 Rework
+2026/05/29 10:28:17 [hook] 触发 review-10 → rework (vars keys=[])
+2026/05/29 10:28:17 [hook] PR #10 将自动触发 Rework (来源: review)
+2026/05/29 10:28:17 [prompt-evolution] type-one: 触发分析 (计数 5, 间隔 2562047h47m0s)
+2026/05/29 10:28:17 [prompt-evolution] type-one: 报告已生成 /Users/turiseek/Desktop/squirrel-house/logs/type-one/prompt-evolution-report-20260529-102817.json, 分析了 5 个日志
+2026/05/29 10:28:17 [prompt-evolution] 任务 #1780021697 启动
+2026/05/29 10:28:17 [workflow] tmux new-session: session=nwops-prompt-evolution-1780021697 dir=/Users/turiseek/Desktop/squirrel-house cmdLen=783
+2026/05/29 10:28:19 [getIssueClassification] 获取 Issue #6 失败: view issue 6: exit status 1, output: unknown shorthand flag: 'O' in -O
+
+Usage:  glab issue view <id> [flags]
+
+Flags:
+  -c, --comments        Show issue comments and activities
+  -F, --output string   Format output as: text, json (default "text")
+  -p, --page int        Page number (default 1)
+  -P, --per-page int    Number of items to list per page (default 20)
+  -s, --system-logs     Show system activities / logs
+  -w, --web             Open issue in a browser. Uses default browser or browser specified in BROWSER variable
+  
+
+2026/05/29 10:28:20 [rework] 添加返工评论失败: comment MR 10: exit status 1, output: POST https://gitlab-office.tanchat.live/api/v4/projects/reskin-framework/type-one/merge_requests/10/notes: 403 {error: insufficient_scope}, {error_description: The request requires higher privileges than provided by the access token.}, {scope: ai_workflows api read_api}
+
+2026/05/29 10:28:23 [rework] 添加 needs-work 标签失败: add label to MR 10: exit status 1, output: - Updating merge request !10
+PUT https://gitlab-office.tanchat.live/api/v4/projects/reskin-framework/type-one/merge_requests/10: 403 {error: insufficient_scope}, {error_description: The request requires higher privileges than provided by the access token.}, {scope: mcp mcp ai_workflows api read_api}
+
+2026/05/29 10:28:27 [workflow] tmux new-session: session=nwops-rework-10 dir=/var/folders/rc/0r3lm52x5ygf9n0crw1hb01w0000gn/T/rework-pr-10-2790252722 cmdLen=94
+2026/05/29 10:34:45 [workflow] runCleanups: 1 steps
+2026/05/29 10:34:45 [workflow] runCleanups: running step commitChanges
