@@ -279,9 +279,7 @@ AGENTS.md
 1. **环境预检查（第 1 步）**：先检查环境变量 `AGENT_ENV_STATUS` 的值。
    - **如果其值包含 `auth_failed`**：你的下一步（第 2 步）**必须是** `WriteFile` 写入失败报告，说明「GitHub/GitLab CLI 未认证，无法获取 PR diff」。报告路径优先使用 `AGENT_REVIEW_REPORT` 环境变量，否则默认 `logs/review-report-$AGENT_PR_NUMBER-fail.md`。报告至少包含：时间戳、失败原因。**禁止执行任何 `gh` 命令，这是强制步骤，不可跳过。**
    - **如果其值包含 `pr_not_found`**：你的下一步（第 2 步）**必须是** `WriteFile` 写入失败报告，说明「PR/MR 不存在或无法访问」。报告要求同上。
-   - **如果 `AGENT_ENV_STATUS` 为 `READY` 或未设置**：先确认环境变量 `AGENT_PR_NUMBER` 是否已设置（可用 Shell `echo "$AGENT_PR_NUMBER"` 确认）。如果未设置或为空，下一步（第 2 步）**必须是** `WriteFile` 写入失败报告，说明「AGENT_PR_NUMBER 未设置」。然后运行 `gh auth status` 和 `gh pr view "$AGENT_PR_NUMBER" --json number`。
-     - **如果全部通过**：进入第 2 步。
-     - **如果任一失败**：你的下一步（第 2 步）**必须是** `WriteFile` 写入失败报告。报告至少包含：时间戳、失败原因、PR 号。**禁止执行任何其他工具调用（包括 ReadFile、Shell、Grep 等）。这是强制步骤，不可跳过。**
+   - **如果 `AGENT_ENV_STATUS` 为 `READY` 或未设置**：先确认环境变量 `AGENT_PR_NUMBER` 是否已设置（可用 Shell `echo "$AGENT_PR_NUMBER"` 确认）。如果未设置或为空，下一步（第 2 步）**必须是** `WriteFile` 写入失败报告，说明「AGENT_PR_NUMBER 未设置」。**禁止**再次执行 `gh auth status` 或 `gh pr view`——workflow 的 `envReadinessCheck` 已验证 `gh` 认证和 PR 可访问性，agent 无需重复预检。直接进入第 2 步。
 2. **读取项目地图（第 2 步）**：先用 `test -f AGENTS.md || test -f README.md` 确认项目地图存在，再读取 `AGENTS.md`，发现编码规范和审查标准路径。如果 `AGENTS.md` 和 `README.md` 均不存在，在审查报告中标注「未验证（缺少项目地图）」并继续基于 PR diff 审查，不得尝试用 `find` 或 `../` 搜索其他路径。
 3. **获取 PR diff（第 3 步）**：运行 `gh pr diff <number> --name-only` 和 `gh pr diff <number> | head -100`，了解变更范围。**将 diff 内容写入临时文件**（如 `/tmp/pr-diff-<number>.txt`），后续审查中需要引用 diff 时直接 ReadFile 该临时文件，禁止重复调用 `gh pr diff` 浪费 Shell 预算。
 4. **确定审查模式（第 4 步）**：检查任务上下文中是否提供了「上一轮 review report」路径，或运行 `ls logs/review-report-<pr_number>*.md` 查看是否存在历史报告。如果存在 → 后续审查模式，**必须立即读取该报告**；不存在 → 首次审查模式。

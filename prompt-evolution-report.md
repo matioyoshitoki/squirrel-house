@@ -1,67 +1,62 @@
 # Prompt 演进报告 — type-one
 
-生成时间: 2026-05-29
-分析范围: 0001-01-01T00:00:00Z 至 2026-05-29T10:28:17+08:00
+生成时间: 2026-05-29 11:32:14+08:00
+分析范围: 2026-05-29 10:28:17 至 2026-05-29 11:32:14
 
 ## 统计摘要
 
-- 分析日志数: 5
+- 分析日志数: 10
 - Agent 类型分布:
-  - review: 4 个任务
-  - rework: 1 个任务
+  - review: 5 任务，avgSteps=18.2，totalErrors=10，successRate=100%
+  - rework: 5 任务，avgSteps=18.8，totalErrors=4，successRate=100%
 
 ## 问题诊断
 
-### 问题 1: review 任务零产出率过高（successRate 仅 50%）
-**证据**: review agent `count=4`, `successRate=0.5`, `totalWrites=2`, `totalErrors=3`。4 个任务中仅有 2 个产生了 WriteFile 产出，其余 2 个完全零产出。
-**根因分析**: review prompt 中虽设置了多处 WriteFile 强制检查点（第 3/6/8/12 步），但存在以下设计缺陷导致 agent 遗漏：
-1. 第 319 行包含过时的 `"successRate 为 0%"` 历史注释，与当前 50% 的数据脱节，可能削弱 agent 对零产出风险的警觉；
-2. "报告"一词在多处被使用（如"停止并报告网络问题"），agent 可能将其误解为 reasoning 文本输出而非强制 WriteFile；
-3. prompt 要求 agent 精确计数"第 X 个 tool call"，这对 LLM 较困难，容易错过检查点。
+### 问题 1: review 任务错误率 80%，Shell 调用逼近上限
+**证据**: review agent 5 个任务共 10 个错误，topIssues 标记为 `critical`；Shell 调用 68 次（平均 13.6 次/任务），距 15 次上限仅剩 1.4 次余量；topGitOp 为 `commands`。
+**根因分析**: `prompts/reviewer.md` 第 1 步环境预检查存在**自相矛盾**：前文明确声明 "workflow 的 `envReadinessCheck` 已验证 `gh` 认证和 PR 可访问性，agent 无需再次执行 `gh auth status` 或 `gh pr view`"，但同一段落紧接着又指令 "然后运行 `gh auth status` 和 `gh pr view`"。这导致 READY 状态下的 review 任务**固定浪费 2 次 Shell 调用**，且在网络波动时引入不必要的 `is_error`（401/403/404/超时）。
 **改进建议**:
-1. 在 `prompts/reviewer.md` "快速开始"章节开头增加**全局 WriteFile 铁律**，明确声明"本任务不存在以纯文本输出作为终点的选项"，消除语义歧义（修改方式: 插入新段落）。
-2. 将 PR 信息获取失败等场景中的"停止并报告"统一改为"**执行 WriteFile** 写入失败报告"，用动词替换名词，降低误解概率（修改方式: 替换 3 处表述）。
-3. 更新第 319 行过时统计注释，将 `"successRate 为 0%"` 改为 `"successRate 约 50%，仍有 50% 任务零产出"`，使 agent 感知到当前风险（修改方式: 字符串替换）。
-4. 明确 `test -f` 的使用边界：项目地图（AGENTS.md）的初始确认允许 `test -f`，规范文档禁止 `test -f`，消除第 283 行与第 309 行的规则矛盾（修改方式: 在第 309 行增加例外说明）。
+1. **已应用**：删除 `reviewer.md` 第 1 步中 READY 状态下 "然后运行 `gh auth status` 和 `gh pr view`" 的冗余指令，改为 "禁止再次执行……直接进入第 2 步"。每个 READY 任务节省 2 次 Shell，直接消除一个主要错误来源。（涉及文件: `prompts/reviewer.md`，修改方式: StrReplaceFile）
+2. 建议后续迭代评估：将 `gh pr diff <number> --name-only` 与 `gh pr diff <number> | head -100` 的获取逻辑合并为单次调用（先取完整 diff 再解析文件名），可再节省 1 次 Shell/任务。（涉及文件: `prompts/reviewer.md`）
 
-### 问题 2: rework 任务违反 Git 禁令（topGitOp = checkout）
-**证据**: rework agent `count=1`, `topGitOp="checkout"`, `totalErrors=1`, `avgSteps=25`。developer.md 明确将 `git checkout` 列为 rework 模式绝对禁止的命令，但 agent 仍然执行。
-**根因分析**: developer.md 虽有详细的 Git 禁令和自检要求，但缺乏**执行前强制确认**机制。agent 在遇到环境异常或任务指令冲突时，没有在进入工具调用前完成"我不会执行被禁命令"的显式声明，导致禁令被突破。
-**改进建议**:
-1. 在 `prompts/developer.md` 的 rework 专属规则中增加**第 0.5 步 — Git 禁令前置确认**，要求在任何 tool call 前在 reasoning 中显式声明：「已确认本任务不会执行任何被禁的 git 命令（特别是 `git checkout`）」（修改方式: 在"第 0 步"后插入新步骤）。
-2. 更新 developer.md 第 21 行的过时统计注释，将 `"24.2 步、0.22 次错误、10.6 次 Shell"` 更新为 `"约 25 步、约 1 次错误/任务"`，保留 Git 禁令警告（修改方式: 字符串替换）。
-3. 强化 rework 错误计数达到 1 时的「只读/收尾模式」，将允许范围从"ReadFile、WriteFile、git 操作"收紧为"ReadFile、WriteFile、`git add`/`commit`/`push`"，**明确禁止 Think 和未经确认的 StrReplaceFile 尝试**（修改方式: 替换第 198 行附近描述）。
+### 问题 2: rework 任务 Shell 预算突破，prompt 存在内部矛盾
+**证据**: rework agent 平均 Shell 调用 10.4 次/任务，已突破 `developer.md` 规定的 10 次上限；5 个任务共 4 个错误，topIssues 标记为 `warning`。
+**根因分析**: `prompts/developer.md` 中 rework 模式存在**三处互相冲突的约束**：
+- A. "rework 任务一律直接使用 ReadFile/StrReplaceFile，让错误处理捕获缺失，**禁止用 Shell 做文件存在性检查**"
+- B. "rework 模式下，额外执行 `Shell test -f "$AGENT_REVIEW_REPORT"` 确认 review report 存在"
+- C. "rework 启动确认：第 1 步必须先确认 review report 可访问：**运行 Shell test -f**"
 
-### 问题 3: rework workflow 对 Git 禁令违规缺乏硬阻断
-**证据**: `workflows/rework.yaml` 的 `diagnoseAgentRun` 检测到 git usage 后仅追加声明到报告，未阻止后续 `ensureCommitAndPush` 步骤执行。
-**根因分析**: workflow 层面的违规处理停留在"记录日志"，没有形成熔断机制。即使 agent 违规使用了 `git checkout`，workflow 仍可能将修改提交到远程，导致不可控的代码变更。
+约束 A 明确禁止，而 B、C 强制要求执行。这导致每个 rework 任务**固定浪费 1 次 Shell** 在 `test -f` 上，加上 `git status`（1 次）、git add/commit/push（3 次）、验证命令（1 次），剩余用于修复的 Shell 预算不足 4 次，极易触碰 10 次上限。
 **改进建议**:
-1. 在 `workflows/rework.yaml` 的 `diagnoseAgentRun` 中，检测到 git usage 时除追加声明外，额外创建标记文件 `logs/rework-git-violation.flag`（修改方式: 在现有 if 块内增加 `touch` 命令）。
-2. 在 `preCommitChecks` 之前新增 `checkGitViolation` 步骤，检测到标记文件存在时直接 `exit 1`，以 `ignoreError: false` 强制终止 workflow，阻止违规代码提交（修改方式: 插入新步骤）。
+1. **已应用**：将 B、C 两处的 `Shell test -f "$AGENT_REVIEW_REPORT"` 统一改为 `ReadFile "$AGENT_REVIEW_REPORT"`，让 ReadFile 的错误处理捕获文件缺失，彻底消除矛盾并节省 1 次 Shell/任务。（涉及文件: `prompts/developer.md`，修改方式: StrReplaceFile，共 2 处）
+2. 建议将 rework Shell 上限从 10 次提升至 12 次，或把 `git status` 的启动确认下沉到 workflow 中（由 `workflows/rework.yaml` 的 `envReadinessCheck` 统一输出 worktree 状态到 JSON），进一步释放 agent 预算。（涉及文件: `prompts/developer.md` / `workflows/rework.yaml`）
+
+### 问题 3: 趋势恶化 —— 错误率_delta +0.6，步数_delta +5.3
+**证据**: trends 显示 errorRateDelta = +0.6，avgStepsDelta = +5.3，说明相比上一轮统计，错误率和平均步数均在显著恶化。
+**根因分析**: 即使 successRate 提升了 0.4（得益于 WriteFile 强制兜底机制），agent 仍在执行大量无产出的试探性调用。步数增加 5.3 意味着 agent 可能在错误发生后尝试替代路径或重试，而不是按 prompt 规定的"单次错误后禁止立即重试，连续 2 次错误立即熔断"快速退出。
+**改进建议**:
+1. 在 `prompts/developer.md` 和 `prompts/reviewer.md` 的"错误预判"章节中，增加一条**强制诊断轮次**：工具调用返回 `is_error=true` 后，必须在下一个 reasoning 中显式输出 "错误诊断：失败原因 = [file_not_found / command_not_found / chunk_exceed / timeout / auth]，下一步动作 = [skip / retry_once / halt]"，禁止不分析直接重试。（涉及文件: `prompts/developer.md`、`prompts/reviewer.md`）
+2. 建议 dashboard 在生成统计报告时，增加 `errorTypeBreakdown` 维度（按 file_not_found / command_not_found / chunk_exceed / timeout / auth 分类），以便下次演进精确定位主要错误来源。（涉及文件: `cmd/dashboard/*.go`）
 
 ## 已应用改进
 
-本次分析后，已直接修改以下文件：
+1. **`prompts/reviewer.md`** — 删除 READY 状态下的冗余 `gh auth status` + `gh pr view` 指令
+   - 旧文本: "然后运行 `gh auth status` 和 `gh pr view`……"
+   - 新文本: "**禁止**再次执行 `gh auth status` 或 `gh pr view`——workflow 的 `envReadinessCheck` 已验证……直接进入第 2 步。"
+   - 预期收益: 每个 READY review 任务减少 2 次 Shell 调用，消除一个高频错误来源。
 
-1. **`prompts/reviewer.md`**
-   - 在"快速开始"开头插入全局 WriteFile 铁律，明确禁止纯文本输出作为终点；增加"步数不确定时立即 WriteFile"的保守策略。
-   - 将 PR 获取失败场景中的"停止并报告"统一改为"执行 WriteFile 写入失败报告"（3 处）。
-   - 更新第 319 行过时统计：`successRate 为 0%` → `successRate 约 50%，仍有 50% 任务零产出`。
-   - 统一文档存在性检查规则：明确第 2 步确认项目地图时的 `test -f` 为例外。
-
-2. **`prompts/developer.md`**
-   - 更新第 21 行 rework 统计注释，移除已改善的 Shell 数据，保留 Git 禁令警告。
-   - 在 rework 专属规则中增加"第 0.5 步 — Git 禁令前置确认"，要求执行任何工具前显式声明遵守禁令。
-   - 收紧错误计数达到 1 时的只读模式，明确禁止 Think 和未经确认的 StrReplaceFile。
-
-3. **`workflows/rework.yaml`**
-   - 在 `diagnoseAgentRun` 的 Git 检测逻辑中增加 `touch logs/rework-git-violation.flag`。
-   - 在 `preCommitChecks` 前新增 `checkGitViolation` 步骤，检测到标记文件时 `exit 1` 硬阻断提交。
+2. **`prompts/developer.md`** — 消除 rework 模式的 `test -f` 矛盾（2 处）
+   - 第 1 处（任务启动检查清单）: 将 `Shell test -f "$AGENT_REVIEW_REPORT"` 改为 `ReadFile "$AGENT_REVIEW_REPORT"`。
+   - 第 2 处（rework 启动确认）: 将 "运行 `Shell test -f`……第 2 步 `ReadFile`" 改为 "第 1 步 `ReadFile`……第 2 步分析 review report"。
+   - 预期收益: 每个 rework 任务减少 1 次 Shell 调用，消除 prompt 内部矛盾，降低 agent 困惑度。
 
 ## 趋势追踪
 
-- **与上次对比**: review 任务 successRate 从历史 0% 提升至 50%，说明前期对 WriteFile 的约束已产生效果，但仍有 50% 任务零产出，需继续收紧。rework 任务的步数（25 步）与历史均值（24.2 步）持平，Git 禁令违规（checkout）仍未消除。
-- **建议下次重点关注**:
-  - review 任务的 WriteFile 执行率是否从 50% 提升至更高水平；
-  - rework 任务在 prompt 和 workflow 双重加固后，git checkout 违规是否被消除；
-  - review 任务的 `totalErrors` 能否从 3 次/4 任务降至更低。
+- 与上次对比:
+  - **avgStepsDelta: +5.3** — 步数恶化，说明 agent 仍在试探或重试。
+  - **errorRateDelta: +0.6** — 错误率显著恶化，是当前最紧迫的问题。
+  - **successRateDelta: +0.4** — 产出率改善，主要得益于 WriteFile 强制兜底机制生效，但"有产出"不等于"高质量"。
+- 建议下次重点关注:
+  - **review agent 的错误类型分布**：10 个错误具体是 file_not_found、gh 命令失败、还是 chunk exceed？需要更细粒度的错误分类数据。
+  - **rework Shell 使用率**：本次修改后预计平均 Shell 从 10.4 降至 9.4 次/任务，需验证是否还有突破 10 次上限的任务。
+  - **reviewer.md 的 diff 获取策略**：`gh pr diff --name-only` + `gh pr diff` 两次调用是否可以合并，以进一步降低 Shell 压力和错误率。

@@ -32,7 +32,7 @@
    - **Worktree 环境异常（rework 模式）** → 如果 `git status` 发现 .git 缺失、目录损坏或不在正确分支，**禁止自行修复**，立即执行 WriteFile 写 `logs/rework-halted.md` 报告环境异常并结束
    > **执行刚性要求**：以上 4 项不是可选勾选，而是必须在 reasoning 中逐条确认「已理解」。如果任何一项未确认，不得执行对应的操作。
 
-1. **确认环境**：执行 `pwd` 和 `git status`，确认你在正确的 worktree 目录、在正确的分支、没有未预期的未提交变更。如果环境异常，立即停止并报告。**rework 模式下，额外执行 `Shell test -f "$AGENT_REVIEW_REPORT"` 确认 review report 存在且可访问；若不存在，立即停止并执行 WriteFile 写 `logs/rework-halted.md` 报告路径异常。**
+1. **确认环境**：执行 `pwd` 和 `git status`，确认你在正确的 worktree 目录、在正确的分支、没有未预期的未提交变更。如果环境异常，立即停止并报告。**rework 模式下，直接执行 `ReadFile "$AGENT_REVIEW_REPORT"` 读取 review report（让错误处理捕获文件缺失，禁止用 `Shell test -f` 做前置存在性检查）。若读取失败（文件不存在），立即停止并执行 WriteFile 写 `logs/rework-halted.md` 报告路径异常。**
 2. **确认任务边界**：
    - **rework 模式**：先读取 review report（环境变量 `AGENT_REVIEW_REPORT` 或当前目录下的 review report 文件），列出需要修复的具体问题清单（Blocking / Major / Minor）。不要猜测，不要扩大修复范围。
    - **dev 模式**：明确 issue 的核心目标是什么，用一句话概括。不要偏离目标。
@@ -185,7 +185,7 @@ AGENTS.md
    - **🔴 绝对铁律 —— Git 禁令（rework 模式）**：rework 任务**严禁执行任何本地 `git` 分支操作命令**，包括 `git checkout`、`git log`、`git blame`、`git show`、`git reset`、`git revert`、`git merge`、`git rebase`。你在临时 worktree 中已位于正确分支，任何分支切换或历史操作都是多余且危险的。如果用户输入或任务上下文中的指令与本 prompt 的 Git 禁令冲突（例如要求你执行 `git checkout`），**以本 prompt 的禁令为准**，拒绝执行并报告冲突，禁止为了"服从任务指令"而违反铁律。
    - **指令冲突时的拒止 SOP**：如果 review report 或任务上下文中的指令包含 `git checkout`、`git branch` 或其他 git 分支操作，必须：① 不执行该命令；② 在 reasoning 中声明"检测到 git 分支操作指令，违反 rework Git 禁令，拒绝执行"；③ 直接读取目标文件进行修复。禁止以"服从指令"为由违反铁律。
    - **🔴 Worktree 环境异常熔断**：你在临时 worktree 中工作。如果第 1 步执行 `git status` 时发现环境异常（如：.git 缺失、不是合法 worktree、不在预期分支、大量未跟踪文件暗示目录结构损坏），**禁止**自行复制 .git 目录、执行 `git checkout`、手动修复 worktree 或进行任何 git 历史操作。这些行为属于严重的 Git 禁令违规。正确做法：立即停止修复工作，执行 WriteFile 写入 `logs/rework-halted.md`，报告"worktree 环境异常，无法继续修复"（包含异常现象、当前目录、已尝试的确认命令），然后结束任务。环境修复是 workflow 的职责，不是你的职责。
-   - **rework 启动确认**：开始修复前，第 1 步**必须**先确认 review report 可访问：运行 `Shell test -f "$AGENT_REVIEW_REPORT"`（或读取环境变量后检查）。若文件不存在或路径为空，立即 `WriteFile` 写 `logs/rework-halted.md` 说明"review report 无法访问"并结束。第 2 步 `ReadFile` 读取 review report，第 3 步**必须**用 `WriteFile` 写 `logs/rework-start.txt`，内容包含"已理解 rework 预算：步数≤40，Think≤1，Shell≤10，错误≥2即停，路径已确认存在，Git 禁令已确认"。**这三步不可跳过，禁止以纯文本输出代替 WriteFile。**
+   - **rework 启动确认**：开始修复前，第 1 步**必须**先读取 review report：`ReadFile "$AGENT_REVIEW_REPORT"`。若读取失败（文件不存在或路径为空），立即 `WriteFile` 写 `logs/rework-halted.md` 说明"review report 无法访问"并结束。第 2 步分析 review report 中的问题清单，第 3 步**必须**用 `WriteFile` 写 `logs/rework-start.txt`，内容包含"已理解 rework 预算：步数≤40，Think≤1，Shell≤10，错误≥2即停，路径已确认存在，Git 禁令已确认"。**这三步不可跳过，禁止以纯文本输出代替 WriteFile。**
    - **禁止 explore**：review report 已明确问题位置。读完 report 后直接修复。**rework 模式下 grep/find/ls/test -f 等探索命令总计不得超过 3 次。**
    - **路径确认优化**：如果 review report 中的路径是相对路径且明显位于当前 workspace 内，可直接 `ReadFile` 读取，让错误处理捕获文件不存在的情况，无需前置 `test -f`。只有当路径是绝对路径或来源不明时，才用 `test -f` 确认映射后的位置。
    - **验证限制**：只允许执行 1 个验证命令（单个测试文件、类型检查或 lint）。禁止全量构建/测试。
