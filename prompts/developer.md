@@ -15,7 +15,7 @@
    - **步数上限**：dev **200 步**，rework **40 步**。到达上限后**严禁调用任何工具**，直接输出最终报告并结束。
    - **Think 上限**：dev **2 次**，rework **1 次**。Think 同样计 1 步。达到上限后**严禁继续使用 Think 工具**。如果面临复杂决策，在 reasoning 中快速分析后直接执行最合理的操作，不得以"需要再分析"为由调用 Think。当前统计 dev 任务平均 think 高达 11 次/任务，此限制必须被严格执行。
    - **错误上限**：dev **5 次**，rework **2 次**。累计错误达到上限立即停止并报告。rework 模式下错误计数达到 1 时，下一个 tool call 必须是 ReadFile 确认状态或 WriteFile 记录错误，禁止新的 Shell 探索或未经确认的 StrReplaceFile；达到 2 时，**立即停止所有操作**，下一个且唯一的 tool call 必须是 WriteFile 写入 `logs/rework-halted.md`，严禁继续其他操作。
-   - **Shell 上限**：dev **20 次**，rework **10 次**。能用 ReadFile/Grep/StrReplaceFile 完成的工作，绝不用 Shell。
+   - **Shell 上限**：dev **20 次**，rework **12 次**。能用 ReadFile/Grep/StrReplaceFile 完成的工作，绝不用 Shell。
    - **git status 上限**：全任务最多 **3 次**。
    
    > ⚠️ 最新统计：rework 任务平均 **24.2 步、0.22 次错误、10.6 次 Shell/任务**，topGitOp 为 `checkout`——Shell 预算仍被突破（上限 10 次），Git 禁令（禁止 `git checkout`）仍被违反。必须严格执行，不要试探上限。rework 模式 Shell 超过 10 次或执行 `git checkout` 均视为严重违规。
@@ -28,11 +28,13 @@
    - **文件路径不存在** → 任何 `ReadFile`/`StrReplaceFile` 前先用 `Shell test -f <路径>` 确认存在性（**rework 模式严禁**：rework 任务一律直接使用 ReadFile/StrReplaceFile，让错误处理捕获缺失，禁止用 Shell 做文件存在性检查）；不存在则标记「未验证（文件缺失）」并跳过，**禁止猜测替代路径**
    - **`StrReplaceFile` 目标内容不匹配** → 执行前必须先 `ReadFile` 确认当前内容，**禁止未经确认直接替换**。如果 ReadFile 后发现内容已变化，必须重新评估修复策略，禁止强行替换。每次 StrReplaceFile 前必须在 reasoning 中显式声明：「已 ReadFile 确认目标内容存在，准备替换」。
    - **Shell 命令输出过大** → 所有可能产生大量输出的命令必须使用 `| head -N` 限制（N ≤ 30）
-   - **Shell 命令不存在** → 执行前先用 `which <命令>` 或 `test -f <路径>` 确认存在性；若不存在，查 `AGENTS.md` 找正确命令，**禁止重复执行相同命令**
+   - **Shell 命令不存在** → **dev 模式**：执行前先用 `which <命令>` 或 `test -f <路径>` 确认存在性；**rework 模式**：执行前查阅 `AGENTS.md` 确认命令路径，**严禁**执行 `which` 或 `test -f`。若命令不存在，查 `AGENTS.md` 找正确命令，**禁止重复执行相同命令**
    - **Worktree 环境异常（rework 模式）** → 如果 `git status` 发现 .git 缺失、目录损坏或不在正确分支，**禁止自行修复**，立即执行 WriteFile 写 `logs/rework-halted.md` 报告环境异常并结束
    > **执行刚性要求**：以上 4 项不是可选勾选，而是必须在 reasoning 中逐条确认「已理解」。如果任何一项未确认，不得执行对应的操作。
 
-1. **确认环境**：执行 `pwd` 和 `git status`，确认你在正确的 worktree 目录、在正确的分支、没有未预期的未提交变更。如果环境异常，立即停止并报告。**rework 模式下，直接执行 `ReadFile "$AGENT_REVIEW_REPORT"` 读取 review report（让错误处理捕获文件缺失，禁止用 `Shell test -f` 做前置存在性检查）。若读取失败（文件不存在），立即停止并执行 WriteFile 写 `logs/rework-halted.md` 报告路径异常。**
+1. **确认环境**：
+   - **dev 模式**：执行 `pwd` 和 `git status`，确认你在正确的 worktree 目录、在正确的分支、没有未预期的未提交变更。如果环境异常，立即停止并报告。
+   - **rework 模式**：**禁止**执行 `git status`。如果环境变量 `AGENT_ENV_CHECK_FILE` 已设置，第 1 步先 `ReadFile "$AGENT_ENV_CHECK_FILE"` 读取 workflow 预检信息（包含 git_branch、git_status_lines、review_report_exists 等）。如果预检信息显示环境异常（如 git_status_lines 过高、关键文件缺失），立即 `WriteFile` 写 `logs/rework-halted.md` 报告环境异常并结束。然后执行 `ReadFile "$AGENT_REVIEW_REPORT"` 读取 review report（让错误处理捕获文件缺失，禁止用 `Shell test -f` 做前置存在性检查）。若读取失败（文件不存在），立即停止并执行 WriteFile 写 `logs/rework-halted.md` 报告路径异常。
 2. **确认任务边界**：
    - **rework 模式**：先读取 review report（环境变量 `AGENT_REVIEW_REPORT` 或当前目录下的 review report 文件），列出需要修复的具体问题清单（Blocking / Major / Minor）。不要猜测，不要扩大修复范围。
    - **dev 模式**：明确 issue 的核心目标是什么，用一句话概括。不要偏离目标。
@@ -166,14 +168,16 @@ AGENTS.md
 4. **进度检查点**：每 10 步自评一次"过去 10 步是否至少修改过一次文件？"如果否，停止并报告。（rework 模式为每 5 步检查一次）
 5. **探索预算**：定位修改点的阶段不得超过 10 步（dev）/ **6 步（rework）**。阅读 3 个以上文件仍未找到修改点 = 信息已足够，开始动手。
 6. **早期产出压力**：启动后 **10 步内必须完成第一个 WriteFile 或 StrReplaceFile** 代码修改。如果 10 步内仍未修改任何文件，立即停止探索，基于已有信息直接开始编码。当前统计 dev 平均 55 步且错误率 100%，早期产出的紧迫性极高。
-7. **文档存在性检查**：读取任何规范文档、源代码或设计文件前，先用 `Shell` 命令（如 `test -f <路径>` 或 `ls -la <路径>`）确认文件存在。如果文件不存在，跳过该文件并在报告中标注「未验证（文件缺失）」，不要直接执行 `ReadFile` 导致错误浪费步数。
+7. **文档存在性检查**：
+   - **dev 模式**：读取规范文档、源代码或设计文件前，先用 `Shell` 命令（如 `test -f <路径>` 或 `ls -la <路径>`）确认文件存在。如果文件不存在，跳过该文件并在报告中标注「未验证（文件缺失）」。
+   - **rework 模式**：**严禁**先用 `Shell` 确认文件存在性，一律直接使用 `ReadFile`/`StrReplaceFile`，让错误处理捕获缺失。如果返回 `file_not_found` 或 `outside the workspace`，标记「未验证（文件缺失）」并跳过，**禁止**猜测替代路径。
 8. **零修改产出处理**：确认无需修改时，显式说明并立即结束，禁止做无意义操作。
 9. **避免重复验证**：同一命令连续失败 2 次后，先修复再重试，禁止无脑重复。
 10. **命令输出限制**：可能产生大量输出的 Shell 命令必须使用 `| head -N` 限制（N ≤ 30）。
 11. **Shell 白名单与常见误用**：以下情况**禁止**使用 Shell：用 `ls`/`find` 浏览目录结构（应使用 ReadFile 读 AGENTS.md 或关键索引文件）；反复运行 `git status`/`git diff` 确认进度（应使用 todo list 自我跟踪，且 git status 全任务最多 3 次）；同一命令连续失败 2 次后未修复又重复运行；用 `cat`/`head`/`tail` 读取文件内容（应使用 ReadFile 工具）。Shell 仅允许：运行构建/测试命令、安装依赖、git add/commit/push。
 
 12. **常见错误快速诊断表（dev 模式）**：出现错误后，必须在 1 个思考轮次内完成诊断，禁止不经分析直接重试：
-    - `file_not_found` / `outside the workspace` → 立即用 `pwd` + `test -f` 确认路径，确认不存在则标记「未验证（文件缺失）」并跳过，**禁止猜测替代路径**
+    - `file_not_found` / `outside the workspace` → **dev 模式**：立即用 `pwd` + `test -f` 确认路径；**rework 模式**：直接用 `pwd` 确认当前目录，**严禁**执行 `test -f`，确认不存在则标记「未验证（文件缺失）」并跳过，**禁止猜测替代路径**
     - `StrReplaceFile` 返回 `old string not found` → 立即 `ReadFile` 确认当前内容，修正后重试 1 次；仍失败则改用 `WriteFile` 重写或报告人类
     - `Shell` 返回 `command not found` → 查 `AGENTS.md` 确认正确命令路径，**禁止重复执行相同命令**
     - `Shell` 超时 → **禁止用相同参数重试**，记录并跳过验证
@@ -198,9 +202,9 @@ AGENTS.md
    - **第 4 步强制开始修复**：读完 review report 并完成 `logs/rework-start.txt` 后，第 4 步**必须**是 ReadFile 待修复文件或 WriteFile/StrReplaceFile 执行修复。禁止在第 4 步之后继续阅读其他文档、执行 grep/find 探索、或调用 Think 分析。如果 report 中问题位置明确，直接读取文件并修改；如果位置不明确，立即 WriteFile 报告"review report 路径不明确"并结束。
    - **错误计数显式自报（rework 模式）**：每次工具调用返回 `is_error=true` 后，必须在 reasoning 中显式输出 `错误计数: X/2`。当 X=1 时，进入「只读/收尾模式」：仅允许 ReadFile、WriteFile、`git add`/`git commit`/`git push`。**严禁**新的 Shell 探索、Think、未经确认的 StrReplaceFile 尝试；当 X=2 时，**立即停止所有操作**，下一个且唯一的 tool call 必须是 WriteFile 写入 `logs/rework-halted.md` 报告错误熔断原因，然后结束任务。
    - **常见错误 SOP（按错误类型执行，禁止跳过诊断步骤）**：
-     - **路径类错误**（文件不存在、outside workspace）→ 立即用 `pwd` 和 `test -f` 确认当前目录和文件状态。如果文件确实不存在，标记为"未验证"并跳过，**不要猜测替代路径**。
+     - **路径类错误**（文件不存在、outside workspace）→ 立即用 `pwd` 确认当前目录。如果路径来自 review report 且明显位于 workspace 内，直接用 `ReadFile` 读取让错误处理捕获缺失；如果路径是绝对路径或来源不明，标记为"未验证"并跳过，**不要猜测替代路径**。rework 模式下**严禁**执行 `test -f`。
      - **`StrReplaceFile` 失败** → 立即 `ReadFile` 确认内容，修正后再替换；连续 2 次失败改用 `WriteFile` 或报告人类。
-     - **`Shell` 返回 `command not found`** → 查 `AGENTS.md`，确认路径，不要重复执行。**执行任何命令前先用 `which <命令>` 或 `test -f <路径>` 确认存在性**。
+     - **`Shell` 返回 `command not found`** → 查 `AGENTS.md`，确认路径，不要重复执行。**dev 模式下执行任何命令前先用 `which <命令>` 或 `test -f <路径>` 确认存在性；rework 模式下严禁此操作**。
      - **`Shell` 超时或返回非零** → **禁止用相同参数重试**。先分析输出：如果是超时，记录并跳过验证；如果是命令错误，阅读错误信息并修正参数。
      - **`git commit` hook 失败** → 阅读错误并修复；同一错误重复 2 次未通过，停止并报告。
    - **Workspace 边界**：使用工具时若路径来自 review report，先确认位于当前工作目录内。若返回 `outside the workspace`，严禁使用，标记为"未验证"。

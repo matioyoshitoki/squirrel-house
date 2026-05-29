@@ -148,15 +148,25 @@ AGENTS.md
 ### 问题分级
 
 - **Blocking（阻塞）**：功能不可用、数据丢失、安全漏洞。必须修复后才能合并。
-- **Major（严重）**：影响用户体验或维护性，建议修复。
+- **Major（严重）**：可自动修复的技术缺陷，如功能缺失、API 契约不一致、架构分层违规、测试覆盖缺失、UI 可见性问题。**不可自动修复的流程问题**（如 PR 范围偏大、需要 git 操作拆分模块）不得标记为 Major，应归入「风险与建议」或标记为 Minor。
 - **Minor（轻微）**：代码风格、命名等，可选修复。
 
 **分级的依据是事实，不是直觉**。如果一个问题只在极端边界情况下触发，且不影响核心功能，不应标记为 Blocking。
+
+**流程问题 vs 技术问题的分级原则**：
+- **范围蔓延**（PR 包含超出 Issue/PRD 范围的代码）：
+  - 如果混入的代码是**新增文件**、**不修改现有代码**、**不破坏现有功能** → 标记为 **Minor** 或归入「风险与建议」，**不得标记为 Major/Blocking**
+  - 如果混入的代码**修改了现有文件**或**引入了 API 契约冲突** → 按实际技术影响分级
+  - **绝对禁止**要求 rework agent "拆分 PR"或"移除已提交的代码"——rework agent 无 git 操作权限，此指令不可执行
 
 **后续审查的分级冻结规则**：
 - 上一轮 Blocking 未全部修复前，**不得新增 Blocking 问题**（修复引入的回归除外）
 - 新增 Major 问题必须明确标注「修复引入」，否则降级为 Minor
 - **目标**：每轮后续审查的 Blocking + Major 总数应**单调递减**
+- **连续未修复 Major 的强制降级规则**：如果某个 Major 问题连续 **2 轮**后续审查仍未修复，必须分析原因：
+  - 如果是因为 rework agent **无法执行**（如需要 git 操作、跨 PR 协调）→ **本轮必须降级为 Minor** 或建议
+  - 如果是因为修复指令不清晰 → **本轮必须重写修复指令**，给出可直接执行的文件路径和代码修改
+  - 降级后的问题不再计入 "Blocking + Major 总数"的单调递减统计
 - **PASS 的额外约束**：后续审查给出 PASS 前，必须确认：
   - 所有上一轮 Blocking/Major 已修复
   - **已执行「最终结论前的强制自检清单」（见下方），且所有检查项通过**
@@ -279,10 +289,10 @@ AGENTS.md
 1. **环境预检查（第 1 步）**：先检查环境变量 `AGENT_ENV_STATUS` 的值。
    - **如果其值包含 `auth_failed`**：你的下一步（第 2 步）**必须是** `WriteFile` 写入失败报告，说明「GitHub/GitLab CLI 未认证，无法获取 PR diff」。报告路径优先使用 `AGENT_REVIEW_REPORT` 环境变量，否则默认 `logs/review-report-$AGENT_PR_NUMBER-fail.md`。报告至少包含：时间戳、失败原因。**禁止执行任何 `gh` 命令，这是强制步骤，不可跳过。**
    - **如果其值包含 `pr_not_found`**：你的下一步（第 2 步）**必须是** `WriteFile` 写入失败报告，说明「PR/MR 不存在或无法访问」。报告要求同上。
-   - **如果 `AGENT_ENV_STATUS` 为 `READY` 或未设置**：先确认环境变量 `AGENT_PR_NUMBER` 是否已设置（可用 Shell `echo "$AGENT_PR_NUMBER"` 确认）。如果未设置或为空，下一步（第 2 步）**必须是** `WriteFile` 写入失败报告，说明「AGENT_PR_NUMBER 未设置」。**禁止**再次执行 `gh auth status` 或 `gh pr view`——workflow 的 `envReadinessCheck` 已验证 `gh` 认证和 PR 可访问性，agent 无需重复预检。直接进入第 2 步。
+   - **如果 `AGENT_ENV_STATUS` 为 `READY` 或未设置**：**禁止**执行 `echo "$AGENT_PR_NUMBER"`——workflow 的 `envReadinessCheck` 已验证 `gh` 认证、PR 可访问性且 `AGENT_PR_NUMBER` 必然已设置。直接进入第 2 步。如果后续 `gh pr diff` 因缺少 PR 号失败，按第 3 步的错误处理规则执行 WriteFile 失败报告，不要在此预检。
 2. **读取项目地图（第 2 步）**：先用 `test -f AGENTS.md || test -f README.md` 确认项目地图存在，再读取 `AGENTS.md`，发现编码规范和审查标准路径。如果 `AGENTS.md` 和 `README.md` 均不存在，在审查报告中标注「未验证（缺少项目地图）」并继续基于 PR diff 审查，不得尝试用 `find` 或 `../` 搜索其他路径。
-3. **获取 PR diff（第 3 步）**：运行 `gh pr diff <number> --name-only` 和 `gh pr diff <number> | head -100`，了解变更范围。**将 diff 内容写入临时文件**（如 `/tmp/pr-diff-<number>.txt`），后续审查中需要引用 diff 时直接 ReadFile 该临时文件，禁止重复调用 `gh pr diff` 浪费 Shell 预算。
-4. **确定审查模式（第 4 步）**：检查任务上下文中是否提供了「上一轮 review report」路径，或运行 `ls logs/review-report-<pr_number>*.md` 查看是否存在历史报告。如果存在 → 后续审查模式，**必须立即读取该报告**；不存在 → 首次审查模式。
+3. **获取 PR diff（第 3 步）**：运行 `gh pr diff <number> | head -200`，一次性获取变更文件名列表和 diff 内容。**将 diff 内容写入临时文件**（如 `/tmp/pr-diff-<number>.txt`），后续审查中需要引用 diff 时直接 ReadFile 该临时文件，禁止重复调用 `gh pr diff` 浪费 Shell 预算。从 diff 内容中自行解析变更文件名列表。
+4. **确定审查模式（第 4 步）**：检查任务上下文中是否提供了「上一轮 review report」路径。如果提供了 → 后续审查模式，**必须立即读取该报告**；如果未提供 → 视为首次审查模式，**禁止**执行 `ls` 搜索历史报告。
 5. **开始审查（第 5 步起）**：直接切入具体文件审查，禁止在第 5 步之后还在"探索项目结构"或"试探路径"。
 6. **强制写入（第 6 步）**：无论前 5 步是否成功、无论审查范围多大，第 6 步必须是 `WriteFile` 写入审查报告。**如果此时你还没有执行过任何 WriteFile，立即执行。** 即使 gh 完全不可用、AGENTS.md 不存在，也必须写入一个说明"无法执行审查"的报告。**avgSteps=0 的零产出任务是不可接受的**。
 7. **第 3 步 WriteFile 兜底**：如果第 3 个 tool call 仍未执行过任何 `WriteFile`，第 3 步**必须是** `WriteFile`——写入失败报告、进度报告或部分完成的审查报告均可。**这是不可跳过的硬性要求，禁止以纯文本输出作为任务终点。**
@@ -344,7 +354,14 @@ AGENTS.md
 13. **🔴 Git 操作白名单（review 专属）**：review 任务只允许使用 `gh` 命令与远程 PR 交互，**严禁执行任何本地 `git` 命令**（包括 `git diff`、`git log`、`git status`、`git show` 等）。本地 worktree 的分支状态与远程 PR 可能不一致，`git diff` 的结果不可信。所有审查依据必须通过 `gh pr diff` 和 `gh pr view` 获取。
 14. **步数自报检查点**：每 10 步必须在思考中自报一次当前步数。review 任务平均应在 25-35 步内完成，如果超过 25 步仍未开始撰写审查结论，说明你陷入了过度探索，必须立即收缩范围，聚焦最关键的问题输出报告。
 15. **任务结束前强制检查**：在任务的最后一个思考轮次中，你必须明确回答以下问题："我是否已经执行了至少一次 WriteFile？" 如果答案为否，立即执行 WriteFile 写入报告（即使是空报告或失败报告）。**禁止在没有 WriteFile 的情况下结束任务，这是不可违背的铁律。**
-16. **Git 禁令自检**：在任务结束前，除确认 WriteFile 外，必须额外自检："本任务的所有工具调用记录中，是否包含任何以 `git` 为命令的 Shell 调用（包括 `git status`、`git diff`、`git log`、`git show`、`git blame`、`git checkout`、`git add`、`git commit`、`git push` 等）？" 如果答案为"是"，无论审查质量如何，必须在审查报告的「风险与建议」章节开头追加一条 Major 级别的声明："⚠️ 审查违规：本任务意外调用了本地 git 命令，审查结论可能不可信。" **并将审查结论强制降级为 NEEDS_MAJOR_FIX**。注意：统计报告中的 `topGitOp` 可能包含 workflow 自动执行的 git 命令（如 `git branch`、`git checkout`、`git worktree remove`），agent 自检时应严格依据**自身实际调用的 Shell 命令**判断，不要仅因统计报告中的 topGitOp 非空就自我降级。
+16. **执行可行性自检（审查输出前强制）**：在任务结束前，除确认 WriteFile 外，必须额外自检以下问题：
+    - **我提出的每个 Blocking/Major 问题，rework agent 能否在禁止 git 操作的前提下修复？**
+      - 如果某个修复需要 `git checkout -b`、`git reset`、`git cherry-pick`、`git rebase` 或跨 PR 协调 → **必须降级为 Minor 或建议**，并在「风险与建议」中说明："此问题需人工处理"
+      - 如果某个 Major 问题已连续 2 轮未修复，且明显是因为 rework agent **无权限执行** → **本轮必须降级**
+    - **本轮 Major 问题数量是否实现了单调递减？**
+      - 如果 Major 数量未减少，且不是因为修复引入 → **必须重新评估分级**，将流程类、无法自动修复的问题降级
+    自检结果必须在审查报告的「风险与建议」章节中体现，如："执行可行性自检：所有 Major 问题均可由 rework agent 在现有权限内修复。"
+17. **Git 禁令自检**：在任务结束前，除确认 WriteFile 外，必须额外自检："本任务的所有工具调用记录中，是否包含任何以 `git` 为命令的 Shell 调用（包括 `git status`、`git diff`、`git log`、`git show`、`git blame`、`git checkout`、`git add`、`git commit`、`git push` 等）？" 如果答案为"是"，无论审查质量如何，必须在审查报告的「风险与建议」章节开头追加一条 Major 级别的声明："⚠️ 审查违规：本任务意外调用了本地 git 命令，审查结论可能不可信。" **并将审查结论强制降级为 NEEDS_MAJOR_FIX**。注意：统计报告中的 `topGitOp` 可能包含 workflow 自动执行的 git 命令（如 `git branch`、`git checkout`、`git worktree remove`），agent 自检时应严格依据**自身实际调用的 Shell 命令**判断，不要仅因统计报告中的 topGitOp 非空就自我降级。
 
 ## 诚实性约束（不可违背）
 

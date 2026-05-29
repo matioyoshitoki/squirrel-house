@@ -89,13 +89,17 @@ steps:
       AGENTS_EXISTS=$([ -f 'AGENTS.md' ] && echo 'true' || echo 'false')
       MAKEFILE_EXISTS=$([ -f 'Makefile' ] && echo 'true' || echo 'false')
       MISSING_VAL=$([ "$MISSING" -eq 1 ] && echo 'true' || echo 'false')
+      GIT_BRANCH=$(git branch --show-current 2>/dev/null || echo 'unknown')
+      GIT_STATUS_LINES=$(git status --porcelain 2>/dev/null | wc -l | tr -d ' ')
       echo '{
         "env_check_time": "'$(date -Iseconds)'",
         "review_report_exists": '$REVIEW_EXISTS',
         "review_report_path": "{{ .Vars.reviewReportPath }}",
         "agents_md_exists": '$AGENTS_EXISTS',
         "makefile_exists": '$MAKEFILE_EXISTS',
-        "missing_critical": '$MISSING_VAL'
+        "missing_critical": '$MISSING_VAL',
+        "git_branch": "'$GIT_BRANCH'",
+        "git_status_lines": '$GIT_STATUS_LINES'
       }' > logs/rework-env-check.json
 
       if [ "$MISSING" -eq 1 ]; then
