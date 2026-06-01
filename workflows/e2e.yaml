@@ -25,10 +25,9 @@ steps:
         echo "✅ maestro: $(maestro --version | head -1)"
       fi
 
-      # Docker daemon 预检
+      # Docker daemon 预检（前端项目可选）
       if ! docker info >/dev/null 2>&1; then
-        echo "❌ Docker daemon 未运行"
-        ENV_READY=false
+        echo "⚠️ Docker daemon 未运行（前端 E2E 可选）"
       else
         echo "✅ Docker daemon 运行中"
       fi
@@ -61,27 +60,15 @@ steps:
       if [ "$ENV_READY" = "true" ]; then
         adb shell settings put global anr_show_dialog 0 2>/dev/null || true
         echo "ENV_READY=true" > .e2e-env-status
+        echo "MAESTRO_VERSION=$(maestro --version | head -1)" >> .e2e-env-status
+        echo "ADB_DEVICES=$(adb devices | grep 'emulator-' | grep 'device' | head -1)" >> .e2e-env-status
         echo "✅ E2E 环境就绪"
       else
         echo "ENV_READY=false" > .e2e-env-status
+        echo "MAESTRO_VERSION=unknown" >> .e2e-env-status
+        echo "ADB_DEVICES=none" >> .e2e-env-status
         echo "⚠️ E2E 环境未就绪，agent 将生成环境不可用报告"
       fi
-
-  - id: checkBackendPorts
-    label: 检查后端端口状态
-    type: shell
-    logFile: '{{ .Vars.logFileName }}'
-    command: |
-      echo "=== 后端服务端口检查 ==="
-      for port in 3306 6379; do
-        if lsof -Pi :$port -sTCP:LISTEN -t >/dev/null 2>&1; then
-          echo "⚠️ 端口 $port 已被占用（可能由其他任务使用，请勿强制关闭）"
-        else
-          echo "✅ 端口 $port 空闲"
-        fi
-      done
-      echo "提示：如果后端服务未运行，agent 需要自行决定启动策略"
-    ignoreError: true
 
   - id: ensureReportDir
     label: 创建报告目录

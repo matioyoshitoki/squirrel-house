@@ -619,7 +619,7 @@ func (gl *gitlabPlatform) ListOpenIssues() ([]Issue, error) {
 }
 
 func (gl *gitlabPlatform) ViewIssue(iid int) (*Issue, error) {
-	output, err := gl.run("issue", "view", strconv.Itoa(iid), "-O", "json")
+	output, err := gl.run("issue", "view", strconv.Itoa(iid), "-F", "json")
 	if err != nil {
 		return nil, fmt.Errorf("view issue %d: %w, output: %s", iid, err, string(output))
 	}

@@ -139,7 +139,7 @@ maestro test --debug-output="$DEBUG_DIR" --flatten-debug-output flows/auth/login
 1. **步数预算**：总步数不得超过 50 步。超过时必须停止当前测试，直接生成报告说明已测试 flow、失败原因和阻塞点。
 2. **重试预算**：同一 flow 因同一原因（同一断言失败、同一崩溃、同一 selector 找不到）失败后，修复并重试不得超过 2 次。超过则标记为"需人工介入"，继续测试其他 flow，不允许死循环。
 3. **强制 WriteFile 检查点（前置）**：**任务开始后的第 1 步必须调用 WriteFile** 创建报告文件框架（至少包含标题、时间戳和"状态：进行中"）。不是第 10 步，而是第 1 步。统计报告显示 e2e 平均仅 5.5 步即停止且零产出——这说明 agent 在尚未到达第 10 步时就已失败退出。只有先把报告文件创建在磁盘上，后续无论发生任何错误，都至少有文件修改产出。如果第 3 步仍未创建报告文件，立即停止所有操作并创建。
-4. **累计错误熔断**：任意工具调用（ReadFile、Shell、WriteFile 等）累计返回错误达到 **2 次**，必须立即停止所有测试操作，调用 WriteFile 更新报告为"因错误熔断终止"状态，然后结束任务。e2e-tester.md 此前完全没有错误处理指引，导致 agent 在工具失败后直接退出而不生成报告。
+4. **累计错误熔断**：执行测试流程（第 8 步起）中，任意工具调用（ReadFile、Shell、WriteFile 等）累计返回错误达到 **2 次**，必须立即停止所有测试操作，调用 WriteFile 更新报告为"因错误熔断终止"状态，然后结束任务。**例外**：第 7 步读取 `.e2e-env-status` 时返回 file_not_found 不计入熔断，应直接视为环境未就绪并跳至第 13 步。禁止通过重复执行环境检查命令来"验证"环境状态，这会浪费 Shell 预算并产生无意义的错误。
 
 ## 执行步骤
 
@@ -153,7 +153,9 @@ maestro test --debug-output="$DEBUG_DIR" --flatten-debug-output flows/auth/login
    - 对比 PRD 需求和已有 flow，列出缺失的用户旅程
    - 如果缺少 flow → **编写新的 `.maestro/flows/*.yaml`**
 6. **修复 includes 格式**：确保所有 includes 文件有 `appId` 和 `---`
-7. **前置环境断言**：在执行测试前，先读取 `.e2e-env-status` 文件（如果存在）了解 workflow 层面的环境就绪状态。然后运行 `maestro --version` 和 `adb devices` 确认环境就绪。如果 `.e2e-env-status` 显示 `ENV_READY=false`，或任一命令失败，或模拟器未连接，**直接跳至第 13 步完成环境不可用报告**，不允许反复尝试启动环境或盲跑测试。
+7. **前置环境断言**：在执行测试前，先读取 `.e2e-env-status` 文件了解 workflow 层面的环境就绪状态。
+   - 如果文件显示 `ENV_READY=true`：**直接信任 workflow 预检结果，不再执行 `maestro --version` 或 `adb devices`**，直接进入第 8 步执行测试。`.e2e-env-status` 中的 `MAESTRO_VERSION` 和 `ADB_DEVICES` 字段供报告引用，无需再次执行命令获取。
+   - 如果文件显示 `ENV_READY=false`，或文件不存在：这是唯一需要判断的条件——**直接跳至第 13 步完成环境不可用报告**。禁止自行尝试启动模拟器、安装 maestro 或执行任何环境修复命令。
 8. **执行 Maestro 测试**：`cd .maestro && maestro test ...`
 9. **分析结果**：
    - 全部通过 → 直接生成报告

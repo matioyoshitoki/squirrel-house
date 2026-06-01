@@ -1,435 +1,122 @@
-2026/05/29 09:54:22 📁 项目根目录: .
-2026/05/29 09:54:22 📋 已加载配置文件: configs/dashboard.json
-2026/05/29 09:54:22 📍 已恢复上次选择的项目: type-one
-2026/05/29 09:54:22 ✅ 已加载 9 个 CTX 模板
-2026/05/29 09:54:22 🔍 开始重建任务状态 [type-one]...
-2026/05/29 09:54:22 📝 已从 state/tasks.json 恢复 1 个任务状态
-2026/05/29 09:54:22 ✅ 任务状态重建完成，当前 1 个任务
-2026/05/29 09:54:22 🚀 Agent Dashboard 启动于 http://localhost:9090
-2026/05/29 09:54:22 [platform] 项目 /Users/turiseek/Desktop/type-one 使用平台: gitlab
-2026/05/29 10:02:35 [workflow] tmux new-session: session=nwops-review-10 dir=/var/folders/rc/0r3lm52x5ygf9n0crw1hb01w0000gn/T/review-pr-10-1404681777 cmdLen=1701
-2026/05/29 10:09:31 [workflow] runCleanups: 2 steps
-2026/05/29 10:09:31 [workflow] runCleanups: running step cleanupWorktree
-2026/05/29 10:09:31 [workflow] runCleanups: running step restoreBranch
-2026/05/29 10:09:31 📄 PR #10 Review 报告来自 workflow state (readReport 步骤)
-2026/05/29 10:09:31 📄 PR #10 Review 报告已保存到历史文件: /Users/turiseek/Desktop/squirrel-house/logs/type-one/review-report-10-20260529-100931.md
-2026/05/29 10:09:31 Review 任务结束: PR #10, 结果: needs_fix, 错误: <nil>
-2026/05/29 10:09:36 ℹ️ PR/MR #10 更新最新评论失败，尝试新建
-2026/05/29 10:09:43 ⚠️ 添加 PR/MR 评论失败: comment MR 10: exit status 1, output: POST https://gitlab-office.tanchat.live/api/v4/projects/reskin-framework/type-one/merge_requests/10/notes: 403 {error: insufficient_scope}, {error_description: The request requires higher privileges than provided by the access token.}, {scope: ai_workflows api read_api}
-
-2026/05/29 10:09:43 [hook] PR #10 Review 未通过，将自动触发 Rework
-2026/05/29 10:09:43 [hook] 触发 review-10 → rework (vars keys=[])
-2026/05/29 10:09:43 [hook] PR #10 将自动触发 Rework (来源: review)
-2026/05/29 10:09:43 [prompt-evolution] type-one: 计数 3/5, 上次分析 2562047h47m0s 前, 暂不触发
-2026/05/29 10:09:46 [getIssueClassification] 获取 Issue #6 失败: view issue 6: exit status 1, output: unknown shorthand flag: 'O' in -O
-
-Usage:  glab issue view <id> [flags]
-
-Flags:
-  -c, --comments        Show issue comments and activities
-  -F, --output string   Format output as: text, json (default "text")
-  -p, --page int        Page number (default 1)
-  -P, --per-page int    Number of items to list per page (default 20)
-  -s, --system-logs     Show system activities / logs
-  -w, --web             Open issue in a browser. Uses default browser or browser specified in BROWSER variable
-  
-
-2026/05/29 10:09:49 [rework] 添加返工评论失败: comment MR 10: exit status 1, output: POST https://gitlab-office.tanchat.live/api/v4/projects/reskin-framework/type-one/merge_requests/10/notes: 403 {error: insufficient_scope}, {error_description: The request requires higher privileges than provided by the access token.}, {scope: ai_workflows api read_api}
-
-2026/05/29 10:09:54 [rework] 添加 needs-work 标签失败: add label to MR 10: exit status 1, output: - Updating merge request !10
-PUT https://gitlab-office.tanchat.live/api/v4/projects/reskin-framework/type-one/merge_requests/10: 403 {error: insufficient_scope}, {error_description: The request requires higher privileges than provided by the access token.}, {scope: mcp mcp ai_workflows api read_api}
-
-2026/05/29 10:09:59 [workflow] tmux new-session: session=nwops-rework-10 dir=/var/folders/rc/0r3lm52x5ygf9n0crw1hb01w0000gn/T/rework-pr-10-3590891841 cmdLen=94
-2026/05/29 10:19:30 [workflow] runCleanups: 2 steps
-2026/05/29 10:19:30 [workflow] runCleanups: running step ensureCommitAndPush
-2026/05/29 10:19:37 [workflow] runCleanups: running step cleanupWorktree
-2026/05/29 10:19:39 [hook] Rework 成功，将自动触发 PR #10 Review
-2026/05/29 10:19:39 [hook] 触发 rework-10 → review (vars keys=[])
-2026/05/29 10:19:39 ✅ PR #10 的 review 状态已重置（返工完成，需重新 Review），历史 review report 已保留
-2026/05/29 10:19:40 [hook] E2E 任务 e2e-10 结束，将自动触发 PR #10 Review
-2026/05/29 10:19:42 ⚠️ 添加 PR/MR 评论失败: comment MR 10: exit status 1, output: POST https://gitlab-office.tanchat.live/api/v4/projects/reskin-framework/type-one/merge_requests/10/notes: 403 {error: insufficient_scope}, {error_description: The request requires higher privileges than provided by the access token.}, {scope: ai_workflows api read_api}
-
-2026/05/29 10:19:42 [prompt-evolution] type-one: 计数 4/5, 上次分析 2562047h47m0s 前, 暂不触发
-2026/05/29 10:19:58 [workflow] tmux new-session: session=nwops-review-10 dir=/var/folders/rc/0r3lm52x5ygf9n0crw1hb01w0000gn/T/review-pr-10-4063682498 cmdLen=1963
-2026/05/29 10:28:14 [workflow] runCleanups: 2 steps
-2026/05/29 10:28:14 [workflow] runCleanups: running step cleanupWorktree
-2026/05/29 10:28:14 [workflow] runCleanups: running step restoreBranch
-2026/05/29 10:28:14 📄 PR #10 Review 报告来自 workflow state (readReport 步骤)
-2026/05/29 10:28:14 📄 PR #10 Review 报告已保存到历史文件: /Users/turiseek/Desktop/squirrel-house/logs/type-one/review-report-10-20260529-102814.md
-2026/05/29 10:28:14 Review 任务结束: PR #10, 结果: needs_fix, 错误: <nil>
-2026/05/29 10:28:15 ℹ️ PR/MR #10 更新最新评论失败，尝试新建
-2026/05/29 10:28:17 ⚠️ 添加 PR/MR 评论失败: comment MR 10: exit status 1, output: POST https://gitlab-office.tanchat.live/api/v4/projects/reskin-framework/type-one/merge_requests/10/notes: 403 {error: insufficient_scope}, {error_description: The request requires higher privileges than provided by the access token.}, {scope: ai_workflows api read_api}
-
-2026/05/29 10:28:17 [hook] PR #10 Review 未通过，将自动触发 Rework
-2026/05/29 10:28:17 [hook] 触发 review-10 → rework (vars keys=[])
-2026/05/29 10:28:17 [hook] PR #10 将自动触发 Rework (来源: review)
-2026/05/29 10:28:17 [prompt-evolution] type-one: 触发分析 (计数 5, 间隔 2562047h47m0s)
-2026/05/29 10:28:17 [prompt-evolution] type-one: 报告已生成 /Users/turiseek/Desktop/squirrel-house/logs/type-one/prompt-evolution-report-20260529-102817.json, 分析了 5 个日志
-2026/05/29 10:28:17 [prompt-evolution] 任务 #1780021697 启动
-2026/05/29 10:28:17 [workflow] tmux new-session: session=nwops-prompt-evolution-1780021697 dir=/Users/turiseek/Desktop/squirrel-house cmdLen=783
-2026/05/29 10:28:19 [getIssueClassification] 获取 Issue #6 失败: view issue 6: exit status 1, output: unknown shorthand flag: 'O' in -O
-
-Usage:  glab issue view <id> [flags]
-
-Flags:
-  -c, --comments        Show issue comments and activities
-  -F, --output string   Format output as: text, json (default "text")
-  -p, --page int        Page number (default 1)
-  -P, --per-page int    Number of items to list per page (default 20)
-  -s, --system-logs     Show system activities / logs
-  -w, --web             Open issue in a browser. Uses default browser or browser specified in BROWSER variable
-  
-
-2026/05/29 10:28:20 [rework] 添加返工评论失败: comment MR 10: exit status 1, output: POST https://gitlab-office.tanchat.live/api/v4/projects/reskin-framework/type-one/merge_requests/10/notes: 403 {error: insufficient_scope}, {error_description: The request requires higher privileges than provided by the access token.}, {scope: ai_workflows api read_api}
-
-2026/05/29 10:28:23 [rework] 添加 needs-work 标签失败: add label to MR 10: exit status 1, output: - Updating merge request !10
-PUT https://gitlab-office.tanchat.live/api/v4/projects/reskin-framework/type-one/merge_requests/10: 403 {error: insufficient_scope}, {error_description: The request requires higher privileges than provided by the access token.}, {scope: mcp mcp ai_workflows api read_api}
-
-2026/05/29 10:28:27 [workflow] tmux new-session: session=nwops-rework-10 dir=/var/folders/rc/0r3lm52x5ygf9n0crw1hb01w0000gn/T/rework-pr-10-2790252722 cmdLen=94
-2026/05/29 10:34:45 [workflow] runCleanups: 1 steps
-2026/05/29 10:34:45 [workflow] runCleanups: running step commitChanges
-2026/05/29 10:34:49 [prompt-evolution] 任务 #1780021697 结束: success
-2026/05/29 10:34:49 [prompt-evolution] type-one: 计数 1/5, 上次分析 7m0s 前, 暂不触发
-2026/05/29 10:35:09 [workflow] runCleanups: 2 steps
-2026/05/29 10:35:09 [workflow] runCleanups: running step ensureCommitAndPush
-2026/05/29 10:35:10 [workflow] runCleanups: running step cleanupWorktree
-2026/05/29 10:35:11 [hook] Rework 成功，将自动触发 PR #10 Review
-2026/05/29 10:35:11 [hook] 触发 rework-10 → review (vars keys=[])
-2026/05/29 10:35:11 ✅ PR #10 的 review 状态已重置（返工完成，需重新 Review），历史 review report 已保留
-2026/05/29 10:35:11 [hook] E2E 任务 e2e-10 结束，将自动触发 PR #10 Review
-2026/05/29 10:35:12 ⚠️ 添加 PR/MR 评论失败: comment MR 10: exit status 1, output: POST https://gitlab-office.tanchat.live/api/v4/projects/reskin-framework/type-one/merge_requests/10/notes: 403 {error: insufficient_scope}, {error_description: The request requires higher privileges than provided by the access token.}, {scope: ai_workflows api read_api}
-
-2026/05/29 10:35:12 [prompt-evolution] type-one: 计数 2/5, 上次分析 7m0s 前, 暂不触发
-2026/05/29 10:35:28 [workflow] tmux new-session: session=nwops-review-10 dir=/var/folders/rc/0r3lm52x5ygf9n0crw1hb01w0000gn/T/review-pr-10-3874159576 cmdLen=1963
-2026/05/29 10:39:52 [workflow] runCleanups: 2 steps
-2026/05/29 10:39:52 [workflow] runCleanups: running step cleanupWorktree
-2026/05/29 10:39:52 [workflow] runCleanups: running step restoreBranch
-2026/05/29 10:39:52 📄 PR #10 Review 报告来自 workflow state (readReport 步骤)
-2026/05/29 10:39:52 📄 PR #10 Review 报告已保存到历史文件: /Users/turiseek/Desktop/squirrel-house/logs/type-one/review-report-10-20260529-103952.md
-2026/05/29 10:39:52 Review 任务结束: PR #10, 结果: needs_fix, 错误: <nil>
-2026/05/29 10:39:53 ℹ️ PR/MR #10 更新最新评论失败，尝试新建
-2026/05/29 10:39:54 ⚠️ 添加 PR/MR 评论失败: comment MR 10: exit status 1, output: POST https://gitlab-office.tanchat.live/api/v4/projects/reskin-framework/type-one/merge_requests/10/notes: 403 {error: insufficient_scope}, {error_description: The request requires higher privileges than provided by the access token.}, {scope: ai_workflows api read_api}
-
-2026/05/29 10:39:54 [hook] PR #10 Review 未通过，将自动触发 Rework
-2026/05/29 10:39:54 [hook] 触发 review-10 → rework (vars keys=[])
-2026/05/29 10:39:54 [hook] PR #10 将自动触发 Rework (来源: review)
-2026/05/29 10:39:54 [prompt-evolution] type-one: 计数 3/5, 上次分析 12m0s 前, 暂不触发
-2026/05/29 10:39:55 [getIssueClassification] 获取 Issue #6 失败: view issue 6: exit status 1, output: unknown shorthand flag: 'O' in -O
-
-Usage:  glab issue view <id> [flags]
-
-Flags:
-  -c, --comments        Show issue comments and activities
-  -F, --output string   Format output as: text, json (default "text")
-  -p, --page int        Page number (default 1)
-  -P, --per-page int    Number of items to list per page (default 20)
-  -s, --system-logs     Show system activities / logs
-  -w, --web             Open issue in a browser. Uses default browser or browser specified in BROWSER variable
-  
-
-2026/05/29 10:39:56 [rework] 添加返工评论失败: comment MR 10: exit status 1, output: POST https://gitlab-office.tanchat.live/api/v4/projects/reskin-framework/type-one/merge_requests/10/notes: 403 {error: insufficient_scope}, {error_description: The request requires higher privileges than provided by the access token.}, {scope: ai_workflows api read_api}
-
-2026/05/29 10:39:57 [rework] 添加 needs-work 标签失败: add label to MR 10: exit status 1, output: - Updating merge request !10
-PUT https://gitlab-office.tanchat.live/api/v4/projects/reskin-framework/type-one/merge_requests/10: 403 {error: insufficient_scope}, {error_description: The request requires higher privileges than provided by the access token.}, {scope: mcp mcp ai_workflows api read_api}
-
-2026/05/29 10:40:00 [workflow] tmux new-session: session=nwops-rework-10 dir=/var/folders/rc/0r3lm52x5ygf9n0crw1hb01w0000gn/T/rework-pr-10-94203570 cmdLen=94
-2026/05/29 10:46:02 [workflow] runCleanups: 2 steps
-2026/05/29 10:46:02 [workflow] runCleanups: running step ensureCommitAndPush
-2026/05/29 10:46:04 [workflow] runCleanups: running step cleanupWorktree
-2026/05/29 10:46:05 [hook] Rework 成功，将自动触发 PR #10 Review
-2026/05/29 10:46:05 [hook] 触发 rework-10 → review (vars keys=[])
-2026/05/29 10:46:05 ✅ PR #10 的 review 状态已重置（返工完成，需重新 Review），历史 review report 已保留
-2026/05/29 10:46:05 [hook] E2E 任务 e2e-10 结束，将自动触发 PR #10 Review
-2026/05/29 10:46:07 ⚠️ 添加 PR/MR 评论失败: comment MR 10: exit status 1, output: POST https://gitlab-office.tanchat.live/api/v4/projects/reskin-framework/type-one/merge_requests/10/notes: 403 {error: insufficient_scope}, {error_description: The request requires higher privileges than provided by the access token.}, {scope: ai_workflows api read_api}
-
-2026/05/29 10:46:07 [prompt-evolution] type-one: 计数 4/5, 上次分析 18m0s 前, 暂不触发
-2026/05/29 10:46:22 [workflow] tmux new-session: session=nwops-review-10 dir=/var/folders/rc/0r3lm52x5ygf9n0crw1hb01w0000gn/T/review-pr-10-3264046407 cmdLen=1963
-2026/05/29 10:51:44 [workflow] runCleanups: 2 steps
-2026/05/29 10:51:44 [workflow] runCleanups: running step cleanupWorktree
-2026/05/29 10:51:44 [workflow] runCleanups: running step restoreBranch
-2026/05/29 10:51:44 📄 PR #10 Review 报告来自 workflow state (readReport 步骤)
-2026/05/29 10:51:44 📄 PR #10 Review 报告已保存到历史文件: /Users/turiseek/Desktop/squirrel-house/logs/type-one/review-report-10-20260529-105144.md
-2026/05/29 10:51:44 Review 任务结束: PR #10, 结果: needs_fix, 错误: <nil>
-2026/05/29 10:51:45 ℹ️ PR/MR #10 更新最新评论失败，尝试新建
-2026/05/29 10:51:47 ⚠️ 添加 PR/MR 评论失败: comment MR 10: exit status 1, output: POST https://gitlab-office.tanchat.live/api/v4/projects/reskin-framework/type-one/merge_requests/10/notes: 403 {error: insufficient_scope}, {error_description: The request requires higher privileges than provided by the access token.}, {scope: ai_workflows api read_api}
-
-2026/05/29 10:51:47 [hook] PR #10 Review 未通过，将自动触发 Rework
-2026/05/29 10:51:47 [hook] 触发 review-10 → rework (vars keys=[])
-2026/05/29 10:51:47 [hook] PR #10 将自动触发 Rework (来源: review)
-2026/05/29 10:51:47 [prompt-evolution] type-one: 计数 5/5, 上次分析 23m0s 前, 暂不触发
-2026/05/29 10:51:48 [getIssueClassification] 获取 Issue #6 失败: view issue 6: exit status 1, output: unknown shorthand flag: 'O' in -O
-
-Usage:  glab issue view <id> [flags]
-
-Flags:
-  -c, --comments        Show issue comments and activities
-  -F, --output string   Format output as: text, json (default "text")
-  -p, --page int        Page number (default 1)
-  -P, --per-page int    Number of items to list per page (default 20)
-  -s, --system-logs     Show system activities / logs
-  -w, --web             Open issue in a browser. Uses default browser or browser specified in BROWSER variable
-  
-
-2026/05/29 10:51:50 [rework] 添加返工评论失败: comment MR 10: exit status 1, output: POST https://gitlab-office.tanchat.live/api/v4/projects/reskin-framework/type-one/merge_requests/10/notes: 403 {error: insufficient_scope}, {error_description: The request requires higher privileges than provided by the access token.}, {scope: ai_workflows api read_api}
-
-2026/05/29 10:51:53 [rework] 添加 needs-work 标签失败: add label to MR 10: exit status 1, output: - Updating merge request !10
-PUT https://gitlab-office.tanchat.live/api/v4/projects/reskin-framework/type-one/merge_requests/10: 403 {error: insufficient_scope}, {error_description: The request requires higher privileges than provided by the access token.}, {scope: mcp mcp ai_workflows api read_api}
-
-2026/05/29 10:51:55 [workflow] tmux new-session: session=nwops-rework-10 dir=/var/folders/rc/0r3lm52x5ygf9n0crw1hb01w0000gn/T/rework-pr-10-2845950327 cmdLen=94
-2026/05/29 11:00:06 [workflow] runCleanups: 2 steps
-2026/05/29 11:00:06 [workflow] runCleanups: running step ensureCommitAndPush
-2026/05/29 11:00:08 [workflow] runCleanups: running step cleanupWorktree
-2026/05/29 11:00:09 [hook] Rework 成功，将自动触发 PR #10 Review
-2026/05/29 11:00:09 [hook] 触发 rework-10 → review (vars keys=[])
-2026/05/29 11:00:09 ✅ PR #10 的 review 状态已重置（返工完成，需重新 Review），历史 review report 已保留
-2026/05/29 11:00:10 [hook] E2E 任务 e2e-10 结束，将自动触发 PR #10 Review
-2026/05/29 11:00:10 ⚠️ 添加 PR/MR 评论失败: comment MR 10: exit status 1, output: POST https://gitlab-office.tanchat.live/api/v4/projects/reskin-framework/type-one/merge_requests/10/notes: 403 {error: insufficient_scope}, {error_description: The request requires higher privileges than provided by the access token.}, {scope: ai_workflows api read_api}
-
-2026/05/29 11:00:10 [prompt-evolution] type-one: 计数 6/5, 上次分析 32m0s 前, 暂不触发
-2026/05/29 11:00:26 [workflow] tmux new-session: session=nwops-review-10 dir=/var/folders/rc/0r3lm52x5ygf9n0crw1hb01w0000gn/T/review-pr-10-437164167 cmdLen=1958
-2026/05/29 11:07:22 [workflow] runCleanups: 2 steps
-2026/05/29 11:07:22 [workflow] runCleanups: running step cleanupWorktree
-2026/05/29 11:07:23 [workflow] runCleanups: running step restoreBranch
-2026/05/29 11:07:23 📄 PR #10 Review 报告来自 workflow state (readReport 步骤)
-2026/05/29 11:07:23 📄 PR #10 Review 报告已保存到历史文件: /Users/turiseek/Desktop/squirrel-house/logs/type-one/review-report-10-20260529-110723.md
-2026/05/29 11:07:23 Review 任务结束: PR #10, 结果: needs_fix, 错误: <nil>
-2026/05/29 11:07:24 ℹ️ PR/MR #10 更新最新评论失败，尝试新建
-2026/05/29 11:07:24 ⚠️ 添加 PR/MR 评论失败: comment MR 10: exit status 1, output: POST https://gitlab-office.tanchat.live/api/v4/projects/reskin-framework/type-one/merge_requests/10/notes: 403 {error: insufficient_scope}, {error_description: The request requires higher privileges than provided by the access token.}, {scope: ai_workflows api read_api}
-
-2026/05/29 11:07:24 [hook] PR #10 Review 未通过，将自动触发 Rework
-2026/05/29 11:07:24 [hook] 触发 review-10 → rework (vars keys=[])
-2026/05/29 11:07:24 [hook] PR #10 将自动触发 Rework (来源: review)
-2026/05/29 11:07:24 [prompt-evolution] type-one: 计数 7/5, 上次分析 39m0s 前, 暂不触发
-2026/05/29 11:07:25 [getIssueClassification] 获取 Issue #6 失败: view issue 6: exit status 1, output: unknown shorthand flag: 'O' in -O
-
-Usage:  glab issue view <id> [flags]
-
-Flags:
-  -c, --comments        Show issue comments and activities
-  -F, --output string   Format output as: text, json (default "text")
-  -p, --page int        Page number (default 1)
-  -P, --per-page int    Number of items to list per page (default 20)
-  -s, --system-logs     Show system activities / logs
-  -w, --web             Open issue in a browser. Uses default browser or browser specified in BROWSER variable
-  
-
-2026/05/29 11:07:27 [rework] 添加返工评论失败: comment MR 10: exit status 1, output: POST https://gitlab-office.tanchat.live/api/v4/projects/reskin-framework/type-one/merge_requests/10/notes: 403 {error: insufficient_scope}, {error_description: The request requires higher privileges than provided by the access token.}, {scope: ai_workflows api read_api}
-
-2026/05/29 11:07:28 [rework] 添加 needs-work 标签失败: add label to MR 10: exit status 1, output: - Updating merge request !10
-PUT https://gitlab-office.tanchat.live/api/v4/projects/reskin-framework/type-one/merge_requests/10: 403 {error: insufficient_scope}, {error_description: The request requires higher privileges than provided by the access token.}, {scope: mcp mcp ai_workflows api read_api}
-
-2026/05/29 11:07:30 [workflow] tmux new-session: session=nwops-rework-10 dir=/var/folders/rc/0r3lm52x5ygf9n0crw1hb01w0000gn/T/rework-pr-10-2775272976 cmdLen=94
-2026/05/29 11:12:34 [workflow] runCleanups: 2 steps
-2026/05/29 11:12:34 [workflow] runCleanups: running step ensureCommitAndPush
-2026/05/29 11:12:36 [workflow] runCleanups: running step cleanupWorktree
-2026/05/29 11:12:36 [hook] Rework 成功，将自动触发 PR #10 Review
-2026/05/29 11:12:36 [hook] 触发 rework-10 → review (vars keys=[])
-2026/05/29 11:12:36 ✅ PR #10 的 review 状态已重置（返工完成，需重新 Review），历史 review report 已保留
-2026/05/29 11:12:37 [hook] E2E 任务 e2e-10 结束，将自动触发 PR #10 Review
-2026/05/29 11:12:38 ⚠️ 添加 PR/MR 评论失败: comment MR 10: exit status 1, output: POST https://gitlab-office.tanchat.live/api/v4/projects/reskin-framework/type-one/merge_requests/10/notes: 403 {error: insufficient_scope}, {error_description: The request requires higher privileges than provided by the access token.}, {scope: ai_workflows api read_api}
-
-2026/05/29 11:12:38 [prompt-evolution] type-one: 计数 8/5, 上次分析 44m0s 前, 暂不触发
-2026/05/29 11:12:53 [workflow] tmux new-session: session=nwops-review-10 dir=/var/folders/rc/0r3lm52x5ygf9n0crw1hb01w0000gn/T/review-pr-10-3387655389 cmdLen=1963
-2026/05/29 11:19:17 [workflow] runCleanups: 2 steps
-2026/05/29 11:19:17 [workflow] runCleanups: running step cleanupWorktree
-2026/05/29 11:19:17 [workflow] runCleanups: running step restoreBranch
-2026/05/29 11:19:17 📄 PR #10 Review 报告来自 workflow state (readReport 步骤)
-2026/05/29 11:19:17 📄 PR #10 Review 报告已保存到历史文件: /Users/turiseek/Desktop/squirrel-house/logs/type-one/review-report-10-20260529-111917.md
-2026/05/29 11:19:17 Review 任务结束: PR #10, 结果: needs_fix, 错误: <nil>
-2026/05/29 11:19:18 ℹ️ PR/MR #10 更新最新评论失败，尝试新建
-2026/05/29 11:19:19 ⚠️ 添加 PR/MR 评论失败: comment MR 10: exit status 1, output: POST https://gitlab-office.tanchat.live/api/v4/projects/reskin-framework/type-one/merge_requests/10/notes: 403 {error: insufficient_scope}, {error_description: The request requires higher privileges than provided by the access token.}, {scope: ai_workflows api read_api}
-
-2026/05/29 11:19:19 [hook] PR #10 Review 未通过，将自动触发 Rework
-2026/05/29 11:19:19 [hook] 触发 review-10 → rework (vars keys=[])
-2026/05/29 11:19:19 [hook] PR #10 将自动触发 Rework (来源: review)
-2026/05/29 11:19:19 [prompt-evolution] type-one: 计数 9/5, 上次分析 51m0s 前, 暂不触发
-2026/05/29 11:19:20 [getIssueClassification] 获取 Issue #6 失败: view issue 6: exit status 1, output: unknown shorthand flag: 'O' in -O
-
-Usage:  glab issue view <id> [flags]
-
-Flags:
-  -c, --comments        Show issue comments and activities
-  -F, --output string   Format output as: text, json (default "text")
-  -p, --page int        Page number (default 1)
-  -P, --per-page int    Number of items to list per page (default 20)
-  -s, --system-logs     Show system activities / logs
-  -w, --web             Open issue in a browser. Uses default browser or browser specified in BROWSER variable
-  
-
-2026/05/29 11:19:21 [rework] 添加返工评论失败: comment MR 10: exit status 1, output: POST https://gitlab-office.tanchat.live/api/v4/projects/reskin-framework/type-one/merge_requests/10/notes: 403 {error: insufficient_scope}, {error_description: The request requires higher privileges than provided by the access token.}, {scope: ai_workflows api read_api}
-
-2026/05/29 11:19:22 [rework] 添加 needs-work 标签失败: add label to MR 10: exit status 1, output: - Updating merge request !10
-PUT https://gitlab-office.tanchat.live/api/v4/projects/reskin-framework/type-one/merge_requests/10: 403 {error: insufficient_scope}, {error_description: The request requires higher privileges than provided by the access token.}, {scope: mcp mcp ai_workflows api read_api}
-
-2026/05/29 11:19:26 [workflow] tmux new-session: session=nwops-rework-10 dir=/var/folders/rc/0r3lm52x5ygf9n0crw1hb01w0000gn/T/rework-pr-10-2577111317 cmdLen=94
-2026/05/29 11:26:22 [workflow] runCleanups: 2 steps
-2026/05/29 11:26:22 [workflow] runCleanups: running step ensureCommitAndPush
-2026/05/29 11:26:23 [workflow] runCleanups: running step cleanupWorktree
-2026/05/29 11:26:24 [hook] Rework 成功，将自动触发 PR #10 Review
-2026/05/29 11:26:24 [hook] 触发 rework-10 → review (vars keys=[])
-2026/05/29 11:26:24 ✅ PR #10 的 review 状态已重置（返工完成，需重新 Review），历史 review report 已保留
-2026/05/29 11:26:24 [hook] E2E 任务 e2e-10 结束，将自动触发 PR #10 Review
-2026/05/29 11:26:25 ⚠️ 添加 PR/MR 评论失败: comment MR 10: exit status 1, output: POST https://gitlab-office.tanchat.live/api/v4/projects/reskin-framework/type-one/merge_requests/10/notes: 403 {error: insufficient_scope}, {error_description: The request requires higher privileges than provided by the access token.}, {scope: ai_workflows api read_api}
-
-2026/05/29 11:26:25 [prompt-evolution] type-one: 计数 10/5, 上次分析 58m0s 前, 暂不触发
-2026/05/29 11:26:40 [workflow] tmux new-session: session=nwops-review-10 dir=/var/folders/rc/0r3lm52x5ygf9n0crw1hb01w0000gn/T/review-pr-10-3635062808 cmdLen=1963
-2026/05/29 11:32:12 [workflow] runCleanups: 2 steps
-2026/05/29 11:32:12 [workflow] runCleanups: running step cleanupWorktree
-2026/05/29 11:32:12 [workflow] runCleanups: running step restoreBranch
-2026/05/29 11:32:12 📄 PR #10 Review 报告来自 workflow state (readReport 步骤)
-2026/05/29 11:32:12 📄 PR #10 Review 报告已保存到历史文件: /Users/turiseek/Desktop/squirrel-house/logs/type-one/review-report-10-20260529-113212.md
-2026/05/29 11:32:12 Review 任务结束: PR #10, 结果: needs_fix, 错误: <nil>
-2026/05/29 11:32:13 ℹ️ PR/MR #10 更新最新评论失败，尝试新建
-2026/05/29 11:32:14 ⚠️ 添加 PR/MR 评论失败: comment MR 10: exit status 1, output: POST https://gitlab-office.tanchat.live/api/v4/projects/reskin-framework/type-one/merge_requests/10/notes: 403 {error: insufficient_scope}, {error_description: The request requires higher privileges than provided by the access token.}, {scope: ai_workflows api read_api}
-
-2026/05/29 11:32:14 [hook] PR #10 Review 未通过，将自动触发 Rework
-2026/05/29 11:32:14 [hook] 触发 review-10 → rework (vars keys=[])
-2026/05/29 11:32:14 [hook] PR #10 将自动触发 Rework (来源: review)
-2026/05/29 11:32:14 [prompt-evolution] type-one: 触发分析 (计数 11, 间隔 1h4m0s)
-2026/05/29 11:32:14 [prompt-evolution] type-one: 报告已生成 /Users/turiseek/Desktop/squirrel-house/logs/type-one/prompt-evolution-report-20260529-113214.json, 分析了 10 个日志
-2026/05/29 11:32:14 [prompt-evolution] 任务 #1780025534 启动
-2026/05/29 11:32:14 [workflow] tmux new-session: session=nwops-prompt-evolution-1780025534 dir=/Users/turiseek/Desktop/squirrel-house cmdLen=783
-2026/05/29 11:32:14 [getIssueClassification] 获取 Issue #6 失败: view issue 6: exit status 1, output: unknown shorthand flag: 'O' in -O
-
-Usage:  glab issue view <id> [flags]
-
-Flags:
-  -c, --comments        Show issue comments and activities
-  -F, --output string   Format output as: text, json (default "text")
-  -p, --page int        Page number (default 1)
-  -P, --per-page int    Number of items to list per page (default 20)
-  -s, --system-logs     Show system activities / logs
-  -w, --web             Open issue in a browser. Uses default browser or browser specified in BROWSER variable
-  
-
-2026/05/29 11:32:15 [rework] 添加返工评论失败: comment MR 10: exit status 1, output: POST https://gitlab-office.tanchat.live/api/v4/projects/reskin-framework/type-one/merge_requests/10/notes: 403 {error: insufficient_scope}, {error_description: The request requires higher privileges than provided by the access token.}, {scope: ai_workflows api read_api}
-
-2026/05/29 11:32:16 [rework] 添加 needs-work 标签失败: add label to MR 10: exit status 1, output: - Updating merge request !10
-PUT https://gitlab-office.tanchat.live/api/v4/projects/reskin-framework/type-one/merge_requests/10: 403 {error: insufficient_scope}, {error_description: The request requires higher privileges than provided by the access token.}, {scope: mcp mcp ai_workflows api read_api}
-
-2026/05/29 11:32:19 [workflow] tmux new-session: session=nwops-rework-10 dir=/var/folders/rc/0r3lm52x5ygf9n0crw1hb01w0000gn/T/rework-pr-10-3652203563 cmdLen=94
-2026/05/29 11:35:17 [workflow] runCleanups: 2 steps
-2026/05/29 11:35:17 [workflow] runCleanups: running step ensureCommitAndPush
-2026/05/29 11:35:18 [workflow] runCleanups: running step cleanupWorktree
-2026/05/29 11:35:19 [hook] Rework 成功，将自动触发 PR #10 Review
-2026/05/29 11:35:19 [hook] 触发 rework-10 → review (vars keys=[])
-2026/05/29 11:35:19 ✅ PR #10 的 review 状态已重置（返工完成，需重新 Review），历史 review report 已保留
-2026/05/29 11:35:19 [hook] E2E 任务 e2e-10 结束，将自动触发 PR #10 Review
-2026/05/29 11:35:20 ⚠️ 添加 PR/MR 评论失败: comment MR 10: exit status 1, output: POST https://gitlab-office.tanchat.live/api/v4/projects/reskin-framework/type-one/merge_requests/10/notes: 403 {error: insufficient_scope}, {error_description: The request requires higher privileges than provided by the access token.}, {scope: ai_workflows api read_api}
-
-2026/05/29 11:35:20 [prompt-evolution] type-one: 计数 1/5, 上次分析 3m0s 前, 暂不触发
-2026/05/29 11:35:33 [workflow] tmux new-session: session=nwops-review-10 dir=/var/folders/rc/0r3lm52x5ygf9n0crw1hb01w0000gn/T/review-pr-10-815863490 cmdLen=1958
-2026/05/29 11:39:10 [workflow] runCleanups: 2 steps
-2026/05/29 11:39:10 [workflow] runCleanups: running step cleanupWorktree
-2026/05/29 11:39:10 [workflow] runCleanups: running step restoreBranch
-2026/05/29 11:39:10 📄 PR #10 Review 报告来自 workflow state (readReport 步骤)
-2026/05/29 11:39:10 📄 PR #10 Review 报告已保存到历史文件: /Users/turiseek/Desktop/squirrel-house/logs/type-one/review-report-10-20260529-113910.md
-2026/05/29 11:39:10 Review 任务结束: PR #10, 结果: needs_fix, 错误: <nil>
-2026/05/29 11:39:11 ℹ️ PR/MR #10 更新最新评论失败，尝试新建
-2026/05/29 11:39:12 ⚠️ 添加 PR/MR 评论失败: comment MR 10: exit status 1, output: POST https://gitlab-office.tanchat.live/api/v4/projects/reskin-framework/type-one/merge_requests/10/notes: 403 {error: insufficient_scope}, {error_description: The request requires higher privileges than provided by the access token.}, {scope: ai_workflows api read_api}
-
-2026/05/29 11:39:12 [hook] PR #10 Review 未通过，将自动触发 Rework
-2026/05/29 11:39:12 [hook] 触发 review-10 → rework (vars keys=[])
-2026/05/29 11:39:12 [hook] PR #10 将自动触发 Rework (来源: review)
-2026/05/29 11:39:12 [prompt-evolution] type-one: 计数 2/5, 上次分析 7m0s 前, 暂不触发
-2026/05/29 11:39:14 [getIssueClassification] 获取 Issue #6 失败: view issue 6: exit status 1, output: unknown shorthand flag: 'O' in -O
-
-Usage:  glab issue view <id> [flags]
-
-Flags:
-  -c, --comments        Show issue comments and activities
-  -F, --output string   Format output as: text, json (default "text")
-  -p, --page int        Page number (default 1)
-  -P, --per-page int    Number of items to list per page (default 20)
-  -s, --system-logs     Show system activities / logs
-  -w, --web             Open issue in a browser. Uses default browser or browser specified in BROWSER variable
-  
-
-2026/05/29 11:39:16 [rework] 添加返工评论失败: comment MR 10: exit status 1, output: POST https://gitlab-office.tanchat.live/api/v4/projects/reskin-framework/type-one/merge_requests/10/notes: 403 {error: insufficient_scope}, {error_description: The request requires higher privileges than provided by the access token.}, {scope: ai_workflows api read_api}
-
-2026/05/29 11:39:17 [rework] 添加 needs-work 标签失败: add label to MR 10: exit status 1, output: - Updating merge request !10
-PUT https://gitlab-office.tanchat.live/api/v4/projects/reskin-framework/type-one/merge_requests/10: 403 {error: insufficient_scope}, {error_description: The request requires higher privileges than provided by the access token.}, {scope: mcp mcp ai_workflows api read_api}
-
-2026/05/29 11:39:19 [workflow] tmux new-session: session=nwops-rework-10 dir=/var/folders/rc/0r3lm52x5ygf9n0crw1hb01w0000gn/T/rework-pr-10-3457265870 cmdLen=94
-2026/05/29 11:40:52 [workflow] runCleanups: 1 steps
-2026/05/29 11:40:52 [workflow] runCleanups: running step commitChanges
-2026/05/29 11:40:55 [prompt-evolution] 任务 #1780025534 结束: success
-2026/05/29 11:40:55 [prompt-evolution] type-one: 计数 3/5, 上次分析 9m0s 前, 暂不触发
-2026/05/29 11:43:25 [workflow] runCleanups: 2 steps
-2026/05/29 11:43:25 [workflow] runCleanups: running step ensureCommitAndPush
-2026/05/29 11:43:26 [workflow] runCleanups: running step cleanupWorktree
-2026/05/29 11:43:26 [hook] Rework 成功，将自动触发 PR #10 Review
-2026/05/29 11:43:26 [hook] 触发 rework-10 → review (vars keys=[])
-2026/05/29 11:43:26 ✅ PR #10 的 review 状态已重置（返工完成，需重新 Review），历史 review report 已保留
-2026/05/29 11:43:27 [hook] E2E 任务 e2e-10 结束，将自动触发 PR #10 Review
-2026/05/29 11:43:27 ⚠️ 添加 PR/MR 评论失败: comment MR 10: exit status 1, output: POST https://gitlab-office.tanchat.live/api/v4/projects/reskin-framework/type-one/merge_requests/10/notes: 403 {error: insufficient_scope}, {error_description: The request requires higher privileges than provided by the access token.}, {scope: ai_workflows api read_api}
-
-2026/05/29 11:43:27 [prompt-evolution] type-one: 计数 4/5, 上次分析 11m0s 前, 暂不触发
-2026/05/29 11:43:41 [workflow] tmux new-session: session=nwops-review-10 dir=/var/folders/rc/0r3lm52x5ygf9n0crw1hb01w0000gn/T/review-pr-10-4291555226 cmdLen=1963
-2026/05/29 11:51:41 [workflow] runCleanups: 2 steps
-2026/05/29 11:51:41 [workflow] runCleanups: running step cleanupWorktree
-2026/05/29 11:51:41 [workflow] runCleanups: running step restoreBranch
-2026/05/29 11:51:41 📄 PR #10 Review 报告来自 workflow state (readReport 步骤)
-2026/05/29 11:51:41 📄 PR #10 Review 报告已保存到历史文件: /Users/turiseek/Desktop/squirrel-house/logs/type-one/review-report-10-20260529-115141.md
-2026/05/29 11:51:41 Review 任务结束: PR #10, 结果: needs_fix, 错误: <nil>
-2026/05/29 11:51:42 ℹ️ PR/MR #10 更新最新评论失败，尝试新建
-2026/05/29 11:51:43 ⚠️ 添加 PR/MR 评论失败: comment MR 10: exit status 1, output: POST https://gitlab-office.tanchat.live/api/v4/projects/reskin-framework/type-one/merge_requests/10/notes: 403 {error: insufficient_scope}, {error_description: The request requires higher privileges than provided by the access token.}, {scope: ai_workflows api read_api}
-
-2026/05/29 11:51:43 [hook] PR #10 Review 未通过，将自动触发 Rework
-2026/05/29 11:51:43 [hook] 触发 review-10 → rework (vars keys=[])
-2026/05/29 11:51:43 [hook] PR #10 将自动触发 Rework (来源: review)
-2026/05/29 11:51:43 [prompt-evolution] type-one: 计数 5/5, 上次分析 19m0s 前, 暂不触发
-2026/05/29 11:51:44 [getIssueClassification] 获取 Issue #6 失败: view issue 6: exit status 1, output: unknown shorthand flag: 'O' in -O
-
-Usage:  glab issue view <id> [flags]
-
-Flags:
-  -c, --comments        Show issue comments and activities
-  -F, --output string   Format output as: text, json (default "text")
-  -p, --page int        Page number (default 1)
-  -P, --per-page int    Number of items to list per page (default 20)
-  -s, --system-logs     Show system activities / logs
-  -w, --web             Open issue in a browser. Uses default browser or browser specified in BROWSER variable
-  
-
-2026/05/29 11:51:45 [rework] 添加返工评论失败: comment MR 10: exit status 1, output: POST https://gitlab-office.tanchat.live/api/v4/projects/reskin-framework/type-one/merge_requests/10/notes: 403 {error: insufficient_scope}, {error_description: The request requires higher privileges than provided by the access token.}, {scope: ai_workflows api read_api}
-
-2026/05/29 11:51:46 [rework] 添加 needs-work 标签失败: add label to MR 10: exit status 1, output: - Updating merge request !10
-PUT https://gitlab-office.tanchat.live/api/v4/projects/reskin-framework/type-one/merge_requests/10: 403 {error: insufficient_scope}, {error_description: The request requires higher privileges than provided by the access token.}, {scope: mcp mcp ai_workflows api read_api}
-
-2026/05/29 11:51:48 [workflow] tmux new-session: session=nwops-rework-10 dir=/var/folders/rc/0r3lm52x5ygf9n0crw1hb01w0000gn/T/rework-pr-10-2199521501 cmdLen=94
-2026/05/29 11:54:52 [workflow] runCleanups: 2 steps
-2026/05/29 11:54:52 [workflow] runCleanups: running step ensureCommitAndPush
-2026/05/29 11:54:53 [workflow] runCleanups: running step cleanupWorktree
-2026/05/29 11:54:54 [hook] Rework 成功，将自动触发 PR #10 Review
-2026/05/29 11:54:54 [hook] 触发 rework-10 → review (vars keys=[])
-2026/05/29 11:54:54 ✅ PR #10 的 review 状态已重置（返工完成，需重新 Review），历史 review report 已保留
-2026/05/29 11:54:54 [hook] E2E 任务 e2e-10 结束，将自动触发 PR #10 Review
-2026/05/29 11:54:55 ⚠️ 添加 PR/MR 评论失败: comment MR 10: exit status 1, output: POST https://gitlab-office.tanchat.live/api/v4/projects/reskin-framework/type-one/merge_requests/10/notes: 403 {error: insufficient_scope}, {error_description: The request requires higher privileges than provided by the access token.}, {scope: ai_workflows api read_api}
-
-2026/05/29 11:54:55 [prompt-evolution] type-one: 计数 6/5, 上次分析 23m0s 前, 暂不触发
-2026/05/29 11:55:08 [workflow] tmux new-session: session=nwops-review-10 dir=/var/folders/rc/0r3lm52x5ygf9n0crw1hb01w0000gn/T/review-pr-10-1641245927 cmdLen=1963
-2026/05/29 11:58:59 [workflow] runCleanups: 0 steps
-2026/05/29 11:58:59 Review 任务结束: PR #10, 结果: needs_fix, 错误: tmux step runAgent cancelled
-2026/05/29 11:59:00 ℹ️ PR/MR #10 更新最新评论失败，尝试新建
-2026/05/29 11:59:01 ⚠️ 添加 PR/MR 评论失败: comment MR 10: exit status 1, output: POST https://gitlab-office.tanchat.live/api/v4/projects/reskin-framework/type-one/merge_requests/10/notes: 403 {error: insufficient_scope}, {error_description: The request requires higher privileges than provided by the access token.}, {scope: ai_workflows api read_api}
-
-2026/05/29 11:59:01 [prompt-evolution] type-one: 计数 7/5, 上次分析 27m0s 前, 暂不触发
-2026/05/29 13:47:31 [workflow] tmux new-session: session=nwops-review-10 dir=/var/folders/rc/0r3lm52x5ygf9n0crw1hb01w0000gn/T/review-pr-10-4023620821 cmdLen=1963
-2026/05/29 13:52:35 [workflow] runCleanups: 2 steps
-2026/05/29 13:52:35 [workflow] runCleanups: running step cleanupWorktree
-2026/05/29 13:52:35 [workflow] runCleanups: running step restoreBranch
-2026/05/29 13:52:35 📄 PR #10 Review 报告来自 workflow state (readReport 步骤)
-2026/05/29 13:52:35 📄 PR #10 Review 报告已保存到历史文件: /Users/turiseek/Desktop/squirrel-house/logs/type-one/review-report-10-20260529-135235.md
-2026/05/29 13:52:35 Review 任务结束: PR #10, 结果: passed, 错误: <nil>
-2026/05/29 13:52:37 ℹ️ PR/MR #10 更新最新评论失败，尝试新建
-2026/05/29 13:52:38 ⚠️ 添加 PR/MR 评论失败: comment MR 10: exit status 1, output: POST https://gitlab-office.tanchat.live/api/v4/projects/reskin-framework/type-one/merge_requests/10/notes: 403 {error: insufficient_scope}, {error_description: The request requires higher privileges than provided by the access token.}, {scope: ai_workflows api read_api}
-
-2026/05/29 13:52:38 [hook] PR #10 Review 通过，无需 Rework
-2026/05/29 13:52:38 [hook] 跳过 review-10 → rework (条件不满足)
-2026/05/29 13:52:38 [prompt-evolution] type-one: 触发分析 (计数 8, 间隔 2h20m0s)
-2026/05/29 13:52:38 [prompt-evolution] type-one: 报告已生成 /Users/turiseek/Desktop/squirrel-house/logs/type-one/prompt-evolution-report-20260529-135238.json, 分析了 7 个日志
-2026/05/29 13:52:38 [prompt-evolution] 任务 #1780033958 启动
-2026/05/29 13:52:38 [workflow] tmux new-session: session=nwops-prompt-evolution-1780033958 dir=/Users/turiseek/Desktop/squirrel-house cmdLen=783
-2026/05/29 14:07:52 [workflow] runCleanups: 1 steps
-2026/05/29 14:07:52 [workflow] runCleanups: running step commitChanges
+2026/06/01 08:32:14 📁 项目根目录: .
+2026/06/01 08:32:14 📋 已加载配置文件: configs/dashboard.json
+2026/06/01 08:32:14 📍 已恢复上次选择的项目: type-one
+2026/06/01 08:32:14 ✅ 已加载 9 个 CTX 模板
+2026/06/01 08:32:14 🔍 开始重建任务状态 [type-one]...
+2026/06/01 08:32:14 📝 已从 state/tasks.json 恢复 6 个任务状态
+2026/06/01 08:32:14 📝 跳过过期的 Review Report: PR #10
+2026/06/01 08:32:14 ✅ 任务状态重建完成，当前 6 个任务
+2026/06/01 08:32:14 🚀 Agent Dashboard 启动于 http://localhost:9090
+2026/06/01 08:36:27 [platform] 项目 /Users/turiseek/Desktop/type-one 使用平台: gitlab
+2026/06/01 08:51:36 📡 收到 terminated，优雅关闭...
+2026/06/01 08:51:46 ⚠️ 优雅关闭失败: context deadline exceeded
+2026/06/01 08:51:51 ✅ 所有 running 任务已完成，旧进程准备退出
+2026/06/01 08:51:51 👋 进程退出
+2026-06-01 08:52:37 +08:00: 2026/06/01 08:52:37 📁 项目根目录: .
+2026-06-01 08:52:37 +08:00: 2026/06/01 08:52:37 📁 项目根目录: .
+2026-06-01 08:52:37 +08:00: 2026/06/01 08:52:37 📋 已加载配置文件: configs/dashboard.json
+2026-06-01 08:52:37 +08:00: 2026/06/01 08:52:37 📍 已恢复上次选择的项目: type-one
+2026-06-01 08:52:37 +08:00: 2026/06/01 08:52:37 📋 已加载配置文件: configs/dashboard.json
+2026-06-01 08:52:37 +08:00: 2026/06/01 08:52:37 📍 已恢复上次选择的项目: type-one
+2026-06-01 08:52:37 +08:00: 2026/06/01 08:52:37 ✅ 已加载 9 个 CTX 模板
+2026-06-01 08:52:37 +08:00: 2026/06/01 08:52:37 ✅ 已加载 9 个 CTX 模板
+2026-06-01 08:52:37 +08:00: 2026/06/01 08:52:37 🔍 开始重建任务状态 [type-one]...
+2026-06-01 08:52:37 +08:00: 2026/06/01 08:52:37 🔍 开始重建任务状态 [type-one]...
+2026-06-01 08:52:37 +08:00: 2026/06/01 08:52:37 📝 已从 state/tasks.json 恢复 6 个任务状态
+2026-06-01 08:52:37 +08:00: 2026/06/01 08:52:37 📝 已从 state/tasks.json 恢复 6 个任务状态
+2026-06-01 08:52:37 +08:00: 2026/06/01 08:52:37 📝 跳过过期的 Review Report: PR #10
+2026-06-01 08:52:37 +08:00: 2026/06/01 08:52:37 ✅ 任务状态重建完成，当前 6 个任务
+2026-06-01 08:52:37 +08:00: 2026/06/01 08:52:37 📝 跳过过期的 Review Report: PR #10
+2026-06-01 08:52:37 +08:00: 2026/06/01 08:52:37 ✅ 任务状态重建完成，当前 6 个任务
+2026-06-01 08:52:37 +08:00: 2026/06/01 08:52:37 🚀 Agent Dashboard 启动于 http://localhost:9090
+2026-06-01 08:52:37 +08:00: 2026/06/01 08:52:37 🚀 Agent Dashboard 启动于 http://localhost:9090
+2026-06-01 08:52:45 +08:00: 2026/06/01 08:52:45 [platform] 项目 /Users/turiseek/Desktop/type-one 使用平台: gitlab
+2026-06-01 08:52:45 +08:00: 2026/06/01 08:52:45 [platform] 项目 /Users/turiseek/Desktop/type-one 使用平台: gitlab
+2026-06-01 09:00:35 +08:00: 2026/06/01 09:00:35 [e2e] E2E 任务已启动: e2e-8
+2026-06-01 09:00:35 +08:00: 2026/06/01 09:00:35 E2E 任务启动: e2e-8
+2026-06-01 09:00:35 +08:00: 2026/06/01 09:00:35 [e2e] E2E 任务已启动: e2e-8
+2026-06-01 09:00:35 +08:00: 2026/06/01 09:00:35 E2E 任务启动: e2e-8
+2026-06-01 09:00:56 +08:00: 2026/06/01 09:00:56 [workflow] tmux new-session: session=nwops-e2e-8 dir=/Users/turiseek/Desktop/type-one cmdLen=90
+2026-06-01 09:00:56 +08:00: 2026/06/01 09:00:56 [workflow] tmux step runE2EAgent start failed: exec: "tmux": executable file not found in $PATH, stderr: 
+2026-06-01 09:00:56 +08:00: 2026/06/01 09:00:56 [workflow] tmux new-session: session=nwops-e2e-8 dir=/Users/turiseek/Desktop/type-one cmdLen=90
+2026-06-01 09:00:56 +08:00: 2026/06/01 09:00:56 [workflow] tmux step runE2EAgent start failed: exec: "tmux": executable file not found in $PATH, stderr: 
+2026-06-01 09:00:56 +08:00: 2026/06/01 09:00:56 [workflow] runCleanups: 0 steps
+2026-06-01 09:00:56 +08:00: 2026/06/01 09:00:56 [workflow] runCleanups: 0 steps
+2026-06-01 09:00:56 +08:00: 2026/06/01 09:00:56 E2E 任务结束: e2e-8, 状态: failed
+2026-06-01 09:00:56 +08:00: 2026/06/01 09:00:56 E2E 任务结束: e2e-8, 状态: failed
+2026-06-01 09:00:56 +08:00: 2026/06/01 09:00:56 [e2e] 报告已生成: /Users/turiseek/Desktop/squirrel-house/logs/type-one/e2e-report-8.md
+2026-06-01 09:00:56 +08:00: 2026/06/01 09:00:56 [e2e] 报告已生成: /Users/turiseek/Desktop/squirrel-house/logs/type-one/e2e-report-8.md
+2026-06-01 09:00:56 +08:00: 2026/06/01 09:00:56 [prompt-evolution] type-one: 计数 3/5, 上次分析 67h8m0s 前, 暂不触发
+2026-06-01 09:00:56 +08:00: 2026/06/01 09:00:56 [prompt-evolution] type-one: 计数 3/5, 上次分析 67h8m0s 前, 暂不触发
+2026-06-01 09:02:51 +08:00: 2026/06/01 09:02:51 📡 收到 interrupt，优雅关闭...
+2026-06-01 09:02:51 +08:00: 2026/06/01 09:02:51 📡 收到 interrupt，优雅关闭...
+2026-06-01 09:02:53 +08:00: 2026/06/01 09:02:53 📁 项目根目录: .
+2026-06-01 09:02:53 +08:00: 2026/06/01 09:02:53 📁 项目根目录: .
+2026-06-01 09:02:53 +08:00: 2026/06/01 09:02:53 📋 已加载配置文件: configs/dashboard.json
+2026-06-01 09:02:53 +08:00: 2026/06/01 09:02:53 📋 已加载配置文件: configs/dashboard.json
+2026-06-01 09:02:53 +08:00: 2026/06/01 09:02:53 📍 已恢复上次选择的项目: type-one
+2026-06-01 09:02:53 +08:00: 2026/06/01 09:02:53 📍 已恢复上次选择的项目: type-one
+2026-06-01 09:02:53 +08:00: 2026/06/01 09:02:53 ✅ 已加载 9 个 CTX 模板
+2026-06-01 09:02:53 +08:00: 2026/06/01 09:02:53 ✅ 已加载 9 个 CTX 模板
+2026-06-01 09:02:53 +08:00: 2026/06/01 09:02:53 🔍 开始重建任务状态 [type-one]...
+2026-06-01 09:02:53 +08:00: 2026/06/01 09:02:53 🔍 开始重建任务状态 [type-one]...
+2026-06-01 09:02:53 +08:00: 2026/06/01 09:02:53 📝 已从 state/tasks.json 恢复 6 个任务状态
+2026-06-01 09:02:53 +08:00: 2026/06/01 09:02:53 📝 已从 state/tasks.json 恢复 6 个任务状态
+2026-06-01 09:02:53 +08:00: 2026/06/01 09:02:53 📝 跳过过期的 Review Report: PR #10
+2026-06-01 09:02:53 +08:00: 2026/06/01 09:02:53 📝 跳过过期的 Review Report: PR #10
+2026-06-01 09:02:53 +08:00: 2026/06/01 09:02:53 ✅ 任务状态重建完成，当前 6 个任务
+2026-06-01 09:02:53 +08:00: 2026/06/01 09:02:53 ✅ 任务状态重建完成，当前 6 个任务
+2026-06-01 09:02:53 +08:00: 2026/06/01 09:02:53 🚀 Agent Dashboard 启动于 http://localhost:9090
+2026-06-01 09:02:53 +08:00: 2026/06/01 09:02:53 🚀 Agent Dashboard 启动于 http://localhost:9090
+2026-06-01 09:02:54 +08:00: 2026/06/01 09:02:54 [platform] 项目 /Users/turiseek/Desktop/type-one 使用平台: gitlab
+2026-06-01 09:02:54 +08:00: 2026/06/01 09:02:54 [platform] 项目 /Users/turiseek/Desktop/type-one 使用平台: gitlab
+2026-06-01 09:13:31 +08:00: 2026/06/01 09:13:31 [e2e] E2E 任务已启动: e2e-8
+2026-06-01 09:13:31 +08:00: 2026/06/01 09:13:31 [e2e] E2E 任务已启动: e2e-8
+2026-06-01 09:13:31 +08:00: 2026/06/01 09:13:31 E2E 任务启动: e2e-8
+2026-06-01 09:13:31 +08:00: 2026/06/01 09:13:31 E2E 任务启动: e2e-8
+2026-06-01 09:13:40 +08:00: 2026/06/01 09:13:40 [workflow] tmux new-session: session=nwops-e2e-8 dir=/Users/turiseek/Desktop/type-one cmdLen=90
+2026-06-01 09:13:40 +08:00: 2026/06/01 09:13:40 [workflow] tmux new-session: session=nwops-e2e-8 dir=/Users/turiseek/Desktop/type-one cmdLen=90
+2026-06-01 09:18:52 +08:00: 2026/06/01 09:18:52 [workflow] runCleanups: 1 steps
+2026-06-01 09:18:52 +08:00: 2026/06/01 09:18:52 [workflow] runCleanups: running step collectArtifacts
+2026-06-01 09:18:52 +08:00: 2026/06/01 09:18:52 [workflow] runCleanups: 1 steps
+2026-06-01 09:18:52 +08:00: 2026/06/01 09:18:52 [workflow] runCleanups: running step collectArtifacts
+2026-06-01 09:18:52 +08:00: 2026/06/01 09:18:52 [e2e] 使用详细报告: /Users/turiseek/Desktop/squirrel-house/logs/type-one/e2e-report-e2e-issue-8-20260601-091331.md
+2026-06-01 09:18:52 +08:00: 2026/06/01 09:18:52 [e2e] e2e-8 报告检测到失败，将状态修正为 failed
+2026-06-01 09:18:52 +08:00: 2026/06/01 09:18:52 [e2e] 使用详细报告: /Users/turiseek/Desktop/squirrel-house/logs/type-one/e2e-report-e2e-issue-8-20260601-091331.md
+2026-06-01 09:18:52 +08:00: 2026/06/01 09:18:52 [e2e] e2e-8 报告检测到失败，将状态修正为 failed
+2026-06-01 09:18:52 +08:00: 2026/06/01 09:18:52 E2E 任务结束: e2e-8, 状态: failed
+2026-06-01 09:18:52 +08:00: 2026/06/01 09:18:52 [e2e] 使用详细报告: /Users/turiseek/Desktop/squirrel-house/logs/type-one/e2e-report-e2e-issue-8-20260601-091331.md
+2026-06-01 09:18:52 +08:00: 2026/06/01 09:18:52 E2E 任务结束: e2e-8, 状态: failed
+2026-06-01 09:18:52 +08:00: 2026/06/01 09:18:52 [e2e] 使用详细报告: /Users/turiseek/Desktop/squirrel-house/logs/type-one/e2e-report-e2e-issue-8-20260601-091331.md
+2026-06-01 09:18:52 +08:00: 2026/06/01 09:18:52 [prompt-evolution] type-one: 计数 4/5, 上次分析 67h26m0s 前, 暂不触发
+2026-06-01 09:18:52 +08:00: 2026/06/01 09:18:52 [prompt-evolution] type-one: 计数 4/5, 上次分析 67h26m0s 前, 暂不触发
+2026-06-01 09:55:49 +08:00: 2026/06/01 09:55:49 [e2e] E2E 任务已启动: e2e-8
+2026-06-01 09:55:49 +08:00: 2026/06/01 09:55:49 [e2e] E2E 任务已启动: e2e-8
+2026-06-01 09:55:49 +08:00: 2026/06/01 09:55:49 E2E 任务启动: e2e-8
+2026-06-01 09:55:49 +08:00: 2026/06/01 09:55:49 E2E 任务启动: e2e-8
+2026-06-01 09:56:00 +08:00: 2026/06/01 09:56:00 [workflow] tmux new-session: session=nwops-e2e-8 dir=/Users/turiseek/Desktop/type-one cmdLen=90
+2026-06-01 09:56:00 +08:00: 2026/06/01 09:56:00 [workflow] tmux new-session: session=nwops-e2e-8 dir=/Users/turiseek/Desktop/type-one cmdLen=90
+2026-06-01 10:00:38 +08:00: 2026/06/01 10:00:38 [workflow] runCleanups: 1 steps
+2026-06-01 10:00:38 +08:00: 2026/06/01 10:00:38 [workflow] runCleanups: running step collectArtifacts
+2026-06-01 10:00:38 +08:00: 2026/06/01 10:00:38 [workflow] runCleanups: 1 steps
+2026-06-01 10:00:38 +08:00: 2026/06/01 10:00:38 [workflow] runCleanups: running step collectArtifacts
+2026-06-01 10:00:38 +08:00: 2026/06/01 10:00:38 [workflow] runCleanups: step collectArtifacts failed: shell step collectArtifacts failed: exit status 1, output: === 收集 E2E 产物 ===
+2026-06-01 10:00:38 +08:00: ❌ agent 未生成报告文件，执行兜底生成并标记失败
+2026-06-01 10:00:38 +08:00: 2026/06/01 10:00:38 [workflow] runCleanups: step collectArtifacts failed: shell step collectArtifacts failed: exit status 1, output: === 收集 E2E 产物 ===
+2026-06-01 10:00:38 +08:00: ❌ agent 未生成报告文件，执行兜底生成并标记失败
+2026-06-01 10:00:38 +08:00: 2026/06/01 10:00:38 E2E 任务结束: e2e-8, 状态: failed
+2026-06-01 10:00:38 +08:00: 2026/06/01 10:00:38 [e2e] 使用详细报告: /Users/turiseek/Desktop/squirrel-house/logs/type-one/e2e-report-e2e-issue-8-20260601-095549.md
+2026-06-01 10:00:38 +08:00: 2026/06/01 10:00:38 E2E 任务结束: e2e-8, 状态: failed
+2026-06-01 10:00:38 +08:00: 2026/06/01 10:00:38 [e2e] 使用详细报告: /Users/turiseek/Desktop/squirrel-house/logs/type-one/e2e-report-e2e-issue-8-20260601-095549.md
+2026-06-01 10:00:38 +08:00: 2026/06/01 10:00:38 [prompt-evolution] type-one: 触发分析 (计数 5, 间隔 68h8m0s)
+2026-06-01 10:00:38 +08:00: 2026/06/01 10:00:38 [prompt-evolution] type-one: 触发分析 (计数 5, 间隔 68h8m0s)
+2026-06-01 10:00:38 +08:00: 2026/06/01 10:00:38 [prompt-evolution] type-one: 报告已生成 /Users/turiseek/Desktop/squirrel-house/logs/type-one/prompt-evolution-report-20260601-100038.json, 分析了 4 个日志
+2026-06-01 10:00:38 +08:00: 2026/06/01 10:00:38 [prompt-evolution] type-one: 报告已生成 /Users/turiseek/Desktop/squirrel-house/logs/type-one/prompt-evolution-report-20260601-100038.json, 分析了 4 个日志
+2026-06-01 10:00:38 +08:00: 2026/06/01 10:00:38 [prompt-evolution] 任务 #1780279238 启动
+2026-06-01 10:00:38 +08:00: 2026/06/01 10:00:38 [prompt-evolution] 任务 #1780279238 启动
+2026-06-01 10:00:38 +08:00: 2026/06/01 10:00:38 [workflow] tmux new-session: session=nwops-prompt-evolution-1780279238 dir=/Users/turiseek/Desktop/squirrel-house cmdLen=783
+2026-06-01 10:00:38 +08:00: 2026/06/01 10:00:38 [workflow] tmux new-session: session=nwops-prompt-evolution-1780279238 dir=/Users/turiseek/Desktop/squirrel-house cmdLen=783
+2026-06-01 10:05:28 +08:00: 2026/06/01 10:05:28 [workflow] runCleanups: 1 steps
+2026-06-01 10:05:28 +08:00: 2026/06/01 10:05:28 [workflow] runCleanups: running step commitChanges
+2026-06-01 10:05:28 +08:00: 2026/06/01 10:05:28 [workflow] runCleanups: 1 steps
+2026-06-01 10:05:28 +08:00: 2026/06/01 10:05:28 [workflow] runCleanups: running step commitChanges

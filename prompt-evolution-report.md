@@ -1,66 +1,51 @@
 # Prompt 演进报告 — type-one
 
-生成时间: 2026-05-29 13:52:38+08:00
-分析范围: 2026-05-29 11:32:14 至 2026-05-29 13:52:38
+生成时间: 2026-06-01 10:00:38+08:00
+分析范围: 2026-05-29 13:52:38 至 2026-06-01 10:00:38
 
 ## 统计摘要
 
-- 分析日志数: 7
+- 分析日志数: 4
 - Agent 类型分布:
-  - review: 4 任务，avgSteps=16.5，totalErrors=8，successRate=75%，Shell=45（11.25/任务）
-  - rework: 3 任务，avgSteps=17.33，totalErrors=1，successRate=100%，Shell=32（10.67/任务）
+  - e2e: 4 任务，avgSteps=14.25，totalErrors=9，successRate=50%，Shell=34（8.5/任务），ReadFile=25（6.25/任务）
 
 ## 问题诊断
 
-### 问题 1: review 任务错误率仍高（每任务 2 个错误），且出现 1 例零产出
-**证据**: review 4 个任务共 8 个错误（平均 2 次/任务），successRate 从上次 100% 降至 75%。topIssues 标记 `review_high_error_rate` 为 critical，`review_no_output` 为 warning。Shell 调用 45 次（11.25/任务），接近 15 次上限。
-**根因分析**: `prompts/reviewer.md` 内部存在**三处自相矛盾**，导致 agent 在"遵守禁令"和"执行建议"之间摇摆，产生不必要的错误和 Shell 浪费：
-1. **错误预判 vs 执行约束的矛盾**：第 280 条错误预判建议"读取前先用 `test -f` 确认"，但第 318 条执行约束明确"禁止先用 Shell `test -f`"——agent 可能先执行 test -f 浪费 Shell，或直接 ReadFile 触发 file_not_found 错误。
-2. **gh diff 双次调用**：第 3 步要求执行 `gh pr diff --name-only` 和 `gh pr diff | head -100` 两次调用，而 `gh pr diff` 本身已是主要错误来源（网络/认证/chunk exceed）。
-3. **第 1 步的冗余 `echo $AGENT_PR_NUMBER`**：workflow 的 `envReadinessCheck` 已验证 PR 可访问性，agent 仍被建议用 Shell echo 确认环境变量，浪费 1 次 Shell/任务。
-4. **第 4 步的 `ls` 搜索历史报告**：用 Shell `ls` 搜索历史报告消耗 1 次 Shell，且当 logs 目录不存在时会报错。
-**改进建议**:
-1. **已应用**：删除 reviewer.md 第 280 条错误预判中的"读取前先用 `test -f` 确认"，统一为"直接执行 ReadFile，若返回 file_not_found 则标记未验证并跳过，禁止先用 test -f"。消除 prompt 内部矛盾，降低 agent 困惑度。（涉及文件: `prompts/reviewer.md`）
-2. **已应用**：合并第 3 步的两次 `gh pr diff` 为单次调用 `gh pr diff <number> | head -200`，从 diff 内容中自行解析文件名列表。每个任务减少 1 次 Shell 调用和 1 个潜在错误来源。（涉及文件: `prompts/reviewer.md`）
-3. **已应用**：删除 READY 状态下"`echo $AGENT_PR_NUMBER` 确认"的冗余指令，改为"禁止执行 echo，直接进入第 2 步"；删除第 4 步的 `ls` 搜索历史报告，改为"检查上下文是否提供路径，未提供则视为首次审查，禁止执行 ls"。每个任务减少 2 次 Shell 调用。（涉及文件: `prompts/reviewer.md`）
+### 问题 1: e2e 错误率飙升至 50%，Shell 调用冗余严重
+**证据**: 
+- 4 个 e2e 任务共 9 个错误（平均 2.25 次/任务），successRate 仅 50%。
+- errorRateDelta: +0.96，successRateDelta: -0.36，趋势显著恶化。
+- Shell 调用 34 次（8.5/任务），占工具调用总量的 39%。而 workflow 的 `checkEnv` 步骤已详尽检查环境并输出 `.e2e-env-status`，agent 却仍需自行执行环境验证命令。
 
-### 问题 2: rework Shell 预算持续突破（10.67/任务 > 上限 10）
-**证据**: rework 3 个任务共 32 次 Shell（平均 10.67/任务），突破 developer.md 规定的 10 次上限。虽然 totalErrors 仅 1 个（显著改善），但 Shell 超标意味着 agent 在压缩其他操作空间，或触发隐性错误。
-**根因分析**: `prompts/developer.md` 存在**通用规则与 rework 专属规则的系统性冲突**：
-1. 通用规则第 7 条要求"读取任何文件前先用 `test -f` 确认"，但 rework 专属规则第 28 条明确"严禁用 Shell 做文件存在性检查"。
-2. 常见错误 SOP 第 201、203 条在 rework 模式下仍要求"用 `test -f` 确认路径"和"用 `which` 确认命令存在性"，与第 189 条"rework 模式下 grep/find/ls/test -f 等探索命令总计不得超过 3 次"直接冲突。
-3. 第 1 步"确认环境"要求执行 `git status`，但 rework 模式下该操作可由 workflow 预检替代。每个 rework 任务固定消耗 1 次 `git status` + 3 次 git add/commit/push + 1 次验证命令 = 5 次 Shell，剩余预算仅 5 次用于实际修复，极易触碰上限。
+**根因分析**: 
+1. **workflow 与 prompt 的职责重叠**：`workflows/e2e.yaml` 的 `checkEnv` 已执行 `adb`、`maestro`、`emulator` 检查并写入 `.e2e-env-status`，但 `prompts/e2e-tester.md` 第 7 步仍强制要求 agent 再次运行 `maestro --version` 和 `adb devices`。重复检查不仅浪费 Shell 预算（每个任务 2+ 次），还在环境已损坏时产生无意义的错误，直接消耗错误熔断配额。
+2. **workflow 存在无效步骤**：`checkBackendPorts` 检查 3306/6379（MySQL/Redis）端口，但 mobile E2E（Maestro）完全不依赖本地数据库端口，且 prompt 中从未引用该检查结果。该步骤仅增加日志噪音和 workflow 执行时间，对 agent 决策零贡献。
+3. **错误熔断机制过于粗粒度**：累计错误熔断未区分"环境预检错误"与"测试执行错误"。`maestro --version` 的 command_not_found 与 flow 断言失败被同等计数，导致 agent 可能在尚未开始实际测试时就因环境检查失败而熔断退出。
+
 **改进建议**:
-1. **已应用**：将通用规则第 7 条拆分为 dev/rework 两个独立子条款：dev 模式允许 test -f，rework 模式"严禁先用 Shell 确认文件存在性，一律直接 ReadFile/StrReplaceFile"。同时修改常见错误 SOP（第 176、201、203 条），在 rework 模式下删除 `test -f` 和 `which` 的强制要求。消除系统性冲突，预计每个 rework 任务减少 1-2 次 Shell。（涉及文件: `prompts/developer.md`）
-2. **已应用**：将 rework Shell 上限从 10 次提升至 12 次，匹配当前实际消耗（10.67/任务）并预留安全余量。（涉及文件: `prompts/developer.md`）
-3. **已应用**：将 `git status` 的启动确认下沉到 workflow：在 `workflows/rework.yaml` 的 `envReadinessCheck` 中增加 `git_branch` 和 `git_status_lines` 到 `rework-env-check.json`。在 `developer.md` 中修改 rework 启动流程：第 1 步先 `ReadFile "$AGENT_ENV_CHECK_FILE"` 读取预检信息，**禁止**执行 `git status`。预计每个 rework 任务减少 1 次 Shell。（涉及文件: `workflows/rework.yaml`、`prompts/developer.md`）
+1. **已应用**：在 `workflows/e2e.yaml` 中删除 `checkBackendPorts` 步骤，并将 `MAESTRO_VERSION`、`ADB_DEVICES` 写入 `.e2e-env-status`，使 workflow 成为环境信息的唯一权威来源。（涉及文件: `workflows/e2e.yaml`）
+2. **已应用**：修改 `prompts/e2e-tester.md` 第 7 步，明确当 `.e2e-env-status` 显示 `ENV_READY=true` 时，agent 必须直接信任 workflow 预检结果，**禁止**再次执行 `maestro --version` 或 `adb devices`；仅当 `ENV_READY=false` 或文件不存在时，直接跳至环境不可用报告。（涉及文件: `prompts/e2e-tester.md`）
+3. **已应用**：修改"累计错误熔断"条款，增加例外：第 7 步读取 `.e2e-env-status` 返回的 file_not_found 不计入熔断计数，禁止通过重复执行环境检查命令来"验证"环境状态。（涉及文件: `prompts/e2e-tester.md`）
 
 ## 已应用改进
 
-1. **`prompts/reviewer.md`** — 消除内部矛盾 + 优化 Shell 使用
-   - 删除错误预判中的 `test -f` 建议，与执行约束保持一致。
-   - 合并 `gh pr diff --name-only` + `gh pr diff` 为单次调用，减少 1 次 Shell/任务。
-   - 删除 READY 状态下的 `echo $AGENT_PR_NUMBER` 和第 4 步的 `ls` 搜索，减少 2 次 Shell/任务。
-   - 预期收益: 每个 review 任务减少 3 次 Shell 调用（从 11.25 降至约 8.25），消除 2 个高频错误来源。
+1. **`workflows/e2e.yaml`** — 消除 workflow 层无效步骤，增强环境状态传递
+   - 删除 `checkBackendPorts` 步骤（检查 3306/6379 端口），消除与 mobile E2E 无关的检查开销。
+   - 在 `checkEnv` 中把 `MAESTRO_VERSION` 和 `ADB_DEVICES` 追加写入 `.e2e-env-status`，使 agent 可直接读取而无需执行 Shell 命令。
+   - 预期收益: 每个 e2e 任务减少 2-3 次冗余 Shell 调用（从 8.5 降至约 6），消除环境检查命令失败导致的错误来源。
 
-2. **`prompts/developer.md`** — 消除 dev/rework 规则冲突 + 释放 Shell 预算
-   - 通用规则第 7 条拆分为 dev/rework 双轨制，rework 模式严禁 `test -f`/`which`。
-   - 常见错误 SOP（第 176、201、203 条）增加 dev/rework 区分，rework 模式删除 `test -f` 强制要求。
-   - rework Shell 上限从 10 提升至 12。
-   - rework 启动流程改为先读取 `AGENT_ENV_CHECK_FILE` 预检信息，跳过 `git status`。
-   - 预期收益: 每个 rework 任务减少 2-3 次 Shell 调用（从 10.67 降至约 8），消除规则冲突导致的 agent 困惑。
-
-3. **`workflows/rework.yaml`** — git 状态预检下沉
-   - 在 `envReadinessCheck` 的 JSON 输出中增加 `git_branch` 和 `git_status_lines`。
-   - 预期收益: rework agent 无需自行执行 `git status`，节省 1 次 Shell/任务。
+2. **`prompts/e2e-tester.md`** — 消除 workflow/prompt 职责重叠，优化熔断规则
+   - 第 7 步改为"条件信任"模式：`ENV_READY=true` 时直接跳过环境检查进入测试；`ENV_READY=false` 时直接生成环境不可用报告。
+   - 累计错误熔断增加"环境预检例外"，`.e2e-env-status` 的 file_not_found 不计入熔断。
+   - 预期收益: 减少因重复环境检查产生的错误（预计从 2.25 次/任务降至 <1 次/任务），提升 successRate；释放 Shell 预算用于实际测试执行。
 
 ## 趋势追踪
 
 - 与上次对比:
-  - **avgStepsDelta: -1.64** ✅ — 平均步数继续下降，说明 prompt 精简措施生效。
-  - **errorRateDelta: -0.11** ✅ — 错误率继续下降，上次修改（删除 review 冗余 gh 命令）的收益在持续释放。
-  - **successRateDelta: -0.14** ❌ — review 成功率从 100% 降至 75%，出现 1 例零产出。虽然整体趋势改善，但零产出任务是个别异常，需观察下轮是否复现。
+  - **avgStepsDelta: -2.61** ✅ — 平均步数继续下降，说明整体操作在精简。
+  - **errorRateDelta: +0.96** ❌ — 错误率大幅恶化，是本次重点关注的紧急问题。
+  - **successRateDelta: -0.36** ❌ — e2e 成功率跌至 50%，零产出风险上升。
 - 建议下次重点关注:
-  - **review 的零产出根因**：本次 1 例零产出是否与 agent 未遵守 WriteFile 强制检查点有关？需要更细粒度的错误类型分布（file_not_found / gh 失败 / chunk exceed）。
-  - **rework Shell 使用率**：本次修改后预计平均 Shell 从 10.67 降至 8-9 次/任务，需验证是否还有突破 12 次上限的任务。
-  - **reviewer.md 的 diff 获取策略**：合并 `gh pr diff` 后，chunk exceed 的风险是否增加？`head -200` 是否足够覆盖小型 PR 的完整 diff？
+  - **e2e Shell 使用率**：验证本次修改后，Shell 调用是否从 8.5/任务降至 6 次以下。
+  - **e2e 错误率回落**：观察 errorRate 是否从 2.25/任务下降，特别是 `command_not_found` 和 `adb` 相关错误是否消除。
+  - **环境不可用报告的产出率**：如果环境确实经常未就绪，需进一步检查 workflow 的 `checkEnv` 逻辑（如 AVD 启动超时、emulator 稳定性），而非让 agent 承担环境修复责任。
